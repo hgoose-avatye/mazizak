@@ -4,6 +4,8 @@ import type { InputEvt } from '../../core/runtime';
 import type { Toy, ToyContext } from '../../core/toy';
 import type { ContinuousSound } from '../../core/audio';
 import { buildSquishySounds } from '../../audio/sfx';
+import { loadSquishySamples } from '../../audio/squishySamples';
+import { param } from '../../core/params';
 import { radialShadowTexture, studioEnvironment } from '../../core/studio';
 import { settings } from '../../core/settings';
 import { numParam } from '../../core/params';
@@ -144,13 +146,43 @@ export function createSquishy(ctx: ToyContext): Toy & { setColor(id: string): vo
     return blob.worldToLocal(hit).sub(blob.worldToLocal(aw.clone()));
   }
 
-  // ----- sounds -----
-  const sfx = buildSquishySounds(ctx.audio.ctx);
-  ctx.audio.register('sq:press', sfx.press);
-  ctx.audio.register('sq:pressHard', sfx.pressHard);
-  ctx.audio.register('sq:release', sfx.release);
-  const friction: ContinuousSound = ctx.audio.createLoop(sfx.friction);
-  const stretchSnd: ContinuousSound = ctx.audio.createLoop(sfx.stretch);
+  // ----- sounds: recording-based samples (synth only if ?sfx=synth or samples fail to load) -----
+  let friction: ContinuousSound | null = null;
+  let stretchSnd: ContinuousSound | null = null;
+  let soundSource: 'samples' | 'synth' | 'loading' = 'loading';
+  const useSynth = () => {
+    const sfx = buildSquishySounds(ctx.audio.ctx);
+    ctx.audio.register('sq:touch', sfx.press);
+    ctx.audio.register('sq:compress', sfx.pressHard);
+    ctx.audio.register('sq:recover', sfx.release);
+    friction = ctx.audio.createLoop(sfx.friction);
+    stretchSnd = ctx.audio.createLoop(sfx.stretch);
+    soundSource = 'synth';
+  };
+  if (param('sfx', 'samples') === 'synth') useSynth();
+  else
+    loadSquishySamples(ctx.audio.ctx).then(
+      (s) => {
+        ctx.audio.register('sq:touch', s.touch);
+        ctx.audio.register('sq:compress', s.compress);
+        ctx.audio.register('sq:recover', s.recover);
+        friction = ctx.audio.createLoop(s.rub);
+        stretchSnd = ctx.audio.createLoop(s.stretch);
+        soundSource = 'samples';
+      },
+      (err) => {
+        console.warn('squishy samples failed, using synthesized fallback', err);
+        useSynth();
+      },
+    );
+  const compressed = new Set<number>(); // pointers whose deep-compression sound already played
+  // one recover voice at a time; cut it when the user presses again / resets / leaves
+  let recoverStop: ((fade?: number) => void) | undefined;
+  const stopRecover = () => {
+    recoverStop?.(0.12);
+    recoverStop = undefined;
+  };
+  let rubOn = false;
 
   const screenPos = new Map<number, { x: number; y: number; t: number }>();
   let dragSpeed = 0;
@@ -162,11 +194,14 @@ export function createSquishy(ctx: ToyContext): Toy & { setColor(id: string): vo
   const inputImmediate = (e: InputEvt, raw: Event) => {
     if (e.kind === 'down') {
       touchedOnce = true;
-      if (pick(e.x, e.y)) {
+      if (model.touchingCount() < 2 && pick(e.x, e.y)) {
+        // finger lands on the surface: soft contact, quieter for an additional finger
+        stopRecover();
         const busy = model.touchingCount() > 0;
-        ctx.audio.play(busy ? 'sq:pressHard' : 'sq:press', { detuneCents: 45, gainJitterDb: 1.5, gainDb: busy ? -3 : 0 }, raw.type);
+        ctx.audio.play('sq:touch', { detuneCents: soundSource === 'samples' ? 12 : 35, gainJitterDb: 1.5, gainDb: (soundSource === 'samples' ? 3 : 0) + (busy ? -4 : 0) }, raw.type);
         ctx.haptic(8);
       }
+      compressed.delete(e.id);
       screenPos.set(e.id, { x: e.x, y: e.y, t: e.t });
     } else if (e.kind === 'move') {
       const lp = screenPos.get(e.id);
@@ -177,11 +212,8 @@ export function createSquishy(ctx: ToyContext): Toy & { setColor(id: string): vo
       screenPos.set(e.id, { x: e.x, y: e.y, t: e.t });
     } else {
       screenPos.delete(e.id);
-      const c = model.contacts.find((k) => k.touching && k.pointerId === e.id);
-      if (c) {
-        const strength = Math.min(1, Math.max(0, c.depth.x) / P.holdDepth + Math.abs(model.stretch.x - 1) * 1.5);
-        if (strength > 0.05) ctx.audio.play('sq:release', { gainDb: -16 + strength * 16, detuneCents: 40, gainJitterDb: 1 }, raw.type);
-      }
+      compressed.delete(e.id);
+      void raw;
     }
   };
 
@@ -201,8 +233,27 @@ export function createSquishy(ctx: ToyContext): Toy & { setColor(id: string): vo
         const d = dragDelta(e.id, e.x, e.y);
         if (d) model.drag(e.id, d);
       } else {
-        model.release(e.id, wall);
+        const c = model.release(e.id, wall);
         anchorsWorld.delete(e.id);
+        if (c && e.id !== -77) {
+          // slow recovery whisper: starts as the dent begins to rise, length ≈ recovery
+          const strength = Math.min(1, c.depthAtRelease / P.holdDepth);
+          const heldS = c.releaseSim - c.downSim;
+          // only a real squeeze earns the slow "rising" whisper (not every quick tap)
+          if (strength > 0.5 || heldS > 0.3) {
+            stopRecover();
+            const rate = THREE.MathUtils.clamp(1.6 / Math.max(0.8, c.predicted * 0.75), 0.85, 1.12);
+            recoverStop = ctx.audio.play('sq:recover', { delaySec: c.delay * 0.6, rate, gainDb: soundSource === 'samples' ? -3 + strength * 5 : -14 + strength * 12, gainJitterDb: 1 }, 'release')?.stop;
+          }
+        }
+      }
+    }
+    // deep compression: once per press, when the finger has pushed past ~55% of max depth
+    for (const c of model.contacts) {
+      if (!c.touching || c.pointerId === -77 || compressed.has(c.pointerId)) continue;
+      if (c.depth.x > P.holdDepth * 0.55) {
+        compressed.add(c.pointerId);
+        ctx.audio.play('sq:compress', { detuneCents: soundSource === 'samples' ? 10 : 25, gainJitterDb: 1.5, gainDb: soundSource === 'samples' ? 0 : -2 }, 'hold');
       }
     }
 
@@ -241,11 +292,15 @@ export function createSquishy(ctx: ToyContext): Toy & { setColor(id: string): vo
 
     // continuous textures
     const nTouch = model.touchingCount();
-    const lvl = nTouch > 0 ? Math.min(1, Math.max(0, (dragSpeed - 60) / 900)) : 0;
-    friction.set(lvl * 0.8, Math.min(1, dragSpeed / 1500));
+    let lvl = nTouch > 0 ? Math.min(1, Math.max(0, (dragSpeed - 60) / 900)) : 0;
+    // hysteresis: start above 0.03, stop below 0.008 (no rapid on/off near threshold)
+    if (!rubOn && lvl > 0.03) rubOn = true;
+    else if (rubOn && lvl < 0.008) rubOn = false;
+    if (!rubOn) lvl = 0;
+    friction?.set(rubOn ? Math.max(lvl, 0.002) * 0.8 : 0, Math.min(1, dragSpeed / 1500));
     const stretchRate = Math.abs(model.stretch.x - lastStretch) / Math.max(dt, 1e-3);
     lastStretch = model.stretch.x;
-    stretchSnd.set(model.stretching ? Math.min(1, stretchRate * 0.9) : 0, Math.min(1, st * 1.5));
+    stretchSnd?.set(model.stretching ? Math.min(1, stretchRate * 1.2) : 0, Math.min(1, 0.4 + st * 1.5));
     dragSpeed *= 0.88;
 
     return moving || lvl > 0.001 || (!touchedOnce && demoTimer < 4.5) || model.isTouching(-77);
@@ -260,6 +315,7 @@ export function createSquishy(ctx: ToyContext): Toy & { setColor(id: string): vo
     frame,
     setColor,
     reset() {
+      stopRecover();
       model.reset();
       ctx.requestFrame();
     },
@@ -271,11 +327,12 @@ export function createSquishy(ctx: ToyContext): Toy & { setColor(id: string): vo
       ctx.requestFrame();
     },
     leave() {
+      stopRecover();
       model.reset();
       screenPos.clear();
       anchorsWorld.clear();
-      friction.set(0, 0);
-      stretchSnd.set(0, 0);
+      friction?.set(0, 0);
+      stretchSnd?.set(0, 0);
     },
     stats() {
       const last = model.releases[model.releases.length - 1];
@@ -285,10 +342,12 @@ export function createSquishy(ctx: ToyContext): Toy & { setColor(id: string): vo
           ? `hold ${round(last.holdMs, 0)}ms peak ${round(last.peakCompressionPct, 1)}% recover ${round(last.settleMsWall, 0)}ms (model ${round(last.predictedMs, 0)}) overs ${last.overshoots}`
           : '-',
         mesh: `verts ${g.getAttribute('position').count}`,
+        sound: soundSource,
       };
     },
     report() {
       return {
+        soundSource,
         params: P,
         meshVertices: g.getAttribute('position').count,
         releases: model.releases.slice(-30).map((r) => ({

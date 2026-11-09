@@ -1,7 +1,9 @@
 import * as THREE from 'three';
 import type { InputEvt } from '../../core/runtime';
 import type { Toy, ToyContext } from '../../core/toy';
-import { buildKeyboardSounds, type KeySwitchPreset } from '../../audio/sfx';
+import { buildKeyboardSounds, type KeySwitchPreset, type KeyboardSounds } from '../../audio/sfx';
+import { loadKeyboardSamples } from '../../audio/keyboardSamples';
+import { param } from '../../core/params';
 import { radialShadowTexture, studioEnvironment } from '../../core/studio';
 import { settings } from '../../core/settings';
 import { round, summarize } from '../../core/metrics';
@@ -81,14 +83,34 @@ export function createKeyboard(ctx: ToyContext): Toy & { setPreset(p: KeySwitchP
   // ----- sound -----
   let preset: KeySwitchPreset = settings.get().keyPreset;
   const loaded = new Set<KeySwitchPreset>();
-  const ensurePreset = (p: KeySwitchPreset) => {
-    if (loaded.has(p)) return;
-    const s = buildKeyboardSounds(ctx.audio.ctx, p);
+  const soundSource: Record<string, string> = {};
+  const registerSet = (p: KeySwitchPreset, s: KeyboardSounds) => {
     ctx.audio.register(`kb:${p}:down`, s.down);
     ctx.audio.register(`kb:${p}:up`, s.up);
     ctx.audio.register(`kb:${p}:spaceDown`, s.spaceDown);
     ctx.audio.register(`kb:${p}:spaceUp`, s.spaceUp);
+  };
+  // recording-based samples; synthesized set only with ?sfx=synth (A/B) or if loading fails
+  const ensurePreset = (p: KeySwitchPreset) => {
+    if (loaded.has(p)) return;
     loaded.add(p);
+    if (param('sfx', 'samples') === 'synth') {
+      registerSet(p, buildKeyboardSounds(ctx.audio.ctx, p));
+      soundSource[p] = 'synth';
+      return;
+    }
+    soundSource[p] = 'loading';
+    loadKeyboardSamples(ctx.audio.ctx, p).then(
+      (s) => {
+        registerSet(p, s);
+        soundSource[p] = 'samples';
+      },
+      (err) => {
+        console.warn(`keyboard samples (${p}) failed, using synthesized fallback`, err);
+        registerSet(p, buildKeyboardSounds(ctx.audio.ctx, p));
+        soundSource[p] = 'synth';
+      },
+    );
   };
   ensurePreset(preset);
   const keyDetune = vis.keys.map((_, i) => ((i * 37) % 31) - 15);
@@ -97,13 +119,19 @@ export function createKeyboard(ctx: ToyContext): Toy & { setPreset(p: KeySwitchP
     const now = performance.now();
     const rapid = now - lastDownAt < 85;
     lastDownAt = now;
+    heldPreset.set(k, preset);
     const name = k === SPACE ? `kb:${preset}:spaceDown` : `kb:${preset}:down`;
-    ctx.audio.play(name, { baseDetune: keyDetune[k], detuneCents: 22, gainJitterDb: 1.2, gainDb: rapid ? -2 : 0, pan: vis.keys[k].rest.x * 0.22 }, evType);
+    const makeup = soundSource[preset] === 'samples' ? 6 : 0;
+    ctx.audio.play(name, { baseDetune: keyDetune[k], detuneCents: 12, gainJitterDb: 1.2, gainDb: makeup + (rapid ? -2 : 0), pan: vis.keys[k].rest.x * 0.22 }, evType);
     ctx.haptic(6);
   };
+  const heldPreset = new Map<number, KeySwitchPreset>();
   const soundUp = (k: number, evType: string) => {
-    const name = k === SPACE ? `kb:${preset}:spaceUp` : `kb:${preset}:up`;
-    ctx.audio.play(name, { baseDetune: keyDetune[k], detuneCents: 18, gainJitterDb: 1, pan: vis.keys[k].rest.x * 0.22 }, evType);
+    const pr = heldPreset.get(k) ?? preset;
+    heldPreset.delete(k);
+    const name = k === SPACE ? `kb:${pr}:spaceUp` : `kb:${pr}:up`;
+    const makeup = soundSource[pr] === 'samples' ? 6 : 0;
+    ctx.audio.play(name, { baseDetune: keyDetune[k], detuneCents: 10, gainJitterDb: 1, gainDb: makeup, pan: vis.keys[k].rest.x * 0.22 }, evType);
   };
 
   const pressAt = (k: number, src: string, x: number, y: number, evType: string) => {
@@ -199,11 +227,12 @@ export function createKeyboard(ctx: ToyContext): Toy & { setPreset(p: KeySwitchP
     stats() {
       const recs = model.records.slice(-50);
       const down = summarize(recs.map((r) => r.downMs).filter((v): v is number => v !== null));
-      return { preset: KEY_PRESET_INFO[preset].label, held: model.downCount(), 'down→90%': `${down.p50}ms` };
+      return { preset: KEY_PRESET_INFO[preset].label, held: model.downCount(), 'down→90%': `${down.p50}ms`, sound: soundSource[preset] ?? '-' };
     },
     report() {
       return {
         preset,
+        soundSource,
         keyRecords: model.records.slice(-50).map((r) => ({ ...r, downMs: r.downMs === null ? null : round(r.downMs, 1), upSettleMs: r.upSettleMs === null ? null : round(r.upSettleMs, 1) })),
         soundPlays: ctx.audio.playLogs.slice(-30),
         keyRectsPx: rects.map((r) => ({ id: r.id, w: round(r.x1 - r.x0, 0), h: round(r.y1 - r.y0, 0), cx: round((r.x0 + r.x1) / 2, 0), cy: round((r.y0 + r.y1) / 2, 0) })),

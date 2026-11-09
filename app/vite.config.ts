@@ -11,6 +11,7 @@ export default defineConfig({
       input: {
         main: r('./index.html'),
         audio: r('./audio-test.html'),
+        labSound: r('./lab-sound.html'),
       },
     },
   },

@@ -1,0 +1,273 @@
+{
+ "version": 1,
+ "preset": "pebble",
+ "file": "pebble.wav",
+ "sampleRate": 48000,
+ "channels": 1,
+ "bitDepth": 16,
+ "totalSamples": 113489,
+ "source": "Rainy 75 (gasket, lubed linear) — freesound:815614 by Techrul, CC0",
+ "notes": "down = strongest well-separated presses; up/spaceUp = weaker transients 50–220 ms after a press (inferred top-outs); spaceDown = heaviest low-body presses (spacebar proxy, not confirmed by ear). See CREDITS.md.",
+ "sources": {
+  "freesound:815614": {
+   "title": "Typing on a rainy 75",
+   "author": "Techrul",
+   "url": "https://freesound.org/people/Techrul/sounds/815614/",
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "retrieved": "2026-11-09",
+   "file": "https://cdn.freesound.org/previews/815/815614_15899953-hq.mp3"
+  }
+ },
+ "srcTimesAre": "seconds into the decoded Freesound HQ preview (same timeline as the original upload)",
+ "entries": {
+  "down": [
+   {
+    "start": 0,
+    "length": 4768,
+    "offset": 0,
+    "duration": 0.099333,
+    "gain": 0.7125,
+    "src": "freesound:815614",
+    "srcStart": 57.8157,
+    "srcEnd": 57.915
+   },
+   {
+    "start": 5248,
+    "length": 3486,
+    "offset": 0.109333,
+    "duration": 0.072625,
+    "gain": 0.8973,
+    "src": "freesound:815614",
+    "srcStart": 15.4294,
+    "srcEnd": 15.502
+   },
+   {
+    "start": 9214,
+    "length": 4610,
+    "offset": 0.191958,
+    "duration": 0.096042,
+    "gain": 0.999,
+    "src": "freesound:815614",
+    "srcStart": 31.734,
+    "srcEnd": 31.83
+   },
+   {
+    "start": 14304,
+    "length": 4119,
+    "offset": 0.298,
+    "duration": 0.085812,
+    "gain": 0.8306,
+    "src": "freesound:815614",
+    "srcStart": 47.6392,
+    "srcEnd": 47.725
+   },
+   {
+    "start": 18903,
+    "length": 6240,
+    "offset": 0.393813,
+    "duration": 0.13,
+    "gain": 0.7774,
+    "src": "freesound:815614",
+    "srcStart": 48.3195,
+    "srcEnd": 48.4495
+   },
+   {
+    "start": 25623,
+    "length": 6240,
+    "offset": 0.533813,
+    "duration": 0.13,
+    "gain": 0.5518,
+    "src": "freesound:815614",
+    "srcStart": 1.5123,
+    "srcEnd": 1.6423
+   },
+   {
+    "start": 32343,
+    "length": 3471,
+    "offset": 0.673813,
+    "duration": 0.072313,
+    "gain": 0.7702,
+    "src": "freesound:815614",
+    "srcStart": 38.8557,
+    "srcEnd": 38.928
+   },
+   {
+    "start": 36294,
+    "length": 5538,
+    "offset": 0.756125,
+    "duration": 0.115375,
+    "gain": 0.6009,
+    "src": "freesound:815614",
+    "srcStart": 53.7026,
+    "srcEnd": 53.818
+   },
+   {
+    "start": 42312,
+    "length": 5109,
+    "offset": 0.8815,
+    "duration": 0.106438,
+    "gain": 0.8694,
+    "src": "freesound:815614",
+    "srcStart": 20.9546,
+    "srcEnd": 21.061
+   },
+   {
+    "start": 47901,
+    "length": 3608,
+    "offset": 0.997938,
+    "duration": 0.075167,
+    "gain": 0.8603,
+    "src": "freesound:815614",
+    "srcStart": 19.0648,
+    "srcEnd": 19.14
+   }
+  ],
+  "up": [
+   {
+    "start": 51989,
+    "length": 2978,
+    "offset": 1.083104,
+    "duration": 0.062042,
+    "gain": 0.3929,
+    "src": "freesound:815614",
+    "srcStart": 48.255,
+    "srcEnd": 48.317
+   },
+   {
+    "start": 55447,
+    "length": 3469,
+    "offset": 1.155146,
+    "duration": 0.072271,
+    "gain": 0.3933,
+    "src": "freesound:815614",
+    "srcStart": 11.8417,
+    "srcEnd": 11.914
+   },
+   {
+    "start": 59396,
+    "length": 2599,
+    "offset": 1.237417,
+    "duration": 0.054146,
+    "gain": 0.3863,
+    "src": "freesound:815614",
+    "srcStart": 17.3129,
+    "srcEnd": 17.367
+   },
+   {
+    "start": 62475,
+    "length": 2308,
+    "offset": 1.301562,
+    "duration": 0.048083,
+    "gain": 0.3761,
+    "src": "freesound:815614",
+    "srcStart": 49.4509,
+    "srcEnd": 49.499
+   },
+   {
+    "start": 65263,
+    "length": 2931,
+    "offset": 1.359646,
+    "duration": 0.061062,
+    "gain": 0.3462,
+    "src": "freesound:815614",
+    "srcStart": 32.3319,
+    "srcEnd": 32.393
+   },
+   {
+    "start": 68674,
+    "length": 1768,
+    "offset": 1.430708,
+    "duration": 0.036833,
+    "gain": 0.3109,
+    "src": "freesound:815614",
+    "srcStart": 17.5472,
+    "srcEnd": 17.584
+   },
+   {
+    "start": 70922,
+    "length": 2603,
+    "offset": 1.477542,
+    "duration": 0.054229,
+    "gain": 0.475,
+    "src": "freesound:815614",
+    "srcStart": 5.0848,
+    "srcEnd": 5.139
+   }
+  ],
+  "spaceDown": [
+   {
+    "start": 74005,
+    "length": 5712,
+    "offset": 1.541771,
+    "duration": 0.119,
+    "gain": 0.9915,
+    "src": "freesound:815614",
+    "srcStart": 53.2106,
+    "srcEnd": 53.3296
+   },
+   {
+    "start": 80197,
+    "length": 5790,
+    "offset": 1.670771,
+    "duration": 0.120625,
+    "gain": 1,
+    "src": "freesound:815614",
+    "srcStart": 42.9874,
+    "srcEnd": 43.108
+   },
+   {
+    "start": 86467,
+    "length": 7900,
+    "offset": 1.801396,
+    "duration": 0.164583,
+    "gain": 0.9853,
+    "src": "freesound:815614",
+    "srcStart": 34.2894,
+    "srcEnd": 34.454
+   },
+   {
+    "start": 94847,
+    "length": 5924,
+    "offset": 1.975979,
+    "duration": 0.123417,
+    "gain": 0.9975,
+    "src": "freesound:815614",
+    "srcStart": 2.7856,
+    "srcEnd": 2.909
+   }
+  ],
+  "spaceUp": [
+   {
+    "start": 101251,
+    "length": 3161,
+    "offset": 2.109396,
+    "duration": 0.065854,
+    "gain": 0.3372,
+    "src": "freesound:815614",
+    "srcStart": 38.0571,
+    "srcEnd": 38.123
+   },
+   {
+    "start": 104892,
+    "length": 2510,
+    "offset": 2.18525,
+    "duration": 0.052292,
+    "gain": 0.2659,
+    "src": "freesound:815614",
+    "srcStart": 3.6297,
+    "srcEnd": 3.682
+   },
+   {
+    "start": 107882,
+    "length": 5127,
+    "offset": 2.247542,
+    "duration": 0.106813,
+    "gain": 0.2318,
+    "src": "freesound:815614",
+    "srcStart": 5.5632,
+    "srcEnd": 5.67
+   }
+  ]
+ }
+}

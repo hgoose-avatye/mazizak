@@ -1,0 +1,86 @@
+/**
+ * Recording-based keyboard sounds (CC0 field recordings, see public/sfx/keyboard/CREDITS.md).
+ *
+ * Each preset ships as ONE 16-bit mono WAV sprite + a JSON map. We fetch both, decode once,
+ * slice every entry into its own AudioBuffer (channel data copied, map gain applied) and cache
+ * the result per (context, preset, baseUrl).
+ *
+ *   pebble — Rainy 75 (gasket-mount, lubed linear switches): low, round "thock"
+ *   clack  — WhiteFox with Hako Violet tactile switches: brighter, crisp press + clear return
+ */
+import type { KeyboardSounds, KeySwitchPreset } from './sfx';
+
+export const KEYBOARD_SAMPLE_CREDITS =
+  'Keyboard sounds cut from CC0 (public-domain) Freesound recordings: ' +
+  '"Typing on a rainy 75" by Techrul (freesound.org/s/815614) [pebble]; ' +
+  '"Keyboard Typing 4 (WhiteFox, Mechanical)" and "Keyboard Typing 10 (WhiteFox, Mechanical)" by grcekh ' +
+  '(freesound.org/s/546045, /546167) [clack].';
+
+interface SpriteEntry {
+  /** seconds into the sprite */
+  offset: number;
+  /** seconds */
+  duration: number;
+  /** linear gain to apply */
+  gain: number;
+  start?: number;
+  length?: number;
+  src?: string;
+  srcStart?: number;
+  srcEnd?: number;
+}
+interface SpriteMap {
+  version: number;
+  file: string;
+  sampleRate: number;
+  entries: Record<keyof KeyboardSounds, SpriteEntry[]>;
+}
+
+const ROLES: (keyof KeyboardSounds)[] = ['down', 'up', 'spaceDown', 'spaceUp'];
+const cache = new WeakMap<BaseAudioContext, Map<string, Promise<KeyboardSounds>>>();
+
+export function loadKeyboardSamples(
+  ctx: BaseAudioContext,
+  preset: KeySwitchPreset,
+  baseUrl = './sfx/keyboard/',
+): Promise<KeyboardSounds> {
+  const base = baseUrl.endsWith('/') ? baseUrl : baseUrl + '/';
+  let perCtx = cache.get(ctx);
+  if (!perCtx) cache.set(ctx, (perCtx = new Map()));
+  const key = `${base}${preset}`;
+  const hit = perCtx.get(key);
+  if (hit) return hit;
+  const p = load(ctx, preset, base);
+  perCtx.set(key, p);
+  p.catch(() => perCtx!.delete(key)); // allow a retry after a network error
+  return p;
+}
+
+async function load(ctx: BaseAudioContext, preset: KeySwitchPreset, base: string): Promise<KeyboardSounds> {
+  const mapRes = await fetch(`${base}${preset}.json`);
+  if (!mapRes.ok) throw new Error(`keyboard samples: ${preset}.json HTTP ${mapRes.status}`);
+  const map = (await mapRes.json()) as SpriteMap;
+  const wavRes = await fetch(`${base}${map.file}`);
+  if (!wavRes.ok) throw new Error(`keyboard samples: ${map.file} HTTP ${wavRes.status}`);
+  const sprite = await ctx.decodeAudioData(await wavRes.arrayBuffer());
+  // decodeAudioData resamples to ctx.sampleRate, so address the sprite in seconds.
+  const sr = sprite.sampleRate;
+  const src = sprite.getChannelData(0);
+  const slice = (e: SpriteEntry): AudioBuffer => {
+    const i0 = Math.max(0, Math.round(e.offset * sr));
+    const n = Math.max(1, Math.min(src.length - i0, Math.round(e.duration * sr)));
+    const buf = ctx.createBuffer(1, n, sr);
+    const out = buf.getChannelData(0);
+    const g = e.gain ?? 1;
+    for (let i = 0; i < n; i++) out[i] = src[i0 + i] * g;
+    return buf;
+  };
+  const sounds = {} as KeyboardSounds;
+  for (const r of ROLES) sounds[r] = (map.entries[r] ?? []).map(slice);
+  if (!sounds.down.length) throw new Error(`keyboard samples: ${preset} has no "down" entries`);
+  // graceful fallbacks so callers never get an empty pool
+  if (!sounds.up.length) sounds.up = sounds.down;
+  if (!sounds.spaceDown.length) sounds.spaceDown = sounds.down;
+  if (!sounds.spaceUp.length) sounds.spaceUp = sounds.up;
+  return sounds;
+}

@@ -52,8 +52,10 @@ export interface PlayLog {
    * dropped-late      — context resumed too late; sound discarded so it never plays out of sync
    * pending           — still waiting
    */
-  outcome: 'played' | 'played-after-resume' | 'dropped-late' | 'pending' | 'muted';
+  outcome: 'played' | 'played-after-resume' | 'dropped-late' | 'pending' | 'muted' | 'stopped';
   delayMs?: number;
+  /** fade out and stop this sound (or cancel it if still pending); not serialized */
+  stop?: (fadeSec?: number) => void;
 }
 
 /** A sound requested while suspended is only played if the context resumes within this window. */
@@ -88,6 +90,7 @@ interface Voice {
 
 export class AudioEngine {
   readonly ctx: AudioContext;
+  private readonly offline: boolean;
   private master: GainNode;
   private limiter: DynamicsCompressorNode;
   private bags = new Map<string, Bag>();
@@ -99,20 +102,31 @@ export class AudioEngine {
   readonly playLogs: PlayLog[] = [];
   onStateChange: (s: string) => void = () => {};
 
-  constructor(maxVoices = 20) {
+  /** `offline` lets tests render the exact engine graph with an OfflineAudioContext. */
+  constructor(maxVoices = 20, offline?: OfflineAudioContext) {
     const Ctor: typeof AudioContext = window.AudioContext ?? (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
-    this.ctx = new Ctor({ latencyHint: 'interactive' });
+    this.ctx = offline ? (offline as unknown as AudioContext) : new Ctor({ latencyHint: 'interactive' });
+    this.offline = !!offline;
     this.maxVoices = maxVoices;
     this.limiter = this.ctx.createDynamicsCompressor();
     // approximate limiter (not brick-wall)
-    this.limiter.threshold.value = -6;
+    this.limiter.threshold.value = -8;
     this.limiter.knee.value = 0;
     this.limiter.ratio.value = 20;
     this.limiter.attack.value = 0.002;
     this.limiter.release.value = 0.08;
     this.master = this.ctx.createGain();
     this.master.gain.value = 0.9;
-    this.master.connect(this.limiter).connect(this.ctx.destination);
+    // final safety: gentle tanh soft-clip so stacked spiky transients never hard-clip
+    const shaper = this.ctx.createWaveShaper();
+    const curve = new Float32Array(2048);
+    for (let i = 0; i < curve.length; i++) {
+      const x = (i / (curve.length - 1)) * 2 - 1;
+      curve[i] = Math.abs(x) < 0.7 ? x : Math.sign(x) * (0.7 + 0.29 * Math.tanh((Math.abs(x) - 0.7) / 0.29));
+    }
+    shaper.curve = curve;
+    shaper.oversample = '2x';
+    this.master.connect(this.limiter).connect(shaper).connect(this.ctx.destination);
     this.ctx.addEventListener('statechange', () => {
       if (this.ctx.state === 'running') this.flushPending();
       this.onStateChange(this.ctx.state);
@@ -186,12 +200,17 @@ export class AudioEngine {
       log.outcome = 'muted';
       return log;
     }
-    if (this.ctx.state !== 'running') {
-      this.pending.push({ log, run: () => this.start(bag, opts) });
+    if (!this.offline && this.ctx.state !== 'running') {
+      const entry = { log, run: () => this.attach(log, this.start(bag, opts)) };
+      this.pending.push(entry);
+      log.stop = () => {
+        this.pending = this.pending.filter((x) => x !== entry);
+        log.outcome = 'stopped';
+      };
       return log;
     }
     log.outcome = 'played';
-    this.start(bag, opts);
+    this.attach(log, this.start(bag, opts));
     return log;
   }
 
@@ -212,8 +231,33 @@ export class AudioEngine {
     this.pending = [];
   }
 
-  private start(bag: Bag, opts: PlayOpts): void {
+  /** recent start times (ctx clock) for density-based de-stacking */
+  private recentStarts: number[] = [];
+
+  private attach(log: PlayLog, v: Voice): void {
+    log.stop = (fadeSec = 0.12) => {
+      log.outcome = 'stopped';
+      const now = this.ctx.currentTime;
+      try {
+        v.gain.gain.cancelScheduledValues(now);
+        v.gain.gain.setTargetAtTime(0, now, fadeSec / 3);
+        v.src.stop(now + fadeSec + 0.05);
+      } catch {
+        /* already stopped */
+      }
+    };
+  }
+
+  private start(bag: Bag, opts: PlayOpts): Voice {
     this.reap();
+    // De-stack near-simultaneous one-shots (chords, multi-touch): spread by 0–6 ms and
+    // lower gain ~1/sqrt(n) so identical-instant transients don't sum into clipping.
+    const nowT = this.ctx.currentTime;
+    this.recentStarts = this.recentStarts.filter((t) => nowT - t < 0.03);
+    const n = this.recentStarts.length;
+    this.recentStarts.push(nowT);
+    const spread = n > 0 ? 0.001 + Math.random() * 0.005 : 0;
+    const densityDb = n > 0 ? -10 * Math.log10(n + 1) * 0.8 : 0;
     if (this.voices.length >= this.maxVoices) {
       const oldest = this.voices.shift()!;
       const now = this.ctx.currentTime;
@@ -227,7 +271,7 @@ export class AudioEngine {
     src.detune.value = detune;
     if (opts.rate) src.playbackRate.value = opts.rate;
     const g = this.ctx.createGain();
-    const db = (opts.gainDb ?? 0) + (opts.gainJitterDb ? (Math.random() * 2 - 1) * opts.gainJitterDb : 0);
+    const db = (opts.gainDb ?? 0) + densityDb + (opts.gainJitterDb ? (Math.random() * 2 - 1) * opts.gainJitterDb : 0);
     g.gain.value = Math.pow(10, db / 20);
     let node: AudioNode = src;
     if (opts.lowpassHz) {
@@ -244,13 +288,15 @@ export class AudioEngine {
       node = node.connect(p);
     }
     node.connect(this.master);
-    src.start(opts.delaySec ? this.ctx.currentTime + opts.delaySec : 0);
+    const when = (opts.delaySec ?? 0) + spread;
+    src.start(when > 0 ? this.ctx.currentTime + when : 0);
     const v: Voice = { src, gain: g, started: this.ctx.currentTime };
     src.onended = () => {
       const i = this.voices.indexOf(v);
       if (i >= 0) this.voices.splice(i, 1);
     };
     this.voices.push(v);
+    return v;
   }
 
   get activeVoices(): number {

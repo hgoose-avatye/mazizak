@@ -8,6 +8,8 @@ import type { Toy, ToyContext } from './core/toy';
 import { createSquishy, SQUISHY_COLORS } from './toys/squishy/toy';
 import { createKeyboard, KEY_PRESET_INFO } from './toys/keyboard/toy';
 import type { KeySwitchPreset } from './audio/sfx';
+import { loadKeyboardSamples } from './audio/keyboardSamples';
+import { loadSquishySamples } from './audio/squishySamples';
 
 const $ = <T extends HTMLElement>(sel: string) => document.querySelector(sel) as T;
 
@@ -15,6 +17,12 @@ const $ = <T extends HTMLElement>(sel: string) => document.querySelector(sel) as
 const audio = new AudioEngine(24);
 const rt = new Runtime($('#stage'));
 const stats = new StatsOverlay(rt, audio);
+// preload recorded sample sets at boot (decoding works while the context is still suspended)
+if (new URLSearchParams(location.search).get('sfx') !== 'synth') {
+  void loadKeyboardSamples(audio.ctx, 'pebble').catch(() => {});
+  void loadKeyboardSamples(audio.ctx, 'clack').catch(() => {});
+  void loadSquishySamples(audio.ctx).catch(() => {});
+}
 
 const ctx: ToyContext = {
   renderer: rt.renderer,
