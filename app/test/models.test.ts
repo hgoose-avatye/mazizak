@@ -145,6 +145,34 @@ describe('KeyboardModel', () => {
     expect(k.records.length).toBe(5);
   });
 
+  it('travel stays within [0, 1]: release never lifts the key above rest (top hard stop)', () => {
+    for (const dt of [1 / 240, 1 / 120, 1 / 60, 1 / 30]) {
+      const k = new KeyboardModel(10);
+      let min = 0;
+      let max = 0;
+      // full press → release, then a fast tap
+      k.press(0, 'p');
+      for (let t = 0; t < 0.2; t += dt) k.update(dt);
+      k.release('p');
+      for (let t = 0; t < 0.6; t += dt) {
+        k.update(dt);
+        min = Math.min(min, k.travel(0));
+      }
+      k.press(0, 'p');
+      for (let t = 0; t < 0.012; t += dt) k.update(dt);
+      k.release('p');
+      for (let t = 0; t < 0.6; t += dt) {
+        k.update(dt);
+        min = Math.min(min, k.travel(0));
+        max = Math.max(max, k.travel(0));
+      }
+      expect(min).toBeGreaterThanOrEqual(0);
+      expect(max).toBeLessThanOrEqual(1);
+      expect(Math.abs(k.travel(0))).toBeLessThan(0.01); // still returns to rest
+      expect(k.records.length).toBe(2); // settle records still produced
+    }
+  });
+
   it('hitTest picks the containing key, nearest center when margins overlap', () => {
     const rects = [
       { id: 0, x0: 0, y0: 0, x1: 100, y1: 100 },

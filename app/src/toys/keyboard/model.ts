@@ -21,6 +21,13 @@ export const DEFAULT_KB_PARAMS: KeyboardParams = {
   up: { freq: 17, damping: 0.5 },
 };
 
+/**
+ * Hard stops: a real stem is caught by the top housing at rest (travel 0) and bottoms
+ * out at full travel (1). On reaching the top the remaining upward speed rebounds
+ * downward (into the travel) by this fraction instead of overshooting above rest.
+ */
+export const TOP_RESTITUTION = 0.12;
+
 export interface KeyPressRecord {
   keyId: number;
   /** press → 90% travel (sim clock) */
@@ -106,6 +113,14 @@ export class KeyboardModel {
     let moving = false;
     this.keys.forEach((k, id) => {
       k.spring.step(dt);
+      const s = k.spring;
+      if (s.x < 0) {
+        s.x = 0;
+        if (s.v < 0) s.v = -s.v * TOP_RESTITUTION;
+      } else if (s.x > 1) {
+        s.x = 1;
+        if (s.v > 0) s.v = 0;
+      }
       if (k.holders.size > 0 && k.downMs === null && k.spring.x >= 0.9) k.downMs = (this.time - k.downAt) * 1000;
       const settled = k.spring.isSettled(0.002, 0.05);
       if (!settled) moving = true;

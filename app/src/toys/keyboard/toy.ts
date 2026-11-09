@@ -84,12 +84,17 @@ export function createKeyboard(ctx: ToyContext): Toy & { setPreset(p: KeySwitchP
   let preset: KeySwitchPreset = settings.get().keyPreset;
   const loaded = new Set<KeySwitchPreset>();
   const soundSource: Record<string, string> = {};
+  /** presets whose sounds are registered, most recently ready last */
+  const ready: KeySwitchPreset[] = [];
   const registerSet = (p: KeySwitchPreset, s: KeyboardSounds) => {
     ctx.audio.register(`kb:${p}:down`, s.down);
     ctx.audio.register(`kb:${p}:up`, s.up);
     ctx.audio.register(`kb:${p}:spaceDown`, s.spaceDown);
     ctx.audio.register(`kb:${p}:spaceUp`, s.spaceUp);
+    if (!ready.includes(p)) ready.push(p);
   };
+  /** While a just-selected preset is still loading, keep sounding the last ready one instead of going silent. */
+  const audible = (p: KeySwitchPreset): KeySwitchPreset => (ready.includes(p) ? p : (ready[ready.length - 1] ?? p));
   // recording-based samples; synthesized set only with ?sfx=synth (A/B) or if loading fails
   const ensurePreset = (p: KeySwitchPreset) => {
     if (loaded.has(p)) return;
@@ -113,21 +118,24 @@ export function createKeyboard(ctx: ToyContext): Toy & { setPreset(p: KeySwitchP
     );
   };
   ensurePreset(preset);
+  let active = false;
+  let prewarmed = false;
   const keyDetune = vis.keys.map((_, i) => ((i * 37) % 31) - 15);
   let lastDownAt = 0;
   const soundDown = (k: number, evType: string) => {
     const now = performance.now();
     const rapid = now - lastDownAt < 85;
     lastDownAt = now;
-    heldPreset.set(k, preset);
-    const name = k === SPACE ? `kb:${preset}:spaceDown` : `kb:${preset}:down`;
-    const makeup = soundSource[preset] === 'samples' ? 6 : 0;
+    const sp = audible(preset);
+    heldPreset.set(k, sp);
+    const name = k === SPACE ? `kb:${sp}:spaceDown` : `kb:${sp}:down`;
+    const makeup = soundSource[sp] === 'samples' ? 6 : 0;
     ctx.audio.play(name, { baseDetune: keyDetune[k], detuneCents: 12, gainJitterDb: 1.2, gainDb: makeup + (rapid ? -2 : 0), pan: vis.keys[k].rest.x * 0.22 }, evType);
     ctx.haptic(6);
   };
   const heldPreset = new Map<number, KeySwitchPreset>();
   const soundUp = (k: number, evType: string) => {
-    const pr = heldPreset.get(k) ?? preset;
+    const pr = heldPreset.get(k) ?? audible(preset);
     heldPreset.delete(k);
     const name = k === SPACE ? `kb:${pr}:spaceUp` : `kb:${pr}:up`;
     const makeup = soundSource[pr] === 'samples' ? 6 : 0;
@@ -217,8 +225,20 @@ export function createKeyboard(ctx: ToyContext): Toy & { setPreset(p: KeySwitchP
       window.addEventListener('keydown', onKeyDown);
       window.addEventListener('keyup', onKeyUp);
       window.addEventListener('blur', onBlur);
+      active = true;
+      // once, after the first frames: precompile/upload the other key style so the first preset switch doesn't hitch
+      if (!prewarmed) {
+        const run = () => {
+          if (!active || prewarmed) return;
+          prewarmed = true;
+          vis.prewarm(ctx.renderer, scene, camera);
+        };
+        const ric = (window as Window & { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number }).requestIdleCallback;
+        setTimeout(() => (ric ? ric(run, { timeout: 1500 }) : run()), 300);
+      }
     },
     leave() {
+      active = false;
       window.removeEventListener('keydown', onKeyDown);
       window.removeEventListener('keyup', onKeyUp);
       window.removeEventListener('blur', onBlur);

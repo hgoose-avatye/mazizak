@@ -19,6 +19,12 @@ export interface KeyboardVisual {
   size: THREE.Vector3;
   travel: number;
   setStyle(p: 'pebble' | 'clack'): void;
+  /**
+   * Compile shader programs and upload legend textures for the styles not currently shown,
+   * so the first setStyle() to them does no GPU compile/upload work (no switch hitch).
+   * Call once while idle, after the renderer state (tone mapping, environment) is final.
+   */
+  prewarm(renderer: THREE.WebGLRenderer, scene: THREE.Scene, camera: THREE.Camera): void;
   setShadowQuality(high: boolean): void;
   sun: THREE.DirectionalLight;
 }
@@ -115,13 +121,17 @@ export function buildKeyboardVisual(renderer: THREE.WebGLRenderer): KeyboardVisu
 
   const keys: KeyVisual[] = [];
   const legendMats: { mat: THREE.MeshPhysicalMaterial; accent: boolean; text: string; aspect: number }[] = [];
-  const addKey = (geo: THREE.BufferGeometry, x: number, z: number, accent: boolean, text: string, halfW: number, aspect = 1) => {
-    const tex = createLegendTexture(text, { color: accent ? '#fff4ea' : STYLES.pebble.legend });
+  const makeLegend = (text: string, accent: boolean, aspect: number, color: string) => {
+    const tex = createLegendTexture(text, { color: accent ? '#fff4ea' : color });
     tex.anisotropy = aniso;
     if (aspect !== 1) {
       tex.repeat.set(aspect, 1);
       tex.offset.set(-(aspect - 1) / 2, 0);
     }
+    return tex;
+  };
+  const addKey = (geo: THREE.BufferGeometry, x: number, z: number, accent: boolean, text: string, halfW: number, aspect = 1) => {
+    const tex = makeLegend(text, accent, aspect, STYLES.pebble.legend);
     const top = legendMaterial(accent ? accentMat : capMat, tex);
     legendMats.push({ mat: top, accent, text, aspect });
     const mesh = new THREE.Mesh(geo, [accent ? accentMat : capMat, top]);
@@ -145,7 +155,28 @@ export function buildKeyboardVisual(renderer: THREE.WebGLRenderer): KeyboardVisu
   const spaceW = COLS * U - (U - CAP);
   addKey(createKeycapGeometry({ width: spaceW, depth: CAP, height: CAP_H }), 0, 1.5 * U, false, '스페이스', spaceW / 2, spaceW / CAP);
 
-  let style: 'pebble' | 'clack' = 'pebble';
+  type StyleId = keyof typeof STYLES;
+  let style: StyleId = 'pebble';
+  // legend textures per style, created once and kept (re-creating 10 canvases + GPU uploads on every switch caused a hitch)
+  const legendTex = new Map<StyleId, THREE.Texture[]>([['pebble', legendMats.map((l) => l.mat.map!)]]);
+  const legendsFor = (p: StyleId) => {
+    let t = legendTex.get(p);
+    if (!t) legendTex.set(p, (t = legendMats.map((l) => makeLegend(l.text, l.accent, l.aspect, STYLES[p].legend))));
+    return t;
+  };
+  const applyStyle = (p: StyleId) => {
+    const s = STYLES[p];
+    capMat.setValues(s.cap);
+    accentMat.setValues(s.accent);
+    caseMat.color.set(s.case);
+    caseMat.roughness = s.caseRough;
+    const tex = legendsFor(p);
+    legendMats.forEach((l, i) => {
+      l.mat.setValues(l.accent ? s.accent : s.cap);
+      l.mat.map = tex[i];
+      l.mat.needsUpdate = true;
+    });
+  };
   return {
     root,
     keys,
@@ -155,24 +186,17 @@ export function buildKeyboardVisual(renderer: THREE.WebGLRenderer): KeyboardVisu
     setStyle(p) {
       if (p === style) return;
       style = p;
-      const s = STYLES[p];
-      capMat.setValues(s.cap);
-      accentMat.setValues(s.accent);
-      caseMat.color.set(s.case);
-      caseMat.roughness = s.caseRough;
-      for (const l of legendMats) {
-        l.mat.setValues(l.accent ? s.accent : s.cap);
-        const old = l.mat.map;
-        const tex = createLegendTexture(l.text, { color: l.accent ? '#fff4ea' : s.legend });
-        tex.anisotropy = aniso;
-        if (l.aspect !== 1) {
-          tex.repeat.set(l.aspect, 1);
-          tex.offset.set(-(l.aspect - 1) / 2, 0);
-        }
-        l.mat.map = tex;
-        l.mat.needsUpdate = true;
-        old?.dispose();
+      applyStyle(p);
+    },
+    prewarm(renderer, scene, camera) {
+      const cur = style;
+      for (const p of Object.keys(STYLES) as StyleId[]) {
+        if (p === cur) continue;
+        applyStyle(p);
+        renderer.compile(scene, camera); // programs are cached per material → later switches only look them up
+        for (const t of legendsFor(p)) renderer.initTexture(t);
       }
+      applyStyle(cur);
     },
     setShadowQuality(high) {
       const n = high ? 2048 : 1024;
