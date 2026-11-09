@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+    <link rel="icon" type="image/png" href="./icons/icon-192.png" />
+    <title>오디오 활성화 검증 · P0</title>
+    <style>
+      body { position: static; overflow: auto; user-select: auto; -webkit-user-select: auto; padding: 12px 14px 40px; font-size: 14px; line-height: 1.45; }
+      h1 { font-size: 17px; margin: 4px 0 6px; }
+      .row { display: flex; gap: 6px; flex-wrap: wrap; margin: 8px 0; }
+      .row button, .row a { font-size: 13px; padding: 7px 10px; border-radius: 8px; border: 1px solid #0002; background: #fff; color: inherit; text-decoration: none; }
+      .row button[aria-pressed='true'] { background: #2b2926; color: #fff; }
+      #pad {
+        height: 34vh; min-height: 200px; border-radius: 18px; background: #f3a6b8; display: flex; align-items: center; justify-content: center;
+        font-weight: 600; color: #5a2433; touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; margin: 10px 0;
+        transition: background 0.05s;
+      }
+      #pad.flash { background: #fff; transition: none; }
+      #status { font: 12px/1.4 ui-monospace, Menlo, monospace; white-space: pre-wrap; background: #0000000d; padding: 8px; border-radius: 8px; }
+      table { border-collapse: collapse; font-size: 12px; width: 100%; }
+      td, th { border-bottom: 1px solid #0001; padding: 4px; text-align: left; vertical-align: top; }
+      .ask { display: none; background: #fff6d6; padding: 8px; border-radius: 8px; }
+      .ask.show { display: block; }
+      small { color: #7a746c; }
+    </style>
+  </head>
+  <body>
+    <h1>모바일 오디오 활성화 검증</h1>
+    <small>목적: 페이지를 새로 연 뒤 <b>첫 번째 터치</b>에서 어떤 이벤트가 소리를 낼 수 있는지 실기기에서 확인합니다. 시도 1회 = 새로고침 1회.</small>
+    <div class="row" id="modes"></div>
+    <div id="pad">여기를 한 번 눌렀다 떼세요</div>
+    <div class="ask" id="ask">
+      첫 터치에서 소리가 어땠나요?
+      <div class="row">
+        <button data-ans="press">누르는 순간 들림</button>
+        <button data-ans="release">떼는 순간 들림</button>
+        <button data-ans="none">안 들림</button>
+      </div>
+    </div>
+    <div class="row">
+      <button id="next">기록 후 새로고침(다음 모드)</button>
+      <button id="flash" aria-pressed="false">지연 촬영 모드</button>
+      <button id="export">결과 JSON 저장</button>
+      <button id="clear">결과 지우기</button>
+      <a href="./index.html">처음으로</a>
+    </div>
+    <div id="status"></div>
+    <h1 style="margin-top: 16px">누적 결과</h1>
+    <table id="results"></table>
+    <script type="module" src="/src/audio-test.ts"></script>
+  </body>
+</html>

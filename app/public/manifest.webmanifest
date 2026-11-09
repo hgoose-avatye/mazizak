@@ -1,0 +1,15 @@
+{
+  "name": "만지작 MANZIZAK",
+  "short_name": "만지작",
+  "description": "손끝으로 만지는 실사형 3D 말랑이와 키보드. Touch. Squish. Relax.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#e9e4dd",
+  "theme_color": "#e9e4dd",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}
