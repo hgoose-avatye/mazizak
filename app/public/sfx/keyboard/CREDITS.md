@@ -87,3 +87,53 @@ Neither preset is a filtered or pitched copy of the other.
   have room for a longer tail.
 
 If confirmed spacebar or upstroke samples are needed, they would have to be recorded in-house.
+
+---
+
+# creamy-thocky (CC BY 4.0, attribution required)
+
+This preset is **not** CC0 and is not cut from a field recording like `pebble` / `clack`. It is built from a
+Mechvibes community sound pack.
+
+| Preset | Title | Author | Source page | License | Retrieved |
+|---|---|---|---|---|---|
+| creamy-thocky | My Sound Pack (5 OGG clips, "Creamy and Thocky", tag asmr) | Chevy | https://mechvibes.com/sound-packs/my-sound-pack-5 | CC BY 4.0 — https://creativecommons.org/licenses/by/4.0/ | 2026-11-10 |
+
+Required attribution: **"My Sound Pack" by Chevy, https://mechvibes.com/sound-packs/my-sound-pack-5, licensed under CC BY 4.0
+(https://creativecommons.org/licenses/by/4.0/). The audio was trimmed, level-normalised and converted to a WAV sprite.**
+
+Download: `https://mechvibes.com/api/sound-packs/mv-2263bade9c724dd98ef92e743a6303b2/download` (no login).
+The original OGG files and the pack's `config.json` are kept unchanged in `app/scripts/kbsamples/source/creamy-thocky/`.
+
+## Rights caveat
+
+CC BY 4.0 is only the **label shown on the Mechvibes pack page**. The pack has no source link, and nothing proves the
+uploader owns every right in the underlying recording (for example whether it was recorded by Chevy or taken from
+someone else's video or sample library). We did not verify that. If the rights holder objects, remove the preset.
+Before a public release, show the attribution above somewhere in the app (e.g. a credits screen) — it is currently only in this file,
+the preset tooltip and the source code.
+
+## Changes made to the original (CC BY 4.0 §3(a)(1)(B) — indication of modification)
+
+Script: `app/scripts/kbsamples/build-creamy.mjs`.
+1. OGG Vorbis (48 kHz mono) decoded to 16-bit PCM with ffmpeg 7.1 (`imageio-ffmpeg` static build, isolated virtualenv).
+2. Near-silence trimmed: samples below peak −45 dB before the first hit and below −50 dB at the end (quiet lead-in material is kept);
+   0.5 ms fade-in and 8 ms raised-cosine fade-out.
+3. Level normalisation: each clip peak-normalised to −1 dBFS in the sprite, then the JSON `gain` (≤ 1) lowers the louder ones so all
+   five have the same RMS. Gain applied before matching: +3.0 dB (`2`), +20.7 dB (`OtherKeys`), +21.1 dB (`BackSpace`), +21.2 dB (`Shift`),
+   +24.0 dB (`Space`); the largest boost is +24 dB (the script refuses more than +26 dB).
+4. The five clips are concatenated with 10 ms of silence into one sprite `creamy-thocky.wav` (+ `creamy-thocky.json`).
+No filtering, EQ, pitch change or noise reduction.
+
+## How the clips are used (and what is NOT verified)
+
+- Each clip is played **whole, on key down only**; there is no release (key-up) sound (`"upMode": "none"`).
+  Each clip shows two strong transients about 80–110 ms apart in its waveform, which may be a press and a release, but
+  nobody has listened to it, so the clips were not split.
+- spaceDown is empty and falls back to the five key-down clips.
+- The original `config.json` maps keys to clips as: default keys → `OtherKeys`, `Space` key → `Shift`, `ShiftLeft/Right` → `Shift`, `Escape` → `Space`,
+  `Digit2` → `2`, `Backspace` → `BackSpace`. The Space/Shift/Escape assignments look swapped, but whether the `Space.ogg` clip is a spacebar
+  sound could not be confirmed without listening. **That mapping was not used.** All five clips are treated as generic key-down
+  sounds. Re-assigning them to specific keys (e.g. a proper space bar) is **unverified** and needs a listen-through.
+- Timbre/quality of this preset has not been checked by ear.
+

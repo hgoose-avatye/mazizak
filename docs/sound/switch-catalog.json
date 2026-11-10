@@ -1,0 +1,540 @@
+{
+ "schema": 1,
+ "note": "확장 가능한 카탈로그. 항목 추가만으로 늘어남(고정 25개 제한 없음). status: ref-only(레퍼런스 영상만) | candidate(검색상 영상 존재, 내용 미확인) | no-source(조사 전) | asset-ready(재사용 가능 음원 있음). listened는 사람이 청취 검증했는지(현재 전부 false). asset.license: 'none-confirmed'이면 게임 적용 불가. creamy-thocky는 구현 완료(feat/creamy-thocky). 다른 28개 스위치 연결은 별도 작업.",
+ "presets_live": [
+  "pebble",
+  "clack",
+  "creamy-thocky"
+ ],
+ "presets_proposed": [],
+ "switches": [
+  {
+   "id": "hmx-mongdol",
+   "name": "HMX 몽돌",
+   "type": "linear",
+   "status": "candidate",
+   "refs": [
+    {
+     "url": "https://www.youtube.com/watch?v=szEPz97KJj4",
+     "channel": "지니뿡 JINIBBUNG",
+     "ts": "02:47 몽돌(PL87W) 타건",
+     "setup": "완제품 키보드, 스위치 단독 아님"
+    },
+    {
+     "url": "https://www.youtube.com/watch?v=qOmN5o-7g3w",
+     "channel": "키노리보드 ASMR",
+     "ts": "전체 2:37(타임라인 미기재)"
+    }
+   ],
+   "asset": {
+    "license": "none-confirmed"
+   },
+   "listened": false,
+   "priority": true
+  },
+  {
+   "id": "hmx-mongdol-white",
+   "name": "HMX 몽돌 화이트",
+   "type": "linear",
+   "status": "candidate",
+   "refs": [
+    {
+     "url": "https://www.youtube.com/watch?v=szEPz97KJj4",
+     "channel": "지니뿡 JINIBBUNG",
+     "ts": "03:23 몽돌 화이트(PL108W) 타건; 01:30 스위치 비교"
+    }
+   ],
+   "asset": {
+    "license": "none-confirmed"
+   },
+   "listened": false,
+   "note": "몽돌과 별도 키보드 모델(PL87W/PL108W). 스위치 사양 차이는 설명란만으로 검증하지 못함 → 별도 후보로 유지하되 '다른 스위치'로 확정하지 않음"
+  },
+  {
+   "id": "haimu-sea-salt",
+   "name": "하이무 바다소금축",
+   "type": "linear",
+   "status": "ref-only",
+   "refs": [
+    {
+     "url": "https://www.youtube.com/watch?v=_QNwpS0q5xA",
+     "channel": "주연 ZUYONI",
+     "ts": "01:53~(다음 챕터 02:41 전까지)"
+    }
+   ],
+   "asset": {
+    "license": "commercial-use-prohibited (설명란)"
+   },
+   "listened": false,
+   "priority": true
+  },
+  {
+   "id": "gateron-oil-king",
+   "name": "Gateron Oil King",
+   "type": "linear",
+   "status": "candidate",
+   "refs": [
+    {
+     "url": "https://www.youtube.com/watch?v=-A_M_hvjVNY",
+     "channel": "Click and Thock",
+     "ts": "미확인",
+     "setup": "GMK/MT3/SA 구성 제목 기준"
+    }
+   ],
+   "asset": {
+    "license": "none-confirmed"
+   },
+   "listened": false
+  },
+  {
+   "id": "kiwitch-leopold-linear",
+   "name": "키위치/레오폴드 개량 리니어",
+   "type": "linear",
+   "status": "no-source",
+   "refs": [],
+   "asset": {
+    "license": "n/a"
+   },
+   "listened": false,
+   "note": "정확한 모델명 불분명 → 제조사 자료로 검증 필요"
+  },
+  {
+   "id": "cherry-mx-red",
+   "name": "Cherry MX Red",
+   "type": "linear",
+   "status": "candidate",
+   "refs": [
+    {
+     "url": "https://www.youtube.com/watch?v=e3kG6ei5ClY",
+     "channel": "Mattie K.B.",
+     "ts": "Red vs Silent Red 소리만 2:21"
+    }
+   ],
+   "asset": {
+    "license": "none-confirmed"
+   },
+   "listened": false
+  },
+  {
+   "id": "banana",
+   "name": "Banana (Keychron Super Banana 등)",
+   "type": "tactile",
+   "status": "candidate",
+   "refs": [
+    {
+     "url": "https://www.youtube.com/watch?v=yysx73kmhcg",
+     "channel": "Keychron Thailand Keyboard",
+     "ts": "0:59"
+    }
+   ],
+   "asset": {
+    "license": "none-confirmed"
+   },
+   "listened": false,
+   "note": "Banana 계열(Keychron/Gateron) 구분 필요"
+  },
+  {
+   "id": "silent-lime",
+   "name": "Silent Lime",
+   "type": "tactile",
+   "categories": [
+    "tactile",
+    "silent"
+   ],
+   "status": "no-source",
+   "refs": [],
+   "asset": {
+    "license": "n/a"
+   },
+   "listened": false,
+   "note": "원 목록에서 Tactile·Silent 중복 → 1개 항목"
+  },
+  {
+   "id": "holy-panda-v2",
+   "name": "Holy Panda V2",
+   "type": "tactile",
+   "status": "candidate",
+   "refs": [
+    {
+     "url": "https://www.youtube.com/watch?v=5PseHc6UpFM",
+     "channel": "PaperAcrobat",
+     "ts": "9:41"
+    }
+   ],
+   "asset": {
+    "license": "none-confirmed"
+   },
+   "listened": false,
+   "note": "V2 여부 영상에서 미확인"
+  },
+  {
+   "id": "aqua-panda",
+   "name": "Aqua Panda",
+   "type": "tactile",
+   "status": "no-source",
+   "refs": [],
+   "asset": {
+    "license": "n/a"
+   },
+   "listened": false
+  },
+  {
+   "id": "cherry-mx-brown",
+   "name": "Cherry MX Brown",
+   "type": "tactile",
+   "status": "candidate",
+   "refs": [
+    {
+     "url": "https://www.youtube.com/watch?v=BSgTht9_C9c",
+     "channel": "QwwER",
+     "ts": "0:55"
+    }
+   ],
+   "asset": {
+    "license": "none-confirmed"
+   },
+   "listened": false
+  },
+  {
+   "id": "kailh-box-tactile",
+   "name": "Kailh BOX Tactile (정확한 변종 미정)",
+   "type": "tactile",
+   "status": "no-source",
+   "refs": [],
+   "asset": {
+    "license": "n/a"
+   },
+   "listened": false,
+   "note": "Deep Sea Whale와 별개로 모델명 검증 필요"
+  },
+  {
+   "id": "kailh-deep-sea-whale",
+   "name": "Kailh BOX Deep Sea Silent Pro Whale",
+   "type": "tactile",
+   "categories": [
+    "tactile",
+    "silent"
+   ],
+   "status": "ref-only",
+   "refs": [
+    {
+     "url": "https://www.youtube.com/watch?v=pYUDDoI6XJ4",
+     "channel": "Click and Thock",
+     "ts": "챕터 없음, 전체 4:58 (타건 + slow bottom-out)",
+     "setup": "Shure SM57, DZ60 + Tofu60 알루미늄, FR4, GMK/MT3/SA"
+    }
+   ],
+   "asset": {
+    "license": "none-confirmed (표준 YouTube)"
+   },
+   "listened": false,
+   "priority": true
+  },
+  {
+   "id": "kailh-box-white",
+   "name": "Kailh BOX White (V2)",
+   "type": "clicky",
+   "status": "candidate",
+   "refs": [
+    {
+     "url": "https://www.youtube.com/watch?v=hlCjITJI02Q",
+     "channel": "Click and Thock",
+     "ts": "3:17"
+    }
+   ],
+   "asset": {
+    "license": "none-confirmed"
+   },
+   "listened": false
+  },
+  {
+   "id": "cherry-mx-blue",
+   "name": "Cherry MX Blue",
+   "type": "clicky",
+   "status": "candidate",
+   "refs": [
+    {
+     "url": "https://www.youtube.com/watch?v=gCuG3WCCwvs",
+     "channel": "パソ活",
+     "ts": "19:03 타이핑"
+    }
+   ],
+   "asset": {
+    "license": "none-confirmed"
+   },
+   "listened": false
+  },
+  {
+   "id": "razer-green",
+   "name": "Razer Green",
+   "type": "clicky",
+   "status": "candidate",
+   "refs": [
+    {
+     "url": "https://www.youtube.com/watch?v=9tRTWHBrmFY",
+     "channel": "KiryaChainik",
+     "ts": "3:26"
+    }
+   ],
+   "asset": {
+    "license": "none-confirmed"
+   },
+   "listened": false
+  },
+  {
+   "id": "kailh-box-blue",
+   "name": "Kailh BOX Blue 후보",
+   "type": "clicky",
+   "status": "no-source",
+   "refs": [],
+   "asset": {
+    "license": "n/a"
+   },
+   "listened": false,
+   "note": "원 목록 '후보' 표기. 실존 모델(Kailh BOX Navy/Jade 등과의 혼동 가능) 제조사 자료로 검증 필요"
+  },
+  {
+   "id": "outemu-blue",
+   "name": "Outemu Blue",
+   "type": "clicky",
+   "status": "candidate",
+   "refs": [
+    {
+     "url": "https://www.youtube.com/watch?v=LDX-R5aSrZo",
+     "channel": "SpotlessMLG",
+     "ts": "1:05"
+    }
+   ],
+   "asset": {
+    "license": "none-confirmed"
+   },
+   "listened": false
+  },
+  {
+   "id": "kailh-deep-sea-islet",
+   "name": "Kailh BOX Deep Sea Silent Pro Islet (외로운 섬)",
+   "type": "linear",
+   "categories": [
+    "linear",
+    "silent"
+   ],
+   "status": "ref-only",
+   "refs": [
+    {
+     "url": "https://www.youtube.com/watch?v=8IZss-tv6cg",
+     "channel": "키킨 KeyKIN",
+     "ts": "쇼츠 1:00 전체",
+     "setup": "Aula F75(독거미), 설명란: 연필로 사각사각 쓰는 소리 (제작자 주관)"
+    }
+   ],
+   "asset": {
+    "license": "none-confirmed (표준 YouTube)"
+   },
+   "listened": false,
+   "priority": true
+  },
+  {
+   "id": "ktt-silent-sea",
+   "name": "KTT 저소음 바다축",
+   "type": "linear",
+   "categories": [
+    "linear",
+    "silent"
+   ],
+   "status": "ref-only",
+   "refs": [
+    {
+     "url": "https://www.youtube.com/watch?v=_QNwpS0q5xA",
+     "channel": "주연 ZUYONI",
+     "ts": "05:23~(다음 챕터 07:16 전까지)"
+    }
+   ],
+   "asset": {
+    "license": "commercial-use-prohibited (설명란)"
+   },
+   "listened": false,
+   "priority": true,
+   "note": "원 목록의 'KTT Silent Sea/White' 중 Sea"
+  },
+  {
+   "id": "ktt-white",
+   "name": "KTT 화이트축 (80 Retros X KTT)",
+   "type": "unknown",
+   "status": "candidate",
+   "refs": [
+    {
+     "url": "https://www.youtube.com/watch?v=_QNwpS0q5xA",
+     "channel": "주연 ZUYONI",
+     "ts": "07:16~09:15"
+    }
+   ],
+   "asset": {
+    "license": "commercial-use-prohibited (설명란)"
+   },
+   "listened": false,
+   "note": "저소음 여부 미확인"
+  },
+  {
+   "id": "outemu-silent-peach-v3",
+   "name": "Outemu Silent Peach V3",
+   "type": "linear",
+   "categories": [
+    "linear",
+    "silent"
+   ],
+   "status": "ref-only",
+   "refs": [
+    {
+     "url": "https://www.youtube.com/watch?v=IvxGnt47JFE",
+     "channel": "Click and Thock",
+     "ts": "사용자 제공: 01:33 GMK 타건, 02:08 GMK 개별키, 02:21 MT3 타건, 02:56 MT3 개별키, 03:10 SA 타건, 03:45 SA 개별키 (설명란 챕터 없음, 재확인 못함)",
+     "setup": "Shure SM57, DZ60 + Tofu60 알루미늄, FR4, 데시벨 측정 포함"
+    }
+   ],
+   "asset": {
+    "license": "none-confirmed (표준 YouTube)"
+   },
+   "listened": false,
+   "priority": true
+  },
+  {
+   "id": "cherry-mx-silent-red",
+   "name": "Cherry MX Silent Red",
+   "type": "linear",
+   "categories": [
+    "linear",
+    "silent"
+   ],
+   "status": "candidate",
+   "refs": [
+    {
+     "url": "https://www.youtube.com/watch?v=-_ro-vwtXsE",
+     "channel": "The Gaming Setup",
+     "ts": "0:36"
+    }
+   ],
+   "asset": {
+    "license": "none-confirmed"
+   },
+   "listened": false,
+   "note": "Mechvibes 'CherryMX RED SILENT' 팩(abo_rfeeq)은 개인 사용 한정이라 적용 불가"
+  },
+  {
+   "id": "wooting-lekker",
+   "name": "Wooting Lekker (V2/Tikken 변종 구분 필요)",
+   "type": "magnetic",
+   "status": "candidate",
+   "refs": [
+    {
+     "url": "https://www.youtube.com/watch?v=R_THxrvomN4",
+     "channel": "Wooting",
+     "ts": "2:59 Lekker V2"
+    },
+    {
+     "url": "https://www.youtube.com/watch?v=wYACSlhQg9E",
+     "channel": "Wooting",
+     "ts": "6:33 RAW HE·Jade·Black Knight·Lekker V2 비교"
+    }
+   ],
+   "asset": {
+    "license": "none-confirmed"
+   },
+   "listened": false
+  },
+  {
+   "id": "gateron-magnetic-jade",
+   "name": "Gateron Magnetic Jade",
+   "type": "magnetic",
+   "categories": [
+    "magnetic",
+    "linear"
+   ],
+   "status": "ref-only",
+   "refs": [
+    {
+     "url": "https://www.youtube.com/watch?v=t2AKW1ROnew",
+     "channel": "Wasabi",
+     "ts": "전체 1:04 (설명: clackity 계열, 제작자 주관)"
+    },
+    {
+     "url": "https://www.youtube.com/watch?v=wYACSlhQg9E",
+     "channel": "Wooting",
+     "ts": "6:33 중 Jade 구간 미확인"
+    }
+   ],
+   "asset": {
+    "license": "none-confirmed",
+    "mechvibes": "[NOVIX#56] Gateron Magnetic Jade Pro HE — 개인 사용 한정"
+   },
+   "listened": false,
+   "priority": true
+  },
+  {
+   "id": "geon-raptor-he",
+   "name": "GEON Raptor HE (V1/V2 구분)",
+   "type": "magnetic",
+   "status": "candidate",
+   "refs": [
+    {
+     "url": "https://www.youtube.com/watch?v=6Gx6wjqEtUs",
+     "channel": "ManbUwU",
+     "ts": "전체 1:41",
+     "setup": "Tofu60 Redux, Wooting60HE, PC 플레이트, PBT, iPhone11 마이크 (V1 + L60 스템)"
+    },
+    {
+     "url": "https://www.youtube.com/watch?v=bF7TELBSyWc",
+     "channel": "Wasabi",
+     "ts": "V2 리뷰 6:58"
+    }
+   ],
+   "asset": {
+    "license": "none-confirmed"
+   },
+   "listened": false,
+   "priority": true
+  },
+  {
+   "id": "razer-analog",
+   "name": "Razer Analog Optical",
+   "type": "magnetic",
+   "status": "candidate",
+   "refs": [
+    {
+     "url": "https://www.youtube.com/watch?v=Mjn77pf7Krk",
+     "channel": "Futurologeek",
+     "ts": "0:59"
+    }
+   ],
+   "asset": {
+    "license": "none-confirmed"
+   },
+   "listened": false,
+   "note": "광학식(자석 아님) — 'Magnetic' 카테고리 부적합 가능, 분류 재검토"
+  },
+  {
+   "id": "outemu-drunkdeer-he",
+   "name": "Outemu/DrunkDeer HE",
+   "type": "magnetic",
+   "status": "no-source",
+   "refs": [],
+   "asset": {
+    "license": "n/a"
+   },
+   "listened": false
+  }
+ ],
+ "presets_implemented_extra": [
+  {
+   "id": "creamy-thocky",
+   "label": "크리미",
+   "kind": "independent-preset",
+   "switchModel": null,
+   "source": "https://mechvibes.com/sound-packs/my-sound-pack-5",
+   "author": "Chevy",
+   "license": "CC BY 4.0 (페이지 표기만 확인, 업로더의 원본 권리는 미검증)",
+   "listened": false,
+   "assets": "app/public/sfx/keyboard/creamy-thocky.{wav,json}",
+   "note": "특정 스위치 모델명이 아닌 독립 Creamy/Thocky ASMR 프리셋. 키다운만(upMode none)"
+  }
+ ]
+}

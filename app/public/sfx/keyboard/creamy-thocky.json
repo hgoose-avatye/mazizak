@@ -1,0 +1,81 @@
+{
+ "version": 1,
+ "preset": "creamy-thocky",
+ "file": "creamy-thocky.wav",
+ "sampleRate": 48000,
+ "channels": 1,
+ "bitDepth": 16,
+ "totalSamples": 38877,
+ "upMode": "none",
+ "source": "My Sound Pack by Chevy (Mechvibes) — CC BY 4.0 as labelled on the pack page",
+ "notes": "Each source clip is used whole as a key-DOWN sound. Release (up/spaceUp) is intentionally empty (upMode \"none\": no release sound). spaceDown is empty (falls back to the down pool). The pack config.json key mapping was NOT used: its Space/Shift/Escape assignments look swapped and could not be verified by listening. Each source clip shows two strong transients ~80–110 ms apart (possibly press + release); not confirmed by ear. See CREDITS.md.",
+ "sources": {
+  "mechvibes:my-sound-pack-5": {
+   "title": "My Sound Pack",
+   "author": "Chevy",
+   "url": "https://mechvibes.com/sound-packs/my-sound-pack-5",
+   "license": "CC BY 4.0 (label on the pack page; uploader’s underlying rights not independently verified)",
+   "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+   "retrieved": "2026-11-10",
+   "file": "https://mechvibes.com/api/sound-packs/mv-2263bade9c724dd98ef92e743a6303b2/download",
+   "originals": "scripts/kbsamples/source/creamy-thocky/*.ogg"
+  }
+ },
+ "entries": {
+  "down": [
+   {
+    "start": 0,
+    "length": 6503,
+    "offset": 0,
+    "duration": 0.135479,
+    "gain": 0.7596,
+    "src": "mechvibes:my-sound-pack-5/OtherKeys.ogg",
+    "srcStart": 0.0033,
+    "srcEnd": 0.1388
+   },
+   {
+    "start": 6983,
+    "length": 7483,
+    "offset": 0.145479,
+    "duration": 0.155896,
+    "gain": 0.5679,
+    "src": "mechvibes:my-sound-pack-5/2.ogg",
+    "srcStart": 0.0026,
+    "srcEnd": 0.1585
+   },
+   {
+    "start": 14946,
+    "length": 7761,
+    "offset": 0.311375,
+    "duration": 0.161688,
+    "gain": 1,
+    "src": "mechvibes:my-sound-pack-5/BackSpace.ogg",
+    "srcStart": 0,
+    "srcEnd": 0.1617
+   },
+   {
+    "start": 23187,
+    "length": 7101,
+    "offset": 0.483063,
+    "duration": 0.147938,
+    "gain": 0.7109,
+    "src": "mechvibes:my-sound-pack-5/Shift.ogg",
+    "srcStart": 0.0303,
+    "srcEnd": 0.1782
+   },
+   {
+    "start": 30768,
+    "length": 8109,
+    "offset": 0.641,
+    "duration": 0.168938,
+    "gain": 0.6555,
+    "src": "mechvibes:my-sound-pack-5/Space.ogg",
+    "srcStart": 0.0031,
+    "srcEnd": 0.172
+   }
+  ],
+  "up": [],
+  "spaceDown": [],
+  "spaceUp": []
+ }
+}

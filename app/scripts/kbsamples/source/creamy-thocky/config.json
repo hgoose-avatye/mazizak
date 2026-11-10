@@ -1,0 +1,803 @@
+{
+  "config_version": "2",
+  "name": "My Sound Pack",
+  "author": "Chevy",
+  "description": "A custom sound pack created with the Mechvibes editor.",
+  "tags": [
+    "asmr"
+  ],
+  "definition_method": "multi",
+  "audio_file": "OtherKeys.ogg",
+  "soundpack_type": "Keyboard",
+  "options": {
+    "recommended_volume": 1,
+    "random_pitch": false
+  },
+  "definitions": {
+    "Escape": {
+      "audio_file": "Space.ogg",
+      "timing": [
+        [
+          0,
+          208.458
+        ]
+      ]
+    },
+    "Space": {
+      "audio_file": "Shift.ogg",
+      "timing": [
+        [
+          0,
+          238.854
+        ]
+      ]
+    },
+    "ShiftLeft": {
+      "audio_file": "Shift.ogg",
+      "timing": [
+        [
+          0,
+          238.854
+        ]
+      ]
+    },
+    "Enter": {
+      "audio_file": "OtherKeys.ogg",
+      "timing": [
+        [
+          0,
+          159.458
+        ]
+      ]
+    },
+    "Digit2": {
+      "audio_file": "2.ogg",
+      "timing": [
+        [
+          0,
+          187.167
+        ]
+      ]
+    },
+    "Backspace": {
+      "audio_file": "BackSpace.ogg",
+      "timing": [
+        [
+          0,
+          200.375
+        ]
+      ]
+    },
+    "ShiftRight": {
+      "audio_file": "Shift.ogg",
+      "timing": [
+        [
+          0,
+          238.854
+        ]
+      ]
+    },
+    "F1": {
+      "audio_file": "OtherKeys.ogg",
+      "timing": [
+        [
+          0,
+          159.458
+        ]
+      ]
+    },
+    "F2": {
+      "audio_file": "OtherKeys.ogg",
+      "timing": [
+        [
+          0,
+          159.458
+        ]
+      ]
+    },
+    "F3": {
+      "audio_file": "OtherKeys.ogg",
+      "timing": [
+        [
+          0,
+          159.458
+        ]
+      ]
+    },
+    "F4": {
+      "audio_file": "OtherKeys.ogg",
+      "timing": [
+        [
+          0,
+          159.458
+        ]
+      ]
+    },
+    "F5": {
+      "audio_file": "OtherKeys.ogg",
+      "timing": [
+        [
+          0,
+          159.458
+        ]
+      ]
+    },
+    "F6": {
+      "audio_file": "OtherKeys.ogg",
+      "timing": [
+        [
+          0,
+          159.458
+        ]
+      ]
+    },
+    "F7": {
+      "audio_file": "OtherKeys.ogg",
+      "timing": [
+        [
+          0,
+          159.458
+        ]
+      ]
+    },
+    "F8": {
+      "audio_file": "OtherKeys.ogg",
+      "timing": [
+        [
+          0,
+          159.458
+        ]
+      ]
+    },
+    "F9": {
+      "audio_file": "OtherKeys.ogg",
+      "timing": [
+        [
+          0,
+          159.458
+        ]
+      ]
+    },
+    "F10": {
+      "audio_file": "OtherKeys.ogg",
+      "timing": [
+        [
+          0,
+          159.458
+        ]
+      ]
+    },
+    "F11": {
+      "audio_file": "OtherKeys.ogg",
+      "timing": [
+        [
+          0,
+          159.458
+        ]
+      ]
+    },
+    "F12": {
+      "audio_file": "OtherKeys.ogg",
+      "timing": [
+        [
+          0,
+          159.458
+        ]
+      ]
+    },
+    "PrintScreen": {
+      "audio_file": "OtherKeys.ogg",
+      "timing": [
+        [
+          0,
+          159.458
+        ]
+      ]
+    },
+    "ScrollLock": {
+      "audio_file": "OtherKeys.ogg",
+      "timing": [
+        [
+          0,
+          159.458
+        ]
+      ]
+    },
+    "Pause": {
+      "audio_file": "OtherKeys.ogg",
+      "timing": [
+        [
+          0,
+          159.458
+        ]
+      ]
+    },
+    "Backquote": {
+      "audio_file": "OtherKeys.ogg",
+      "timing": [
+        [
+          0,
+          159.458
+        ]
+      ]
+    },
+    "Digit1": {
+      "audio_file": "OtherKeys.ogg",
+      "timing": [
+        [
+          0,
+          159.458
+        ]
+      ]
+    },
+    "Tab": {
+      "audio_file": "OtherKeys.ogg",
+      "timing": [
+        [
+          0,
+          159.458
+        ]
+      ]
+    },
+    "KeyQ": {
+      "audio_file": "OtherKeys.ogg",
+      "timing": [
+        [
+          0,
+          159.458
+        ]
+      ]
+    },
+    "KeyW": {
+      "audio_file": "OtherKeys.ogg",
+      "timing": [
+        [
+          0,
+          159.458
+        ]
+      ]
+    },
+    "KeyE": {
+      "audio_file": "OtherKeys.ogg",
+      "timing": [
+        [
+          0,
+          159.458
+        ]
+      ]
+    },
+    "KeyR": {
+      "audio_file": "OtherKeys.ogg",
+      "timing": [
+        [
+          0,
+          159.458
+        ]
+      ]
+    },
+    "KeyT": {
+      "audio_file": "OtherKeys.ogg",
+      "timing": [
+        [
+          0,
+          159.458
+        ]
+      ]
+    },
+    "KeyY": {
+      "audio_file": "OtherKeys.ogg",
+      "timing": [
+        [
+          0,
+          159.458
+        ]
+      ]
+    },
+    "KeyU": {
+      "audio_file": "OtherKeys.ogg",
+      "timing": [
+        [
+          0,
+          159.458
+        ]
+      ]
+    },
+    "KeyI": {
+      "audio_file": "OtherKeys.ogg",
+      "timing": [
+        [
+          0,
+          159.458
+        ]
+      ]
+    },
+    "KeyO": {
+      "audio_file": "OtherKeys.ogg",
+      "timing": [
+        [
+          0,
+          159.458
+        ]
+      ]
+    },
+    "KeyP": {
+      "audio_file": "OtherKeys.ogg",
+      "timing": [
+        [
+          0,
+          159.458
+        ]
+      ]
+    },
+    "BracketLeft": {
+      "audio_file": "OtherKeys.ogg",
+      "timing": [
+        [
+          0,
+          159.458
+        ]
+      ]
+    },
+    "CapsLock": {
+      "audio_file": "OtherKeys.ogg",
+      "timing": [
+        [
+          0,
+          159.458
+        ]
+      ]
+    },
+    "KeyA": {
+      "audio_file": "OtherKeys.ogg",
+      "timing": [
+        [
+          0,
+          159.458
+        ]
+      ]
+    },
+    "KeyS": {
+      "audio_file": "OtherKeys.ogg",
+      "timing": [
+        [
+          0,
+          159.458
+        ]
+      ]
+    },
+    "KeyD": {
+      "audio_file": "OtherKeys.ogg",
+      "timing": [
+        [
+          0,
+          159.458
+        ]
+      ]
+    },
+    "KeyF": {
+      "audio_file": "OtherKeys.ogg",
+      "timing": [
+        [
+          0,
+          159.458
+        ]
+      ]
+    },
+    "KeyG": {
+      "audio_file": "OtherKeys.ogg",
+      "timing": [
+        [
+          0,
+          159.458
+        ]
+      ]
+    },
+    "KeyH": {
+      "audio_file": "OtherKeys.ogg",
+      "timing": [
+        [
+          0,
+          159.458
+        ]
+      ]
+    },
+    "KeyJ": {
+      "audio_file": "OtherKeys.ogg",
+      "timing": [
+        [
+          0,
+          159.458
+        ]
+      ]
+    },
+    "KeyK": {
+      "audio_file": "OtherKeys.ogg",
+      "timing": [
+        [
+          0,
+          159.458
+        ]
+      ]
+    },
+    "KeyL": {
+      "audio_file": "OtherKeys.ogg",
+      "timing": [
+        [
+          0,
+          159.458
+        ]
+      ]
+    },
+    "Semicolon": {
+      "audio_file": "OtherKeys.ogg",
+      "timing": [
+        [
+          0,
+          159.458
+        ]
+      ]
+    },
+    "Quote": {
+      "audio_file": "OtherKeys.ogg",
+      "timing": [
+        [
+          0,
+          159.458
+        ]
+      ]
+    },
+    "Backslash": {
+      "audio_file": "OtherKeys.ogg",
+      "timing": [
+        [
+          0,
+          159.458
+        ]
+      ]
+    },
+    "BracketRight": {
+      "audio_file": "OtherKeys.ogg",
+      "timing": [
+        [
+          0,
+          159.458
+        ]
+      ]
+    },
+    "KeyZ": {
+      "audio_file": "OtherKeys.ogg",
+      "timing": [
+        [
+          0,
+          159.458
+        ]
+      ]
+    },
+    "KeyX": {
+      "audio_file": "OtherKeys.ogg",
+      "timing": [
+        [
+          0,
+          159.458
+        ]
+      ]
+    },
+    "KeyC": {
+      "audio_file": "OtherKeys.ogg",
+      "timing": [
+        [
+          0,
+          159.458
+        ]
+      ]
+    },
+    "KeyV": {
+      "audio_file": "OtherKeys.ogg",
+      "timing": [
+        [
+          0,
+          159.458
+        ]
+      ]
+    },
+    "KeyB": {
+      "audio_file": "OtherKeys.ogg",
+      "timing": [
+        [
+          0,
+          159.458
+        ]
+      ]
+    },
+    "KeyN": {
+      "audio_file": "OtherKeys.ogg",
+      "timing": [
+        [
+          0,
+          159.458
+        ]
+      ]
+    },
+    "KeyM": {
+      "audio_file": "OtherKeys.ogg",
+      "timing": [
+        [
+          0,
+          159.458
+        ]
+      ]
+    },
+    "Comma": {
+      "audio_file": "OtherKeys.ogg",
+      "timing": [
+        [
+          0,
+          159.458
+        ]
+      ]
+    },
+    "Period": {
+      "audio_file": "OtherKeys.ogg",
+      "timing": [
+        [
+          0,
+          159.458
+        ]
+      ]
+    },
+    "Slash": {
+      "audio_file": "OtherKeys.ogg",
+      "timing": [
+        [
+          0,
+          159.458
+        ]
+      ]
+    },
+    "ControlLeft": {
+      "audio_file": "OtherKeys.ogg",
+      "timing": [
+        [
+          0,
+          159.458
+        ]
+      ]
+    },
+    "MetaLeft": {
+      "audio_file": "OtherKeys.ogg",
+      "timing": [
+        [
+          0,
+          159.458
+        ]
+      ]
+    },
+    "AltLeft": {
+      "audio_file": "OtherKeys.ogg",
+      "timing": [
+        [
+          0,
+          159.458
+        ]
+      ]
+    },
+    "AltRight": {
+      "audio_file": "OtherKeys.ogg",
+      "timing": [
+        [
+          0,
+          159.458
+        ]
+      ]
+    },
+    "MetaRight": {
+      "audio_file": "OtherKeys.ogg",
+      "timing": [
+        [
+          0,
+          159.458
+        ]
+      ]
+    },
+    "ContextMenu": {
+      "audio_file": "OtherKeys.ogg",
+      "timing": [
+        [
+          0,
+          159.458
+        ]
+      ]
+    },
+    "ControlRight": {
+      "audio_file": "OtherKeys.ogg",
+      "timing": [
+        [
+          0,
+          159.458
+        ]
+      ]
+    },
+    "ArrowLeft": {
+      "audio_file": "OtherKeys.ogg",
+      "timing": [
+        [
+          0,
+          159.458
+        ]
+      ]
+    },
+    "ArrowDown": {
+      "audio_file": "OtherKeys.ogg",
+      "timing": [
+        [
+          0,
+          159.458
+        ]
+      ]
+    },
+    "ArrowRight": {
+      "audio_file": "OtherKeys.ogg",
+      "timing": [
+        [
+          0,
+          159.458
+        ]
+      ]
+    },
+    "ArrowUp": {
+      "audio_file": "OtherKeys.ogg",
+      "timing": [
+        [
+          0,
+          159.458
+        ]
+      ]
+    },
+    "Insert": {
+      "audio_file": "OtherKeys.ogg",
+      "timing": [
+        [
+          0,
+          159.458
+        ]
+      ]
+    },
+    "Home": {
+      "audio_file": "OtherKeys.ogg",
+      "timing": [
+        [
+          0,
+          159.458
+        ]
+      ]
+    },
+    "PageUp": {
+      "audio_file": "OtherKeys.ogg",
+      "timing": [
+        [
+          0,
+          159.458
+        ]
+      ]
+    },
+    "Delete": {
+      "audio_file": "OtherKeys.ogg",
+      "timing": [
+        [
+          0,
+          159.458
+        ]
+      ]
+    },
+    "End": {
+      "audio_file": "OtherKeys.ogg",
+      "timing": [
+        [
+          0,
+          159.458
+        ]
+      ]
+    },
+    "PageDown": {
+      "audio_file": "OtherKeys.ogg",
+      "timing": [
+        [
+          0,
+          159.458
+        ]
+      ]
+    },
+    "Digit3": {
+      "audio_file": "OtherKeys.ogg",
+      "timing": [
+        [
+          0,
+          159.458
+        ]
+      ]
+    },
+    "Digit4": {
+      "audio_file": "OtherKeys.ogg",
+      "timing": [
+        [
+          0,
+          159.458
+        ]
+      ]
+    },
+    "Digit5": {
+      "audio_file": "OtherKeys.ogg",
+      "timing": [
+        [
+          0,
+          159.458
+        ]
+      ]
+    },
+    "Digit6": {
+      "audio_file": "OtherKeys.ogg",
+      "timing": [
+        [
+          0,
+          159.458
+        ]
+      ]
+    },
+    "Digit7": {
+      "audio_file": "OtherKeys.ogg",
+      "timing": [
+        [
+          0,
+          159.458
+        ]
+      ]
+    },
+    "Digit8": {
+      "audio_file": "OtherKeys.ogg",
+      "timing": [
+        [
+          0,
+          159.458
+        ]
+      ]
+    },
+    "Digit9": {
+      "audio_file": "OtherKeys.ogg",
+      "timing": [
+        [
+          0,
+          159.458
+        ]
+      ]
+    },
+    "Digit0": {
+      "audio_file": "OtherKeys.ogg",
+      "timing": [
+        [
+          0,
+          159.458
+        ]
+      ]
+    },
+    "Minus": {
+      "audio_file": "OtherKeys.ogg",
+      "timing": [
+        [
+          0,
+          159.458
+        ]
+      ]
+    },
+    "Equal": {
+      "audio_file": "OtherKeys.ogg",
+      "timing": [
+        [
+          0,
+          159.458
+        ]
+      ]
+    }
+  },
+  "id": "mv-2263bade9c724dd98ef92e743a6303b2",
+  "version": "1"
+}

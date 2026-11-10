@@ -1,3 +1,5 @@
+import type { KeyPresetId } from '../audio/keyPresets';
+
 export type Quality = 'auto' | 'high' | 'saver';
 
 export interface Settings {
@@ -8,7 +10,7 @@ export interface Settings {
   reduceMotion: boolean;
   showStats: boolean;
   squishyColor: string;
-  keyPreset: 'pebble' | 'clack';
+  keyPreset: KeyPresetId;
 }
 
 const KEY = 'mzk-settings-v1';

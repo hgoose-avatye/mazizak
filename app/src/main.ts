@@ -7,7 +7,7 @@ import { StatsOverlay } from './core/hud';
 import type { Toy, ToyContext } from './core/toy';
 import { createSquishy, SQUISHY_COLORS } from './toys/squishy/toy';
 import { createKeyboard, KEY_PRESET_INFO } from './toys/keyboard/toy';
-import type { KeySwitchPreset } from './audio/sfx';
+import type { KeyPresetId } from './audio/keyPresets';
 import { loadKeyboardSamples } from './audio/keyboardSamples';
 import { loadSquishySamples } from './audio/squishySamples';
 
@@ -102,7 +102,7 @@ window.addEventListener('keydown', (e) => {
 });
 
 // ---------- toys ----------
-const toys: Record<string, (Toy & { setColor?(id: string): void; setPreset?(p: KeySwitchPreset): void }) | undefined> = {};
+const toys: Record<string, (Toy & { setColor?(id: string): void; setPreset?(p: KeyPresetId): void }) | undefined> = {};
 const TOY_TITLES: Record<string, string> = { squishy: '말랑이', keyboard: '키보드' };
 const TOY_HINTS: Record<string, string> = {
   squishy: '꾹 눌러보세요 · 두 손가락으로 늘려보세요',
@@ -135,7 +135,7 @@ function buildVariants(id: string): void {
       variants.appendChild(b);
     }
   } else if (id === 'keyboard') {
-    for (const p of Object.keys(KEY_PRESET_INFO) as KeySwitchPreset[]) {
+    for (const p of Object.keys(KEY_PRESET_INFO) as KeyPresetId[]) {
       const b = document.createElement('button');
       b.className = 'chip';
       b.setAttribute('role', 'radio');

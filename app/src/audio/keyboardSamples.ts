@@ -7,14 +7,17 @@
  *
  *   pebble — Rainy 75 (gasket-mount, lubed linear switches): low, round "thock"
  *   clack  — WhiteFox with Hako Violet tactile switches: brighter, crisp press + clear return
+ *   creamy-thocky — "My Sound Pack" (Chevy, CC BY 4.0): whole clips used as key-down only (map `upMode: "none"`)
  */
-import type { KeyboardSounds, KeySwitchPreset } from './sfx';
+import type { KeyboardSounds } from './sfx';
+import type { KeyPresetId } from './keyPresets';
 
 export const KEYBOARD_SAMPLE_CREDITS =
   'Keyboard sounds cut from CC0 (public-domain) Freesound recordings: ' +
   '"Typing on a rainy 75" by Techrul (freesound.org/s/815614) [pebble]; ' +
   '"Keyboard Typing 4 (WhiteFox, Mechanical)" and "Keyboard Typing 10 (WhiteFox, Mechanical)" by grcekh ' +
-  '(freesound.org/s/546045, /546167) [clack].';
+  '(freesound.org/s/546045, /546167) [clack]; ' +
+  '"My Sound Pack" by Chevy (mechvibes.com/sound-packs/my-sound-pack-5), CC BY 4.0 [creamy-thocky].';
 
 interface SpriteEntry {
   /** seconds into the sprite */
@@ -33,6 +36,8 @@ interface SpriteMap {
   version: number;
   file: string;
   sampleRate: number;
+  /** "none": the preset deliberately has no release sound (up/spaceUp stay empty instead of reusing key-down sounds) */
+  upMode?: 'none';
   entries: Record<keyof KeyboardSounds, SpriteEntry[]>;
 }
 
@@ -41,7 +46,7 @@ const cache = new WeakMap<BaseAudioContext, Map<string, Promise<KeyboardSounds>>
 
 export function loadKeyboardSamples(
   ctx: BaseAudioContext,
-  preset: KeySwitchPreset,
+  preset: KeyPresetId,
   baseUrl = './sfx/keyboard/',
 ): Promise<KeyboardSounds> {
   const base = baseUrl.endsWith('/') ? baseUrl : baseUrl + '/';
@@ -56,7 +61,7 @@ export function loadKeyboardSamples(
   return p;
 }
 
-async function load(ctx: BaseAudioContext, preset: KeySwitchPreset, base: string): Promise<KeyboardSounds> {
+async function load(ctx: BaseAudioContext, preset: KeyPresetId, base: string): Promise<KeyboardSounds> {
   const mapRes = await fetch(`${base}${preset}.json`);
   if (!mapRes.ok) throw new Error(`keyboard samples: ${preset}.json HTTP ${mapRes.status}`);
   const map = (await mapRes.json()) as SpriteMap;
@@ -79,8 +84,10 @@ async function load(ctx: BaseAudioContext, preset: KeySwitchPreset, base: string
   for (const r of ROLES) sounds[r] = (map.entries[r] ?? []).map(slice);
   if (!sounds.down.length) throw new Error(`keyboard samples: ${preset} has no "down" entries`);
   // graceful fallbacks so callers never get an empty pool
-  if (!sounds.up.length) sounds.up = sounds.down;
   if (!sounds.spaceDown.length) sounds.spaceDown = sounds.down;
-  if (!sounds.spaceUp.length) sounds.spaceUp = sounds.up;
+  if (map.upMode !== 'none') {
+    if (!sounds.up.length) sounds.up = sounds.down;
+    if (!sounds.spaceUp.length) sounds.spaceUp = sounds.up;
+  }
   return sounds;
 }

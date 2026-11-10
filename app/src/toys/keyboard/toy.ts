@@ -1,8 +1,9 @@
 import * as THREE from 'three';
 import type { InputEvt } from '../../core/runtime';
 import type { Toy, ToyContext } from '../../core/toy';
-import { buildKeyboardSounds, type KeySwitchPreset, type KeyboardSounds } from '../../audio/sfx';
+import { buildKeyboardSounds, type KeyboardSounds } from '../../audio/sfx';
 import { loadKeyboardSamples } from '../../audio/keyboardSamples';
+import { SYNTH_BASE, VISUAL_STYLE, type KeyPresetId } from '../../audio/keyPresets';
 import { param } from '../../core/params';
 import { radialShadowTexture, studioEnvironment } from '../../core/studio';
 import { settings } from '../../core/settings';
@@ -10,14 +11,15 @@ import { round, summarize } from '../../core/metrics';
 import { hitTest, KeyboardModel, type KeyRect } from './model';
 import { buildKeyboardVisual, type KeyboardVisual } from './visual';
 
-export const KEY_PRESET_INFO: Record<KeySwitchPreset, { label: string; desc: string }> = {
+export const KEY_PRESET_INFO: Record<KeyPresetId, { label: string; desc: string }> = {
   pebble: { label: '조약돌', desc: '묵직하고 둥근 저음' },
   clack: { label: '까랑까랑', desc: '선명하고 경쾌한 고음' },
+  'creamy-thocky': { label: '크리미', desc: '부드럽고 크리미한 타건음 (My Sound Pack · Chevy · CC BY 4.0)' },
 };
 
 const PHYS_KEYS = ['KeyQ', 'KeyW', 'KeyE', 'KeyA', 'KeyS', 'KeyD', 'KeyZ', 'KeyX', 'KeyC', 'Space'];
 
-export function createKeyboard(ctx: ToyContext): Toy & { setPreset(p: KeySwitchPreset): void } {
+export function createKeyboard(ctx: ToyContext): Toy & { setPreset(p: KeyPresetId): void } {
   const scene = new THREE.Scene();
   scene.background = new THREE.Color(0xe9e4dd);
   scene.environment = studioEnvironment(ctx.renderer);
@@ -81,26 +83,26 @@ export function createKeyboard(ctx: ToyContext): Toy & { setPreset(p: KeySwitchP
   };
 
   // ----- sound -----
-  let preset: KeySwitchPreset = settings.get().keyPreset;
-  const loaded = new Set<KeySwitchPreset>();
+  // a stored id this build doesn't know (e.g. from a newer/older version) must not crash sound or style lookup
+  let preset: KeyPresetId = settings.get().keyPreset in KEY_PRESET_INFO ? settings.get().keyPreset : 'pebble';
+  const loaded = new Set<KeyPresetId>();
   const soundSource: Record<string, string> = {};
   /** presets whose sounds are registered, most recently ready last */
-  const ready: KeySwitchPreset[] = [];
-  const registerSet = (p: KeySwitchPreset, s: KeyboardSounds) => {
-    ctx.audio.register(`kb:${p}:down`, s.down);
-    ctx.audio.register(`kb:${p}:up`, s.up);
-    ctx.audio.register(`kb:${p}:spaceDown`, s.spaceDown);
-    ctx.audio.register(`kb:${p}:spaceUp`, s.spaceUp);
+  const ready: KeyPresetId[] = [];
+  const registerSet = (p: KeyPresetId, s: KeyboardSounds) => {
+    // an empty pool means "no sound for this role" (e.g. a preset without release sounds): leave it unregistered
+    // so audio.play() returns null instead of picking from nothing
+    for (const role of ['down', 'up', 'spaceDown', 'spaceUp'] as const) if (s[role].length) ctx.audio.register(`kb:${p}:${role}`, s[role]);
     if (!ready.includes(p)) ready.push(p);
   };
   /** While a just-selected preset is still loading, keep sounding the last ready one instead of going silent. */
-  const audible = (p: KeySwitchPreset): KeySwitchPreset => (ready.includes(p) ? p : (ready[ready.length - 1] ?? p));
+  const audible = (p: KeyPresetId): KeyPresetId => (ready.includes(p) ? p : (ready[ready.length - 1] ?? p));
   // recording-based samples; synthesized set only with ?sfx=synth (A/B) or if loading fails
-  const ensurePreset = (p: KeySwitchPreset) => {
+  const ensurePreset = (p: KeyPresetId) => {
     if (loaded.has(p)) return;
     loaded.add(p);
     if (param('sfx', 'samples') === 'synth') {
-      registerSet(p, buildKeyboardSounds(ctx.audio.ctx, p));
+      registerSet(p, buildKeyboardSounds(ctx.audio.ctx, SYNTH_BASE[p]));
       soundSource[p] = 'synth';
       return;
     }
@@ -112,7 +114,7 @@ export function createKeyboard(ctx: ToyContext): Toy & { setPreset(p: KeySwitchP
       },
       (err) => {
         console.warn(`keyboard samples (${p}) failed, using synthesized fallback`, err);
-        registerSet(p, buildKeyboardSounds(ctx.audio.ctx, p));
+        registerSet(p, buildKeyboardSounds(ctx.audio.ctx, SYNTH_BASE[p]));
         soundSource[p] = 'synth';
       },
     );
@@ -133,7 +135,7 @@ export function createKeyboard(ctx: ToyContext): Toy & { setPreset(p: KeySwitchP
     ctx.audio.play(name, { baseDetune: keyDetune[k], detuneCents: 12, gainJitterDb: 1.2, gainDb: makeup + (rapid ? -2 : 0), pan: vis.keys[k].rest.x * 0.22 }, evType);
     ctx.haptic(6);
   };
-  const heldPreset = new Map<number, KeySwitchPreset>();
+  const heldPreset = new Map<number, KeyPresetId>();
   const soundUp = (k: number, evType: string) => {
     const pr = heldPreset.get(k) ?? audible(preset);
     heldPreset.delete(k);
@@ -211,7 +213,7 @@ export function createKeyboard(ctx: ToyContext): Toy & { setPreset(p: KeySwitchP
     setPreset(p) {
       preset = p;
       ensurePreset(p);
-      vis.setStyle(p);
+      vis.setStyle(VISUAL_STYLE[p]);
       ctx.requestFrame();
     },
     reset() {
@@ -221,7 +223,7 @@ export function createKeyboard(ctx: ToyContext): Toy & { setPreset(p: KeySwitchP
     enter() {
       ctx.renderer.toneMapping = THREE.NeutralToneMapping;
       vis.setShadowQuality(settings.get().quality !== 'saver');
-      vis.setStyle(preset);
+      vis.setStyle(VISUAL_STYLE[preset]);
       window.addEventListener('keydown', onKeyDown);
       window.addEventListener('keyup', onKeyUp);
       window.addEventListener('blur', onBlur);
@@ -232,6 +234,8 @@ export function createKeyboard(ctx: ToyContext): Toy & { setPreset(p: KeySwitchP
           if (!active || prewarmed) return;
           prewarmed = true;
           vis.prewarm(ctx.renderer, scene, camera);
+          // fetch + decode the other presets while idle so a later switch has its own sound immediately
+          for (const p of Object.keys(KEY_PRESET_INFO) as KeyPresetId[]) ensurePreset(p);
         };
         const ric = (window as Window & { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number }).requestIdleCallback;
         setTimeout(() => (ric ? ric(run, { timeout: 1500 }) : run()), 300);
