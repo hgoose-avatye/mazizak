@@ -5,287 +5,272 @@
  "sampleRate": 48000,
  "channels": 1,
  "bitDepth": 16,
- "totalSamples": 157005,
- "source": "WhiteFox, Hako Violet tactile — freesound:546045 + 546167 by grcekh, CC0",
- "notes": "isolated press/release pairs from the \"individual keys\" tail; spaceDown/spaceUp = spacebar PROXY: the heaviest pairs (loud + longest ring + lowest centroid) with their own releases; not confirmed spacebar hits. See CREDITS.md.",
+ "totalSamples": 147185,
+ "source": "Gateron Blue click — freesound:755222 by forfii, CC0 (recorded bank B of branch sound/recorded-ab)",
+ "notes": "Replaces the earlier WhiteFox/Hako Violet sprite (git: c6d7209). Clips were cut and level-matched by sound/recorded-ab scripts/sound/build_bank.py and are copied unchanged. Entry gain 0.5012 (−6 dB) cancels the toy’s +6 dB makeup so the loudness equals branch B. The source is the Freesound public HQ preview (OGG ~192 kbps), not the original upload. Not listened to by the author of this file.",
  "sources": {
-  "freesound:546045": {
-   "title": "Keyboard Typing 4 (WhiteFox, Mechanical)",
-   "author": "grcekh",
-   "url": "https://freesound.org/people/grcekh/sounds/546045/",
+  "freesound:755222": {
+   "title": "Keyboard slow typing with Gateron Blue switches + low echo",
+   "author": "forfii",
+   "url": "https://freesound.org/people/forfii/sounds/755222/",
    "license": "CC0 1.0",
    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "sha256": "674273f0f65df42a3cee31611d367ccaaff62d39550306d1c9f085b5c350c393",
    "retrieved": "2026-11-09",
-   "file": "https://cdn.freesound.org/previews/546/546045_12206738-hq.mp3"
-  },
-  "freesound:546167": {
-   "title": "Keyboard Typing 10 (WhiteFox, Mechanical)",
-   "author": "grcekh",
-   "url": "https://freesound.org/people/grcekh/sounds/546167/",
-   "license": "CC0 1.0",
-   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
-   "retrieved": "2026-11-09",
-   "file": "https://cdn.freesound.org/previews/546/546167_12206738-hq.mp3"
+   "file": "Freesound public HQ preview (OGG ~192 kbps), not the original upload"
   }
  },
- "srcTimesAre": "seconds into the decoded Freesound HQ preview (same timeline as the original upload)",
+ "srcTimesAre": "not recorded here: the cut points live in sound/recorded-ab sound-src/edit-spec.json + candidates-keyboard.json",
  "entries": {
   "down": [
    {
     "start": 0,
-    "length": 3804,
+    "length": 4375,
     "offset": 0,
-    "duration": 0.07925,
-    "gain": 0.4537,
-    "src": "freesound:546045",
-    "srcStart": 125.2938,
-    "srcEnd": 125.3731
+    "duration": 0.091146,
+    "gain": 0.5012,
+    "src": "freesound:755222",
+    "file": "kb-clack-down-00.wav"
    },
    {
-    "start": 4284,
-    "length": 4977,
-    "offset": 0.08925,
-    "duration": 0.103688,
-    "gain": 0.4239,
-    "src": "freesound:546045",
-    "srcStart": 103.5343,
-    "srcEnd": 103.638
+    "start": 4855,
+    "length": 5329,
+    "offset": 0.101146,
+    "duration": 0.111021,
+    "gain": 0.5012,
+    "src": "freesound:755222",
+    "file": "kb-clack-down-01.wav"
    },
    {
-    "start": 9741,
-    "length": 3402,
-    "offset": 0.202937,
-    "duration": 0.070875,
-    "gain": 0.394,
-    "src": "freesound:546045",
-    "srcStart": 105.9611,
-    "srcEnd": 106.032
+    "start": 10664,
+    "length": 3250,
+    "offset": 0.222167,
+    "duration": 0.067708,
+    "gain": 0.5012,
+    "src": "freesound:755222",
+    "file": "kb-clack-down-02.wav"
    },
    {
-    "start": 13623,
-    "length": 3423,
-    "offset": 0.283813,
-    "duration": 0.071313,
-    "gain": 0.3607,
-    "src": "freesound:546045",
-    "srcStart": 104.7097,
-    "srcEnd": 104.781
+    "start": 14394,
+    "length": 4940,
+    "offset": 0.299875,
+    "duration": 0.102917,
+    "gain": 0.5012,
+    "src": "freesound:755222",
+    "file": "kb-clack-down-03.wav"
    },
    {
-    "start": 17526,
-    "length": 3789,
-    "offset": 0.365125,
-    "duration": 0.078937,
-    "gain": 0.4425,
-    "src": "freesound:546045",
-    "srcStart": 119.4761,
-    "srcEnd": 119.555
+    "start": 19814,
+    "length": 7440,
+    "offset": 0.412792,
+    "duration": 0.155,
+    "gain": 0.5012,
+    "src": "freesound:755222",
+    "file": "kb-clack-down-04.wav"
    },
    {
-    "start": 21795,
-    "length": 3563,
-    "offset": 0.454062,
-    "duration": 0.074229,
-    "gain": 0.4404,
-    "src": "freesound:546045",
-    "srcStart": 117.2678,
-    "srcEnd": 117.342
+    "start": 27734,
+    "length": 5436,
+    "offset": 0.577792,
+    "duration": 0.11325,
+    "gain": 0.5012,
+    "src": "freesound:755222",
+    "file": "kb-clack-down-05.wav"
    },
    {
-    "start": 25838,
-    "length": 3805,
-    "offset": 0.538292,
-    "duration": 0.079271,
-    "gain": 0.4819,
-    "src": "freesound:546045",
-    "srcStart": 123.0257,
-    "srcEnd": 123.105
+    "start": 33650,
+    "length": 4831,
+    "offset": 0.701042,
+    "duration": 0.100646,
+    "gain": 0.5012,
+    "src": "freesound:755222",
+    "file": "kb-clack-down-06.wav"
    },
    {
-    "start": 30123,
-    "length": 3881,
-    "offset": 0.627563,
-    "duration": 0.080854,
-    "gain": 0.4796,
-    "src": "freesound:546045",
-    "srcStart": 124.1481,
-    "srcEnd": 124.229
+    "start": 38961,
+    "length": 5261,
+    "offset": 0.811688,
+    "duration": 0.109604,
+    "gain": 0.5012,
+    "src": "freesound:755222",
+    "file": "kb-clack-down-07.wav"
    },
    {
-    "start": 34484,
-    "length": 5607,
-    "offset": 0.718417,
-    "duration": 0.116812,
-    "gain": 0.5108,
-    "src": "freesound:546045",
-    "srcStart": 100.3392,
-    "srcEnd": 100.456
+    "start": 44702,
+    "length": 7066,
+    "offset": 0.931292,
+    "duration": 0.147208,
+    "gain": 0.5012,
+    "src": "freesound:755222",
+    "file": "kb-clack-down-08.wav"
    },
    {
-    "start": 40571,
-    "length": 7680,
-    "offset": 0.845229,
-    "duration": 0.16,
-    "gain": 0.5787,
-    "src": "freesound:546045",
-    "srcStart": 96.6736,
-    "srcEnd": 96.8336
+    "start": 52248,
+    "length": 4997,
+    "offset": 1.0885,
+    "duration": 0.104104,
+    "gain": 0.5012,
+    "src": "freesound:755222",
+    "file": "kb-clack-down-09.wav"
+   },
+   {
+    "start": 57725,
+    "length": 6000,
+    "offset": 1.202604,
+    "duration": 0.125,
+    "gain": 0.5012,
+    "src": "freesound:755222",
+    "file": "kb-clack-down-10.wav"
+   },
+   {
+    "start": 64205,
+    "length": 5443,
+    "offset": 1.337604,
+    "duration": 0.113396,
+    "gain": 0.5012,
+    "src": "freesound:755222",
+    "file": "kb-clack-down-11.wav"
    }
   ],
   "up": [
    {
-    "start": 48731,
-    "length": 6720,
-    "offset": 1.015229,
-    "duration": 0.14,
-    "gain": 0.2618,
-    "src": "freesound:546045",
-    "srcStart": 125.3755,
-    "srcEnd": 125.5155
+    "start": 70128,
+    "length": 5040,
+    "offset": 1.461,
+    "duration": 0.105,
+    "gain": 0.5012,
+    "src": "freesound:755222",
+    "file": "kb-clack-up-00.wav"
    },
    {
-    "start": 55931,
-    "length": 6720,
-    "offset": 1.165229,
-    "duration": 0.14,
-    "gain": 0.1763,
-    "src": "freesound:546045",
-    "srcStart": 103.6399,
-    "srcEnd": 103.7799
+    "start": 75648,
+    "length": 5187,
+    "offset": 1.576,
+    "duration": 0.108063,
+    "gain": 0.5012,
+    "src": "freesound:755222",
+    "file": "kb-clack-up-01.wav"
    },
    {
-    "start": 63131,
-    "length": 6720,
-    "offset": 1.315229,
-    "duration": 0.14,
-    "gain": 0.2163,
-    "src": "freesound:546045",
-    "srcStart": 106.0345,
-    "srcEnd": 106.1745
+    "start": 81315,
+    "length": 4685,
+    "offset": 1.694063,
+    "duration": 0.097604,
+    "gain": 0.5012,
+    "src": "freesound:755222",
+    "file": "kb-clack-up-02.wav"
    },
    {
-    "start": 70331,
-    "length": 6720,
-    "offset": 1.465229,
-    "duration": 0.14,
-    "gain": 0.1973,
-    "src": "freesound:546045",
-    "srcStart": 104.7828,
-    "srcEnd": 104.9228
+    "start": 86480,
+    "length": 6384,
+    "offset": 1.801667,
+    "duration": 0.133,
+    "gain": 0.5012,
+    "src": "freesound:755222",
+    "file": "kb-clack-up-03.wav"
    },
    {
-    "start": 77531,
-    "length": 6720,
-    "offset": 1.615229,
-    "duration": 0.14,
-    "gain": 0.1855,
-    "src": "freesound:546045",
-    "srcStart": 119.5575,
-    "srcEnd": 119.6975
+    "start": 93344,
+    "length": 4652,
+    "offset": 1.944667,
+    "duration": 0.096917,
+    "gain": 0.5012,
+    "src": "freesound:755222",
+    "file": "kb-clack-up-04.wav"
    },
    {
-    "start": 84731,
-    "length": 6720,
-    "offset": 1.765229,
-    "duration": 0.14,
-    "gain": 0.1977,
-    "src": "freesound:546045",
-    "srcStart": 117.3447,
-    "srcEnd": 117.4847
+    "start": 98476,
+    "length": 4080,
+    "offset": 2.051583,
+    "duration": 0.085,
+    "gain": 0.5012,
+    "src": "freesound:755222",
+    "file": "kb-clack-up-05.wav"
    },
    {
-    "start": 91931,
-    "length": 6480,
-    "offset": 1.915229,
-    "duration": 0.135,
-    "gain": 0.1967,
-    "src": "freesound:546045",
-    "srcStart": 123.1073,
-    "srcEnd": 123.2423
-   },
-   {
-    "start": 98891,
-    "length": 6720,
-    "offset": 2.060229,
-    "duration": 0.14,
-    "gain": 0.1806,
-    "src": "freesound:546045",
-    "srcStart": 124.2316,
-    "srcEnd": 124.3716
+    "start": 103036,
+    "length": 4966,
+    "offset": 2.146583,
+    "duration": 0.103458,
+    "gain": 0.5012,
+    "src": "freesound:755222",
+    "file": "kb-clack-up-06.wav"
    }
   ],
   "spaceDown": [
    {
-    "start": 106091,
-    "length": 6209,
-    "offset": 2.210229,
-    "duration": 0.129354,
-    "gain": 0.5054,
-    "src": "freesound:546045",
-    "srcStart": 101.1486,
-    "srcEnd": 101.278
+    "start": 108482,
+    "length": 4757,
+    "offset": 2.260042,
+    "duration": 0.099104,
+    "gain": 0.5012,
+    "src": "freesound:755222",
+    "file": "kb-clack-spaceDown-00.wav"
    },
    {
-    "start": 112780,
-    "length": 8087,
-    "offset": 2.349583,
-    "duration": 0.168479,
-    "gain": 0.397,
-    "src": "freesound:546167",
-    "srcStart": 117.4275,
-    "srcEnd": 117.596
+    "start": 113719,
+    "length": 5218,
+    "offset": 2.369146,
+    "duration": 0.108708,
+    "gain": 0.5012,
+    "src": "freesound:755222",
+    "file": "kb-clack-spaceDown-01.wav"
    },
    {
-    "start": 121347,
-    "length": 5223,
-    "offset": 2.528062,
-    "duration": 0.108813,
-    "gain": 0.4831,
-    "src": "freesound:546045",
-    "srcStart": 100.7462,
-    "srcEnd": 100.855
+    "start": 119417,
+    "length": 3851,
+    "offset": 2.487854,
+    "duration": 0.080229,
+    "gain": 0.5012,
+    "src": "freesound:755222",
+    "file": "kb-clack-spaceDown-02.wav"
    },
    {
-    "start": 127050,
-    "length": 8163,
-    "offset": 2.646875,
-    "duration": 0.170063,
-    "gain": 0.6222,
-    "src": "freesound:546045",
-    "srcStart": 98.7469,
-    "srcEnd": 98.917
+    "start": 123748,
+    "length": 4348,
+    "offset": 2.578083,
+    "duration": 0.090583,
+    "gain": 0.5012,
+    "src": "freesound:755222",
+    "file": "kb-clack-spaceDown-03.wav"
+   },
+   {
+    "start": 128576,
+    "length": 6234,
+    "offset": 2.678667,
+    "duration": 0.129875,
+    "gain": 0.5012,
+    "src": "freesound:755222",
+    "file": "kb-clack-spaceDown-04.wav"
    }
   ],
   "spaceUp": [
    {
-    "start": 135693,
-    "length": 6720,
-    "offset": 2.826938,
-    "duration": 0.14,
-    "gain": 0.1484,
-    "src": "freesound:546045",
-    "srcStart": 101.2801,
-    "srcEnd": 101.4201
+    "start": 135290,
+    "length": 4065,
+    "offset": 2.818542,
+    "duration": 0.084688,
+    "gain": 0.5012,
+    "src": "freesound:755222",
+    "file": "kb-clack-spaceUp-00.wav"
    },
    {
-    "start": 142893,
-    "length": 6432,
-    "offset": 2.976938,
-    "duration": 0.134,
-    "gain": 0.1422,
-    "src": "freesound:546167",
-    "srcStart": 117.598,
-    "srcEnd": 117.732
+    "start": 139835,
+    "length": 2160,
+    "offset": 2.913229,
+    "duration": 0.045,
+    "gain": 0.5012,
+    "src": "freesound:755222",
+    "file": "kb-clack-spaceUp-01.wav"
    },
    {
-    "start": 149805,
-    "length": 6720,
-    "offset": 3.120938,
-    "duration": 0.14,
-    "gain": 0.1311,
-    "src": "freesound:546045",
-    "srcStart": 100.8569,
-    "srcEnd": 100.9969
+    "start": 142475,
+    "length": 4710,
+    "offset": 2.968229,
+    "duration": 0.098125,
+    "gain": 0.5012,
+    "src": "freesound:755222",
+    "file": "kb-clack-spaceUp-02.wav"
    }
   ]
  }

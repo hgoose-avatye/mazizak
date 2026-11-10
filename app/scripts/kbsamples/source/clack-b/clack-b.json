@@ -1,0 +1,71 @@
+{
+ "from": "branch sound/recorded-ab (public/sfx/rec), bank B, kb:clack:*",
+ "roles": {
+  "down": {
+   "files": [
+    "kb-clack-down-00.wav",
+    "kb-clack-down-01.wav",
+    "kb-clack-down-02.wav",
+    "kb-clack-down-03.wav",
+    "kb-clack-down-04.wav",
+    "kb-clack-down-05.wav",
+    "kb-clack-down-06.wav",
+    "kb-clack-down-07.wav",
+    "kb-clack-down-08.wav",
+    "kb-clack-down-09.wav",
+    "kb-clack-down-10.wav",
+    "kb-clack-down-11.wav"
+   ],
+   "gainDb": 0.0
+  },
+  "up": {
+   "files": [
+    "kb-clack-up-00.wav",
+    "kb-clack-up-01.wav",
+    "kb-clack-up-02.wav",
+    "kb-clack-up-03.wav",
+    "kb-clack-up-04.wav",
+    "kb-clack-up-05.wav",
+    "kb-clack-up-06.wav"
+   ],
+   "gainDb": 0.0
+  },
+  "spaceDown": {
+   "files": [
+    "kb-clack-spaceDown-00.wav",
+    "kb-clack-spaceDown-01.wav",
+    "kb-clack-spaceDown-02.wav",
+    "kb-clack-spaceDown-03.wav",
+    "kb-clack-spaceDown-04.wav"
+   ],
+   "gainDb": 0.0
+  },
+  "spaceUp": {
+   "files": [
+    "kb-clack-spaceUp-00.wav",
+    "kb-clack-spaceUp-01.wav",
+    "kb-clack-spaceUp-02.wav"
+   ],
+   "gainDb": 0.0
+  }
+ },
+ "sources": [
+  {
+   "id": "freesound:755222",
+   "title": "Keyboard slow typing with Gateron Blue switches + low echo",
+   "author": "forfii",
+   "url": "https://freesound.org/people/forfii/sounds/755222/",
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "sha256": "674273f0f65df42a3cee31611d367ccaaff62d39550306d1c9f085b5c350c393",
+   "verified": "2026-11-09",
+   "media": "Freesound public HQ preview (OGG ~192 kbps), not the original upload",
+   "roles": [
+    "kb:clack:down",
+    "kb:clack:spaceDown",
+    "kb:clack:spaceUp",
+    "kb:clack:up"
+   ]
+  }
+ ]
+}

@@ -6,7 +6,7 @@
  * the result per (context, preset, baseUrl).
  *
  *   pebble — Rainy 75 (gasket-mount, lubed linear switches): low, round "thock"
- *   clack  — WhiteFox with Hako Violet tactile switches: brighter, crisp press + clear return
+ *   clack  — Gateron Blue clicky switches (recorded bank B of branch sound/recorded-ab): bright, crisp click + clear return
  *   creamy-thocky — "My Sound Pack" (Chevy, CC BY 4.0): whole clips used as key-down only (map `upMode: "none"`)
  */
 import type { KeyboardSounds } from './sfx';
@@ -15,8 +15,7 @@ import type { KeyPresetId } from './keyPresets';
 export const KEYBOARD_SAMPLE_CREDITS =
   'Keyboard sounds cut from CC0 (public-domain) Freesound recordings: ' +
   '"Typing on a rainy 75" by Techrul (freesound.org/s/815614) [pebble]; ' +
-  '"Keyboard Typing 4 (WhiteFox, Mechanical)" and "Keyboard Typing 10 (WhiteFox, Mechanical)" by grcekh ' +
-  '(freesound.org/s/546045, /546167) [clack]; ' +
+  '"Keyboard slow typing with Gateron Blue switches + low echo" by forfii (freesound.org/s/755222) [clack]; ' +
   '"My Sound Pack" by Chevy (mechvibes.com/sound-packs/my-sound-pack-5), CC BY 4.0 [creamy-thocky].';
 
 interface SpriteEntry {

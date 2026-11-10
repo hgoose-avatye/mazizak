@@ -4,7 +4,7 @@
 | 프리셋 | 출처 | 라이선스 | 비고 |
 |---|---|---|---|
 | pebble | Freesound 815614 "Typing on a rainy 75" (Techrul) | CC0 1.0 | `app/public/sfx/keyboard/CREDITS.md` |
-| clack | Freesound 546045, 546167 (grcekh) | CC0 1.0 | 같음 |
+| clack | Freesound 755222 "Gateron Blue" (forfii) — branch `sound/recorded-ab` 뱅크 B, 2026-11-10 교체 (이전: WhiteFox 546045/546167, git c6d7209) | CC0 1.0 | 같음 |
 | creamy-thocky | Mechvibes "My Sound Pack" (Chevy) https://mechvibes.com/sound-packs/my-sound-pack-5 | **CC BY 4.0 (출처 표기 필수)** — 페이지 표기만 확인, 업로더의 원본 권리는 미검증 | 정규화·트림·WAV 변환. 앱 내 크레딧 화면 필요(릴리스 전). 상세는 CREDITS.md |
 | 말랑이 5종 + 젤 | Freesound CC0 | CC0 | `app/public/sfx/squishy/CREDITS.md` |
 

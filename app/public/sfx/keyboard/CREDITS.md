@@ -1,5 +1,7 @@
 # Keyboard sound credits and provenance
 
+> **2026-11-10: `clack` (까랑까랑) now uses recorded bank B from branch `sound/recorded-ab` (Gateron Blue, forfii, Freesound 755222, CC0).** The WhiteFox/Hako Violet sections below describe the *previous* clack sprite (git `c6d7209`) and are kept for history only. The clack clips were cut and level-matched by that branch's `scripts/sound/build_bank.py` and copied unchanged (`app/scripts/kbsamples/source/clack-b/`, built by `build-clack-b.mjs`); the Freesound HQ preview (OGG ~192 kbps) was used, not the original upload.
+
 Every sound in `pebble.wav` and `clack.wav` was cut from the real field recordings listed below.
 All of them are **Creative Commons 0 (CC0 1.0 Universal, public domain dedication)**, so they can be
 used commercially and embedded in an app with no attribution required. We credit the authors anyway.
@@ -9,8 +11,8 @@ License text: https://creativecommons.org/publicdomain/zero/1.0/ (legal code: ht
 | Preset | Title | Author | Source page | License | Upload date (per page) | Retrieved |
 |---|---|---|---|---|---|---|
 | pebble | Typing on a rainy 75 | Techrul | https://freesound.org/people/Techrul/sounds/815614/ | CC0 1.0 | 2025-07-10 | 2026-11-09 |
-| clack | Keyboard Typing 4 (WhiteFox, Mechanical) | grcekh | https://freesound.org/people/grcekh/sounds/546045/ | CC0 1.0 | 2020-11-24 | 2026-11-09 |
-| clack | Keyboard Typing 10 (WhiteFox, Mechanical) | grcekh | https://freesound.org/people/grcekh/sounds/546167/ | CC0 1.0 | 2020-11-25 | 2026-11-09 |
+| clack | Keyboard slow typing with Gateron Blue switches + low echo | forfii | https://freesound.org/people/forfii/sounds/755222/ | CC0 1.0 | (see page) | 2026-11-09 (verified on branch sound/recorded-ab) |
+| ~~clack (until 2026-11-10)~~ | ~~Keyboard Typing 4 / 10 (WhiteFox, Mechanical)~~ — **replaced, no longer in the sprite** | grcekh | https://freesound.org/people/grcekh/sounds/546045/ , /546167/ | CC0 1.0 | | |
 
 Files downloaded on 2026-11-09 (UTC ≈ 02:20–02:40), without logging in, as the Freesound high-quality
 preview MP3s (the preview has the same license as the upload):

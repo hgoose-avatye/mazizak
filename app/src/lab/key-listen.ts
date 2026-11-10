@@ -11,7 +11,7 @@ import type { KeyboardSounds } from '../audio/sfx';
  */
 const PRESETS: { id: KeyPresetId; label: string }[] = [
   { id: 'pebble', label: '조약돌' },
-  { id: 'clack', label: '까랑까랑 (B)' },
+  { id: 'clack', label: '까랑까랑' },
   { id: 'creamy-thocky', label: '크리미' },
 ];
 const CLIP_NAMES = ['OtherKeys', '2', 'BackSpace', 'Shift', 'Space']; // = order of entries.down in creamy-thocky.json
@@ -25,27 +25,9 @@ const statusEl = $('#status');
 const loaded = new Map<KeyPresetId, KeyboardSounds>();
 const failed = new Map<KeyPresetId, string>();
 
-/**
- * 까랑까랑 column = bank B of branch sound/recorded-ab (Freesound 755222 "Gateron Blue", forfii, CC0), played with that
- * branch's own parameters (detune 22/18 cents, no +6 dB makeup). Files live in app/bench-out/clack-b/ (git-ignored, copied
- * from /Users/hgoose/mazizak-sound/app/public/sfx/rec). If missing, the column falls back to the clack sprite this branch ships.
- */
-const CLACK_B_DIR = './bench-out/clack-b/';
-let clackIsB = false;
 const trimDb: Record<string, number> = {};
-const paramsFor = (id: KeyPresetId, up: boolean) =>
-  id === 'clack' && clackIsB ? { detuneCents: up ? 18 : 22, gainJitterDb: up ? 1 : 1.2, gainDb: 0 } : { detuneCents: up ? 10 : 12, gainJitterDb: up ? 1 : 1.2, gainDb: 6 };
-async function loadClackB(): Promise<KeyboardSounds> {
-  const m = (await (await fetch(`${CLACK_B_DIR}clack-b.json`)).json()) as { roles: Record<string, { files: string[]; gainDb: number }> };
-  const dec = async (f: string) => {
-    const r = await fetch(CLACK_B_DIR + f);
-    if (!r.ok) throw new Error(`${f}: HTTP ${r.status}`);
-    return audio.ctx.decodeAudioData(await r.arrayBuffer());
-  };
-  const out = {} as KeyboardSounds;
-  for (const role of ['down', 'up', 'spaceDown', 'spaceUp'] as const) out[role] = await Promise.all(m.roles[role].files.map(dec));
-  return out;
-}
+// same parameters as the keyboard toy (recorded samples: +6 dB makeup, detune 12/10 cents)
+const paramsFor = (_id: KeyPresetId, up: boolean) => ({ detuneCents: up ? 10 : 12, gainJitterDb: up ? 1 : 1.2, gainDb: 6 });
 
 const keyDetune = (i: number) => ((i * 37) % 31) - 15; // same per-key offsets as the keyboard toy
 const NORMAL_KEY = 4;
@@ -62,7 +44,7 @@ function playUp(id: KeyPresetId, space: boolean): void {
 }
 
 function refreshStatus(): void {
-  const parts = PRESETS.map((p) => `${p.label}${p.id === 'clack' && loaded.has(p.id) ? (clackIsB ? ' [Gateron Blue · sound/recorded-ab B]' : ' [B 없음 → 앱 탑재 WhiteFox]') : ''}: ${loaded.has(p.id) ? '로드됨' : failed.has(p.id) ? `실패(${failed.get(p.id)})` : '로딩…'}`);
+  const parts = PRESETS.map((p) => `${p.label}: ${loaded.has(p.id) ? '로드됨' : failed.has(p.id) ? `실패(${failed.get(p.id)})` : '로딩…'}`);
   statusEl.textContent = `${parts.join(' · ')} · AudioContext ${audio.ctx.state} ${audio.ctx.sampleRate} Hz — 첫 터치에서 소리가 안 나면 한 번 더 눌러 보세요.`;
 }
 
@@ -290,10 +272,7 @@ void (async () => {
   await Promise.all(
     PRESETS.map(async (p) => {
       try {
-        let s: KeyboardSounds;
-        if (p.id === 'clack') {
-          try { s = await loadClackB(); clackIsB = true; } catch (e) { console.warn('clack B unavailable, using shipped clack', e); s = await loadKeyboardSamples(audio.ctx, p.id); }
-        } else s = await loadKeyboardSamples(audio.ctx, p.id);
+        const s = await loadKeyboardSamples(audio.ctx, p.id);
         loaded.set(p.id, s);
         for (const role of ['down', 'up', 'spaceDown', 'spaceUp'] as const) if (s[role].length) audio.register(`lk:${p.id}:${role}`, s[role]);
         if (p.id === 'creamy-thocky') s.down.forEach((b, i) => clips.push({ name: CLIP_NAMES[i] ?? `clip${i}`, processed: b }));
