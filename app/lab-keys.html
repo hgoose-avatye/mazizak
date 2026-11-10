@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <link rel="icon" type="image/png" href="./icons/icon-192.png" />
+    <title>키보드 청취 비교 · 만지작 개발용</title>
+    <style>
+      body { position: static !important; overflow: auto !important; user-select: auto !important; -webkit-user-select: auto !important; padding: 14px 14px 80px; max-width: 720px; margin: 0 auto; line-height: 1.45; }
+      h1 { font-size: 19px; margin: 4px 0; }
+      h2 { font-size: 16px; margin: 26px 0 6px; }
+      h3 { font-size: 13.5px; margin: 0 0 6px; }
+      small, .muted { color: #6c645b; font-size: 12.5px; }
+      .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+      .col { background: #fff8; border-radius: 12px; padding: 8px; }
+      button.pad { width: 100%; min-height: 56px; margin: 3px 0; border: 0; border-radius: 10px; background: #2a2724; color: #fff; font-size: 14px; touch-action: none; user-select: none; -webkit-user-select: none; }
+      button.pad.space { background: #4b4540; }
+      button.pad.burst { background: #6b4a55; }
+      button.pad:active, button.pad.on { transform: scale(0.97); filter: brightness(1.25); }
+      .row { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; margin: 6px 0; }
+      .row button, .row select, .row input[type='text'] { font-size: 13px; padding: 7px 10px; border-radius: 8px; border: 1px solid #0002; background: #fff; }
+      .row button[aria-pressed='true'] { background: #2a2724; color: #fff; }
+      .warn { background: #fff4d0; padding: 8px 10px; border-radius: 8px; font-size: 13px; }
+      .clip { background: #fff8; border-radius: 12px; padding: 8px 10px; margin: 8px 0; }
+      .clip canvas { width: 100%; height: 64px; background: #0000000d; border-radius: 6px; display: block; }
+      .clip .row button { min-height: 40px; }
+      .clip input[type='range'] { flex: 1 1 120px; }
+      #out { font: 11.5px/1.4 ui-monospace, Menlo, monospace; white-space: pre-wrap; background: #0000000d; padding: 8px; border-radius: 8px; max-height: 260px; overflow: auto; }
+    </style>
+  </head>
+  <body>
+    <h1>키보드 청취 비교 (개발용)</h1>
+    <p class="muted">앱과 같은 재생 경로(로더·라운드로빈·디튠/게인 변주·+6 dB 보정·리미터)로 조약돌 · 까랑까랑 · 크리미를 나란히 들어봅니다. 패드를 누르면 키다운, 떼면 키업(있는 프리셋만)이 재생됩니다. 이어폰과 휴대폰 스피커 양쪽으로 들어보세요. <b>이 화면의 판정 메모는 사람이 적는 기록일 뿐, 자동으로 소리나 매핑을 바꾸지 않습니다.</b></p>
+    <div class="warn" id="status">불러오는 중…</div>
+    <div class="row"><a href="./index.html">앱으로</a> <a href="./lab-sound.html">합성/녹음 A/B</a></div>
+
+    <h2>1. 3종 즉시 비교</h2>
+    <div class="row">
+      <button id="seq-key">일반 키 3종 연속(조약돌→까랑까랑→크리미)</button>
+      <button id="seq-space">스페이스바 3종 연속</button>
+      <button id="seq-burst">연타 10회 3종 연속</button>
+    </div>
+    <div class="row"><small id="now"></small></div>
+    <div class="grid3" id="pads"></div>
+    <div class="row">
+      <span class="muted">PC 키보드 입력 대상:</span>
+      <span id="kbtarget" class="row"></span>
+      <small>(문자 키 = 일반 키, Space = 스페이스바. 버튼에 포커스가 있으면 먼저 화면 빈 곳을 누르세요)</small>
+    </div>
+
+    <h2>2. 크리미 원본 클립 5개 개별 청취</h2>
+    <p class="muted">
+      <b>처리본</b> = 앱에 들어간 스프라이트 조각(트림·정규화·맵 gain 적용). <b>원본 OGG</b> = Mechvibes 팩 그대로(무보정이라 4개는 매우 작음). <b>원본 +증폭</b> = 원본을 단순히 피크 −1 dBFS로 키운 것(트림 영향 비교용).
+      구간 슬라이더와 배속(0.25×는 음높이도 같이 내려갑니다)은 타격이 몇 번 들리는지 확인하기 위한 청취 도구입니다. 원본 OGG는 개발 서버에서만 열립니다(Safari는 OGG를 못 읽을 수 있음).
+    </p>
+    <div id="clips"></div>
+
+    <h2>3. 청취 메모</h2>
+    <p class="muted">판정은 이 브라우저(localStorage)에만 저장됩니다. 결과 JSON을 복사해 알려주세요. 그 전에는 키다운·키업 구조나 키 매핑을 수정하지 않습니다.</p>
+    <div id="notes"></div>
+    <div class="row"><button id="copy">메모 JSON 복사</button><button id="clear">메모 지우기</button></div>
+    <pre id="out"></pre>
+    <script type="module" src="/src/lab/key-listen.ts"></script>
+  </body>
+</html>
