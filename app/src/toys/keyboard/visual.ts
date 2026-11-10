@@ -1,3 +1,4 @@
+import type { KeyPresetId } from '../../audio/keyPresets';
 import * as THREE from 'three';
 import { createCaseGeometry, createKeycapGeometry, createLegendTexture } from './keycap';
 
@@ -18,7 +19,7 @@ export interface KeyboardVisual {
   keys: KeyVisual[]; // 9 x 1u then spacebar
   size: THREE.Vector3;
   travel: number;
-  setStyle(p: 'pebble' | 'clack'): void;
+  setStyle(p: KeyPresetId): void;
   /**
    * Compile shader programs and upload legend textures for the styles not currently shown,
    * so the first setStyle() to them does no GPU compile/upload work (no switch hitch).
@@ -65,7 +66,7 @@ interface Style {
   case: number;
   caseRough: number;
 }
-const STYLES: Record<'pebble' | 'clack', Style> = {
+const STYLES: Record<KeyPresetId, Style> = {
   // matte cream PBT, warm accent, light aluminium tray
   pebble: {
     cap: { color: 0xe4d9c2, roughness: 0.58, clearcoat: 0, specularIntensity: 0.6 },
@@ -73,6 +74,14 @@ const STYLES: Record<'pebble' | 'clack', Style> = {
     legend: '#4a443b',
     case: 0xb9bcc1,
     caseRough: 0.42,
+  },
+  // soft sage-mint PBT, dusty-rose accent, lilac-grey tray (creamy-thocky: visibly different from pebble's cream/orange)
+  'creamy-thocky': {
+    cap: { color: 0xcfe0d2, roughness: 0.52, clearcoat: 0.1, clearcoatRoughness: 0.5, specularIntensity: 0.6 },
+    accent: { color: 0xe39aa8, roughness: 0.52, clearcoat: 0.1, clearcoatRoughness: 0.5, specularIntensity: 0.6 },
+    legend: '#3f4a43',
+    case: 0xb8aec4,
+    caseRough: 0.46,
   },
   // glossy white ABS, cool accent, dark anodized tray
   clack: {

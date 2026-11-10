@@ -15,9 +15,9 @@ export const SYNTH_BASE: Record<KeyPresetId, KeySwitchPreset> = {
   'creamy-thocky': 'pebble', // soft, round "thock"
 };
 
-/** Visual key style for each preset (creamy-thocky reuses the cream PBT look of pebble). */
-export const VISUAL_STYLE: Record<KeyPresetId, KeySwitchPreset> = {
+/** Visual key style for each preset (keys of STYLES in toys/keyboard/visual.ts). */
+export const VISUAL_STYLE: Record<KeyPresetId, KeyPresetId> = {
   pebble: 'pebble',
   clack: 'clack',
-  'creamy-thocky': 'pebble',
+  'creamy-thocky': 'creamy-thocky',
 };
