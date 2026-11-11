@@ -1,12 +1,18 @@
 import * as THREE from "three";
-import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
 import type { Toy, ToyContext } from "../../core/toy";
 import type { InputEvt } from "../../core/runtime";
 import { radialShadowTexture, studioEnvironment } from "../../core/studio";
 import type { FidgetSpec } from "./catalog";
 import { FidgetModel, FractureModel, GrainModel } from "./model";
 import { FidgetAudio } from "./audio";
-import { STAGES, surfaceTexture, bodyGeometry, shellPatches } from "./visuals";
+import {
+  STAGES,
+  surfaceTexture,
+  bodyGeometry,
+  shellPatches,
+  sugarColor,
+  sugarTexture,
+} from "./visuals";
 import { LOCAL_FIDGETS, referenceMesh } from "./references";
 export interface FidgetToy extends Toy {
   action(name: string): void;
@@ -52,6 +58,25 @@ export function createFidget(ctx: ToyContext, spec: FidgetSpec): FidgetToy {
     material.bumpScale = spec.shape === "foam" ? 0.025 : 0.006;
   }
   let geometry: THREE.BufferGeometry = bodyGeometry(spec);
+  if (spec.shape === "beads") {
+    const a = geometry.getAttribute("position"),
+      colors = new Float32Array(a.count * 3);
+    for (let i = 0; i < a.count; i++) {
+      const c = sugarColor(a.getX(i), a.getY(i), a.getZ(i));
+      c.toArray(colors, i * 3);
+    }
+    geometry.setAttribute("color", new THREE.BufferAttribute(colors, 3));
+    const grit = sugarTexture();
+    material.vertexColors = true;
+    material.map = grit;
+    material.bumpMap = null;
+    material.bumpScale = 0;
+    material.side = THREE.FrontSide;
+    material.clearcoat = 0.05;
+    material.roughness = 0.45;
+    material.depthWrite = false;
+  }
+
   if (spec.family === "wax") geometry.scale(0.88, 0.88, 0.88);
   let base = Float32Array.from(geometry.getAttribute("position").array);
   const blob = new THREE.Mesh(geometry, material);
@@ -59,6 +84,71 @@ export function createFidget(ctx: ToyContext, spec: FidgetSpec): FidgetToy {
   blob.position.y = spec.height * 0.94;
   blob.frustumCulled = false;
   scene.add(blob);
+  let softbox: THREE.Mesh | null = null;
+  const softboxRest = new THREE.Vector3(-0.09, 0.45, 0.89)
+    .normalize()
+    .multiplyScalar(1.018);
+  if (spec.shape === "beads") {
+    const skin = new THREE.Mesh(
+      geometry,
+      new THREE.MeshPhysicalMaterial({
+        color: 0xffffff,
+        transparent: true,
+        opacity: 0.42,
+        envMap: scene.environment,
+        envMapIntensity: 3,
+        roughness: 0.025,
+        clearcoat: 1,
+        clearcoatRoughness: 0.04,
+        ior: 1.38,
+        depthWrite: false,
+        side: THREE.FrontSide,
+      }),
+    );
+    skin.position.copy(blob.position);
+    skin.scale.setScalar(1.009);
+    skin.frustumCulled = false;
+    skin.renderOrder = 3;
+    blob.renderOrder = 2;
+    scene.add(skin);
+    // Small studio-light reflection, approximated on the deforming clear skin.
+    const canvas = document.createElement("canvas");
+    canvas.width = canvas.height = 64;
+    const c = canvas.getContext("2d")!;
+    const edge = c.createLinearGradient(0, 0, 64, 0);
+    edge.addColorStop(0, "rgba(255,255,255,0)");
+    edge.addColorStop(0.12, "white");
+    edge.addColorStop(0.88, "white");
+    edge.addColorStop(1, "rgba(255,255,255,0)");
+    c.fillStyle = edge;
+    c.fillRect(0, 0, 64, 64);
+    c.globalCompositeOperation = "destination-in";
+    const fade = c.createLinearGradient(0, 0, 0, 64);
+    fade.addColorStop(0, "rgba(255,255,255,0)");
+    fade.addColorStop(0.1, "white");
+    fade.addColorStop(0.9, "white");
+    fade.addColorStop(1, "rgba(255,255,255,0)");
+    c.fillStyle = fade;
+    c.fillRect(0, 0, 64, 64);
+    softbox = new THREE.Mesh(
+      new THREE.PlaneGeometry(0.1, 0.13),
+      new THREE.MeshBasicMaterial({
+        map: new THREE.CanvasTexture(canvas),
+        transparent: true,
+        opacity: 0.92,
+        depthWrite: false,
+        depthTest: false,
+        toneMapped: false,
+      }),
+    );
+    softbox.quaternion.setFromUnitVectors(
+      new THREE.Vector3(0, 0, 1),
+      softboxRest.clone().normalize(),
+    );
+    softbox.renderOrder = 4;
+    scene.add(softbox);
+  }
+
   const shadow = new THREE.Mesh(
     new THREE.PlaneGeometry(4.5, 4),
     new THREE.MeshBasicMaterial({
@@ -208,33 +298,51 @@ export function createFidget(ctx: ToyContext, spec: FidgetSpec): FidgetToy {
   const grains =
     spec.family === "particles" ? new GrainModel(spec.shape === "soap") : null;
   let grainMesh: THREE.InstancedMesh | null = null;
-  const matrix = new THREE.Object3D();
-  if (grains) {
+  const matrix = new THREE.Object3D(),
+    visualGrains: THREE.Vector3[] = [],
+    visualParents: number[] = [],
+    flowOffsets: THREE.Vector3[] = [];
+  if (grains && spec.shape === "beads") {
+    const count = 1400;
     grainMesh = new THREE.InstancedMesh(
-      spec.shape === "soap"
-        ? new RoundedBoxGeometry(0.25, 0.17, 0.23, 2, 0.018)
-        : new THREE.IcosahedronGeometry(0.095, 2),
-      new THREE.MeshPhysicalMaterial({
-        roughness: spec.shape === "soap" ? 0.92 : 0.3,
-        clearcoat: 0.25,
-      }),
-      grains.grains.length * 4,
+      new THREE.IcosahedronGeometry(0.0075, 0),
+      new THREE.MeshPhysicalMaterial({ roughness: 0.3, clearcoat: 0.4 }),
+      count,
     );
-    grainMesh.count = grains.grains.length;
+    grainMesh.count = count;
     grainMesh.position.copy(blob.position);
     grainMesh.frustumCulled = false;
     scene.add(grainMesh);
-    for (let i = 0; i < grains.grains.length * 4; i++)
+    for (let i = 0; i < count; i++) {
+      const y = 1 - 2 * ((i + 0.5) / count),
+        r = Math.sqrt(1 - y * y),
+        angle = i * 2.399963,
+        radius = 0.91 * Math.cbrt(0.08 + 0.92 * ((i * 0.75487766) % 1));
+      const rest = new THREE.Vector3(
+        Math.cos(angle) * r * radius,
+        y * radius,
+        Math.sin(angle) * r * radius,
+      );
+      visualGrains.push(rest);
+      let closest = 0,
+        best = Infinity;
+      grains.grains.forEach((g, j) => {
+        const d = rest.distanceToSquared(g.initial);
+        if (d < best) {
+          best = d;
+          closest = j;
+        }
+      });
+      visualParents.push(closest);
       grainMesh.setColorAt(
         i,
-        new THREE.Color(
-          (spec.shape === "soap"
-            ? [0xcce4da, 0xf5eddc, 0xe4c5c0, 0xaacbc8]
-            : [0xffeee1, 0xf5d5ad, 0xc2d7cf, 0xe5bbcc, 0xd5c5e2, 0xf5eee0])[
-            i % (spec.shape === "soap" ? 4 : 6)
-          ],
+        sugarColor(rest.x, rest.y, rest.z).lerp(
+          new THREE.Color(0xffffff),
+          0.12 + (i % 4) * 0.08,
         ),
       );
+    }
+    grains.grains.forEach(() => flowOffsets.push(new THREE.Vector3()));
     grainMesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
   }
   const bubbles: THREE.Mesh[] = [];
@@ -314,14 +422,15 @@ export function createFidget(ctx: ToyContext, spec: FidgetSpec): FidgetToy {
         coreTouches++;
         corePointers.add(e.id);
       }
-      sound.play(
-        spec.family === "wax"
-          ? h.object === blob
-            ? "knead"
-            : "press"
-          : "press",
-        0.4,
-      );
+      if (spec.family !== "particles")
+        sound.play(
+          spec.family === "wax"
+            ? h.object === blob
+              ? "knead"
+              : "press"
+            : "press",
+          0.4,
+        );
       ctx.haptic(7);
       compressClock = 0;
     } else if (e.kind === "move") {
@@ -339,7 +448,9 @@ export function createFidget(ctx: ToyContext, spec: FidgetSpec): FidgetToy {
       model.release(e.id);
       corePointers.delete(e.id);
       anchors.delete(e.id);
-      if (e.kind === "up") sound.play("release", model.compression);
+      if (e.kind === "up" && spec.family !== "particles")
+        sound.play("release", model.compression);
+      if (!anchors.size && spec.family === "particles") sound.releaseGesture();
       ctx.requestFrame();
     }
   };
@@ -375,12 +486,17 @@ export function createFidget(ctx: ToyContext, spec: FidgetSpec): FidgetToy {
       a.setXYZ(i, tmp.x, tmp.y, tmp.z);
     }
     a.needsUpdate = true;
+    if (softbox) {
+      model.deform(softboxRest, tmp);
+      softbox.position.copy(tmp).add(blob.position);
+    }
     if (frames % 2 === 0) geometry.computeVertexNormals();
     geometry.computeBoundingSphere();
     if (held.length) {
       compressClock += dt;
       if (compressClock > 0.28) {
-        if (spec.family !== "wax") sound.play("compress", model.compression);
+        if (spec.family !== "wax" && spec.family !== "particles")
+          sound.play("compress", model.compression);
         else if (corePointers.size > 0) sound.play("knead", model.compression);
         compressClock = -100;
       }
@@ -436,49 +552,39 @@ export function createFidget(ctx: ToyContext, spec: FidgetSpec): FidgetToy {
       shell.geometry.computeBoundingSphere();
       if (held.length) moving = true;
     }
-    if (grains && grainMesh) {
-      const events = grains.step(dt, model);
+    if (grains) {
+      const beforeCrush = grains.crushed,
+        events = grains.step(dt, model);
       crunchClock -= dt;
-      if (events && crunchClock <= 0 && held.length) {
-        sound.play("crunch", Math.min(1, events * 0.1));
-        crunchClock = spec.shape === "soap" ? 0.1 : 0.075;
+      const pressureWork = grains.contactWork > 0.006;
+      if (
+        held.length &&
+        crunchClock <= 0 &&
+        (grains.crushed > beforeCrush ||
+          (pressureWork && (events > 0 || model.compression > 0.025)))
+      ) {
+        sound.play("crunch", Math.min(1, 0.3 + grains.contactWork));
+        crunchClock = 0.18;
       }
-      let count = grains.grains.length;
       grainMotion = 0;
       grains.grains.forEach((g, i) => {
-        matrix.position.copy(g.pos);
-        matrix.rotation.set(
-          i * 0.7 + g.velocity.x,
-          i * 0.3,
-          i * 0.4 + g.velocity.z,
-        );
-        matrix.scale.setScalar(
-          spec.shape === "soap" && g.integrity <= 0
-            ? 0.4
-            : 0.8 + ((i * 17) % 11) * 0.04,
-        );
-        matrix.updateMatrix();
-        grainMesh!.setMatrixAt(i, matrix.matrix);
         grainMotion += g.velocity.lengthSq();
-        if (spec.shape === "soap" && g.integrity <= 0)
-          for (let j = 0; j < 3; j++) {
-            matrix.position
-              .copy(g.pos)
-              .add(
-                tmp.set(
-                  Math.sin(i + j) * 0.13,
-                  -0.09,
-                  Math.cos(i * 2 + j) * 0.13,
-                ),
-              );
-            matrix.scale.setScalar(0.28);
-            matrix.updateMatrix();
-            grainMesh!.setMatrixAt(count, matrix.matrix);
-            count++;
-          }
+        if (grainMesh) {
+          model.deform(g.initial, tmp);
+          flowOffsets[i].copy(g.pos).sub(tmp).clampLength(0, 0.07);
+        }
       });
-      grainMesh.count = count;
-      grainMesh.instanceMatrix.needsUpdate = true;
+      if (grainMesh) {
+        visualGrains.forEach((rest, i) => {
+          model.deform(rest, tmp);
+          matrix.position.copy(tmp).add(flowOffsets[visualParents[i]]);
+          matrix.rotation.set(i * 0.7, i * 0.3, i * 0.4);
+          matrix.scale.setScalar(0.65 + ((i * 17) % 13) * 0.065);
+          matrix.updateMatrix();
+          grainMesh!.setMatrixAt(i, matrix.matrix);
+        });
+        grainMesh.instanceMatrix.needsUpdate = true;
+      }
       moving = moving || grainMotion > 0.0001;
     }
     if (spec.shape === "mango" && held.length) {
@@ -562,6 +668,15 @@ export function createFidget(ctx: ToyContext, spec: FidgetSpec): FidgetToy {
         totalFaces: centers.length,
         crushedParticles: grains?.crushed ?? 0,
         particleCollisions: grains?.collisions ?? 0,
+        enclosure: spec.family === "particles" ? "intact-elastic-skin" : null,
+        grainPresentation:
+          spec.shape === "soap"
+            ? "concealed-filling"
+            : spec.shape === "beads"
+              ? "fine-embedded-rainbow"
+              : null,
+        visibleMicroGrains: visualGrains.length,
+        internalRearrangements: grains?.rearrangements ?? 0,
         coreTouches,
         pops,
         audio: sound.state,

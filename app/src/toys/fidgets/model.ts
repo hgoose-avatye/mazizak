@@ -195,7 +195,13 @@ export class FidgetModel {
       out.addScaledVector(
         p,
         ((Math.max(0, c.depth.x) * ring) / Math.max(p.length(), 0.01)) *
-          (s.shape === "mochi" ? 0.5 : s.shape === "mango" ? 0.65 : 0.2),
+          (s.shape === "mochi"
+            ? 0.5
+            : s.shape === "mango"
+              ? 0.65
+              : s.family === "particles"
+                ? 0.42
+                : 0.2),
       );
     }
     if (s.family === "viscous") {
@@ -302,6 +308,7 @@ export class FractureModel {
 }
 
 export interface Grain {
+  initial: Vector3;
   rest: Vector3;
   pos: Vector3;
   velocity: Vector3;
@@ -312,6 +319,10 @@ export class GrainModel {
   readonly grains: Grain[] = [];
   crushed = 0;
   collisions = 0;
+  rearrangements = 0;
+  contactWork = 0;
+  private priorCompression = 0;
+  private wasHeld = false;
   constructor(readonly soap: boolean) {
     for (let i = 0; i < (soap ? 96 : 220); i++) {
       const u = (i * 0.61803398875) % 1,
@@ -322,7 +333,19 @@ export class GrainModel {
         (v - 0.5) * 1.0 + 0.12 * Math.sin(u * 6.28),
         Math.sin(u * Math.PI * 2) * r * 1.0,
       );
+      if (!soap) {
+        const yy = 1 - 2 * ((i + 0.5) / 220),
+          rr = Math.sqrt(1 - yy * yy),
+          a = i * 2.399963;
+        const radius = 0.72 + 0.18 * ((i * 0.75487766) % 1);
+        p.set(
+          Math.cos(a) * rr * radius,
+          yy * radius,
+          Math.sin(a) * rr * radius,
+        );
+      }
       this.grains.push({
+        initial: p.clone(),
         rest: p.clone(),
         pos: p.clone(),
         velocity: new Vector3(),
@@ -335,6 +358,19 @@ export class GrainModel {
     let events = 0;
     const target = new Vector3(),
       held = model.held;
+    this.contactWork = held.length
+      ? Math.max(0, model.compression - this.priorCompression) * 25 +
+        Math.min(1, model.motion) * 0.15
+      : 0;
+    this.priorCompression = model.compression;
+    if (this.wasHeld && !held.length && !this.soap) {
+      for (const g of this.grains) {
+        g.rest.lerp(g.pos, 0.2);
+        g.rest.clampLength(0, 0.93);
+      }
+      this.rearrangements++;
+    }
+    this.wasHeld = held.length > 0;
     for (const g of this.grains) {
       model.deform(g.rest, target);
       g.velocity.addScaledVector(target.sub(g.pos), dt * 24);
@@ -390,7 +426,12 @@ export class GrainModel {
   reset() {
     this.crushed = 0;
     this.collisions = 0;
+    this.rearrangements = 0;
+    this.priorCompression = 0;
+    this.wasHeld = false;
+    this.contactWork = 0;
     for (const g of this.grains) {
+      g.rest.copy(g.initial);
       g.pos.copy(g.rest);
       g.velocity.set(0, 0, 0);
       g.integrity = 1;

@@ -76,6 +76,9 @@ export class FidgetAudio {
   private enabled = false;
   private last: Record<string, number> = {};
   private stops: (() => void)[] = [];
+  private crunchUntil = 0;
+  private crunchStop: (() => void) | null = null;
+  private crunchDuration = 0;
   constructor(
     private audio: AudioEngine,
     readonly spec: FidgetSpec,
@@ -88,8 +91,11 @@ export class FidgetAudio {
         wet = sq.compressGel ?? sq.compress,
         foam = this.spec.sound === "foam",
         cream = this.spec.sound === "cream";
-      const register = (r: string, b: AudioBuffer[]) =>
+      const register = (r: string, b: AudioBuffer[]) => {
         this.audio.register(`fg:${this.spec.id}:${r}`, b);
+        if (r === "crunch")
+          this.crunchDuration = Math.max(...b.map((x) => x.duration));
+      };
       register(
         "press",
         this.spec.family === "wax"
@@ -139,14 +145,7 @@ export class FidgetAudio {
       if (LOCAL_FIDGETS) {
         const local = await referenceSounds(this.audio.ctx, this.spec.id);
         for (const [role, buffers] of Object.entries(local)) {
-          register(
-            role,
-            role === "crunch"
-              ? buffers.map((b) =>
-                  cut(this.audio.ctx, b, 0, Math.min(0.36, b.duration)),
-                )
-              : buffers,
-          );
+          register(role, buffers);
         }
         const wetLocal = local.knead ?? local.compress ?? local.press;
         register(
@@ -170,7 +169,14 @@ export class FidgetAudio {
   }
   play(role: string, strength = 1) {
     if (!this.enabled || this.state !== "recorded/derived") return;
+    if (this.spec.family === "particles" && role !== "crunch") return;
     const now = performance.now();
+    if (
+      role === "crunch" &&
+      this.spec.family === "particles" &&
+      now < this.crunchUntil
+    )
+      return;
     if (
       now - (this.last[role] ?? -1000) <
       (role === "crunch"
@@ -220,19 +226,26 @@ export class FidgetAudio {
                   ? 6500
                   : 7000,
         gainDb:
-          (role === "release" ? -9 : role === "crunch" ? -6 : -2) +
-          Math.min(3, strength * 3),
+          this.spec.family === "particles"
+            ? -8 + Math.min(2, strength * 2)
+            : (role === "release" ? -9 : role === "crunch" ? -6 : -2) +
+              Math.min(3, strength * 3),
         gainJitterDb: 1.3,
-        detuneCents: 18,
+        detuneCents: this.spec.family === "particles" ? 0 : 18,
       },
       `fidget:${role}`,
     );
+    if (role === "crunch" && this.spec.family === "particles" && log?.stop) {
+      this.crunchUntil = now + this.crunchDuration * 1000 + 35;
+      this.crunchStop = () => log.stop?.(0.06);
+    }
     if (log?.stop) {
       this.stops.push(() => log.stop?.(0.04));
       if (this.stops.length > 24) this.stops.shift();
     }
   }
   continuous(stretch: number, rub: number) {
+    if (this.spec.family === "particles") return;
     if (this.enabled) {
       this.stretch?.set(
         Math.min(LOCAL_FIDGETS ? 0.22 : 0.5, stretch),
@@ -244,7 +257,13 @@ export class FidgetAudio {
       );
     }
   }
+  releaseGesture() {
+    this.crunchStop?.();
+    this.crunchStop = null;
+    this.crunchUntil = 0;
+  }
   stop() {
+    this.releaseGesture();
     this.rub?.set(0, 0);
     this.stretch?.set(0, 0);
     for (const stop of this.stops) stop();

@@ -9,8 +9,8 @@ export const STAGES: Record<string, number> = {
   L03: 0xf0e9e6,
   W01: 0xecf0e3,
   W02: 0xede3df,
-  C01: 0xe8eeee,
-  C02: 0xf0eaf2,
+  C01: 0xf2f0ea,
+  C02: 0xf0f1ee,
 };
 export function surfaceTexture(shape: string) {
   const c = document.createElement("canvas");
@@ -67,8 +67,8 @@ export function bodyGeometry(s: FidgetSpec) {
       y = p.getY(i),
       z = p.getZ(i);
     const theta = Math.atan2(z, x);
-    if (s.shape === "foam" || s.shape === "cheese") {
-      const pow = s.shape === "cheese" ? 0.42 : 0.38;
+    if (s.shape === "foam" || s.shape === "cheese" || s.shape === "soap") {
+      const pow = s.shape === "cheese" ? 0.42 : s.shape === "soap" ? 0.5 : 0.38;
       x = Math.sign(x) * Math.pow(Math.abs(x), pow);
       y = Math.sign(y) * Math.pow(Math.abs(y), pow);
       z = Math.sign(z) * Math.pow(Math.abs(z), pow);
@@ -95,7 +95,15 @@ export function bodyGeometry(s: FidgetSpec) {
       z *= 1 + 0.08 * y;
       y -= 0.08 * Math.exp((-x * x) / 0.025) * Math.max(0, y);
     }
-    p.setXYZ(i, x * s.width, Math.max(y, -0.86) * s.height, z * s.depth);
+    p.setXYZ(
+      i,
+      x * s.width,
+      Math.max(
+        y,
+        s.shape === "soap" ? -0.93 : s.shape === "beads" ? -1 : -0.86,
+      ) * s.height,
+      z * s.depth,
+    );
   }
   g.computeVertexNormals();
   return g;
@@ -152,4 +160,45 @@ export function shellPatches(
     else c.copy(seeds[i]);
   });
   return { geometry, centers, vertices, faceToPatch };
+}
+
+/** Fine embedded sugar grains, based on the user's photo rather than large exposed pearls. */
+export function sugarColor(x: number, y = 0, z = 0) {
+  const stops = [
+    new THREE.Color(0x299fc5),
+    new THREE.Color(0xa888cf),
+    new THREE.Color(0xe98bab),
+    new THREE.Color(0xefc45b),
+  ];
+  const t =
+    THREE.MathUtils.clamp((x + 0.92) / 1.84 + y * 0.06 - z * 0.035, 0, 0.999) *
+    3;
+  return stops[Math.floor(t)]
+    .clone()
+    .lerp(stops[Math.min(3, Math.floor(t) + 1)], t % 1);
+}
+export function sugarTexture() {
+  const c = document.createElement("canvas");
+  c.width = 1024;
+  c.height = 512;
+  const ctx = c.getContext("2d")!;
+  ctx.fillStyle = "#eeeeee";
+  ctx.fillRect(0, 0, c.width, c.height);
+  let seed = 432;
+  const rnd = () => {
+    seed = (seed * 1664525 + 1013904223) >>> 0;
+    return seed / 4294967296;
+  };
+  for (let i = 0; i < 22000; i++) {
+    const x = rnd() * c.width,
+      y = rnd() * c.height,
+      r = 0.35 + rnd() * 1.25;
+    ctx.fillStyle = i % 3 === 0 ? "rgba(88,88,88,.25)" : "rgba(255,255,255,.7)";
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, 6.283);
+    ctx.fill();
+  }
+  const t = new THREE.CanvasTexture(c);
+  t.colorSpace = THREE.SRGBColorSpace;
+  return t;
 }

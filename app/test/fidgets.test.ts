@@ -100,6 +100,33 @@ describe("fidget material mechanics", () => {
     soap.reset();
     expect(soap.grains.every((g) => g.integrity === 1)).toBe(true);
   });
+  it("an intact crunch skin recovers while internal bead rearrangement persists until reset", () => {
+    const m = new FidgetModel(spec("C02")),
+      beads = new GrainModel(false);
+    press(m);
+    for (let i = 0; i < 180; i++) {
+      m.step(1 / 120);
+      beads.step(1 / 120, m);
+    }
+    m.release(1);
+    for (let i = 0; i < 360; i++) {
+      m.step(1 / 120);
+      beads.step(1 / 120, m);
+    }
+    expect(m.compression).toBeLessThan(0.02);
+    expect(beads.rearrangements).toBe(1);
+    expect(beads.grains.some((g) => g.rest.distanceTo(g.initial) > 0.001)).toBe(
+      true,
+    );
+    expect(beads.grains.every((g) => g.rest.length() <= 0.930001)).toBe(true);
+    beads.reset();
+    expect(beads.rearrangements).toBe(0);
+    expect(
+      beads.grains.every(
+        (g) => g.rest.equals(g.initial) && g.pos.equals(g.initial),
+      ),
+    ).toBe(true);
+  });
   it("bounds simultaneous pointers and releases all state on reset", () => {
     const m = new FidgetModel(spec("S01"));
     for (let i = 0; i < 10; i++)
