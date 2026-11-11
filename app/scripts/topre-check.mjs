@@ -47,7 +47,7 @@ async function session({ mobile = false, fail = false, slow = false } = {}) {
 try {
   for (const mobile of [false, true]) {
     const s = await session({ mobile });
-    check(`four chips / mobile=${mobile}`, JSON.stringify(await s.page.getByRole('radio').allTextContents()) === JSON.stringify(['조약돌', '까랑까랑', '크리미', 'Topre']));
+    check(`six chips / mobile=${mobile}`, JSON.stringify(await s.page.getByRole('radio').allTextContents()) === JSON.stringify(['조약돌', '까랑까랑', '크리미', 'Topre', 'Turquoise Tealios', 'IBM Buckling Spring']));
     await s.choose('Topre'); await s.clear();
     for (const code of pattern) await s.key(code);
     let l = await s.logs();
@@ -114,7 +114,7 @@ try {
   });
   await page.goto(url + 'keyboard-compare.html');
   await page.waitForFunction(() => document.querySelector('#status')?.textContent?.includes('12개 로드 완료'));
-  check('comparison has all four presets', await page.locator('#preset option').count() === 4);
+  check('comparison has all six presets', await page.locator('#preset option').count() === 6);
   for (const preset of ['pebble', 'clack', 'creamy-thocky', 'topre']) {
     await page.selectOption('#preset', preset);
     await page.evaluate(() => { window.__starts = 0; });

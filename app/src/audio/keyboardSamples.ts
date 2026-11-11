@@ -12,6 +12,7 @@
  */
 import type { KeyboardSounds } from './sfx';
 import type { KeyPresetId } from './keyPresets';
+import { isLocalKeyPreset, LOCAL_KEY_PRESETS_ENABLED } from './localKeyPresets';
 
 export const EXTRA_KEY_ROLES = ['enterDown', 'enterUp', 'backspaceDown', 'backspaceUp'] as const;
 export type KeyboardSampleSounds = KeyboardSounds & Partial<Record<typeof EXTRA_KEY_ROLES[number], AudioBuffer[]>> & { rowDown?: AudioBuffer[] };
@@ -21,7 +22,7 @@ export const KEYBOARD_SAMPLE_CREDITS =
   '"Typing on a rainy 75" by Techrul (freesound.org/s/815614) [pebble]; ' +
   '"Keyboard slow typing with Gateron Blue switches + low echo" by forfii (freesound.org/s/755222) [clack]; ' +
   '"My Sound Pack" by Chevy (mechvibes.com/sound-packs/my-sound-pack-5), CC BY 4.0 [creamy-thocky]; ' +
-  'Topre from tplai/kbsim (github.com/tplai/kbsim), Copyright (c) Thomas Lai, MIT; original recording provenance unverified.';
+  'Topre, Turquoise Tealios and Buckling Spring from tplai/kbsim (github.com/tplai/kbsim), Copyright (c) Thomas Lai, MIT; original recording provenance unverified.';
 
 interface SpriteEntry {
   /** seconds into the sprite */
@@ -54,6 +55,10 @@ export function loadKeyboardSamples(
   preset: KeyPresetId,
   baseUrl = './sfx/keyboard/',
 ): Promise<KeyboardSampleSounds> {
+  if (isLocalKeyPreset(preset)) {
+    if (!LOCAL_KEY_PRESETS_ENABLED) return Promise.reject(new Error('Local-only preset is disabled'));
+    baseUrl = '/__local-keyboard/';
+  }
   const base = baseUrl.endsWith('/') ? baseUrl : baseUrl + '/';
   let perCtx = cache.get(ctx);
   if (!perCtx) cache.set(ctx, (perCtx = new Map()));

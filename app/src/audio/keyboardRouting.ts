@@ -19,3 +19,6 @@ export function topreRole(code: string, phase: 'Down' | 'Up'): string | undefine
   const row = topreRow(code);
   return row === undefined ? undefined : phase === 'Down' ? `downR${row}` : 'up';
 }
+
+/** kbsim packs with five row presses plus dedicated press/release pairs. */
+export const isKbsimMappedPreset = (id: string) => ['topre', 'turquoise-tealios', 'ibm-buckling-spring'].includes(id);

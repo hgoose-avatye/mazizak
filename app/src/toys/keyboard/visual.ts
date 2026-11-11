@@ -1,5 +1,6 @@
-import type { KeyPresetId } from '../../audio/keyPresets';
+import type { KeyVisualStyle } from '../../audio/keyPresets';
 import * as THREE from 'three';
+import { KEYBOARD_COLORS } from './colors';
 import { createCaseGeometry, createKeycapGeometry, createLegendTexture } from './keycap';
 
 /**
@@ -19,7 +20,7 @@ export interface KeyboardVisual {
   keys: KeyVisual[]; // 9 x 1u then spacebar
   size: THREE.Vector3;
   travel: number;
-  setStyle(p: Exclude<KeyPresetId, 'topre'>): void;
+  setStyle(p: KeyVisualStyle): void;
   /**
    * Compile shader programs and upload legend textures for the styles not currently shown,
    * so the first setStyle() to them does no GPU compile/upload work (no switch hitch).
@@ -42,7 +43,6 @@ const CASE_H = 0.62;
 const INSET = 0.24;
 const PLATE_Y = CASE_H - INSET;
 const CAP_Y = PLATE_Y + 0.16;
-const ACCENT_INDEX = 4;
 export const LEGENDS = ['만', '지', '작', '↺', '♪', '★', '1', '2', '3'];
 
 /** PBT/ABS top material compositing a premultiplied legend texture over the albedo. */
@@ -59,38 +59,10 @@ function legendMaterial(base: THREE.MeshPhysicalMaterial, tex: THREE.Texture): T
   return m;
 }
 
-interface Style {
-  cap: THREE.MeshPhysicalMaterialParameters;
-  accent: THREE.MeshPhysicalMaterialParameters;
-  legend: string;
-  case: number;
-  caseRough: number;
-}
-const STYLES: Record<Exclude<KeyPresetId, 'topre'>, Style> = {
-  // matte cream PBT, warm accent, light aluminium tray
-  pebble: {
-    cap: { color: 0xe4d9c2, roughness: 0.58, clearcoat: 0, specularIntensity: 0.6 },
-    accent: { color: 0xd9643a, roughness: 0.58, clearcoat: 0, specularIntensity: 0.6 },
-    legend: '#4a443b',
-    case: 0xb9bcc1,
-    caseRough: 0.42,
-  },
-  // soft sage-mint PBT, dusty-rose accent, lilac-grey tray (creamy-thocky: visibly different from pebble's cream/orange)
-  'creamy-thocky': {
-    cap: { color: 0xcfe0d2, roughness: 0.52, clearcoat: 0.1, clearcoatRoughness: 0.5, specularIntensity: 0.6 },
-    accent: { color: 0xe39aa8, roughness: 0.52, clearcoat: 0.1, clearcoatRoughness: 0.5, specularIntensity: 0.6 },
-    legend: '#3f4a43',
-    case: 0xb8aec4,
-    caseRough: 0.46,
-  },
-  // glossy white ABS, cool accent, dark anodized tray
-  clack: {
-    cap: { color: 0xf2f2ef, roughness: 0.28, clearcoat: 0.45, clearcoatRoughness: 0.2, specularIntensity: 0.8 },
-    accent: { color: 0x3f6fa8, roughness: 0.28, clearcoat: 0.45, clearcoatRoughness: 0.2, specularIntensity: 0.8 },
-    legend: '#3b3f46',
-    case: 0x45484e,
-    caseRough: 0.35,
-  },
+const STYLES = KEYBOARD_COLORS;
+const inkFor = (hex: number) => {
+  const c = new THREE.Color(hex);
+  return c.r * .2126 + c.g * .7152 + c.b * .0722 > .28 ? '#302d2a' : '#f5f1e8';
 };
 
 export function buildKeyboardVisual(renderer: THREE.WebGLRenderer): KeyboardVisual {
@@ -122,28 +94,35 @@ export function buildKeyboardVisual(renderer: THREE.WebGLRenderer): KeyboardVisu
   plate.receiveShadow = true;
   root.add(plate);
 
-  const capMat = new THREE.MeshPhysicalMaterial(STYLES.pebble.cap);
-  const accentMat = new THREE.MeshPhysicalMaterial(STYLES.pebble.accent);
   const switchMat = new THREE.MeshStandardMaterial({ color: 0x2a2b2f, roughness: 0.55 });
   const switchGeo = new THREE.BoxGeometry(0.6, 0.16, 0.6);
   const aniso = renderer.capabilities.getMaxAnisotropy();
 
   const keys: KeyVisual[] = [];
-  const legendMats: { mat: THREE.MeshPhysicalMaterial; accent: boolean; text: string; aspect: number }[] = [];
-  const makeLegend = (text: string, accent: boolean, aspect: number, color: string) => {
-    const tex = createLegendTexture(text, { color: accent ? '#fff4ea' : color });
+  const legendMats: { mat: THREE.MeshPhysicalMaterial; side: THREE.MeshPhysicalMaterial; text: string; aspect: number }[] = [];
+  // Reuse the same two ink variants per legend across all ten designs.
+  const legendCache = new Map<string, THREE.Texture>();
+  const makeLegend = (text: string, aspect: number, color: string) => {
+    const id = `${text}:${aspect}:${color}`;
+    const cached = legendCache.get(id);
+    if (cached) return cached;
+    const tex = createLegendTexture(text, { color });
     tex.anisotropy = aniso;
     if (aspect !== 1) {
       tex.repeat.set(aspect, 1);
       tex.offset.set(-(aspect - 1) / 2, 0);
     }
+    legendCache.set(id, tex);
     return tex;
   };
-  const addKey = (geo: THREE.BufferGeometry, x: number, z: number, accent: boolean, text: string, halfW: number, aspect = 1) => {
-    const tex = makeLegend(text, accent, aspect, STYLES.pebble.legend);
-    const top = legendMaterial(accent ? accentMat : capMat, tex);
-    legendMats.push({ mat: top, accent, text, aspect });
-    const mesh = new THREE.Mesh(geo, [accent ? accentMat : capMat, top]);
+  const addKey = (geo: THREE.BufferGeometry, x: number, z: number, text: string, halfW: number, aspect = 1) => {
+    const theme = STYLES.pebble;
+    const color = theme.keys[keys.length];
+    const side = new THREE.MeshPhysicalMaterial({ color, roughness: theme.roughness, clearcoat: theme.clearcoat, clearcoatRoughness: .3, specularIntensity: .6 });
+    const tex = makeLegend(text, aspect, inkFor(color));
+    const top = legendMaterial(side, tex);
+    legendMats.push({ mat: top, side, text, aspect });
+    const mesh = new THREE.Mesh(geo, [side, top]);
     const rest = new THREE.Vector3(x, CAP_Y, z);
     mesh.position.copy(rest);
     mesh.castShadow = mesh.receiveShadow = true;
@@ -159,33 +138,27 @@ export function buildKeyboardVisual(renderer: THREE.WebGLRenderer): KeyboardVisu
   for (let r = 0; r < ROWS; r++)
     for (let c = 0; c < COLS; c++) {
       const i = r * COLS + c;
-      addKey(cap1u, (c - 1) * U, (r - 1.5) * U, i === ACCENT_INDEX, LEGENDS[i], CAP / 2);
+      addKey(cap1u, (c - 1) * U, (r - 1.5) * U, LEGENDS[i], CAP / 2);
     }
   const spaceW = COLS * U - (U - CAP);
-  addKey(createKeycapGeometry({ width: spaceW, depth: CAP, height: CAP_H }), 0, 1.5 * U, false, '스페이스', spaceW / 2, spaceW / CAP);
+  addKey(createKeycapGeometry({ width: spaceW, depth: CAP, height: CAP_H }), 0, 1.5 * U, '스페이스', spaceW / 2, spaceW / CAP);
 
   type StyleId = keyof typeof STYLES;
   let style: StyleId = 'pebble';
-  // legend textures per style, created once and kept (re-creating 10 canvases + GPU uploads on every switch caused a hitch)
-  const legendTex = new Map<StyleId, THREE.Texture[]>([['pebble', legendMats.map((l) => l.mat.map!)]]);
-  const legendsFor = (p: StyleId) => {
-    let t = legendTex.get(p);
-    if (!t) legendTex.set(p, (t = legendMats.map((l) => makeLegend(l.text, l.accent, l.aspect, STYLES[p].legend))));
-    return t;
-  };
+  const legendsFor = (p: StyleId) => legendMats.map((l, i) => makeLegend(l.text, l.aspect, inkFor(STYLES[p].keys[i])));
   const applyStyle = (p: StyleId) => {
     const s = STYLES[p];
-    capMat.setValues(s.cap);
-    accentMat.setValues(s.accent);
-    caseMat.color.set(s.case);
-    caseMat.roughness = s.caseRough;
+    caseMat.setValues({ color: s.tray, metalness: s.metalness, roughness: s.caseRoughness, clearcoat: s.clearcoat, clearcoatRoughness: .4 });
     const tex = legendsFor(p);
     legendMats.forEach((l, i) => {
-      l.mat.setValues(l.accent ? s.accent : s.cap);
+      const finish = { color: s.keys[i], roughness: s.roughness, clearcoat: s.clearcoat };
+      l.side.setValues(finish);
+      l.mat.setValues(finish);
       l.mat.map = tex[i];
       l.mat.needsUpdate = true;
     });
   };
+  applyStyle('pebble');
   return {
     root,
     keys,

@@ -1,0 +1,188 @@
+[
+  {
+    "id": "K07",
+    "pack": "Boba U4T",
+    "keysMapped": 99,
+    "specialMappings": {
+      "KeyQ": {
+        "timing": [
+          [
+            0,
+            262.6666666666667
+          ]
+        ]
+      },
+      "KeyA": {
+        "timing": [
+          [
+            0,
+            262.6666666666667
+          ]
+        ]
+      },
+      "KeyZ": {
+        "timing": [
+          [
+            0,
+            262.6666666666667
+          ]
+        ]
+      },
+      "Space": {
+        "timing": [
+          [
+            0,
+            262.6666666666667
+          ]
+        ]
+      },
+      "Enter": {
+        "timing": [
+          [
+            0,
+            262.6666666666667
+          ]
+        ]
+      },
+      "Backspace": {
+        "timing": [
+          [
+            0,
+            262.6666666666667
+          ]
+        ]
+      }
+    },
+    "pairsAreNotProofOfRecordingSeparation": true
+  },
+  {
+    "id": "K05",
+    "pack": "gmk67 oil kings",
+    "keysMapped": 61,
+    "specialMappings": {
+      "KeyQ": {
+        "audio_file": "1.mp3",
+        "timing": [
+          [
+            49.500000000000014,
+            160.87500000000003
+          ],
+          [
+            160.87500000000003,
+            259.87499999999983
+          ]
+        ]
+      },
+      "KeyA": {
+        "audio_file": "2.mp3",
+        "timing": [
+          [
+            66.22027618726844,
+            138.19602559784434
+          ],
+          [
+            115.88548332771984,
+            183.72246547659145
+          ]
+        ]
+      },
+      "KeyZ": {
+        "audio_file": "4.mp3",
+        "timing": [
+          [
+            45.375,
+            136.125
+          ],
+          [
+            144.375,
+            247.5
+          ]
+        ]
+      },
+      "Space": {
+        "audio_file": "spacebar.mp3",
+        "timing": [
+          [
+            0,
+            240
+          ]
+        ]
+      },
+      "Enter": {
+        "audio_file": "1.mp3",
+        "timing": [
+          [
+            12.22575976845152,
+            264
+          ]
+        ]
+      },
+      "Backspace": {
+        "audio_file": "1.mp3",
+        "timing": [
+          [
+            12.22575976845152,
+            264
+          ]
+        ]
+      }
+    },
+    "pairsAreNotProofOfRecordingSeparation": true
+  },
+  {
+    "id": "K08",
+    "pack": "Kailh Box Jade",
+    "keysMapped": 99,
+    "specialMappings": {
+      "KeyQ": {
+        "timing": [
+          [
+            766.2585034013606,
+            1160.997732426304
+          ]
+        ]
+      },
+      "KeyA": {
+        "timing": [
+          [
+            1160.997732426304,
+            1602.1768707482993
+          ]
+        ]
+      },
+      "KeyZ": {
+        "timing": [
+          [
+            1160.997732426304,
+            1602.1768707482993
+          ]
+        ]
+      },
+      "Space": {
+        "timing": [
+          [
+            2670.294784580499,
+            3088.253968253968
+          ]
+        ]
+      },
+      "Enter": {
+        "timing": [
+          [
+            2321.9954648526077,
+            2670.294784580499
+          ]
+        ]
+      },
+      "Backspace": {
+        "timing": [
+          [
+            1602.1768707482993,
+            1950.4761904761904
+          ]
+        ]
+      }
+    },
+    "pairsAreNotProofOfRecordingSeparation": true
+  }
+]

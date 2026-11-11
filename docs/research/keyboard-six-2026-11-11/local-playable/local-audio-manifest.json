@@ -1,0 +1,743 @@
+[
+  {
+    "preset": "oil-king",
+    "usage": "LOCAL_DEVELOPMENT_ONLY_NOT_FOR_PUBLIC_DISTRIBUTION",
+    "rights": "unverified",
+    "source": {
+      "referenceManifest": "docs/research/keyboard-six-2026-11-11/download-manifest.json",
+      "modelId": "K05"
+    },
+    "entries": {
+      "down": [
+        {
+          "offset": 0.0,
+          "duration": 0.19033333333333333,
+          "gain": 1,
+          "src": "thockhub/K05/0.ogg",
+          "sourceDetail": "thockhub/K05/0.ogg"
+        },
+        {
+          "offset": 0.20033333333333334,
+          "duration": 0.10533333333333333,
+          "gain": 1,
+          "src": "thockhub/K05/1.ogg",
+          "sourceDetail": "thockhub/K05/1.ogg"
+        },
+        {
+          "offset": 0.31566666666666665,
+          "duration": 0.23733333333333334,
+          "gain": 1,
+          "src": "thockhub/K05/2.ogg",
+          "sourceDetail": "thockhub/K05/2.ogg"
+        },
+        {
+          "offset": 0.563,
+          "duration": 0.13033333333333333,
+          "gain": 1,
+          "src": "thockhub/K05/3.ogg",
+          "sourceDetail": "thockhub/K05/3.ogg"
+        },
+        {
+          "offset": 0.7033333333333334,
+          "duration": 0.10033333333333333,
+          "gain": 1,
+          "src": "thockhub/K05/4.ogg",
+          "sourceDetail": "thockhub/K05/4.ogg"
+        },
+        {
+          "offset": 0.8136666666666666,
+          "duration": 0.09533333333333334,
+          "gain": 1,
+          "src": "thockhub/K05/5.ogg",
+          "sourceDetail": "thockhub/K05/5.ogg"
+        },
+        {
+          "offset": 0.919,
+          "duration": 0.23733333333333334,
+          "gain": 1,
+          "src": "thockhub/K05/6.ogg",
+          "sourceDetail": "thockhub/K05/6.ogg"
+        }
+      ],
+      "up": [],
+      "spaceDown": [],
+      "spaceUp": []
+    },
+    "processing": {
+      "monoHz": 48000,
+      "playbackCompensationGain": 10,
+      "boundaryFadeMs": 1,
+      "note": "Complete transient clusters on down; no independent recorded keyup claimed. Source key identity unverified."
+    },
+    "wavSha256": "9586ab67349a81c713d922d8a2be8fe8bd5b5364aaa53c05196ca1810a89f812",
+    "decodedPeak": 0.1593017578125,
+    "rms": 0.006810403253796643,
+    "humanListeningPerformed": false
+  },
+  {
+    "preset": "hmx-cheese",
+    "usage": "LOCAL_DEVELOPMENT_ONLY_NOT_FOR_PUBLIC_DISTRIBUTION",
+    "rights": "unverified",
+    "source": {
+      "url": "https://www.youtube.com/watch?v=Ia83r5bt62U",
+      "videoId": "Ia83r5bt62U",
+      "fileSha256": "b46247391ff2f68286b7633530fbbad9cf849e9cf23b4c928da62e3cf69dd20b",
+      "candidateWindow": [
+        62,
+        80
+      ]
+    },
+    "entries": {
+      "down": [
+        {
+          "offset": 0.0,
+          "duration": 0.2,
+          "gain": 1,
+          "src": "youtube:Ia83r5bt62U",
+          "sourceDetail": {
+            "video": "Ia83r5bt62U",
+            "startSeconds": 62.11,
+            "endSeconds": 62.31
+          }
+        },
+        {
+          "offset": 0.21,
+          "duration": 0.2,
+          "gain": 1,
+          "src": "youtube:Ia83r5bt62U",
+          "sourceDetail": {
+            "video": "Ia83r5bt62U",
+            "startSeconds": 63.605,
+            "endSeconds": 63.805
+          }
+        },
+        {
+          "offset": 0.42,
+          "duration": 0.2,
+          "gain": 1,
+          "src": "youtube:Ia83r5bt62U",
+          "sourceDetail": {
+            "video": "Ia83r5bt62U",
+            "startSeconds": 64.66,
+            "endSeconds": 64.86
+          }
+        },
+        {
+          "offset": 0.63,
+          "duration": 0.2,
+          "gain": 1,
+          "src": "youtube:Ia83r5bt62U",
+          "sourceDetail": {
+            "video": "Ia83r5bt62U",
+            "startSeconds": 65.73,
+            "endSeconds": 65.93
+          }
+        },
+        {
+          "offset": 0.84,
+          "duration": 0.2,
+          "gain": 1,
+          "src": "youtube:Ia83r5bt62U",
+          "sourceDetail": {
+            "video": "Ia83r5bt62U",
+            "startSeconds": 66.275,
+            "endSeconds": 66.475
+          }
+        },
+        {
+          "offset": 1.05,
+          "duration": 0.2,
+          "gain": 1,
+          "src": "youtube:Ia83r5bt62U",
+          "sourceDetail": {
+            "video": "Ia83r5bt62U",
+            "startSeconds": 66.99,
+            "endSeconds": 67.19
+          }
+        },
+        {
+          "offset": 1.26,
+          "duration": 0.2,
+          "gain": 1,
+          "src": "youtube:Ia83r5bt62U",
+          "sourceDetail": {
+            "video": "Ia83r5bt62U",
+            "startSeconds": 67.38,
+            "endSeconds": 67.58
+          }
+        },
+        {
+          "offset": 1.47,
+          "duration": 0.2,
+          "gain": 1,
+          "src": "youtube:Ia83r5bt62U",
+          "sourceDetail": {
+            "video": "Ia83r5bt62U",
+            "startSeconds": 67.75,
+            "endSeconds": 67.95
+          }
+        },
+        {
+          "offset": 1.68,
+          "duration": 0.2,
+          "gain": 1,
+          "src": "youtube:Ia83r5bt62U",
+          "sourceDetail": {
+            "video": "Ia83r5bt62U",
+            "startSeconds": 68.19,
+            "endSeconds": 68.39
+          }
+        },
+        {
+          "offset": 1.89,
+          "duration": 0.2,
+          "gain": 1,
+          "src": "youtube:Ia83r5bt62U",
+          "sourceDetail": {
+            "video": "Ia83r5bt62U",
+            "startSeconds": 69.425,
+            "endSeconds": 69.625
+          }
+        }
+      ],
+      "up": [],
+      "spaceDown": [],
+      "spaceUp": []
+    },
+    "processing": {
+      "monoHz": 48000,
+      "playbackCompensationGain": 3.1275702208890097,
+      "boundaryFadeMs": 1,
+      "note": "Complete transient clusters on down; no independent recorded keyup claimed. Source key identity unverified."
+    },
+    "wavSha256": "01583edef0900479d258e70504fb4c6b0ef5049aa3f5a1d78e944a82c24ff3cf",
+    "decodedPeak": 0.3499755859375,
+    "rms": 0.06094236457828481,
+    "humanListeningPerformed": false
+  },
+  {
+    "preset": "boba-u4t",
+    "usage": "LOCAL_DEVELOPMENT_ONLY_NOT_FOR_PUBLIC_DISTRIBUTION",
+    "rights": "unverified",
+    "source": {
+      "referenceManifest": "docs/research/keyboard-six-2026-11-11/download-manifest.json",
+      "modelId": "K07"
+    },
+    "entries": {
+      "down": [
+        {
+          "offset": 0.0,
+          "duration": 0.23733333333333334,
+          "gain": 1,
+          "src": "thockhub/K07/0.ogg",
+          "sourceDetail": "thockhub/K07/0.ogg"
+        },
+        {
+          "offset": 0.24733333333333332,
+          "duration": 0.16033333333333333,
+          "gain": 1,
+          "src": "thockhub/K07/1.ogg",
+          "sourceDetail": "thockhub/K07/1.ogg"
+        },
+        {
+          "offset": 0.4176666666666667,
+          "duration": 0.16033333333333333,
+          "gain": 1,
+          "src": "thockhub/K07/2.ogg",
+          "sourceDetail": "thockhub/K07/2.ogg"
+        },
+        {
+          "offset": 0.588,
+          "duration": 0.14927083333333332,
+          "gain": 1,
+          "src": "thockhub/K07/3.ogg",
+          "sourceDetail": "thockhub/K07/3.ogg"
+        },
+        {
+          "offset": 0.7472708333333333,
+          "duration": 0.13033333333333333,
+          "gain": 1,
+          "src": "thockhub/K07/4.ogg",
+          "sourceDetail": "thockhub/K07/4.ogg"
+        },
+        {
+          "offset": 0.8876041666666666,
+          "duration": 0.23733333333333334,
+          "gain": 1,
+          "src": "thockhub/K07/5.ogg",
+          "sourceDetail": "thockhub/K07/5.ogg"
+        },
+        {
+          "offset": 1.1349375,
+          "duration": 0.14033333333333334,
+          "gain": 1,
+          "src": "thockhub/K07/6.ogg",
+          "sourceDetail": "thockhub/K07/6.ogg"
+        },
+        {
+          "offset": 1.2852708333333334,
+          "duration": 0.13533333333333333,
+          "gain": 1,
+          "src": "thockhub/K07/7.ogg",
+          "sourceDetail": "thockhub/K07/7.ogg"
+        },
+        {
+          "offset": 1.4306041666666667,
+          "duration": 0.14754166666666665,
+          "gain": 1,
+          "src": "thockhub/K07/8.ogg",
+          "sourceDetail": "thockhub/K07/8.ogg"
+        },
+        {
+          "offset": 1.5881458333333334,
+          "duration": 0.1484375,
+          "gain": 1,
+          "src": "thockhub/K07/9.ogg",
+          "sourceDetail": "thockhub/K07/9.ogg"
+        },
+        {
+          "offset": 1.7465833333333334,
+          "duration": 0.14033333333333334,
+          "gain": 1,
+          "src": "thockhub/K07/10.ogg",
+          "sourceDetail": "thockhub/K07/10.ogg"
+        },
+        {
+          "offset": 1.8969166666666666,
+          "duration": 0.14533333333333334,
+          "gain": 1,
+          "src": "thockhub/K07/11.ogg",
+          "sourceDetail": "thockhub/K07/11.ogg"
+        },
+        {
+          "offset": 2.05225,
+          "duration": 0.164,
+          "gain": 1,
+          "src": "thockhub/K07/12.ogg",
+          "sourceDetail": "thockhub/K07/12.ogg"
+        },
+        {
+          "offset": 2.22625,
+          "duration": 0.23733333333333334,
+          "gain": 1,
+          "src": "thockhub/K07/13.ogg",
+          "sourceDetail": "thockhub/K07/13.ogg"
+        },
+        {
+          "offset": 2.4735833333333335,
+          "duration": 0.23733333333333334,
+          "gain": 1,
+          "src": "thockhub/K07/14.ogg",
+          "sourceDetail": "thockhub/K07/14.ogg"
+        },
+        {
+          "offset": 2.7209166666666667,
+          "duration": 0.14033333333333334,
+          "gain": 1,
+          "src": "thockhub/K07/15.ogg",
+          "sourceDetail": "thockhub/K07/15.ogg"
+        },
+        {
+          "offset": 2.87125,
+          "duration": 0.14033333333333334,
+          "gain": 1,
+          "src": "thockhub/K07/16.ogg",
+          "sourceDetail": "thockhub/K07/16.ogg"
+        }
+      ],
+      "up": [],
+      "spaceDown": [],
+      "spaceUp": []
+    },
+    "processing": {
+      "monoHz": 48000,
+      "playbackCompensationGain": 1,
+      "boundaryFadeMs": 1,
+      "note": "Complete transient clusters on down; no independent recorded keyup claimed. Source key identity unverified."
+    },
+    "wavSha256": "4232641cd39f046b02dd33b55e2ed54a7e11a103a866305d25e1d6c2cf6f70f1",
+    "decodedPeak": 0.181610107421875,
+    "rms": 0.009782043374214844,
+    "humanListeningPerformed": false
+  },
+  {
+    "preset": "box-jade",
+    "usage": "LOCAL_DEVELOPMENT_ONLY_NOT_FOR_PUBLIC_DISTRIBUTION",
+    "rights": "unverified",
+    "source": {
+      "pack": "https://mechvibes.com/sound-packs/kailh-box-jade",
+      "license": "Personal use only"
+    },
+    "entries": {
+      "down": [
+        {
+          "offset": 0.0,
+          "duration": 0.39475,
+          "gain": 1,
+          "src": "mechvibes:mv-37918613073f4a61b78bce2801940f0f",
+          "sourceDetail": {
+            "pack": "mv-37918613073f4a61b78bce2801940f0f",
+            "mappedKey": "KeyQ",
+            "timingMs": [
+              766.2585034013606,
+              1160.997732426304
+            ]
+          }
+        },
+        {
+          "offset": 0.40475,
+          "duration": 0.44116666666666665,
+          "gain": 1,
+          "src": "mechvibes:mv-37918613073f4a61b78bce2801940f0f",
+          "sourceDetail": {
+            "pack": "mv-37918613073f4a61b78bce2801940f0f",
+            "mappedKey": "KeyA",
+            "timingMs": [
+              1160.997732426304,
+              1602.1768707482993
+            ]
+          }
+        },
+        {
+          "offset": 0.8559166666666667,
+          "duration": 0.37152083333333336,
+          "gain": 1,
+          "src": "mechvibes:mv-37918613073f4a61b78bce2801940f0f",
+          "sourceDetail": {
+            "pack": "mv-37918613073f4a61b78bce2801940f0f",
+            "mappedKey": "KeyE",
+            "timingMs": [
+              1950.4761904761904,
+              2321.9954648526077
+            ]
+          }
+        }
+      ],
+      "up": [],
+      "spaceDown": [
+        {
+          "offset": 1.2374375,
+          "duration": 0.4179583333333333,
+          "gain": 1,
+          "src": "mechvibes:mv-37918613073f4a61b78bce2801940f0f",
+          "sourceDetail": {
+            "pack": "mv-37918613073f4a61b78bce2801940f0f",
+            "mappedKey": "Space",
+            "timingMs": [
+              2670.294784580499,
+              3088.253968253968
+            ]
+          }
+        }
+      ],
+      "spaceUp": [],
+      "enterDown": [
+        {
+          "offset": 1.6653958333333334,
+          "duration": 0.34829166666666667,
+          "gain": 1,
+          "src": "mechvibes:mv-37918613073f4a61b78bce2801940f0f",
+          "sourceDetail": {
+            "pack": "mv-37918613073f4a61b78bce2801940f0f",
+            "mappedKey": "Enter",
+            "timingMs": [
+              2321.9954648526077,
+              2670.294784580499
+            ]
+          }
+        }
+      ],
+      "backspaceDown": [
+        {
+          "offset": 2.0236875,
+          "duration": 0.3483125,
+          "gain": 1,
+          "src": "mechvibes:mv-37918613073f4a61b78bce2801940f0f",
+          "sourceDetail": {
+            "pack": "mv-37918613073f4a61b78bce2801940f0f",
+            "mappedKey": "Backspace",
+            "timingMs": [
+              1602.1768707482993,
+              1950.4761904761904
+            ]
+          }
+        }
+      ]
+    },
+    "processing": {
+      "monoHz": 48000,
+      "playbackCompensationGain": 1,
+      "boundaryFadeMs": 1,
+      "note": "Complete transient clusters on down; no independent recorded keyup claimed. Source key identity unverified."
+    },
+    "wavSha256": "7f0d9be24a1ca1085daf658368881183905cf8076db7c4320f04d3aaaed64545",
+    "decodedPeak": 0.528076171875,
+    "rms": 0.021075692417964722,
+    "humanListeningPerformed": false
+  },
+  {
+    "preset": "silent-peach-v3",
+    "usage": "LOCAL_DEVELOPMENT_ONLY_NOT_FOR_PUBLIC_DISTRIBUTION",
+    "rights": "unverified",
+    "source": {
+      "referenceManifest": "docs/research/keyboard-six-2026-11-11/download-manifest.json",
+      "modelId": "K09"
+    },
+    "entries": {
+      "down": [
+        {
+          "offset": 0.0,
+          "duration": 0.23733333333333334,
+          "gain": 1,
+          "src": "thockhub/K09/0.ogg",
+          "sourceDetail": "thockhub/K09/0.ogg"
+        },
+        {
+          "offset": 0.24733333333333332,
+          "duration": 0.23733333333333334,
+          "gain": 1,
+          "src": "thockhub/K09/1.ogg",
+          "sourceDetail": "thockhub/K09/1.ogg"
+        },
+        {
+          "offset": 0.49466666666666664,
+          "duration": 0.23733333333333334,
+          "gain": 1,
+          "src": "thockhub/K09/2.ogg",
+          "sourceDetail": "thockhub/K09/2.ogg"
+        },
+        {
+          "offset": 0.742,
+          "duration": 0.15033333333333335,
+          "gain": 1,
+          "src": "thockhub/K09/3.ogg",
+          "sourceDetail": "thockhub/K09/3.ogg"
+        },
+        {
+          "offset": 0.9023333333333333,
+          "duration": 0.16033333333333333,
+          "gain": 1,
+          "src": "thockhub/K09/4.ogg",
+          "sourceDetail": "thockhub/K09/4.ogg"
+        },
+        {
+          "offset": 1.0726666666666667,
+          "duration": 0.23733333333333334,
+          "gain": 1,
+          "src": "thockhub/K09/5.ogg",
+          "sourceDetail": "thockhub/K09/5.ogg"
+        },
+        {
+          "offset": 1.32,
+          "duration": 0.23733333333333334,
+          "gain": 1,
+          "src": "thockhub/K09/6.ogg",
+          "sourceDetail": "thockhub/K09/6.ogg"
+        },
+        {
+          "offset": 1.5673333333333332,
+          "duration": 0.23733333333333334,
+          "gain": 1,
+          "src": "thockhub/K09/7.ogg",
+          "sourceDetail": "thockhub/K09/7.ogg"
+        },
+        {
+          "offset": 1.8146666666666667,
+          "duration": 0.23733333333333334,
+          "gain": 1,
+          "src": "thockhub/K09/8.ogg",
+          "sourceDetail": "thockhub/K09/8.ogg"
+        },
+        {
+          "offset": 2.062,
+          "duration": 0.23733333333333334,
+          "gain": 1,
+          "src": "thockhub/K09/9.ogg",
+          "sourceDetail": "thockhub/K09/9.ogg"
+        },
+        {
+          "offset": 2.3093333333333335,
+          "duration": 0.23733333333333334,
+          "gain": 1,
+          "src": "thockhub/K09/10.ogg",
+          "sourceDetail": "thockhub/K09/10.ogg"
+        },
+        {
+          "offset": 2.5566666666666666,
+          "duration": 0.23733333333333334,
+          "gain": 1,
+          "src": "thockhub/K09/11.ogg",
+          "sourceDetail": "thockhub/K09/11.ogg"
+        },
+        {
+          "offset": 2.804,
+          "duration": 0.23733333333333334,
+          "gain": 1,
+          "src": "thockhub/K09/12.ogg",
+          "sourceDetail": "thockhub/K09/12.ogg"
+        },
+        {
+          "offset": 3.0513333333333335,
+          "duration": 0.23733333333333334,
+          "gain": 1,
+          "src": "thockhub/K09/13.ogg",
+          "sourceDetail": "thockhub/K09/13.ogg"
+        }
+      ],
+      "up": [],
+      "spaceDown": [],
+      "spaceUp": []
+    },
+    "processing": {
+      "monoHz": 48000,
+      "playbackCompensationGain": 10,
+      "boundaryFadeMs": 1,
+      "note": "Complete transient clusters on down; no independent recorded keyup claimed. Source key identity unverified."
+    },
+    "wavSha256": "b95424cab6a75b24fa7fad46b83b7328170de123a67602b4b05c87ef0ceb1801",
+    "decodedPeak": 0.19378662109375,
+    "rms": 0.007704239975555649,
+    "humanListeningPerformed": false
+  },
+  {
+    "preset": "magnetic-jade",
+    "usage": "LOCAL_DEVELOPMENT_ONLY_NOT_FOR_PUBLIC_DISTRIBUTION",
+    "rights": "unverified",
+    "source": {
+      "url": "https://www.youtube.com/watch?v=uv47LMQMXn8",
+      "videoId": "uv47LMQMXn8",
+      "fileSha256": "1e7780ad8cab9a431f5e79b8fff8a7ab5700552b7fddd06005138a0a661d8b79",
+      "candidateWindow": [
+        56,
+        71
+      ]
+    },
+    "entries": {
+      "down": [
+        {
+          "offset": 0.0,
+          "duration": 0.2,
+          "gain": 1,
+          "src": "youtube:uv47LMQMXn8",
+          "sourceDetail": {
+            "video": "uv47LMQMXn8",
+            "startSeconds": 56.175,
+            "endSeconds": 56.375
+          }
+        },
+        {
+          "offset": 0.21,
+          "duration": 0.2,
+          "gain": 1,
+          "src": "youtube:uv47LMQMXn8",
+          "sourceDetail": {
+            "video": "uv47LMQMXn8",
+            "startSeconds": 56.595,
+            "endSeconds": 56.795
+          }
+        },
+        {
+          "offset": 0.42,
+          "duration": 0.2,
+          "gain": 1,
+          "src": "youtube:uv47LMQMXn8",
+          "sourceDetail": {
+            "video": "uv47LMQMXn8",
+            "startSeconds": 57.195,
+            "endSeconds": 57.395
+          }
+        },
+        {
+          "offset": 0.63,
+          "duration": 0.2,
+          "gain": 1,
+          "src": "youtube:uv47LMQMXn8",
+          "sourceDetail": {
+            "video": "uv47LMQMXn8",
+            "startSeconds": 57.67,
+            "endSeconds": 57.87
+          }
+        },
+        {
+          "offset": 0.84,
+          "duration": 0.2,
+          "gain": 1,
+          "src": "youtube:uv47LMQMXn8",
+          "sourceDetail": {
+            "video": "uv47LMQMXn8",
+            "startSeconds": 58.785,
+            "endSeconds": 58.985
+          }
+        },
+        {
+          "offset": 1.05,
+          "duration": 0.2,
+          "gain": 1,
+          "src": "youtube:uv47LMQMXn8",
+          "sourceDetail": {
+            "video": "uv47LMQMXn8",
+            "startSeconds": 59.165,
+            "endSeconds": 59.365
+          }
+        },
+        {
+          "offset": 1.26,
+          "duration": 0.2,
+          "gain": 1,
+          "src": "youtube:uv47LMQMXn8",
+          "sourceDetail": {
+            "video": "uv47LMQMXn8",
+            "startSeconds": 59.535,
+            "endSeconds": 59.735
+          }
+        },
+        {
+          "offset": 1.47,
+          "duration": 0.2,
+          "gain": 1,
+          "src": "youtube:uv47LMQMXn8",
+          "sourceDetail": {
+            "video": "uv47LMQMXn8",
+            "startSeconds": 59.905,
+            "endSeconds": 60.105000000000004
+          }
+        },
+        {
+          "offset": 1.68,
+          "duration": 0.2,
+          "gain": 1,
+          "src": "youtube:uv47LMQMXn8",
+          "sourceDetail": {
+            "video": "uv47LMQMXn8",
+            "startSeconds": 60.269999999999996,
+            "endSeconds": 60.47
+          }
+        },
+        {
+          "offset": 1.89,
+          "duration": 0.2,
+          "gain": 1,
+          "src": "youtube:uv47LMQMXn8",
+          "sourceDetail": {
+            "video": "uv47LMQMXn8",
+            "startSeconds": 60.769999999999996,
+            "endSeconds": 60.97
+          }
+        }
+      ],
+      "up": [],
+      "spaceDown": [],
+      "spaceUp": []
+    },
+    "processing": {
+      "monoHz": 48000,
+      "playbackCompensationGain": 2.702356267672007,
+      "boundaryFadeMs": 1,
+      "note": "Complete transient clusters on down; no independent recorded keyup claimed. Source key identity unverified."
+    },
+    "wavSha256": "464b57964baa7cbbef130b3da32670dea85f69c2c0c3755decaeadc9e42b9054",
+    "decodedPeak": 0.3499755859375,
+    "rms": 0.026654341328822335,
+    "humanListeningPerformed": false
+  }
+]

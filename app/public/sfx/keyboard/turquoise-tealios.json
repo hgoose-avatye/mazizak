@@ -1,0 +1,144 @@
+{
+  "version": 1,
+  "preset": "turquoise-tealios",
+  "file": "turquoise-tealios.wav",
+  "sampleRate": 48000,
+  "channels": 1,
+  "totalSamples": 44348,
+  "rowDown": true,
+  "source": {
+    "url": "https://github.com/tplai/kbsim",
+    "commit": "ba103f3b0afa9dab80447aa2e7e2ed80b6bd80e4",
+    "path": "src/assets/audio/turquoise",
+    "copyright": "Copyright (c) Thomas Lai",
+    "license": "MIT",
+    "recordingProvenance": "Unverified: no separate recording authorship or rights statement found in upstream."
+  },
+  "changes": "Chromium MP3 decode; stereo averaged to mono; resampled to 48 kHz; quantised to 16-bit PCM; 10 ms sprite gaps. No trim, EQ, pitch or level changes.",
+  "entries": {
+    "down": [
+      {
+        "start": 0,
+        "length": 4239,
+        "offset": 0,
+        "duration": 0.0883125,
+        "gain": 1,
+        "src": "press/GENERIC_R0.mp3",
+        "sha256": "4f08f0862685d5b3f536daefcfa98c9cccae14df4831274cdc415aa8876df330"
+      },
+      {
+        "start": 4719,
+        "length": 4239,
+        "offset": 0.0983125,
+        "duration": 0.0883125,
+        "gain": 1,
+        "src": "press/GENERIC_R1.mp3",
+        "sha256": "5e4d3bdd956760fd6831519549302db42aacf5b7abf162a6271b3032898276b3"
+      },
+      {
+        "start": 9438,
+        "length": 4239,
+        "offset": 0.196625,
+        "duration": 0.0883125,
+        "gain": 1,
+        "src": "press/GENERIC_R2.mp3",
+        "sha256": "06ab4c0ffc7f37ed08a4d1abd5ad583b997a81427d52a0099e3f41cc5b7d6509"
+      },
+      {
+        "start": 14157,
+        "length": 4239,
+        "offset": 0.2949375,
+        "duration": 0.0883125,
+        "gain": 1,
+        "src": "press/GENERIC_R3.mp3",
+        "sha256": "b310eaff87450c28415459075c60dd1f817d84d38bf1e5602311edc072f8ba09"
+      },
+      {
+        "start": 18876,
+        "length": 4239,
+        "offset": 0.39325,
+        "duration": 0.0883125,
+        "gain": 1,
+        "src": "press/GENERIC_R4.mp3",
+        "sha256": "a745cc55cc453c74f0f372ccce82dd9d2823ce96ff31d36a4bed13147858ccd4"
+      }
+    ],
+    "up": [
+      {
+        "start": 23595,
+        "length": 2305,
+        "offset": 0.4915625,
+        "duration": 0.04802083333333333,
+        "gain": 1,
+        "src": "release/GENERIC.mp3",
+        "sha256": "086fbb780ab02f2dd214d8718b9a2420097be58af3a47ac5aa592873bf075817"
+      }
+    ],
+    "spaceDown": [
+      {
+        "start": 26380,
+        "length": 3136,
+        "offset": 0.5495833333333333,
+        "duration": 0.06533333333333333,
+        "gain": 1,
+        "src": "press/SPACE.mp3",
+        "sha256": "cc122ddcfb66fb1af5b2f6e42c1ac8a98d2a21b202ad270435df797ef9e16ef3"
+      }
+    ],
+    "spaceUp": [
+      {
+        "start": 29996,
+        "length": 1141,
+        "offset": 0.6249166666666667,
+        "duration": 0.023770833333333335,
+        "gain": 1,
+        "src": "release/SPACE.mp3",
+        "sha256": "f08384868eadc73475bb3dc7a5cf6175f8a249d3dfbed9b5f3672319f5492833"
+      }
+    ],
+    "enterDown": [
+      {
+        "start": 31617,
+        "length": 3764,
+        "offset": 0.6586875,
+        "duration": 0.07841666666666666,
+        "gain": 1,
+        "src": "press/ENTER.mp3",
+        "sha256": "de635098bee3f1145491dbd667412a276b320e8183bf28b5626aab2fb50fd985"
+      }
+    ],
+    "enterUp": [
+      {
+        "start": 35861,
+        "length": 1618,
+        "offset": 0.7471041666666667,
+        "duration": 0.03370833333333333,
+        "gain": 1,
+        "src": "release/ENTER.mp3",
+        "sha256": "7a916fca4c1a27dd8a616f74eaabc97640c0f580bbf4b99b07200ff109f8142b"
+      }
+    ],
+    "backspaceDown": [
+      {
+        "start": 37959,
+        "length": 3477,
+        "offset": 0.7908125,
+        "duration": 0.0724375,
+        "gain": 1,
+        "src": "press/BACKSPACE.mp3",
+        "sha256": "c1c81bc9abf87914467220d556d985c3b740d86ff1e865d1f26bdd29d19e2f87"
+      }
+    ],
+    "backspaceUp": [
+      {
+        "start": 41916,
+        "length": 2432,
+        "offset": 0.87325,
+        "duration": 0.050666666666666665,
+        "gain": 1,
+        "src": "release/BACKSPACE.mp3",
+        "sha256": "2415a4c37fab40e12bcc715bac69313299dd30fc731021513a9c599c9cd827ab"
+      }
+    ]
+  }
+}

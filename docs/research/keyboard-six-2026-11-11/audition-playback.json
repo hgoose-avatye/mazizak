@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "purpose": "Local audition only; compensate quiet delivery clips at playback without modifying source files. Not calibrated SPL and not representative of relative real switch loudness.",
+  "gainDbBySwitchAndSource": {
+    "K05": {
+      "ct": 20,
+      "pack": 0
+    },
+    "K07": {
+      "ct": 0,
+      "pack": 0
+    },
+    "K08": {
+      "pack": 0
+    },
+    "K09": {
+      "ct": 20
+    }
+  },
+  "perVoicePeakCeiling": 0.8
+}

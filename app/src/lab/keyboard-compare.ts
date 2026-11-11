@@ -1,14 +1,14 @@
 import { AudioEngine } from '../core/audio';
 import { EXTRA_KEY_ROLES, loadKeyboardSamples, type KeyboardSampleSounds } from '../audio/keyboardSamples';
 import type { KeyPresetId } from '../audio/keyPresets';
-import { topreRole } from '../audio/keyboardRouting';
+import { topreRole, isKbsimMappedPreset } from '../audio/keyboardRouting';
 
 const audio = new AudioEngine(32);
 const select = document.querySelector<HTMLSelectElement>('#preset')!;
 const status = document.querySelector<HTMLElement>('#status')!;
 const demo = document.querySelector<HTMLButtonElement>('#demo')!;
 const held = new Map<string, { preset: KeyPresetId; code: string }>();
-const presets: KeyPresetId[] = ['pebble', 'clack', 'creamy-thocky', 'topre'];
+const presets: KeyPresetId[] = ['pebble', 'clack', 'creamy-thocky', 'topre', 'turquoise-tealios', 'ibm-buckling-spring'];
 const pattern = ['F1', 'Digit1', 'KeyQ', 'KeyA', 'KeyZ', 'Space', 'Enter', 'Backspace'];
 let ready = false;
 let demoTimers: ReturnType<typeof setTimeout>[] = [];
@@ -21,7 +21,7 @@ function register(p: KeyPresetId, s: KeyboardSampleSounds) {
   s.rowDown?.forEach((buf, i) => audio.register(`kb:${p}:downR${i}`, [buf]));
 }
 function play(p: KeyPresetId, code: string, phase: 'Down' | 'Up') {
-  const specific = p === 'topre' ? topreRole(code, phase) : undefined;
+  const specific = isKbsimMappedPreset(p) ? topreRole(code, phase) : undefined;
   const role = specific ?? (code === 'Space' ? `space${phase}` : phase.toLowerCase());
   audio.play(`kb:${p}:${role}`, { gainDb: 6 }, phase === 'Down' ? 'keydown' : 'keyup');
 }
@@ -70,5 +70,5 @@ try {
   await Promise.all(presets.map(async p => register(p, await loadKeyboardSamples(audio.ctx, p))));
   ready = true;
   document.querySelectorAll<HTMLButtonElement>('button').forEach(b => b.disabled = false);
-  status.textContent = '4종 준비됨 · Topre 원본 12개 로드 완료';
+  status.textContent = '6종 준비됨 · Topre / Tealios / Buckling Spring 원본 각 12개 로드 완료';
 } catch (e) { status.textContent = `음원 로드 실패: ${String(e)}`; }

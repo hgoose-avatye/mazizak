@@ -1,0 +1,37 @@
+{
+  "id": "K06",
+  "videoUrl": "https://www.youtube.com/watch?v=Ia83r5bt62U",
+  "uploader": "CarnellBoards",
+  "title": "Mode Envoy with HMX Cheese is SO BALANCED | Keyboard Sound Test",
+  "durationSeconds": 89,
+  "modelEvidence": "Uploader description explicitly names the requested switch; internal switch not visually authenticated.",
+  "visualReviewMethod": "Public YouTube storyboard preview frames sampled at 1 second; not a continuous playback or listening review.",
+  "candidateWindows": [
+    {
+      "startSeconds": 2,
+      "endSeconds": 60,
+      "visualOnly": true,
+      "basis": "general typing visible",
+      "audioSuitability": "NOT_VERIFIED"
+    },
+    {
+      "startSeconds": 62,
+      "endSeconds": 80,
+      "visualOnly": true,
+      "basis": "individual-key actions; actual key identity unverified",
+      "audioSuitability": "NOT_VERIFIED"
+    }
+  ],
+  "downloadProvidedInDescription": false,
+  "permissionEvidenceFound": false,
+  "licenseStatus": "unconfirmed; no reuse grant or CC notice found in checked description/channel metadata",
+  "audioAcquired": false,
+  "audioExtracted": false,
+  "listeningPerformed": false,
+  "bgm": "unverified",
+  "speech": "unverified",
+  "otherSwitchAudio": "unverified",
+  "keydownKeyupSeparation": "unverified",
+  "noiseLoudnessTimbre": "unverified",
+  "appStatus": "pending-audio"
+}

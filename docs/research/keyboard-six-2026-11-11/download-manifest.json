@@ -1,0 +1,437 @@
+{
+  "checkedDateKST": "2026-11-11",
+  "status": "REFERENCE_ONLY_NOT_APP_APPROVED",
+  "storage": "/private/tmp/manzizak-six-research/reference-only",
+  "note": "Public delivery clips, not original session masters. Personal/unknown recording permissions. No binaries included in the repository. Temporary storage may be cleaned.",
+  "downloads": [
+    {
+      "id": "K05",
+      "path": "/private/tmp/manzizak-six-research/reference-only/thockhub/K05/0.ogg",
+      "url": "https://thockhub.com/audio/ct/gateron-oil-king-sound-test-with-gmk-mt3-and-sa-keycaps/0.ogg",
+      "licenseStatus": "Unconfirmed; reference-only",
+      "appUse": "HOLD",
+      "bytes": 5287,
+      "sha256": "da0759b0796a96eb53a4d7beb492fd5bc3b90288da5f5395e2af9d0b63c97950",
+      "magic": "4f676753"
+    },
+    {
+      "id": "K05",
+      "path": "/private/tmp/manzizak-six-research/reference-only/thockhub/K05/1.ogg",
+      "url": "https://thockhub.com/audio/ct/gateron-oil-king-sound-test-with-gmk-mt3-and-sa-keycaps/1.ogg",
+      "licenseStatus": "Unconfirmed; reference-only",
+      "appUse": "HOLD",
+      "bytes": 4695,
+      "sha256": "d83c30433f14670132c53e01c80f8191da1ecad4826fb6e24bc9ad6fe87e7222",
+      "magic": "4f676753"
+    },
+    {
+      "id": "K05",
+      "path": "/private/tmp/manzizak-six-research/reference-only/thockhub/K05/2.ogg",
+      "url": "https://thockhub.com/audio/ct/gateron-oil-king-sound-test-with-gmk-mt3-and-sa-keycaps/2.ogg",
+      "licenseStatus": "Unconfirmed; reference-only",
+      "appUse": "HOLD",
+      "bytes": 5643,
+      "sha256": "8f0aaf92efef9f18234d9560698b667db1f125e75b3627adfb8b749b7ec8dba6",
+      "magic": "4f676753"
+    },
+    {
+      "id": "K05",
+      "path": "/private/tmp/manzizak-six-research/reference-only/thockhub/K05/3.ogg",
+      "url": "https://thockhub.com/audio/ct/gateron-oil-king-sound-test-with-gmk-mt3-and-sa-keycaps/3.ogg",
+      "licenseStatus": "Unconfirmed; reference-only",
+      "appUse": "HOLD",
+      "bytes": 4920,
+      "sha256": "3d1479a782080c8d0e382620cd11397727c703208368a0f3fa4e5ba554de37f2",
+      "magic": "4f676753"
+    },
+    {
+      "id": "K05",
+      "path": "/private/tmp/manzizak-six-research/reference-only/thockhub/K05/4.ogg",
+      "url": "https://thockhub.com/audio/ct/gateron-oil-king-sound-test-with-gmk-mt3-and-sa-keycaps/4.ogg",
+      "licenseStatus": "Unconfirmed; reference-only",
+      "appUse": "HOLD",
+      "bytes": 4538,
+      "sha256": "0ca4c72c371a8e31786ee4b46f4b20cd2d378ff6b39c45b4004841d6a52dcb4f",
+      "magic": "4f676753"
+    },
+    {
+      "id": "K05",
+      "path": "/private/tmp/manzizak-six-research/reference-only/thockhub/K05/5.ogg",
+      "url": "https://thockhub.com/audio/ct/gateron-oil-king-sound-test-with-gmk-mt3-and-sa-keycaps/5.ogg",
+      "licenseStatus": "Unconfirmed; reference-only",
+      "appUse": "HOLD",
+      "bytes": 4563,
+      "sha256": "4ffa13faedd885aee84349fa83ac71ab1f7bae0638a12512dccb7266f85c4184",
+      "magic": "4f676753"
+    },
+    {
+      "id": "K05",
+      "path": "/private/tmp/manzizak-six-research/reference-only/thockhub/K05/6.ogg",
+      "url": "https://thockhub.com/audio/ct/gateron-oil-king-sound-test-with-gmk-mt3-and-sa-keycaps/6.ogg",
+      "licenseStatus": "Unconfirmed; reference-only",
+      "appUse": "HOLD",
+      "bytes": 5580,
+      "sha256": "8b0b7beaf7e15b18dbef96222a74be9b3fc618c1b58f896d53ac410bc33333a8",
+      "magic": "4f676753"
+    },
+    {
+      "id": "K07",
+      "path": "/private/tmp/manzizak-six-research/reference-only/thockhub/K07/0.ogg",
+      "url": "https://thockhub.com/audio/ct/gazzew-boba-u4t-62g-sound-test-review-one-of-the-best-tactile/0.ogg",
+      "licenseStatus": "Unconfirmed; reference-only",
+      "appUse": "HOLD",
+      "bytes": 6008,
+      "sha256": "371325ee6e560c164d24a4f56e641e787a3351b4594f3581c9eae0ae6f9b43c8",
+      "magic": "4f676753"
+    },
+    {
+      "id": "K07",
+      "path": "/private/tmp/manzizak-six-research/reference-only/thockhub/K07/1.ogg",
+      "url": "https://thockhub.com/audio/ct/gazzew-boba-u4t-62g-sound-test-review-one-of-the-best-tactile/1.ogg",
+      "licenseStatus": "Unconfirmed; reference-only",
+      "appUse": "HOLD",
+      "bytes": 5385,
+      "sha256": "3ca41180af74f0f5ece1b93c3ae65c4f05538d4d0fa8b25d6de9b8e2a46b0ae8",
+      "magic": "4f676753"
+    },
+    {
+      "id": "K07",
+      "path": "/private/tmp/manzizak-six-research/reference-only/thockhub/K07/2.ogg",
+      "url": "https://thockhub.com/audio/ct/gazzew-boba-u4t-62g-sound-test-review-one-of-the-best-tactile/2.ogg",
+      "licenseStatus": "Unconfirmed; reference-only",
+      "appUse": "HOLD",
+      "bytes": 5394,
+      "sha256": "8b263988a95675df10bc0101c68eb7ef1828469e41cec7e796afa6342a7520a8",
+      "magic": "4f676753"
+    },
+    {
+      "id": "K07",
+      "path": "/private/tmp/manzizak-six-research/reference-only/thockhub/K07/3.ogg",
+      "url": "https://thockhub.com/audio/ct/gazzew-boba-u4t-62g-sound-test-review-one-of-the-best-tactile/3.ogg",
+      "licenseStatus": "Unconfirmed; reference-only",
+      "appUse": "HOLD",
+      "bytes": 5341,
+      "sha256": "610dc803eb3f185583772ea8839272620ca89be647ccec8e82f765e060405900",
+      "magic": "4f676753"
+    },
+    {
+      "id": "K07",
+      "path": "/private/tmp/manzizak-six-research/reference-only/thockhub/K07/4.ogg",
+      "url": "https://thockhub.com/audio/ct/gazzew-boba-u4t-62g-sound-test-review-one-of-the-best-tactile/4.ogg",
+      "licenseStatus": "Unconfirmed; reference-only",
+      "appUse": "HOLD",
+      "bytes": 5091,
+      "sha256": "7ebc1f2e4d5fb11b397ed836a8b1e76fa102def4c7c69b837b6c05d6073bf3f0",
+      "magic": "4f676753"
+    },
+    {
+      "id": "K07",
+      "path": "/private/tmp/manzizak-six-research/reference-only/thockhub/K07/5.ogg",
+      "url": "https://thockhub.com/audio/ct/gazzew-boba-u4t-62g-sound-test-review-one-of-the-best-tactile/5.ogg",
+      "licenseStatus": "Unconfirmed; reference-only",
+      "appUse": "HOLD",
+      "bytes": 6022,
+      "sha256": "46f9e6eb015efda6a6bd064c54ba0506c044c806dd01150ee849ee557921921f",
+      "magic": "4f676753"
+    },
+    {
+      "id": "K07",
+      "path": "/private/tmp/manzizak-six-research/reference-only/thockhub/K07/6.ogg",
+      "url": "https://thockhub.com/audio/ct/gazzew-boba-u4t-62g-sound-test-review-one-of-the-best-tactile/6.ogg",
+      "licenseStatus": "Unconfirmed; reference-only",
+      "appUse": "HOLD",
+      "bytes": 5077,
+      "sha256": "3b2cd8bd88a038383242b7f72e630da008572b5ca809e7348824bd0b1f1009d7",
+      "magic": "4f676753"
+    },
+    {
+      "id": "K07",
+      "path": "/private/tmp/manzizak-six-research/reference-only/thockhub/K07/7.ogg",
+      "url": "https://thockhub.com/audio/ct/gazzew-boba-u4t-62g-sound-test-review-one-of-the-best-tactile/7.ogg",
+      "licenseStatus": "Unconfirmed; reference-only",
+      "appUse": "HOLD",
+      "bytes": 5089,
+      "sha256": "5a659f82a20ac86aabd5125286e2c10d36047ac64be4b21ef36a639525b78346",
+      "magic": "4f676753"
+    },
+    {
+      "id": "K07",
+      "path": "/private/tmp/manzizak-six-research/reference-only/thockhub/K07/8.ogg",
+      "url": "https://thockhub.com/audio/ct/gazzew-boba-u4t-62g-sound-test-review-one-of-the-best-tactile/8.ogg",
+      "licenseStatus": "Unconfirmed; reference-only",
+      "appUse": "HOLD",
+      "bytes": 5290,
+      "sha256": "440968757a8f23fb6296a468314454a3414d069e9832acd59b689bf31fb677b8",
+      "magic": "4f676753"
+    },
+    {
+      "id": "K07",
+      "path": "/private/tmp/manzizak-six-research/reference-only/thockhub/K07/9.ogg",
+      "url": "https://thockhub.com/audio/ct/gazzew-boba-u4t-62g-sound-test-review-one-of-the-best-tactile/9.ogg",
+      "licenseStatus": "Unconfirmed; reference-only",
+      "appUse": "HOLD",
+      "bytes": 5198,
+      "sha256": "ba368220b90dff92f26ff50ada1757e3eec696d52a52480144e562166cb1b6c1",
+      "magic": "4f676753"
+    },
+    {
+      "id": "K07",
+      "path": "/private/tmp/manzizak-six-research/reference-only/thockhub/K07/10.ogg",
+      "url": "https://thockhub.com/audio/ct/gazzew-boba-u4t-62g-sound-test-review-one-of-the-best-tactile/10.ogg",
+      "licenseStatus": "Unconfirmed; reference-only",
+      "appUse": "HOLD",
+      "bytes": 5122,
+      "sha256": "4b5d0d13cb86f19f833ab69dc341c3ebddf75ca2c10228f4527ba5bfe36eafa6",
+      "magic": "4f676753"
+    },
+    {
+      "id": "K07",
+      "path": "/private/tmp/manzizak-six-research/reference-only/thockhub/K07/11.ogg",
+      "url": "https://thockhub.com/audio/ct/gazzew-boba-u4t-62g-sound-test-review-one-of-the-best-tactile/11.ogg",
+      "licenseStatus": "Unconfirmed; reference-only",
+      "appUse": "HOLD",
+      "bytes": 5151,
+      "sha256": "ead0088969d1dcb6abc2c2178ab6b355a3649655de17486d74569211068c2f7a",
+      "magic": "4f676753"
+    },
+    {
+      "id": "K07",
+      "path": "/private/tmp/manzizak-six-research/reference-only/thockhub/K07/12.ogg",
+      "url": "https://thockhub.com/audio/ct/gazzew-boba-u4t-62g-sound-test-review-one-of-the-best-tactile/12.ogg",
+      "licenseStatus": "Unconfirmed; reference-only",
+      "appUse": "HOLD",
+      "bytes": 5118,
+      "sha256": "7673a16f4f5ed6021c26ee9695781bcbb7abbef5967ad451f9767ef07b58b45a",
+      "magic": "4f676753"
+    },
+    {
+      "id": "K07",
+      "path": "/private/tmp/manzizak-six-research/reference-only/thockhub/K07/13.ogg",
+      "url": "https://thockhub.com/audio/ct/gazzew-boba-u4t-62g-sound-test-review-one-of-the-best-tactile/13.ogg",
+      "licenseStatus": "Unconfirmed; reference-only",
+      "appUse": "HOLD",
+      "bytes": 5948,
+      "sha256": "2abfd04712969e20a24911ab500ec78a18360eb0716a91a82c915e1ffa69dc03",
+      "magic": "4f676753"
+    },
+    {
+      "id": "K07",
+      "path": "/private/tmp/manzizak-six-research/reference-only/thockhub/K07/14.ogg",
+      "url": "https://thockhub.com/audio/ct/gazzew-boba-u4t-62g-sound-test-review-one-of-the-best-tactile/14.ogg",
+      "licenseStatus": "Unconfirmed; reference-only",
+      "appUse": "HOLD",
+      "bytes": 5976,
+      "sha256": "6587608d1b4aa2e7f66f09d75f8c94672d3d3366e81e29485dff5e750bd77030",
+      "magic": "4f676753"
+    },
+    {
+      "id": "K07",
+      "path": "/private/tmp/manzizak-six-research/reference-only/thockhub/K07/15.ogg",
+      "url": "https://thockhub.com/audio/ct/gazzew-boba-u4t-62g-sound-test-review-one-of-the-best-tactile/15.ogg",
+      "licenseStatus": "Unconfirmed; reference-only",
+      "appUse": "HOLD",
+      "bytes": 5127,
+      "sha256": "ce39894920b5109f64d0496974a128bcad286e6fdc5409546d1c7e854ffc95f9",
+      "magic": "4f676753"
+    },
+    {
+      "id": "K07",
+      "path": "/private/tmp/manzizak-six-research/reference-only/thockhub/K07/16.ogg",
+      "url": "https://thockhub.com/audio/ct/gazzew-boba-u4t-62g-sound-test-review-one-of-the-best-tactile/16.ogg",
+      "licenseStatus": "Unconfirmed; reference-only",
+      "appUse": "HOLD",
+      "bytes": 5090,
+      "sha256": "79cb5bb089838378e5941dff910426bc793b116442c5633ee68f1b696df0cd09",
+      "magic": "4f676753"
+    },
+    {
+      "id": "K09",
+      "path": "/private/tmp/manzizak-six-research/reference-only/thockhub/K09/0.ogg",
+      "url": "https://thockhub.com/audio/ct/ultimate-outemu-silent-peach-v3-sound-test-better-than-the-original/0.ogg",
+      "licenseStatus": "Unconfirmed; reference-only",
+      "appUse": "HOLD",
+      "bytes": 5864,
+      "sha256": "1aba6a42ab9ebd68b648b649fb6207a50c3a115da848bd172cc02c3b45b75b51",
+      "magic": "4f676753"
+    },
+    {
+      "id": "K09",
+      "path": "/private/tmp/manzizak-six-research/reference-only/thockhub/K09/1.ogg",
+      "url": "https://thockhub.com/audio/ct/ultimate-outemu-silent-peach-v3-sound-test-better-than-the-original/1.ogg",
+      "licenseStatus": "Unconfirmed; reference-only",
+      "appUse": "HOLD",
+      "bytes": 5916,
+      "sha256": "54fa43e3be88fced3a1d9358e85557cc85685fb880fa8a7626f91ec29bf428bd",
+      "magic": "4f676753"
+    },
+    {
+      "id": "K09",
+      "path": "/private/tmp/manzizak-six-research/reference-only/thockhub/K09/2.ogg",
+      "url": "https://thockhub.com/audio/ct/ultimate-outemu-silent-peach-v3-sound-test-better-than-the-original/2.ogg",
+      "licenseStatus": "Unconfirmed; reference-only",
+      "appUse": "HOLD",
+      "bytes": 5898,
+      "sha256": "23b9ff032919afe25a2ffac57d78d94f531bac6354a7d390c233b7a9ef9ce020",
+      "magic": "4f676753"
+    },
+    {
+      "id": "K09",
+      "path": "/private/tmp/manzizak-six-research/reference-only/thockhub/K09/3.ogg",
+      "url": "https://thockhub.com/audio/ct/ultimate-outemu-silent-peach-v3-sound-test-better-than-the-original/3.ogg",
+      "licenseStatus": "Unconfirmed; reference-only",
+      "appUse": "HOLD",
+      "bytes": 5142,
+      "sha256": "6add59add9aae99008b1cf191e7d38cf075551a352cda484c3bec819f21baf18",
+      "magic": "4f676753"
+    },
+    {
+      "id": "K09",
+      "path": "/private/tmp/manzizak-six-research/reference-only/thockhub/K09/4.ogg",
+      "url": "https://thockhub.com/audio/ct/ultimate-outemu-silent-peach-v3-sound-test-better-than-the-original/4.ogg",
+      "licenseStatus": "Unconfirmed; reference-only",
+      "appUse": "HOLD",
+      "bytes": 5304,
+      "sha256": "58a4ff86382d53b7b06dfeaa1256bf0d0bb62fc9699cdf1e2b6367bddbf9ff79",
+      "magic": "4f676753"
+    },
+    {
+      "id": "K09",
+      "path": "/private/tmp/manzizak-six-research/reference-only/thockhub/K09/5.ogg",
+      "url": "https://thockhub.com/audio/ct/ultimate-outemu-silent-peach-v3-sound-test-better-than-the-original/5.ogg",
+      "licenseStatus": "Unconfirmed; reference-only",
+      "appUse": "HOLD",
+      "bytes": 5898,
+      "sha256": "9035c7485bd39d78a17485a325395204b9195c76ae404a2a9cebc039a0c94acb",
+      "magic": "4f676753"
+    },
+    {
+      "id": "K09",
+      "path": "/private/tmp/manzizak-six-research/reference-only/thockhub/K09/6.ogg",
+      "url": "https://thockhub.com/audio/ct/ultimate-outemu-silent-peach-v3-sound-test-better-than-the-original/6.ogg",
+      "licenseStatus": "Unconfirmed; reference-only",
+      "appUse": "HOLD",
+      "bytes": 5937,
+      "sha256": "1563a0c7608dd1c392507fe85293bb27c2dd1d126c235c646f68cf27e14acaac",
+      "magic": "4f676753"
+    },
+    {
+      "id": "K09",
+      "path": "/private/tmp/manzizak-six-research/reference-only/thockhub/K09/7.ogg",
+      "url": "https://thockhub.com/audio/ct/ultimate-outemu-silent-peach-v3-sound-test-better-than-the-original/7.ogg",
+      "licenseStatus": "Unconfirmed; reference-only",
+      "appUse": "HOLD",
+      "bytes": 5994,
+      "sha256": "e63146e3d067fbe6ab0a324dba541b6ba81dbfd8c748057163e44075dc84bf99",
+      "magic": "4f676753"
+    },
+    {
+      "id": "K09",
+      "path": "/private/tmp/manzizak-six-research/reference-only/thockhub/K09/8.ogg",
+      "url": "https://thockhub.com/audio/ct/ultimate-outemu-silent-peach-v3-sound-test-better-than-the-original/8.ogg",
+      "licenseStatus": "Unconfirmed; reference-only",
+      "appUse": "HOLD",
+      "bytes": 5848,
+      "sha256": "11f63e3f3e972d76dd16fa42d652854c122f4c928229cce19075977a2280e5ad",
+      "magic": "4f676753"
+    },
+    {
+      "id": "K09",
+      "path": "/private/tmp/manzizak-six-research/reference-only/thockhub/K09/9.ogg",
+      "url": "https://thockhub.com/audio/ct/ultimate-outemu-silent-peach-v3-sound-test-better-than-the-original/9.ogg",
+      "licenseStatus": "Unconfirmed; reference-only",
+      "appUse": "HOLD",
+      "bytes": 5871,
+      "sha256": "389eace0fa5c851f5d89d992e3d8b78add6810c245d663f3c62e38747af4a569",
+      "magic": "4f676753"
+    },
+    {
+      "id": "K09",
+      "path": "/private/tmp/manzizak-six-research/reference-only/thockhub/K09/10.ogg",
+      "url": "https://thockhub.com/audio/ct/ultimate-outemu-silent-peach-v3-sound-test-better-than-the-original/10.ogg",
+      "licenseStatus": "Unconfirmed; reference-only",
+      "appUse": "HOLD",
+      "bytes": 5926,
+      "sha256": "50bd9d887c47f0fa238e28a32d2881c9de7d6be4f301071450309ecfa6aad4d5",
+      "magic": "4f676753"
+    },
+    {
+      "id": "K09",
+      "path": "/private/tmp/manzizak-six-research/reference-only/thockhub/K09/11.ogg",
+      "url": "https://thockhub.com/audio/ct/ultimate-outemu-silent-peach-v3-sound-test-better-than-the-original/11.ogg",
+      "licenseStatus": "Unconfirmed; reference-only",
+      "appUse": "HOLD",
+      "bytes": 5899,
+      "sha256": "5af13529eca2504bbe7d05ed726b64181b433f995aed7179960ac2cff465af4a",
+      "magic": "4f676753"
+    },
+    {
+      "id": "K09",
+      "path": "/private/tmp/manzizak-six-research/reference-only/thockhub/K09/12.ogg",
+      "url": "https://thockhub.com/audio/ct/ultimate-outemu-silent-peach-v3-sound-test-better-than-the-original/12.ogg",
+      "licenseStatus": "Unconfirmed; reference-only",
+      "appUse": "HOLD",
+      "bytes": 5863,
+      "sha256": "e3903d98d4ff821b4ec1fc1f9f1c1d6db058b55f3b82ecc25b5c70933413c8a7",
+      "magic": "4f676753"
+    },
+    {
+      "id": "K09",
+      "path": "/private/tmp/manzizak-six-research/reference-only/thockhub/K09/13.ogg",
+      "url": "https://thockhub.com/audio/ct/ultimate-outemu-silent-peach-v3-sound-test-better-than-the-original/13.ogg",
+      "licenseStatus": "Unconfirmed; reference-only",
+      "appUse": "HOLD",
+      "bytes": 5883,
+      "sha256": "b4d2b5695c289af1f70c4eba20660a13cd0f4374dde1c778f5a7825833da4aad",
+      "magic": "4f676753"
+    },
+    {
+      "id": "K05",
+      "path": "/private/tmp/manzizak-six-research/reference-only/mechvibes/K05-mv-9dbc3ddcabc444dba7ba2a584ba2c8ea.zip",
+      "url": "https://mechvibes.com/api/sound-packs/mv-9dbc3ddcabc444dba7ba2a584ba2c8ea/download",
+      "licenseStatus": "Pack page MIT; recording rights chain unconfirmed",
+      "appUse": "HOLD",
+      "bytes": 47809,
+      "sha256": "f9a4d03a7e233ead173904fb2469624c0a325b9722e26783a0f833b7cc4e6367",
+      "magic": "504b0304",
+      "files": [
+        "config.json",
+        "1.mp3",
+        "2.mp3",
+        "3.mp3",
+        "4.mp3",
+        "5.mp3",
+        "spacebar.mp3"
+      ]
+    },
+    {
+      "id": "K07",
+      "path": "/private/tmp/manzizak-six-research/reference-only/mechvibes/K07-mv-1921cd45c1ae414fb8a98210671c63c4.zip",
+      "url": "https://mechvibes.com/api/sound-packs/mv-1921cd45c1ae414fb8a98210671c63c4/download",
+      "licenseStatus": "Personal use",
+      "appUse": "HOLD",
+      "bytes": 29148,
+      "sha256": "142bd727775268be3d614ff4bf462ed3754382c2738cb3cac52e058c5965d721",
+      "magic": "504b0304",
+      "files": [
+        "config.json",
+        "LICENSE.txt",
+        "concatenated_audio.wav"
+      ]
+    },
+    {
+      "id": "K08",
+      "path": "/private/tmp/manzizak-six-research/reference-only/mechvibes/K08-mv-37918613073f4a61b78bce2801940f0f.zip",
+      "url": "https://mechvibes.com/api/sound-packs/mv-37918613073f4a61b78bce2801940f0f/download",
+      "licenseStatus": "Personal use",
+      "appUse": "HOLD",
+      "bytes": 174022,
+      "sha256": "40cb4e579011b2464d62e536f101ccad05b043033e597a3437db5f7451054aad",
+      "magic": "504b0304",
+      "files": [
+        "config.json",
+        "LICENSE.txt",
+        "concatenated_audio.wav"
+      ]
+    }
+  ]
+}

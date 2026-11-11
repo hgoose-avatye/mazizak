@@ -1,0 +1,374 @@
+{
+  "listeningPerformed": false,
+  "note": "Decode and signal statistics only; does not establish exact model, key identity or recording rights.",
+  "files": [
+    {
+      "file": "/private/tmp/manzizak-six-research/reference-only/mechvibes/K05-mv-9dbc3ddcabc444dba7ba2a584ba2c8ea/1.mp3",
+      "duration": 0.264,
+      "sampleRate": 48000,
+      "channels": 2,
+      "peak": 0.5284749865531921,
+      "rms": 0.04777373041878379
+    },
+    {
+      "file": "/private/tmp/manzizak-six-research/reference-only/mechvibes/K05-mv-9dbc3ddcabc444dba7ba2a584ba2c8ea/2.mp3",
+      "duration": 0.192,
+      "sampleRate": 48000,
+      "channels": 2,
+      "peak": 0.9738048911094666,
+      "rms": 0.06031626701922064
+    },
+    {
+      "file": "/private/tmp/manzizak-six-research/reference-only/mechvibes/K05-mv-9dbc3ddcabc444dba7ba2a584ba2c8ea/3.mp3",
+      "duration": 0.264,
+      "sampleRate": 48000,
+      "channels": 2,
+      "peak": 0.5971274375915527,
+      "rms": 0.04706400792492303
+    },
+    {
+      "file": "/private/tmp/manzizak-six-research/reference-only/mechvibes/K05-mv-9dbc3ddcabc444dba7ba2a584ba2c8ea/4.mp3",
+      "duration": 0.264,
+      "sampleRate": 48000,
+      "channels": 2,
+      "peak": 0.5324296355247498,
+      "rms": 0.04754819210655921
+    },
+    {
+      "file": "/private/tmp/manzizak-six-research/reference-only/mechvibes/K05-mv-9dbc3ddcabc444dba7ba2a584ba2c8ea/5.mp3",
+      "duration": 0.192,
+      "sampleRate": 48000,
+      "channels": 2,
+      "peak": 0.47557809948921204,
+      "rms": 0.0584153520769426
+    },
+    {
+      "file": "/private/tmp/manzizak-six-research/reference-only/mechvibes/K05-mv-9dbc3ddcabc444dba7ba2a584ba2c8ea/spacebar.mp3",
+      "duration": 0.24,
+      "sampleRate": 48000,
+      "channels": 2,
+      "peak": 0.8987008929252625,
+      "rms": 0.08256278815727754
+    },
+    {
+      "file": "/private/tmp/manzizak-six-research/reference-only/mechvibes/K07-mv-1921cd45c1ae414fb8a98210671c63c4/concatenated_audio.wav",
+      "duration": 0.26266666666666666,
+      "sampleRate": 48000,
+      "channels": 2,
+      "peak": 0.08801537752151489,
+      "rms": 0.0056734611508612535
+    },
+    {
+      "file": "/private/tmp/manzizak-six-research/reference-only/mechvibes/K08-mv-37918613073f4a61b78bce2801940f0f/concatenated_audio.wav",
+      "duration": 3.08825,
+      "sampleRate": 48000,
+      "channels": 2,
+      "peak": 0.5871250629425049,
+      "rms": 0.020837042296017023
+    },
+    {
+      "file": "/private/tmp/manzizak-six-research/reference-only/thockhub/K05/0.ogg",
+      "duration": 0.19033333333333333,
+      "sampleRate": 48000,
+      "channels": 1,
+      "peak": 0.012450918555259705,
+      "rms": 0.000695975776166687
+    },
+    {
+      "file": "/private/tmp/manzizak-six-research/reference-only/thockhub/K05/1.ogg",
+      "duration": 0.10533333333333333,
+      "sampleRate": 48000,
+      "channels": 1,
+      "peak": 0.01519377063959837,
+      "rms": 0.0009251404790963132
+    },
+    {
+      "file": "/private/tmp/manzizak-six-research/reference-only/thockhub/K05/2.ogg",
+      "duration": 0.23733333333333334,
+      "sampleRate": 48000,
+      "channels": 1,
+      "peak": 0.01594054512679577,
+      "rms": 0.0006272591842354633
+    },
+    {
+      "file": "/private/tmp/manzizak-six-research/reference-only/thockhub/K05/3.ogg",
+      "duration": 0.13033333333333333,
+      "sampleRate": 48000,
+      "channels": 1,
+      "peak": 0.011482542380690575,
+      "rms": 0.000753221423143281
+    },
+    {
+      "file": "/private/tmp/manzizak-six-research/reference-only/thockhub/K05/4.ogg",
+      "duration": 0.10033333333333333,
+      "sampleRate": 48000,
+      "channels": 1,
+      "peak": 0.012170564383268356,
+      "rms": 0.0008654383523872788
+    },
+    {
+      "file": "/private/tmp/manzizak-six-research/reference-only/thockhub/K05/5.ogg",
+      "duration": 0.09533333333333334,
+      "sampleRate": 48000,
+      "channels": 1,
+      "peak": 0.007269734051078558,
+      "rms": 0.000530526250907334
+    },
+    {
+      "file": "/private/tmp/manzizak-six-research/reference-only/thockhub/K05/6.ogg",
+      "duration": 0.23733333333333334,
+      "sampleRate": 48000,
+      "channels": 1,
+      "peak": 0.012404314242303371,
+      "rms": 0.0006133782304838636
+    },
+    {
+      "file": "/private/tmp/manzizak-six-research/reference-only/thockhub/K07/0.ogg",
+      "duration": 0.23733333333333334,
+      "sampleRate": 48000,
+      "channels": 1,
+      "peak": 0.1229262724518776,
+      "rms": 0.008084859517032649
+    },
+    {
+      "file": "/private/tmp/manzizak-six-research/reference-only/thockhub/K07/1.ogg",
+      "duration": 0.16033333333333333,
+      "sampleRate": 48000,
+      "channels": 1,
+      "peak": 0.14190131425857544,
+      "rms": 0.011059719086488014
+    },
+    {
+      "file": "/private/tmp/manzizak-six-research/reference-only/thockhub/K07/10.ogg",
+      "duration": 0.14033333333333334,
+      "sampleRate": 48000,
+      "channels": 1,
+      "peak": 0.14896905422210693,
+      "rms": 0.011345326880236135
+    },
+    {
+      "file": "/private/tmp/manzizak-six-research/reference-only/thockhub/K07/11.ogg",
+      "duration": 0.14533333333333334,
+      "sampleRate": 48000,
+      "channels": 1,
+      "peak": 0.16641774773597717,
+      "rms": 0.010928678807669345
+    },
+    {
+      "file": "/private/tmp/manzizak-six-research/reference-only/thockhub/K07/12.ogg",
+      "duration": 0.14266666666666666,
+      "sampleRate": 48000,
+      "channels": 1,
+      "peak": 0.14830921590328217,
+      "rms": 0.010570796785153408
+    },
+    {
+      "file": "/private/tmp/manzizak-six-research/reference-only/thockhub/K07/13.ogg",
+      "duration": 0.23733333333333334,
+      "sampleRate": 48000,
+      "channels": 1,
+      "peak": 0.15324516594409943,
+      "rms": 0.008907280627423155
+    },
+    {
+      "file": "/private/tmp/manzizak-six-research/reference-only/thockhub/K07/14.ogg",
+      "duration": 0.23733333333333334,
+      "sampleRate": 48000,
+      "channels": 1,
+      "peak": 0.15077170729637146,
+      "rms": 0.008653718427153102
+    },
+    {
+      "file": "/private/tmp/manzizak-six-research/reference-only/thockhub/K07/15.ogg",
+      "duration": 0.14033333333333334,
+      "sampleRate": 48000,
+      "channels": 1,
+      "peak": 0.14581559598445892,
+      "rms": 0.00996663373677161
+    },
+    {
+      "file": "/private/tmp/manzizak-six-research/reference-only/thockhub/K07/16.ogg",
+      "duration": 0.14033333333333334,
+      "sampleRate": 48000,
+      "channels": 1,
+      "peak": 0.15515483915805817,
+      "rms": 0.011200383519669246
+    },
+    {
+      "file": "/private/tmp/manzizak-six-research/reference-only/thockhub/K07/2.ogg",
+      "duration": 0.16033333333333333,
+      "sampleRate": 48000,
+      "channels": 1,
+      "peak": 0.1548069417476654,
+      "rms": 0.00928699392706487
+    },
+    {
+      "file": "/private/tmp/manzizak-six-research/reference-only/thockhub/K07/3.ogg",
+      "duration": 0.14927083333333332,
+      "sampleRate": 48000,
+      "channels": 1,
+      "peak": 0.18161974847316742,
+      "rms": 0.010895615637008312
+    },
+    {
+      "file": "/private/tmp/manzizak-six-research/reference-only/thockhub/K07/4.ogg",
+      "duration": 0.13033333333333333,
+      "sampleRate": 48000,
+      "channels": 1,
+      "peak": 0.16867338120937347,
+      "rms": 0.011169647213970806
+    },
+    {
+      "file": "/private/tmp/manzizak-six-research/reference-only/thockhub/K07/5.ogg",
+      "duration": 0.23733333333333334,
+      "sampleRate": 48000,
+      "channels": 1,
+      "peak": 0.15554054081439972,
+      "rms": 0.00834578536190039
+    },
+    {
+      "file": "/private/tmp/manzizak-six-research/reference-only/thockhub/K07/6.ogg",
+      "duration": 0.14033333333333334,
+      "sampleRate": 48000,
+      "channels": 1,
+      "peak": 0.17181739211082458,
+      "rms": 0.010978147200250728
+    },
+    {
+      "file": "/private/tmp/manzizak-six-research/reference-only/thockhub/K07/7.ogg",
+      "duration": 0.13533333333333333,
+      "sampleRate": 48000,
+      "channels": 1,
+      "peak": 0.15872329473495483,
+      "rms": 0.01104091310152947
+    },
+    {
+      "file": "/private/tmp/manzizak-six-research/reference-only/thockhub/K07/8.ogg",
+      "duration": 0.14754166666666665,
+      "sampleRate": 48000,
+      "channels": 1,
+      "peak": 0.16660836338996887,
+      "rms": 0.011004744043825645
+    },
+    {
+      "file": "/private/tmp/manzizak-six-research/reference-only/thockhub/K07/9.ogg",
+      "duration": 0.1484375,
+      "sampleRate": 48000,
+      "channels": 1,
+      "peak": 0.1719765067100525,
+      "rms": 0.01127673817099983
+    },
+    {
+      "file": "/private/tmp/manzizak-six-research/reference-only/thockhub/K09/0.ogg",
+      "duration": 0.23733333333333334,
+      "sampleRate": 48000,
+      "channels": 1,
+      "peak": 0.012475650757551193,
+      "rms": 0.0007181870999470894
+    },
+    {
+      "file": "/private/tmp/manzizak-six-research/reference-only/thockhub/K09/1.ogg",
+      "duration": 0.23733333333333334,
+      "sampleRate": 48000,
+      "channels": 1,
+      "peak": 0.016151132062077522,
+      "rms": 0.0008149700991923798
+    },
+    {
+      "file": "/private/tmp/manzizak-six-research/reference-only/thockhub/K09/10.ogg",
+      "duration": 0.23733333333333334,
+      "sampleRate": 48000,
+      "channels": 1,
+      "peak": 0.01937502808868885,
+      "rms": 0.0007619384136689428
+    },
+    {
+      "file": "/private/tmp/manzizak-six-research/reference-only/thockhub/K09/11.ogg",
+      "duration": 0.23733333333333334,
+      "sampleRate": 48000,
+      "channels": 1,
+      "peak": 0.015324464067816734,
+      "rms": 0.0007408162232754742
+    },
+    {
+      "file": "/private/tmp/manzizak-six-research/reference-only/thockhub/K09/12.ogg",
+      "duration": 0.23733333333333334,
+      "sampleRate": 48000,
+      "channels": 1,
+      "peak": 0.016042115166783333,
+      "rms": 0.000737441016369164
+    },
+    {
+      "file": "/private/tmp/manzizak-six-research/reference-only/thockhub/K09/13.ogg",
+      "duration": 0.23733333333333334,
+      "sampleRate": 48000,
+      "channels": 1,
+      "peak": 0.014154145494103432,
+      "rms": 0.0007442157861243434
+    },
+    {
+      "file": "/private/tmp/manzizak-six-research/reference-only/thockhub/K09/2.ogg",
+      "duration": 0.23733333333333334,
+      "sampleRate": 48000,
+      "channels": 1,
+      "peak": 0.01633819192647934,
+      "rms": 0.0007774079328315863
+    },
+    {
+      "file": "/private/tmp/manzizak-six-research/reference-only/thockhub/K09/3.ogg",
+      "duration": 0.15033333333333335,
+      "sampleRate": 48000,
+      "channels": 1,
+      "peak": 0.013692248612642288,
+      "rms": 0.00097455625389468
+    },
+    {
+      "file": "/private/tmp/manzizak-six-research/reference-only/thockhub/K09/4.ogg",
+      "duration": 0.16033333333333333,
+      "sampleRate": 48000,
+      "channels": 1,
+      "peak": 0.014449726790189743,
+      "rms": 0.0009972161080664499
+    },
+    {
+      "file": "/private/tmp/manzizak-six-research/reference-only/thockhub/K09/5.ogg",
+      "duration": 0.23733333333333334,
+      "sampleRate": 48000,
+      "channels": 1,
+      "peak": 0.013617996126413345,
+      "rms": 0.0007949363747807569
+    },
+    {
+      "file": "/private/tmp/manzizak-six-research/reference-only/thockhub/K09/6.ogg",
+      "duration": 0.23733333333333334,
+      "sampleRate": 48000,
+      "channels": 1,
+      "peak": 0.014981696382164955,
+      "rms": 0.0007546339850610776
+    },
+    {
+      "file": "/private/tmp/manzizak-six-research/reference-only/thockhub/K09/7.ogg",
+      "duration": 0.23733333333333334,
+      "sampleRate": 48000,
+      "channels": 1,
+      "peak": 0.012485645711421967,
+      "rms": 0.0007821478736257559
+    },
+    {
+      "file": "/private/tmp/manzizak-six-research/reference-only/thockhub/K09/8.ogg",
+      "duration": 0.23733333333333334,
+      "sampleRate": 48000,
+      "channels": 1,
+      "peak": 0.012706131674349308,
+      "rms": 0.0007503131362643007
+    },
+    {
+      "file": "/private/tmp/manzizak-six-research/reference-only/thockhub/K09/9.ogg",
+      "duration": 0.23733333333333334,
+      "sampleRate": 48000,
+      "channels": 1,
+      "peak": 0.012420017272233963,
+      "rms": 0.000767131369963015
+    }
+  ]
+}

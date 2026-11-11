@@ -8,10 +8,18 @@ import type { Toy, ToyContext } from './core/toy';
 import { createSquishy, SQUISHY_COLORS } from './toys/squishy/toy';
 import { createKeyboard, KEY_PRESET_INFO } from './toys/keyboard/toy';
 import type { KeyPresetId } from './audio/keyPresets';
+import { isLocalKeyPreset, isKeyPresetEnabled } from './audio/localKeyPresets';
 import { loadKeyboardSamples } from './audio/keyboardSamples';
 import { loadSquishySamples } from './audio/squishySamples';
 
 const $ = <T extends HTMLElement>(sel: string) => document.querySelector(sel) as T;
+
+// Preserve the user's selected slot when replacing the two video-based presets.
+const replacement = ({ 'hmx-cheese': 'turquoise-tealios', 'magnetic-jade': 'ibm-buckling-spring' } as Record<string, KeyPresetId>)[settings.get().keyPreset];
+if (replacement) settings.set('keyPreset', replacement);
+
+// A saved local-only choice must not leave the public UI without an active preset.
+if (!isKeyPresetEnabled(settings.get().keyPreset)) settings.set('keyPreset', 'pebble');
 
 // ---------- core services ----------
 const audio = new AudioEngine(24);
@@ -136,6 +144,7 @@ function buildVariants(id: string): void {
     }
   } else if (id === 'keyboard') {
     for (const p of Object.keys(KEY_PRESET_INFO) as KeyPresetId[]) {
+      if (!isKeyPresetEnabled(p)) continue;
       const b = document.createElement('button');
       b.className = 'chip';
       b.setAttribute('role', 'radio');
@@ -145,6 +154,15 @@ function buildVariants(id: string): void {
       b.onclick = () => {
         settings.set('keyPreset', p);
         toys.keyboard?.setPreset?.(p);
+        if (isLocalKeyPreset(p) || p === 'turquoise-tealios' || p === 'ibm-buckling-spring') {
+          b.dataset.loadState = 'loading';
+          b.textContent = `${KEY_PRESET_INFO[p].label} · 로딩 중`;
+          void loadKeyboardSamples(audio.ctx, p).then(() => {
+            b.dataset.loadState = 'ready'; b.textContent = KEY_PRESET_INFO[p].label;
+          }, () => {
+            b.dataset.loadState = 'error'; b.textContent = `${KEY_PRESET_INFO[p].label} · 재시도`;
+          });
+        }
         variants.querySelectorAll('button').forEach((x) => x.setAttribute('aria-checked', String(x === b)));
       };
       variants.appendChild(b);

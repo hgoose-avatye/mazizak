@@ -4,7 +4,8 @@ import type { Toy, ToyContext } from '../../core/toy';
 import { buildKeyboardSounds } from '../../audio/sfx';
 import { EXTRA_KEY_ROLES, loadKeyboardSamples, type KeyboardSampleSounds } from '../../audio/keyboardSamples';
 import { SYNTH_BASE, VISUAL_STYLE, type KeyPresetId } from '../../audio/keyPresets';
-import { topreRole, topreRow } from '../../audio/keyboardRouting';
+import { LOCAL_KEY_PRESETS, isLocalKeyPreset, isKeyPresetEnabled } from '../../audio/localKeyPresets';
+import { topreRole, topreRow, isKbsimMappedPreset } from '../../audio/keyboardRouting';
 import { param } from '../../core/params';
 import { radialShadowTexture, studioEnvironment } from '../../core/studio';
 import { settings } from '../../core/settings';
@@ -17,6 +18,9 @@ export const KEY_PRESET_INFO: Record<KeyPresetId, { label: string; desc: string 
   clack: { label: '까랑까랑', desc: '선명하고 경쾌한 고음' },
   'creamy-thocky': { label: '크리미', desc: '부드럽고 크리미한 타건음 (My Sound Pack · Chevy · CC BY 4.0)' },
   topre: { label: 'Topre', desc: 'kbs.im Topre · 행별 타건음과 전용 특수키 (MIT)' },
+  'turquoise-tealios': { label: 'Turquoise Tealios', desc: 'K06 · kbsim 실록 · 행별 누름/공통 키업 · 특수키 전용 (MIT)' },
+  'ibm-buckling-spring': { label: 'IBM Buckling Spring', desc: 'K10 · kbsim Buckling Spring 실록 · 행별 누름/공통 키업 · 특수키 전용 (MIT)' },
+  ...Object.fromEntries(Object.entries(LOCAL_KEY_PRESETS).map(([id, p]) => [id, { label: p.label, desc: `${p.sensoryExpression} · ${p.onomatopoeia} · 로컬 검토용` }])) as Record<keyof typeof LOCAL_KEY_PRESETS, { label: string; desc: string }>,
 };
 
 const PHYS_KEYS = ['KeyQ', 'KeyW', 'KeyE', 'KeyA', 'KeyS', 'KeyD', 'KeyZ', 'KeyX', 'KeyC', 'Space'];
@@ -86,7 +90,7 @@ export function createKeyboard(ctx: ToyContext): Toy & { setPreset(p: KeyPresetI
 
   // ----- sound -----
   // a stored id this build doesn't know (e.g. from a newer/older version) must not crash sound or style lookup
-  let preset: KeyPresetId = settings.get().keyPreset in KEY_PRESET_INFO ? settings.get().keyPreset : 'pebble';
+  let preset: KeyPresetId = settings.get().keyPreset in KEY_PRESET_INFO && isKeyPresetEnabled(settings.get().keyPreset) ? settings.get().keyPreset : 'pebble';
   const loaded = new Set<KeyPresetId>();
   const soundSource: Record<string, string> = {};
   /** presets whose sounds are registered, most recently ready last */
@@ -102,10 +106,11 @@ export function createKeyboard(ctx: ToyContext): Toy & { setPreset(p: KeyPresetI
   /** While a just-selected preset is still loading, keep sounding the last ready one instead of going silent. */
   const audible = (p: KeyPresetId): KeyPresetId => (ready.includes(p) ? p : (ready[ready.length - 1] ?? p));
   // recording-based samples; synthesized set only with ?sfx=synth (A/B) or if loading fails
+  const ownRecordingOnly = (p: KeyPresetId) => isLocalKeyPreset(p) || p === 'turquoise-tealios' || p === 'ibm-buckling-spring';
   const ensurePreset = (p: KeyPresetId) => {
     if (loaded.has(p)) return;
     loaded.add(p);
-    if (param('sfx', 'samples') === 'synth') {
+    if (param('sfx', 'samples') === 'synth' && !ownRecordingOnly(p)) {
       registerSet(p, buildKeyboardSounds(ctx.audio.ctx, SYNTH_BASE[p]));
       soundSource[p] = 'synth';
       return;
@@ -117,6 +122,11 @@ export function createKeyboard(ctx: ToyContext): Toy & { setPreset(p: KeyPresetI
         soundSource[p] = 'samples';
       },
       (err) => {
+        if (ownRecordingOnly(p)) {
+          soundSource[p] = 'error'; loaded.delete(p);
+          console.warn(`Local keyboard samples (${p}) failed; no replacement sound`, err);
+          return;
+        }
         console.warn(`keyboard samples (${p}) failed, using synthesized fallback`, err);
         registerSet(p, buildKeyboardSounds(ctx.audio.ctx, SYNTH_BASE[p]));
         soundSource[p] = 'synth';
@@ -129,7 +139,7 @@ export function createKeyboard(ctx: ToyContext): Toy & { setPreset(p: KeyPresetI
   const keyDetune = vis.keys.map((_, i) => ((i * 37) % 31) - 15);
   let lastDownAt = 0;
   const roleName = (p: KeyPresetId, code: string, phase: 'Down' | 'Up') => {
-    const specific = p === 'topre' ? topreRole(code, phase) : undefined;
+    const specific = (isKbsimMappedPreset(p) || isLocalKeyPreset(p)) ? topreRole(code, phase) : undefined;
     if (specific && ctx.audio.has(`kb:${p}:${specific}`)) return `kb:${p}:${specific}`;
     return `kb:${p}:${code === 'Space' ? 'space' + phase : phase.toLowerCase()}`;
   };
@@ -137,22 +147,24 @@ export function createKeyboard(ctx: ToyContext): Toy & { setPreset(p: KeyPresetI
     const now = performance.now();
     const rapid = now - lastDownAt < 85;
     lastDownAt = now;
+    if (ownRecordingOnly(preset) && soundSource[preset] !== 'samples') return;
     const sp = audible(preset);
     heldPreset.set(holdId, { preset: sp, code });
     const name = roleName(sp, code, 'Down');
     const makeup = soundSource[sp] === 'samples' ? 6 : 0;
-    ctx.audio.play(name, { baseDetune: sp === 'topre' ? 0 : keyDetune[k], detuneCents: sp === 'topre' ? 0 : 12, gainJitterDb: 1.2, gainDb: makeup + (rapid ? -2 : 0), pan: vis.keys[k].rest.x * 0.22 }, evType);
+    ctx.audio.play(name, { baseDetune: (isKbsimMappedPreset(sp) || isLocalKeyPreset(sp)) ? 0 : keyDetune[k], detuneCents: (isKbsimMappedPreset(sp) || isLocalKeyPreset(sp)) ? 0 : 12, gainJitterDb: 1.2, gainDb: makeup + (rapid ? -2 : 0), pan: vis.keys[k].rest.x * 0.22 }, evType);
     ctx.haptic(6);
   };
   const heldPreset = new Map<string, { preset: KeyPresetId; code: string }>();
   const heldPhysical = new Map<string, number>();
   const soundUp = (k: number, evType: string, holdId = String(k)) => {
     const held = heldPreset.get(holdId);
+    if (!held && ownRecordingOnly(preset)) return;
     const pr = held?.preset ?? audible(preset);
     heldPreset.delete(holdId);
     const name = roleName(pr, held?.code ?? PHYS_KEYS[k], 'Up');
     const makeup = soundSource[pr] === 'samples' ? 6 : 0;
-    ctx.audio.play(name, { baseDetune: pr === 'topre' ? 0 : keyDetune[k], detuneCents: pr === 'topre' ? 0 : 10, gainJitterDb: 1, gainDb: makeup, pan: vis.keys[k].rest.x * 0.22 }, evType);
+    ctx.audio.play(name, { baseDetune: (isKbsimMappedPreset(pr) || isLocalKeyPreset(pr)) ? 0 : keyDetune[k], detuneCents: (isKbsimMappedPreset(pr) || isLocalKeyPreset(pr)) ? 0 : 10, gainJitterDb: 1, gainDb: makeup, pan: vis.keys[k].rest.x * 0.22 }, evType);
   };
 
   const pressAt = (k: number, src: string, x: number, y: number, evType: string) => {
@@ -189,7 +201,7 @@ export function createKeyboard(ctx: ToyContext): Toy & { setPreset(p: KeyPresetI
   };
   const onKeyDown = (ev: KeyboardEvent) => {
     if (ev.repeat || ev.metaKey || ev.ctrlKey || ev.altKey || ignoreKeys()) return;
-    if (preset === 'topre' && topreRole(ev.code, 'Down')) {
+    if ((isKbsimMappedPreset(preset) || isLocalKeyPreset(preset)) && topreRole(ev.code, 'Down')) {
       ev.preventDefault();
       if (heldPhysical.has(ev.code) || model.keyOf(`k${ev.code}`) >= 0) return;
       const visible = PHYS_KEYS.indexOf(ev.code);
@@ -243,6 +255,7 @@ export function createKeyboard(ctx: ToyContext): Toy & { setPreset(p: KeyPresetI
     inputImmediate,
     frame,
     setPreset(p) {
+      if (!isKeyPresetEnabled(p)) return;
       preset = p;
       ensurePreset(p);
       vis.setStyle(VISUAL_STYLE[p]);
@@ -269,7 +282,7 @@ export function createKeyboard(ctx: ToyContext): Toy & { setPreset(p: KeyPresetI
           prewarmed = true;
           vis.prewarm(ctx.renderer, scene, camera);
           // fetch + decode the other presets while idle so a later switch has its own sound immediately
-          for (const p of Object.keys(KEY_PRESET_INFO) as KeyPresetId[]) ensurePreset(p);
+          for (const p of Object.keys(KEY_PRESET_INFO) as KeyPresetId[]) if (isKeyPresetEnabled(p) && !ownRecordingOnly(p)) ensurePreset(p);
         };
         const ric = (window as Window & { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number }).requestIdleCallback;
         setTimeout(() => (ric ? ric(run, { timeout: 1500 }) : run()), 300);

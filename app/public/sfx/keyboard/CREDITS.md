@@ -163,3 +163,23 @@ No filtering, EQ, pitch change or noise reduction.
 - Topre playback disables the existing per-key/random pitch offsets to preserve row pitches;
   the app's existing limiter, gain jitter and fast-typing attenuation still apply.
 - Machine decoding/routing checks are not a listening assessment. Human listening pending.
+
+
+## Turquoise Tealios / IBM Buckling Spring — tplai/kbsim (MIT)
+
+- Source repository: https://github.com/tplai/kbsim
+- Pinned commit: `ba103f3b0afa9dab80447aa2e7e2ed80b6bd80e4`.
+- Original directories: `src/assets/audio/turquoise/` and `src/assets/audio/buckling/`.
+- Copyright (c) Thomas Lai. Full unmodified MIT notice: [kbsim-LICENSE.md](./kbsim-LICENSE.md).
+- Original 12 MP3s per model, MIT notice and upstream mapping modules are preserved under
+  `scripts/kbsamples/source/turquoise-tealios/` and `ibm-buckling-spring/`.
+- Changes: Chromium decode, channel averaging to mono, 48kHz resampling, 16-bit PCM quantisation,
+  concatenation with 10ms silent gaps. No trim, EQ, pitch shift or level normalisation.
+- Five row-specific presses, common release, dedicated Space/Enter/Backspace press and release.
+  No video-derived or other-switch samples are used for either preset.
+- Upstream calls the second pack “Buckling Spring”; an individual IBM keyboard model is not identified.
+  “IBM Buckling Spring” is the MANZIZAK user-selected display name, not a verified Model M/Model F claim.
+- Recording authorship and recording-specific rights provenance are not separately documented by upstream.
+  The available permission basis is the repository MIT license, as with the existing Topre preset.
+- Cheese and Magnetic Jade were replaced by these two presets. Their private video files are retained
+  outside the repository, are not served by the app, and are not included in the build.

@@ -1,0 +1,104 @@
+{
+  "version": 1,
+  "tagBasis": "user-experience-descriptors-not-audio-measurements",
+  "copyPolicy": "User-confirmed wording; editable after listening if the actual sound differs. Never generate or alter source audio from tags.",
+  "integrationPolicy": "User authorized adding completed presets to the existing app after recording rights are verified. No candidate currently has verified rights; approvedForApp remains false.",
+  "switches": [
+    {
+      "id": "K05",
+      "switchName": "Gateron Oil King",
+      "classification": "Linear",
+      "sensoryExpression": "묵직한 돌멩이",
+      "onomatopoeia": "둑둑·퉁퉁",
+      "tags": [
+        "deep",
+        "heavy",
+        "thocky"
+      ],
+      "labelTemplate": "{switchName} · {sensoryExpression}",
+      "wordingStatus": "user-approved-editable-after-listening",
+      "audioStatus": "reference-only",
+      "approvedForApp": false
+    },
+    {
+      "id": "K06",
+      "switchName": "HMX Cheese",
+      "classification": "Linear",
+      "sensoryExpression": "맑은 도자기·마른 자갈",
+      "onomatopoeia": "또각·사각",
+      "tags": [
+        "bright",
+        "crisp",
+        "clacky"
+      ],
+      "labelTemplate": "{switchName} · {sensoryExpression}",
+      "wordingStatus": "user-approved-editable-after-listening",
+      "audioStatus": "pending-audio",
+      "approvedForApp": false
+    },
+    {
+      "id": "K07",
+      "switchName": "Gazzew Boba U4T",
+      "classification": "Tactile",
+      "sensoryExpression": "찰진 가래떡·절구공이",
+      "onomatopoeia": "도각·톡톡",
+      "tags": [
+        "tactile",
+        "punchy",
+        "poppy"
+      ],
+      "labelTemplate": "{switchName} · {sensoryExpression}",
+      "wordingStatus": "user-approved-editable-after-listening",
+      "audioStatus": "reference-only",
+      "approvedForApp": false
+    },
+    {
+      "id": "K08",
+      "switchName": "Kailh BOX Jade",
+      "classification": "Clicky",
+      "sensoryExpression": "유리구슬·방울",
+      "onomatopoeia": "찰칵·챙",
+      "tags": [
+        "clicky",
+        "sharp",
+        "click-bar"
+      ],
+      "labelTemplate": "{switchName} · {sensoryExpression}",
+      "wordingStatus": "user-approved-editable-after-listening",
+      "audioStatus": "reference-only",
+      "approvedForApp": false
+    },
+    {
+      "id": "K09",
+      "switchName": "Outemu Silent Peach V3",
+      "classification": "Silent Linear",
+      "sensoryExpression": "솜사탕·모래사장",
+      "onomatopoeia": "푹·톡",
+      "tags": [
+        "silent",
+        "soft",
+        "muted"
+      ],
+      "labelTemplate": "{switchName} · {sensoryExpression}",
+      "wordingStatus": "user-approved-editable-after-listening",
+      "audioStatus": "reference-only",
+      "approvedForApp": false
+    },
+    {
+      "id": "K10",
+      "switchName": "Gateron Magnetic Jade",
+      "classification": "Magnetic HE",
+      "sensoryExpression": "아스팔트 위 쇠구슬",
+      "onomatopoeia": "따각·탁탁",
+      "tags": [
+        "clean",
+        "solid",
+        "clacky"
+      ],
+      "labelTemplate": "{switchName} · {sensoryExpression}",
+      "wordingStatus": "user-approved-editable-after-listening",
+      "audioStatus": "pending-audio",
+      "approvedForApp": false
+    }
+  ]
+}
