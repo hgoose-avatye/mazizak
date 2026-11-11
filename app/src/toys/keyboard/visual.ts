@@ -19,7 +19,7 @@ export interface KeyboardVisual {
   keys: KeyVisual[]; // 9 x 1u then spacebar
   size: THREE.Vector3;
   travel: number;
-  setStyle(p: KeyPresetId): void;
+  setStyle(p: Exclude<KeyPresetId, 'topre'>): void;
   /**
    * Compile shader programs and upload legend textures for the styles not currently shown,
    * so the first setStyle() to them does no GPU compile/upload work (no switch hitch).
@@ -66,7 +66,7 @@ interface Style {
   case: number;
   caseRough: number;
 }
-const STYLES: Record<KeyPresetId, Style> = {
+const STYLES: Record<Exclude<KeyPresetId, 'topre'>, Style> = {
   // matte cream PBT, warm accent, light aluminium tray
   pebble: {
     cap: { color: 0xe4d9c2, roughness: 0.58, clearcoat: 0, specularIntensity: 0.6 },

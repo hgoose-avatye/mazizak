@@ -12,6 +12,7 @@ export default defineConfig({
         main: r('./index.html'),
         audio: r('./audio-test.html'),
         labSound: r('./lab-sound.html'),
+        keyboardCompare: r('./keyboard-compare.html'),
       },
     },
   },

@@ -1,5 +1,5 @@
 /**
- * Recording-based keyboard sounds (CC0 field recordings, see public/sfx/keyboard/CREDITS.md).
+ * Recording-based keyboard sounds (per-preset licenses: public/sfx/keyboard/CREDITS.md).
  *
  * Each preset ships as ONE 16-bit mono WAV sprite + a JSON map. We fetch both, decode once,
  * slice every entry into its own AudioBuffer (channel data copied, map gain applied) and cache
@@ -7,16 +7,21 @@
  *
  *   pebble — Rainy 75 (gasket-mount, lubed linear switches): low, round "thock"
  *   clack  — Gateron Blue clicky switches (recorded bank B of branch sound/recorded-ab): bright, crisp click + clear return
+ *   topre — kbsim (MIT repository license; original recording provenance unverified): five rows + dedicated special keys
  *   creamy-thocky — "My Sound Pack" (Chevy, CC BY 4.0): whole clips used as key-down only (map `upMode: "none"`)
  */
 import type { KeyboardSounds } from './sfx';
 import type { KeyPresetId } from './keyPresets';
 
+export const EXTRA_KEY_ROLES = ['enterDown', 'enterUp', 'backspaceDown', 'backspaceUp'] as const;
+export type KeyboardSampleSounds = KeyboardSounds & Partial<Record<typeof EXTRA_KEY_ROLES[number], AudioBuffer[]>> & { rowDown?: AudioBuffer[] };
+
 export const KEYBOARD_SAMPLE_CREDITS =
   'Keyboard sounds cut from CC0 (public-domain) Freesound recordings: ' +
   '"Typing on a rainy 75" by Techrul (freesound.org/s/815614) [pebble]; ' +
   '"Keyboard slow typing with Gateron Blue switches + low echo" by forfii (freesound.org/s/755222) [clack]; ' +
-  '"My Sound Pack" by Chevy (mechvibes.com/sound-packs/my-sound-pack-5), CC BY 4.0 [creamy-thocky].';
+  '"My Sound Pack" by Chevy (mechvibes.com/sound-packs/my-sound-pack-5), CC BY 4.0 [creamy-thocky]; ' +
+  'Topre from tplai/kbsim (github.com/tplai/kbsim), Copyright (c) Thomas Lai, MIT; original recording provenance unverified.';
 
 interface SpriteEntry {
   /** seconds into the sprite */
@@ -37,17 +42,18 @@ interface SpriteMap {
   sampleRate: number;
   /** "none": the preset deliberately has no release sound (up/spaceUp stay empty instead of reusing key-down sounds) */
   upMode?: 'none';
-  entries: Record<keyof KeyboardSounds, SpriteEntry[]>;
+  rowDown?: boolean;
+  entries: Record<keyof KeyboardSounds, SpriteEntry[]> & Partial<Record<typeof EXTRA_KEY_ROLES[number], SpriteEntry[]>>;
 }
 
 const ROLES: (keyof KeyboardSounds)[] = ['down', 'up', 'spaceDown', 'spaceUp'];
-const cache = new WeakMap<BaseAudioContext, Map<string, Promise<KeyboardSounds>>>();
+const cache = new WeakMap<BaseAudioContext, Map<string, Promise<KeyboardSampleSounds>>>();
 
 export function loadKeyboardSamples(
   ctx: BaseAudioContext,
   preset: KeyPresetId,
   baseUrl = './sfx/keyboard/',
-): Promise<KeyboardSounds> {
+): Promise<KeyboardSampleSounds> {
   const base = baseUrl.endsWith('/') ? baseUrl : baseUrl + '/';
   let perCtx = cache.get(ctx);
   if (!perCtx) cache.set(ctx, (perCtx = new Map()));
@@ -60,7 +66,7 @@ export function loadKeyboardSamples(
   return p;
 }
 
-async function load(ctx: BaseAudioContext, preset: KeyPresetId, base: string): Promise<KeyboardSounds> {
+async function load(ctx: BaseAudioContext, preset: KeyPresetId, base: string): Promise<KeyboardSampleSounds> {
   const mapRes = await fetch(`${base}${preset}.json`);
   if (!mapRes.ok) throw new Error(`keyboard samples: ${preset}.json HTTP ${mapRes.status}`);
   const map = (await mapRes.json()) as SpriteMap;
@@ -79,7 +85,7 @@ async function load(ctx: BaseAudioContext, preset: KeyPresetId, base: string): P
     for (let i = 0; i < n; i++) out[i] = src[i0 + i] * g;
     return buf;
   };
-  const sounds = {} as KeyboardSounds;
+  const sounds = {} as KeyboardSampleSounds;
   for (const r of ROLES) sounds[r] = (map.entries[r] ?? []).map(slice);
   if (!sounds.down.length) throw new Error(`keyboard samples: ${preset} has no "down" entries`);
   // graceful fallbacks so callers never get an empty pool
@@ -87,6 +93,11 @@ async function load(ctx: BaseAudioContext, preset: KeyPresetId, base: string): P
   if (map.upMode !== 'none') {
     if (!sounds.up.length) sounds.up = sounds.down;
     if (!sounds.spaceUp.length) sounds.spaceUp = sounds.up;
+  }
+  for (const r of EXTRA_KEY_ROLES) if (map.entries[r]?.length) sounds[r] = map.entries[r]!.map(slice);
+  if (map.rowDown) {
+    if (sounds.down.length !== 5) throw new Error(`keyboard samples: ${preset} needs five row sounds`);
+    sounds.rowDown = sounds.down;
   }
   return sounds;
 }

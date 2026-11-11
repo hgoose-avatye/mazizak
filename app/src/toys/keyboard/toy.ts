@@ -1,9 +1,10 @@
 import * as THREE from 'three';
 import type { InputEvt } from '../../core/runtime';
 import type { Toy, ToyContext } from '../../core/toy';
-import { buildKeyboardSounds, type KeyboardSounds } from '../../audio/sfx';
-import { loadKeyboardSamples } from '../../audio/keyboardSamples';
+import { buildKeyboardSounds } from '../../audio/sfx';
+import { EXTRA_KEY_ROLES, loadKeyboardSamples, type KeyboardSampleSounds } from '../../audio/keyboardSamples';
 import { SYNTH_BASE, VISUAL_STYLE, type KeyPresetId } from '../../audio/keyPresets';
+import { topreRole, topreRow } from '../../audio/keyboardRouting';
 import { param } from '../../core/params';
 import { radialShadowTexture, studioEnvironment } from '../../core/studio';
 import { settings } from '../../core/settings';
@@ -15,6 +16,7 @@ export const KEY_PRESET_INFO: Record<KeyPresetId, { label: string; desc: string 
   pebble: { label: '조약돌', desc: '묵직하고 둥근 저음' },
   clack: { label: '까랑까랑', desc: '선명하고 경쾌한 고음' },
   'creamy-thocky': { label: '크리미', desc: '부드럽고 크리미한 타건음 (My Sound Pack · Chevy · CC BY 4.0)' },
+  topre: { label: 'Topre', desc: 'kbs.im Topre · 행별 타건음과 전용 특수키 (MIT)' },
 };
 
 const PHYS_KEYS = ['KeyQ', 'KeyW', 'KeyE', 'KeyA', 'KeyS', 'KeyD', 'KeyZ', 'KeyX', 'KeyC', 'Space'];
@@ -89,10 +91,12 @@ export function createKeyboard(ctx: ToyContext): Toy & { setPreset(p: KeyPresetI
   const soundSource: Record<string, string> = {};
   /** presets whose sounds are registered, most recently ready last */
   const ready: KeyPresetId[] = [];
-  const registerSet = (p: KeyPresetId, s: KeyboardSounds) => {
+  const registerSet = (p: KeyPresetId, s: KeyboardSampleSounds) => {
     // an empty pool means "no sound for this role" (e.g. a preset without release sounds): leave it unregistered
     // so audio.play() returns null instead of picking from nothing
     for (const role of ['down', 'up', 'spaceDown', 'spaceUp'] as const) if (s[role].length) ctx.audio.register(`kb:${p}:${role}`, s[role]);
+    for (const role of EXTRA_KEY_ROLES) if (s[role]?.length) ctx.audio.register(`kb:${p}:${role}`, s[role]!);
+    s.rowDown?.forEach((buffer, row) => ctx.audio.register(`kb:${p}:downR${row}`, [buffer]));
     if (!ready.includes(p)) ready.push(p);
   };
   /** While a just-selected preset is still loading, keep sounding the last ready one instead of going silent. */
@@ -124,24 +128,31 @@ export function createKeyboard(ctx: ToyContext): Toy & { setPreset(p: KeyPresetI
   let prewarmed = false;
   const keyDetune = vis.keys.map((_, i) => ((i * 37) % 31) - 15);
   let lastDownAt = 0;
-  const soundDown = (k: number, evType: string) => {
+  const roleName = (p: KeyPresetId, code: string, phase: 'Down' | 'Up') => {
+    const specific = p === 'topre' ? topreRole(code, phase) : undefined;
+    if (specific && ctx.audio.has(`kb:${p}:${specific}`)) return `kb:${p}:${specific}`;
+    return `kb:${p}:${code === 'Space' ? 'space' + phase : phase.toLowerCase()}`;
+  };
+  const soundDown = (k: number, evType: string, code = PHYS_KEYS[k], holdId = String(k)) => {
     const now = performance.now();
     const rapid = now - lastDownAt < 85;
     lastDownAt = now;
     const sp = audible(preset);
-    heldPreset.set(k, sp);
-    const name = k === SPACE ? `kb:${sp}:spaceDown` : `kb:${sp}:down`;
+    heldPreset.set(holdId, { preset: sp, code });
+    const name = roleName(sp, code, 'Down');
     const makeup = soundSource[sp] === 'samples' ? 6 : 0;
-    ctx.audio.play(name, { baseDetune: keyDetune[k], detuneCents: 12, gainJitterDb: 1.2, gainDb: makeup + (rapid ? -2 : 0), pan: vis.keys[k].rest.x * 0.22 }, evType);
+    ctx.audio.play(name, { baseDetune: sp === 'topre' ? 0 : keyDetune[k], detuneCents: sp === 'topre' ? 0 : 12, gainJitterDb: 1.2, gainDb: makeup + (rapid ? -2 : 0), pan: vis.keys[k].rest.x * 0.22 }, evType);
     ctx.haptic(6);
   };
-  const heldPreset = new Map<number, KeyPresetId>();
-  const soundUp = (k: number, evType: string) => {
-    const pr = heldPreset.get(k) ?? audible(preset);
-    heldPreset.delete(k);
-    const name = k === SPACE ? `kb:${pr}:spaceUp` : `kb:${pr}:up`;
+  const heldPreset = new Map<string, { preset: KeyPresetId; code: string }>();
+  const heldPhysical = new Map<string, number>();
+  const soundUp = (k: number, evType: string, holdId = String(k)) => {
+    const held = heldPreset.get(holdId);
+    const pr = held?.preset ?? audible(preset);
+    heldPreset.delete(holdId);
+    const name = roleName(pr, held?.code ?? PHYS_KEYS[k], 'Up');
     const makeup = soundSource[pr] === 'samples' ? 6 : 0;
-    ctx.audio.play(name, { baseDetune: keyDetune[k], detuneCents: 10, gainJitterDb: 1, gainDb: makeup, pan: vis.keys[k].rest.x * 0.22 }, evType);
+    ctx.audio.play(name, { baseDetune: pr === 'topre' ? 0 : keyDetune[k], detuneCents: pr === 'topre' ? 0 : 10, gainJitterDb: 1, gainDb: makeup, pan: vis.keys[k].rest.x * 0.22 }, evType);
   };
 
   const pressAt = (k: number, src: string, x: number, y: number, evType: string) => {
@@ -166,6 +177,8 @@ export function createKeyboard(ctx: ToyContext): Toy & { setPreset(p: KeyPresetI
   };
 
   const onBlur = () => {
+    heldPhysical.clear();
+    heldPreset.clear();
     model.reset();
     ctx.requestFrame();
   };
@@ -176,6 +189,17 @@ export function createKeyboard(ctx: ToyContext): Toy & { setPreset(p: KeyPresetI
   };
   const onKeyDown = (ev: KeyboardEvent) => {
     if (ev.repeat || ev.metaKey || ev.ctrlKey || ev.altKey || ignoreKeys()) return;
+    if (preset === 'topre' && topreRole(ev.code, 'Down')) {
+      ev.preventDefault();
+      if (heldPhysical.has(ev.code) || model.keyOf(`k${ev.code}`) >= 0) return;
+      const visible = PHYS_KEYS.indexOf(ev.code);
+      const k = visible >= 0 ? visible : [0, 0, 0, 3, 6][topreRow(ev.code) ?? 4];
+      if (visible >= 0) model.press(k, `k${ev.code}`);
+      heldPhysical.set(ev.code, k);
+      soundDown(k, ev.type, ev.code, `physical:${ev.code}`);
+      ctx.requestFrame();
+      return;
+    }
     const k = PHYS_KEYS.indexOf(ev.code);
     if (k < 0) return;
     ev.preventDefault();
@@ -187,6 +211,14 @@ export function createKeyboard(ctx: ToyContext): Toy & { setPreset(p: KeyPresetI
     ctx.requestFrame();
   };
   const onKeyUp = (ev: KeyboardEvent) => {
+    const physical = heldPhysical.get(ev.code);
+    if (physical !== undefined) {
+      heldPhysical.delete(ev.code);
+      model.release(`k${ev.code}`);
+      soundUp(physical, ev.type, `physical:${ev.code}`);
+      ctx.requestFrame();
+      return;
+    }
     const k = model.release(`k${ev.code}`);
     if (k >= 0) soundUp(k, ev.type);
     ctx.requestFrame();
@@ -217,6 +249,8 @@ export function createKeyboard(ctx: ToyContext): Toy & { setPreset(p: KeyPresetI
       ctx.requestFrame();
     },
     reset() {
+      heldPhysical.clear();
+      heldPreset.clear();
       model.reset();
       ctx.requestFrame();
     },
@@ -246,6 +280,8 @@ export function createKeyboard(ctx: ToyContext): Toy & { setPreset(p: KeyPresetI
       window.removeEventListener('keydown', onKeyDown);
       window.removeEventListener('keyup', onKeyUp);
       window.removeEventListener('blur', onBlur);
+      heldPhysical.clear();
+      heldPreset.clear();
       model.reset();
     },
     stats() {

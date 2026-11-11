@@ -139,3 +139,27 @@ No filtering, EQ, pitch change or noise reduction.
   sounds. Re-assigning them to specific keys (e.g. a proper space bar) is **unverified** and needs a listen-through.
 - Timbre/quality of this preset has not been checked by ear.
 
+
+
+## Topre — kbs.im / tplai/kbsim (MIT)
+
+- Upstream: https://github.com/tplai/kbsim
+- Pinned commit: `ba103f3b0afa9dab80447aa2e7e2ed80b6bd80e4`
+- Source: `src/assets/audio/topre/press/*.mp3` (8) and `release/*.mp3` (4).
+- Copyright (c) Thomas Lai. Repository license: MIT. Full, unmodified notice:
+  [topre-LICENSE.md](./topre-LICENSE.md). Preserve this notice when redistributing.
+- **Recording rights provenance: unverified.** The checked upstream tree has no separate
+  recording author, recording license, or third-party rights statement for Topre.
+  The repository MIT license is the available permission basis; it does not independently
+  establish who made or owns the original recordings. No separate restriction was found.
+- All 12 MP3s and upstream LICENSE.md are retained byte-for-byte under
+  `scripts/kbsamples/source/topre/`. SHA-256 hashes are recorded in `topre.json`.
+- Changes: Chromium MP3 decoding, channel averaging to mono, 48 kHz resampling,
+  16-bit PCM quantisation, concatenation with 10 ms silent sprite gaps.
+  No trimming, fades, EQ, pitch shifting, or per-clip level normalisation.
+- Generic key-down uses R0–R4 by fullsize keyboard row, generic release uses one clip.
+  Space, Enter and Backspace each retain separate press/release clips. Bottom row uses R4,
+  matching upstream's default branch. The small on-screen Q/A/Z rows use R2/R3/R4.
+- Topre playback disables the existing per-key/random pitch offsets to preserve row pitches;
+  the app's existing limiter, gain jitter and fast-typing attenuation still apply.
+- Machine decoding/routing checks are not a listening assessment. Human listening pending.
