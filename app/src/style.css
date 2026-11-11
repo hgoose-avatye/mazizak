@@ -302,3 +302,20 @@ canvas.stage { display: block; width: 100%; height: 100%; touch-action: none; }
 }
 html.reduce-motion * { animation: none !important; transition: none !important; }
 #home.lock { pointer-events: none; }
+
+.categories { display:flex; gap:6px; overflow-x:auto; padding:4px 0 16px; }
+.categories button { border:0; border-radius:99px; padding:10px 14px; white-space:nowrap; background:#e0d9d0; color:#514941; font:inherit; font-size:13px; cursor:pointer; }
+.categories button[aria-pressed=true] { background:#37332e; color:#fff8ed; }
+.preview-keyboard { display:grid; grid-template-columns:repeat(3,1fr); gap:5px; padding:20px; }
+.preview-keyboard i { border-radius:5px; box-shadow:inset 0 -4px 0 #0002; }
+.preview-fidget { display:grid; place-items:center; }
+.preview-fidget > i { width:78px; height:72px; background:radial-gradient(ellipse at 30% 20%,#fff7,transparent 60%),var(--toy-color); border-radius:48% 52% 42% 46%; box-shadow:inset -7px -12px 12px #0002,0 9px 8px -5px #0003; }
+.preview-fidget.foam > i { border-radius:24px; height:65px; transform:rotate(-10deg); }
+.preview-fidget.cheese > i,.preview-fidget.mango > i { width:90px; height:42px; border-radius:40%; }
+.preview-fidget.cream > i { border-radius:70% 30% 50% 50%; background:repeating-radial-gradient(ellipse at 45% 20%,#f8efdf 0 8px,#e7d7bb 9px 12px); }
+.preview-fidget.mochi > i { height:48px; border-radius:45%; }
+.preview-fidget.apple > i::after { content:''; display:block; width:17px; height:9px; background:#4f7734; border-radius:0 99% 0 99%; margin:-5px 0 0 42px; }
+.preview-fidget.chocolate > i { background:repeating-linear-gradient(30deg,#805740 0 3px,var(--toy-color) 4px 19px); }
+.preview-fidget.soap > i { background:repeating-conic-gradient(var(--toy-color) 0 25%,#e9eee6 0 50%) 0/22px 18px; }
+.preview-fidget.beads > i { background:radial-gradient(circle,#f4e6d7 3px,transparent 4px) 0/13px 13px,var(--toy-color); }
+.toy-jump { border:0; border-radius:99px; max-width:175px; padding:10px; font:inherit; font-size:13px; background:transparent; color:var(--ink); }

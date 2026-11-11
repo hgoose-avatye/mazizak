@@ -27,24 +27,10 @@
         </button>
       </header>
       <p class="lede">손끝으로 누르고, 늘리고, 두드리는<br />작은 휴식.</p>
-      <nav class="cards">
-        <a class="card" href="#/squishy" data-toy="squishy">
-          <div class="thumb thumb-squishy"><img src="./thumbs/squishy.jpg" alt="" loading="eager" onerror="this.remove()" /></div>
-          <div class="card-body">
-            <b>말랑이</b>
-            <span>폭신한 폼 말랑이. 꾹 누르면 자국이 남았다가 천천히 차올라요.</span>
-            <i>누르기 · 끌기 · 두 손가락으로 늘리기</i>
-          </div>
-        </a>
-        <a class="card" href="#/keyboard" data-toy="keyboard">
-          <div class="thumb thumb-keyboard"><img src="./thumbs/keyboard.jpg" alt="" loading="eager" onerror="this.remove()" /></div>
-          <div class="card-body">
-            <b>키보드</b>
-            <span>9키 + 스페이스 미니 키보드. 조약돌·까랑까랑 두 가지 타건감.</span>
-            <i>누르기 · 연타 · 여러 키 동시에</i>
-          </div>
-        </a>
+      <nav class="categories" aria-label="장난감 카테고리">
+        <button data-category="키보드">키보드</button><button data-category="슬랑이">슬랑이</button><button data-category="말랑이">말랑이</button><button data-category="왁뿌볼">왁뿌볼</button><button data-category="크런치 말랑이">크런치</button>
       </nav>
+      <nav class="cards" id="content-cards" aria-label="콘텐츠 목록"></nav>
       <footer class="home-foot">소리는 기기의 무음 모드·볼륨 설정을 따릅니다.</footer>
     </main>
 
@@ -91,6 +77,7 @@
           <a href="./keyboard-compare.html">키보드 6종 비교 청취</a><br />
           Topre · Turquoise Tealios · Buckling Spring: <a href="https://github.com/tplai/kbsim">tplai/kbsim</a>, Copyright (c) Thomas Lai, <a href="./sfx/keyboard/kbsim-LICENSE.md">MIT</a>. MP3→mono WAV 스프라이트 변환. 원 녹음 권리 출처는 별도 확인되지 않음<br />
           키보드 ‘크리미’: “My Sound Pack” by Chevy (<a href="https://mechvibes.com/sound-packs/my-sound-pack-5">Mechvibes</a>), <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>, 잘라내기·음량 보정·변환 등 가공함<br />
+          왁뿌볼 음원: <a href="https://github.com/apple77771/wakppuball-simulator">apple77771</a>, <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a> · <a href="./sfx/wax/CREDITS.md">피젯 음원·가공 내역</a><br />
           <a href="./audio-test.html">오디오 진단</a> · v0.1 MVP
         </p>
         <button class="primary" data-action="close-sheet">완료</button>

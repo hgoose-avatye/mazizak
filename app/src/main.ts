@@ -11,6 +11,10 @@ import type { KeyPresetId } from './audio/keyPresets';
 import { isLocalKeyPreset, isKeyPresetEnabled } from './audio/localKeyPresets';
 import { loadKeyboardSamples } from './audio/keyboardSamples';
 import { loadSquishySamples } from './audio/squishySamples';
+import { FIDGETS, findFidget } from './toys/fidgets/catalog';
+import { createFidget } from './toys/fidgets/toy';
+import { preloadFidgetAudio } from './toys/fidgets/audio';
+import { KEYBOARD_COLORS } from './toys/keyboard/colors';
 
 const $ = <T extends HTMLElement>(sel: string) => document.querySelector(sel) as T;
 
@@ -25,6 +29,7 @@ if (!isKeyPresetEnabled(settings.get().keyPreset)) settings.set('keyPreset', 'pe
 const audio = new AudioEngine(24);
 const rt = new Runtime($('#stage'));
 const stats = new StatsOverlay(rt, audio);
+void preloadFidgetAudio(audio).catch(e => console.warn('Fidget audio preload', e));
 // preload recorded sample sets at boot (decoding works while the context is still suspended)
 if (new URLSearchParams(location.search).get('sfx') !== 'synth') {
   void loadKeyboardSamples(audio.ctx, 'pebble').catch(() => {});
@@ -110,9 +115,10 @@ window.addEventListener('keydown', (e) => {
 });
 
 // ---------- toys ----------
-const toys: Record<string, (Toy & { setColor?(id: string): void; setPreset?(p: KeyPresetId): void }) | undefined> = {};
-const TOY_TITLES: Record<string, string> = { squishy: '말랑이', keyboard: '키보드' };
+const toys: Record<string, (Toy & { setColor?(id: string): void; action?(name: string): void; setPreset?(p: KeyPresetId): void }) | undefined> = {};
+const TOY_TITLES: Record<string, string> = { squishy: '말랑이', keyboard: '키보드', ...Object.fromEntries(FIDGETS.map(f => [f.id, f.name])) };
 const TOY_HINTS: Record<string, string> = {
+  ...Object.fromEntries(FIDGETS.map(f => [f.id, f.hint])),
   squishy: '꾹 눌러보세요 · 두 손가락으로 늘려보세요',
   keyboard: '키를 눌러보세요 · 여러 키를 동시에',
 };
@@ -120,6 +126,7 @@ function getToy(id: string) {
   if (!toys[id]) {
     if (id === 'squishy') toys[id] = createSquishy(ctx);
     else if (id === 'keyboard') toys[id] = createKeyboard(ctx);
+    else { const spec = findFidget(id); if (spec) toys[id] = createFidget(ctx, spec); }
   }
   return toys[id];
 }
@@ -127,7 +134,18 @@ function getToy(id: string) {
 const variants = $('#variants');
 function buildVariants(id: string): void {
   variants.innerHTML = '';
-  if (id === 'squishy') {
+  if (findFidget(id)) {
+    const spec = findFidget(id)!;
+    if (spec.family === 'viscous') {
+      for (const [action, label] of [['fold', '접기'], ['gather', '뭉치기']]) {
+        const b = document.createElement('button'); b.className = 'chip'; b.textContent = label;
+        b.onclick = () => toys[id]?.action?.(action); variants.append(b);
+      }
+    }
+    const select = document.createElement('select'); select.className = 'toy-jump'; select.setAttribute('aria-label', '다른 장난감');
+    for (const f of FIDGETS) { const o = new Option(f.name, f.id); o.selected = f.id === id; select.add(o); }
+    select.onchange = () => { location.hash = '#/' + select.value; }; variants.append(select);
+  } else if (id === 'squishy') {
     for (const c of SQUISHY_COLORS) {
       const b = document.createElement('button');
       b.className = 'swatch';
@@ -178,7 +196,10 @@ let cameFromHome = false;
 let hintTimer = 0;
 
 function route(): void {
-  const id = location.hash.replace(/^#\/?/, '');
+  const [id, presetId] = location.hash.replace(/^#\/?/, '').split('/');
+  if (id === 'keyboard' && presetId && Object.hasOwn(KEY_PRESET_INFO, presetId) && isKeyPresetEnabled(presetId)) {
+    settings.set('keyPreset', presetId as KeyPresetId); toys.keyboard?.setPreset?.(presetId as KeyPresetId);
+  }
   const toy = id ? getToy(id) : undefined;
   closeSheet();
   if (!toy) {
@@ -202,7 +223,8 @@ function route(): void {
   hintTimer = window.setTimeout(() => hint.classList.add('gone'), 6000);
   rt.canvas.setAttribute('aria-label', `${TOY_TITLES[id]} 장난감 — 터치해서 조작`);
   rt.canvas.setAttribute('role', 'img');
-  variants.setAttribute('aria-label', id === 'squishy' ? '색상' : '타건감');
+  variants.setAttribute('role', findFidget(id) ? 'group' : 'radiogroup');
+  variants.setAttribute('aria-label', findFidget(id) ? '장난감 조작' : id === 'squishy' ? '색상' : '타건감');
   rt.setToy(toy);
 }
 window.addEventListener('hashchange', route);
@@ -249,5 +271,33 @@ audio.onStateChange = (s) => {
   setTimeout(() => n.remove(), 3200);
 };
 
+const homeCards = document.querySelector<HTMLElement>('#content-cards')!;
+function showCategory(category: string) {
+  document.querySelectorAll<HTMLButtonElement>('[data-category]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.category === category)));
+  homeCards.replaceChildren();
+  if (category === '키보드') {
+    for (const p of Object.keys(KEY_PRESET_INFO) as KeyPresetId[]) {
+      if (!isKeyPresetEnabled(p)) continue;
+      const link = document.createElement('a'); link.className = 'card'; link.href = '#/keyboard/' + p;
+      const thumb = document.createElement('div'); thumb.className = 'thumb preview-keyboard';
+      for (const color of KEYBOARD_COLORS[p].keys.slice(0, 9)) { const key = document.createElement('i'); key.style.background = '#' + color.toString(16).padStart(6, '0'); thumb.append(key); }
+      const body = document.createElement('div'); body.className = 'card-body'; const title = document.createElement('b'); title.textContent = KEY_PRESET_INFO[p].label;
+      const desc = document.createElement('span'); desc.textContent = KEY_PRESET_INFO[p].desc; body.append(title, desc); link.append(thumb, body); homeCards.append(link);
+    }
+  } else {
+    for (const f of FIDGETS.filter(f => f.category === category)) {
+      const link = document.createElement('a'); link.className = 'card'; link.href = '#/' + f.id; link.dataset.toy = f.id;
+      const thumb = document.createElement('div'); thumb.className = 'thumb preview-fidget ' + f.shape; thumb.style.setProperty('--toy-color', '#' + f.color.toString(16).padStart(6, '0'));
+      const shape = document.createElement('i'); thumb.append(shape);
+      const body = document.createElement('div'); body.className = 'card-body'; const title = document.createElement('b'); title.textContent = f.name;
+      const desc = document.createElement('span'); desc.textContent = f.hint; const label = document.createElement('i'); label.textContent = f.category; body.append(title, desc, label); link.append(thumb, body); homeCards.append(link);
+    }
+  }
+}
+document.querySelectorAll<HTMLButtonElement>('[data-category]').forEach(b => b.onclick = () => showCategory(b.dataset.category!));
+showCategory('말랑이');
+if (import.meta.env.DEV) (window as unknown as { __MANZIZAK__: unknown }).__MANZIZAK__ = {
+  report: () => rt.toy?.report?.(), audio: () => audio.playLogs.slice(-100), frames: () => rt.framesRendered,
+};
 applySettings(settings.get());
 route();
