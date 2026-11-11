@@ -11,6 +11,7 @@ import type { KeyPresetId } from './audio/keyPresets';
 import { isLocalKeyPreset, isKeyPresetEnabled } from './audio/localKeyPresets';
 import { loadKeyboardSamples } from './audio/keyboardSamples';
 import { loadSquishySamples } from './audio/squishySamples';
+import { LOCAL_FIDGETS } from './toys/fidgets/references';
 import { FIDGETS, findFidget } from './toys/fidgets/catalog';
 import { createFidget } from './toys/fidgets/toy';
 import { preloadFidgetAudio } from './toys/fidgets/audio';
@@ -289,6 +290,7 @@ function showCategory(category: string) {
       const link = document.createElement('a'); link.className = 'card'; link.href = '#/' + f.id; link.dataset.toy = f.id;
       const thumb = document.createElement('div'); thumb.className = 'thumb preview-fidget ' + f.shape; thumb.style.setProperty('--toy-color', '#' + f.color.toString(16).padStart(6, '0'));
       const shape = document.createElement('i'); thumb.append(shape);
+      if (LOCAL_FIDGETS) { const image = document.createElement('img'); image.src = '/__local-fidgets/thumbs/' + f.id + '.png'; image.alt = ''; image.onload = () => shape.hidden = true; image.onerror = () => image.remove(); thumb.append(image); }
       const body = document.createElement('div'); body.className = 'card-body'; const title = document.createElement('b'); title.textContent = f.name;
       const desc = document.createElement('span'); desc.textContent = f.hint; const label = document.createElement('i'); label.textContent = f.category; body.append(title, desc, label); link.append(thumb, body); homeCards.append(link);
     }

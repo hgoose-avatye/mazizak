@@ -1,5 +1,6 @@
 import type { AudioEngine, ContinuousSound } from "../../core/audio";
 import { loadSquishySamples } from "../../audio/squishySamples";
+import { LOCAL_FIDGETS, referenceSounds } from "./references";
 import type { FidgetSpec } from "./catalog";
 const waxCache = new WeakMap<
   BaseAudioContext,
@@ -69,6 +70,7 @@ export const preloadFidgetAudio = (audio: AudioEngine) =>
   Promise.all([loadSquishySamples(audio.ctx), loadWax(audio.ctx)]);
 export class FidgetAudio {
   state = "loading";
+  source = "CC0 / CC BY recorded foley";
   private rub: ContinuousSound | null = null;
   private stretch: ContinuousSound | null = null;
   private enabled = false;
@@ -134,6 +136,29 @@ export class FidgetAudio {
           ),
         );
       }
+      if (LOCAL_FIDGETS) {
+        const local = await referenceSounds(this.audio.ctx, this.spec.id);
+        for (const [role, buffers] of Object.entries(local)) {
+          register(
+            role,
+            role === "crunch"
+              ? buffers.map((b) =>
+                  cut(this.audio.ctx, b, 0, Math.min(0.36, b.duration)),
+                )
+              : buffers,
+          );
+        }
+        const wetLocal = local.knead ?? local.compress ?? local.press;
+        register(
+          "bubble",
+          wetLocal.map((b) =>
+            cut(this.audio.ctx, b, 0, Math.min(0.09, b.duration)),
+          ),
+        );
+        this.rub = this.audio.createLoop(wetLocal[0]);
+        this.stretch = this.audio.createLoop((local.stretch ?? wetLocal)[0]);
+        this.source = "installed app / local development only";
+      }
       this.state = "recorded/derived";
     } catch (e) {
       this.state = "failed";
@@ -180,9 +205,12 @@ export class FidgetAudio {
     const log = this.audio.play(
       `fg:${this.spec.id}:${role}`,
       {
-        rate,
-        lowpassHz:
-          t === "foam"
+        rate: LOCAL_FIDGETS ? (role === "bubble" ? 1.12 : 1) : rate,
+        lowpassHz: LOCAL_FIDGETS
+          ? t === "foam"
+            ? 6000
+            : 14000
+          : t === "foam"
             ? 1800
             : t === "cream"
               ? 2200
@@ -207,11 +235,11 @@ export class FidgetAudio {
   continuous(stretch: number, rub: number) {
     if (this.enabled) {
       this.stretch?.set(
-        Math.min(0.5, stretch),
+        Math.min(LOCAL_FIDGETS ? 0.22 : 0.5, stretch),
         this.spec.sound === "cream" ? 0.05 : 0.4,
       );
       this.rub?.set(
-        Math.min(0.3, rub),
+        Math.min(LOCAL_FIDGETS ? 0.17 : 0.3, rub),
         this.spec.sound === "beads" ? 0.75 : 0.2,
       );
     }

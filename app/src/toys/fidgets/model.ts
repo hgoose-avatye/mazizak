@@ -149,14 +149,21 @@ export class FidgetModel {
         b = held[1].anchor.clone().add(held[1].drag);
       const distance = a.distanceTo(b);
       if (!this.pinchStart) this.pinchStart = Math.max(0.25, distance);
-      const ratio = distance / this.pinchStart;
+      const ratio =
+        1 +
+        (distance - this.pinchStart) /
+          Math.max(this.pinchStart, this.spec.width * 2.5);
       this.axis.copy(b.sub(a));
       this.axis.y = 0;
       if (this.axis.lengthSq() < 0.01) this.axis.set(1, 0, 0);
       this.axis.normalize();
       this.stretch.target = Math.min(this.spec.stretch, Math.max(0.75, ratio));
       this.maxStretch = Math.max(this.maxStretch, this.stretch.target);
-      if (this.maxStretch > 1.35 && ratio < 0.82 && !this.foldedGesture) {
+      if (
+        this.maxStretch > 1.35 &&
+        distance < this.pinchStart * 0.82 &&
+        !this.foldedGesture
+      ) {
         this.foldNow();
         this.foldedGesture = true;
       }
@@ -172,9 +179,17 @@ export class FidgetModel {
     for (const c of this.contacts.values()) {
       const r = p.distanceTo(c.anchor),
         radius = s.shape === "mochi" ? 0.85 : 0.72;
-      const w = Math.exp(-(r * r) / (radius * radius * 0.48));
+      const w = Math.exp(-(r * r) / (radius * radius * 0.64));
       out.addScaledVector(c.normal, -c.depth.x * w);
-      out.addScaledVector(c.drag, w * (s.family === "viscous" ? 0.5 : 0.6));
+      out.addScaledVector(
+        c.drag,
+        w *
+          (s.family === "viscous"
+            ? this.contacts.size > 1
+              ? 0.12
+              : 0.65
+            : 0.6),
+      );
       // Pressure redistributes volume around the fingertip, not a uniform scale animation.
       const ring = Math.exp(-Math.pow((r - radius * 0.85) / (radius * 0.4), 2));
       out.addScaledVector(
@@ -186,13 +201,16 @@ export class FidgetModel {
     if (s.family === "viscous") {
       const st = Math.max(0.6, this.stretch.x),
         along = p.dot(this.axis),
-        neck = Math.max(0.5, 1 / (1 + (st - 1) * Math.exp((-along * along) / 0.8) * 0.65));
+        neck =
+          (1 / Math.sqrt(Math.max(0.6, st))) *
+          (1 - 0.14 * Math.max(0, st - 1) * Math.exp((-along * along) / 0.6));
       const projection = p.x * this.axis.x + p.z * this.axis.z;
       const ax = this.axis.x * projection,
         az = this.axis.z * projection;
       out.x += ax * st + (p.x - ax) * neck - p.x;
       out.z += az * st + (p.z - az) * neck - p.z;
-      out.y *= Math.pow(Math.max(st, 1), -0.16) * Math.sqrt(neck);
+      out.y *=
+        Math.pow(Math.max(st, 1), -0.15) * Math.sqrt(Math.max(0.4, neck));
       if (this.foldCount) {
         const f = this.fold.x;
         out.y +=
@@ -295,21 +313,21 @@ export class GrainModel {
   crushed = 0;
   collisions = 0;
   constructor(readonly soap: boolean) {
-    for (let i = 0; i < (soap ? 45 : 84); i++) {
+    for (let i = 0; i < (soap ? 96 : 220); i++) {
       const u = (i * 0.61803398875) % 1,
         v = (i * 0.41421356) % 1,
-        r = Math.sqrt((i + 0.5) / (soap ? 45 : 84)) * 0.8;
+        r = Math.sqrt((i + 0.5) / (soap ? 96 : 220)) * 0.8;
       const p = new Vector3(
         Math.cos(u * Math.PI * 2) * r,
-        (v - 0.5) * 0.7,
-        Math.sin(u * Math.PI * 2) * r * 0.8,
+        (v - 0.5) * 1.0 + 0.12 * Math.sin(u * 6.28),
+        Math.sin(u * Math.PI * 2) * r * 1.0,
       );
       this.grains.push({
         rest: p.clone(),
         pos: p.clone(),
         velocity: new Vector3(),
         integrity: 1,
-        radius: soap ? 0.12 : 0.067,
+        radius: soap ? 0.14 : 0.092,
       });
     }
   }

@@ -1,110 +1,77 @@
 import * as THREE from "three";
+import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
 import type { Toy, ToyContext } from "../../core/toy";
 import type { InputEvt } from "../../core/runtime";
 import { radialShadowTexture, studioEnvironment } from "../../core/studio";
 import type { FidgetSpec } from "./catalog";
 import { FidgetModel, FractureModel, GrainModel } from "./model";
 import { FidgetAudio } from "./audio";
-function grainTexture() {
-  const c = document.createElement("canvas");
-  c.width = c.height = 128;
-  const ctx = c.getContext("2d")!,
-    img = ctx.createImageData(128, 128);
-  for (let i = 0; i < 128 * 128; i++) {
-    const n = 175 + ((i * 7919 + i * i * 13) % 80);
-    img.data.set([n, n, n, 255], i * 4);
-  }
-  ctx.putImageData(img, 0, 0);
-  const t = new THREE.CanvasTexture(c);
-  t.wrapS = t.wrapT = THREE.RepeatWrapping;
-  t.repeat.set(5, 5);
-  return t;
-}
-function bodyGeometry(s: FidgetSpec) {
-  const g = new THREE.SphereGeometry(1, 40, 28),
-    p = g.getAttribute("position");
-  for (let i = 0; i < p.count; i++) {
-    let x = p.getX(i),
-      y = p.getY(i),
-      z = p.getZ(i);
-    const theta = Math.atan2(z, x);
-    if (s.shape === "foam") {
-      x = Math.sign(x) * Math.pow(Math.abs(x), 0.5);
-      y = Math.sign(y) * Math.pow(Math.abs(y), 0.5);
-      z = Math.sign(z) * Math.pow(Math.abs(z), 0.5);
-    }
-    if (s.shape === "cream") {
-      const l = 1 + 0.13 * Math.sin(theta * 7 + y * 6);
-      x *= l * (1 - y * 0.18);
-      z *= l * (1 - y * 0.18);
-      y += 0.14 * Math.pow(Math.max(0, y), 4);
-    }
-    if (s.shape === "mango") {
-      const r = 1 + 0.08 * Math.sin(theta * 3 + 0.7);
-      x *= r;
-      z *= r;
-      y *= 1 - 0.2 * Math.abs(x);
-    }
-    if (s.shape === "apple") {
-      const r = Math.sqrt(x * x + z * z);
-      x *= 1 + 0.12 * Math.sin(y * 2);
-      z *= 1 + 0.12 * Math.sin(y * 2);
-      y -= 0.18 * Math.exp((-r * r) / 0.09) * Math.max(0, y);
-    }
-    p.setXYZ(i, x * s.width, Math.max(y, -0.8) * s.height, z * s.depth);
-  }
-  g.computeVertexNormals();
-  return g;
-}
+import { STAGES, surfaceTexture, bodyGeometry, shellPatches } from "./visuals";
+import { LOCAL_FIDGETS, referenceMesh } from "./references";
 export interface FidgetToy extends Toy {
   action(name: string): void;
 }
 export function createFidget(ctx: ToyContext, spec: FidgetSpec): FidgetToy {
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color(0xece7e0);
+  scene.background = new THREE.Color(STAGES[spec.id]);
   scene.environment = studioEnvironment(ctx.renderer);
-  scene.environmentIntensity = 0.8;
+  scene.environmentIntensity = 0.48;
   const camera = new THREE.PerspectiveCamera(34, 1, 0.1, 100),
-    target = new THREE.Vector3(0, 0.7, 0);
-  const light = new THREE.DirectionalLight(0xfff1dc, 2.4);
+    target = new THREE.Vector3(0, spec.height * 0.92, 0);
+  const light = new THREE.DirectionalLight(0xfff8ef, 2.8);
   light.position.set(-3, 5, 3);
-  scene.add(light, new THREE.HemisphereLight(0xfff8ea, 0xa59ba6, 0.8));
+  scene.add(light, new THREE.HemisphereLight(0xfff8ea, 0xa9a1a3, 1.2));
   const model = new FidgetModel(spec),
     sound = new FidgetAudio(ctx.audio, spec);
   const material = new THREE.MeshPhysicalMaterial({
     color: spec.family === "wax" ? spec.inner : spec.color,
     roughness: spec.roughness,
     metalness: 0,
-    clearcoat: spec.roughness < 0.5 ? 0.65 : 0.05,
-    clearcoatRoughness: 0.18,
+    clearcoat: spec.roughness < 0.5 ? 0.9 : 0.08,
+    clearcoatRoughness: 0.12,
     transparent: spec.opacity < 1,
     opacity: spec.opacity,
     depthWrite: spec.opacity >= 0.9,
+    sheen: spec.shape === "mochi" || spec.shape === "cream" ? 0.65 : 0,
+    sheenColor: new THREE.Color(0xffe9d8),
+    sheenRoughness: 0.8,
     side: THREE.DoubleSide,
   });
-  if (["foam", "cream", "mochi"].includes(spec.shape)) {
-    material.bumpMap = grainTexture();
-    material.bumpScale = spec.shape === "foam" ? 0.045 : 0.012;
+  if (spec.shape === "ball") {
+    material.opacity = 1;
+    material.transparent = false;
+    material.transmission = 0.48;
+    material.thickness = 0.8;
+    material.ior = 1.34;
+    material.roughness = 0.11;
+    material.attenuationColor = new THREE.Color(0x5da98f);
+    material.attenuationDistance = 2;
   }
-  const geometry = bodyGeometry(spec);
+  if (["foam", "cream", "mochi"].includes(spec.shape)) {
+    material.bumpMap = surfaceTexture(spec.shape);
+    material.bumpScale = spec.shape === "foam" ? 0.025 : 0.006;
+  }
+  let geometry: THREE.BufferGeometry = bodyGeometry(spec);
   if (spec.family === "wax") geometry.scale(0.88, 0.88, 0.88);
-  const base = Float32Array.from(geometry.getAttribute("position").array),
-    blob = new THREE.Mesh(geometry, material);
-  blob.position.y = spec.height * 0.84;
+  let base = Float32Array.from(geometry.getAttribute("position").array);
+  const blob = new THREE.Mesh(geometry, material);
+  let visualSource = "reconstructed-material";
+  blob.position.y = spec.height * 0.94;
   blob.frustumCulled = false;
   scene.add(blob);
   const shadow = new THREE.Mesh(
-    new THREE.PlaneGeometry(6, 5),
+    new THREE.PlaneGeometry(4.5, 4),
     new THREE.MeshBasicMaterial({
       map: radialShadowTexture(0.7, 0.4),
       transparent: true,
-      opacity: 0.45,
+      opacity: 0.3,
       depthWrite: false,
     }),
   );
   shadow.rotation.x = -Math.PI / 2;
   shadow.position.y = 0.002;
   scene.add(shadow);
+  const gestureCamera = camera.clone();
   const ray = new THREE.Raycaster(),
     plane = new THREE.Plane(),
     anchors = new Map<number, THREE.Vector3>(),
@@ -122,6 +89,7 @@ export function createFidget(ctx: ToyContext, spec: FidgetSpec): FidgetToy {
     compressClock = 0,
     grainMotion = 0,
     coreTouches = 0;
+  const corePointers = new Set<number>();
   let shell: THREE.Mesh<
       THREE.BufferGeometry,
       THREE.MeshPhysicalMaterial
@@ -134,60 +102,109 @@ export function createFidget(ctx: ToyContext, spec: FidgetSpec): FidgetToy {
       spin: number;
     }[] = [],
     centers: THREE.Vector3[] = [];
-  if (spec.family === "wax") {
-    const g = new THREE.IcosahedronGeometry(1, spec.shape === "apple" ? 3 : 1),
-      a = g.getAttribute("position");
-    for (let i = 0; i < a.count; i++)
-      a.setXYZ(
-        i,
-        a.getX(i) * spec.width * 1.035,
-        a.getY(i) * spec.height * 1.035,
-        a.getZ(i) * spec.depth * 1.035,
-      );
-    for (let i = 0; i < a.count; i += 3) {
-      const c = new THREE.Vector3();
-      for (let j = 0; j < 3; j++)
-        c.add(new THREE.Vector3(a.getX(i + j), a.getY(i + j), a.getZ(i + j)));
-      c.multiplyScalar(1 / 3);
-      centers.push(c);
-      shards.push({
+  let patchVertices: number[][] = [],
+    faceToPatch = new Uint16Array();
+  const buildShell = (
+    source: THREE.BufferGeometry,
+    map: THREE.Texture | null = null,
+  ) => {
+    if (shell) {
+      scene.remove(shell);
+      shell.geometry.dispose();
+      shell.material.dispose();
+    }
+    const patches = shellPatches(source, spec),
+      g = patches.geometry;
+    centers.splice(0, centers.length, ...patches.centers);
+    patchVertices = patches.vertices;
+    faceToPatch = new Uint16Array(patches.faceToPatch);
+    shards.splice(
+      0,
+      shards.length,
+      ...centers.map(() => ({
         offset: new THREE.Vector3(),
         velocity: new THREE.Vector3(),
         spin: 0,
-      });
-    }
-    shellBase = Float32Array.from(a.array);
+      })),
+    );
+    shellBase = Float32Array.from(g.getAttribute("position").array);
     fracture = new FractureModel(centers, spec.shape === "chocolate");
     shell = new THREE.Mesh(
       g,
       new THREE.MeshPhysicalMaterial({
-        color: spec.color,
-        roughness: spec.roughness,
-        clearcoat: spec.shape === "apple" ? 0.75 : 0.1,
+        color: map ? 0xffffff : spec.color,
+        map,
+        roughness: spec.shape === "apple" ? 0.26 : 0.42,
+        clearcoat: spec.shape === "apple" ? 0.75 : 0.3,
+        clearcoatRoughness: 0.18,
         side: THREE.DoubleSide,
       }),
     );
     shell.position.copy(blob.position);
     shell.frustumCulled = false;
     scene.add(shell);
+  };
+  if (spec.family === "wax") {
+    const g = bodyGeometry(spec);
+    g.scale(1.035, 1.035, 1.035);
+    buildShell(g);
+    g.dispose();
     if (spec.shape === "apple") {
-      const stem = new THREE.Mesh(
-        new THREE.CylinderGeometry(0.055, 0.07, 0.26, 8),
-        new THREE.MeshStandardMaterial({ color: 0x65503c }),
+      // Rounded tied balloon neck, as observed in the installed wax-ball reference.
+      const neck = new THREE.Mesh(
+        new THREE.SphereGeometry(0.115, 24, 16),
+        new THREE.MeshPhysicalMaterial({
+          color: 0xf5f5dd,
+          roughness: 0.3,
+          clearcoat: 0.5,
+        }),
       );
-      stem.position.set(0, blob.position.y + spec.height, 0.02);
-      stem.rotation.z = -0.2;
-      scene.add(stem);
-      const leaf = new THREE.Mesh(
-        new THREE.SphereGeometry(1, 16, 8),
-        new THREE.MeshStandardMaterial({ color: 0x426b32, roughness: 0.65 }),
+      neck.scale.set(1, 0.8, 1);
+      neck.position.set(0, blob.position.y + spec.height + 0.015, 0);
+      scene.add(neck);
+      const cap = new THREE.Mesh(
+        new THREE.TorusGeometry(0.095, 0.032, 10, 24),
+        neck.material,
       );
-      leaf.scale.set(0.3, 0.025, 0.12);
-      leaf.position.set(0.21, stem.position.y + 0.06, 0.01);
-      leaf.rotation.z = 0.3;
-      scene.add(leaf);
+      cap.rotation.x = Math.PI / 2;
+      cap.position.copy(neck.position).y += 0.07;
+      scene.add(cap);
     }
   }
+  if (LOCAL_FIDGETS)
+    void referenceMesh(spec)
+      .then((result) => {
+        if (!result) return;
+        const old = geometry;
+        geometry = result.geometry;
+        if (spec.family === "wax") {
+          buildShell(geometry, result.map);
+          geometry = geometry.clone();
+          geometry.scale(0.89, 0.89, 0.89);
+        } else {
+          material.map = result.map;
+          material.color.set(0xffffff);
+          material.roughness =
+            spec.shape === "foam"
+              ? 0.85
+              : spec.shape === "mochi"
+                ? 0.55
+                : spec.roughness;
+          material.opacity = 1;
+          material.transparent = false;
+          material.depthWrite = true;
+          material.needsUpdate = true;
+        }
+        blob.geometry = geometry;
+        base = Float32Array.from(geometry.getAttribute("position").array);
+        old.dispose();
+        visualSource = result.source;
+        ctx.requestFrame();
+      })
+      .catch((e) => {
+        visualSource = "reference-load-failed";
+        console.warn(e);
+      });
   const grains =
     spec.family === "particles" ? new GrainModel(spec.shape === "soap") : null;
   let grainMesh: THREE.InstancedMesh | null = null;
@@ -195,10 +212,10 @@ export function createFidget(ctx: ToyContext, spec: FidgetSpec): FidgetToy {
   if (grains) {
     grainMesh = new THREE.InstancedMesh(
       spec.shape === "soap"
-        ? new THREE.BoxGeometry(0.19, 0.13, 0.23)
-        : new THREE.SphereGeometry(0.065, 8, 6),
+        ? new RoundedBoxGeometry(0.25, 0.17, 0.23, 2, 0.018)
+        : new THREE.IcosahedronGeometry(0.095, 2),
       new THREE.MeshPhysicalMaterial({
-        roughness: spec.shape === "soap" ? 0.75 : 0.2,
+        roughness: spec.shape === "soap" ? 0.92 : 0.3,
         clearcoat: 0.25,
       }),
       grains.grains.length * 4,
@@ -210,19 +227,25 @@ export function createFidget(ctx: ToyContext, spec: FidgetSpec): FidgetToy {
     for (let i = 0; i < grains.grains.length * 4; i++)
       grainMesh.setColorAt(
         i,
-        new THREE.Color([spec.inner, 0xf5e9d0, 0xc5abd5, 0x94c9c1][i % 4]),
+        new THREE.Color(
+          (spec.shape === "soap"
+            ? [0xcce4da, 0xf5eddc, 0xe4c5c0, 0xaacbc8]
+            : [0xffeee1, 0xf5d5ad, 0xc2d7cf, 0xe5bbcc, 0xd5c5e2, 0xf5eee0])[
+            i % (spec.shape === "soap" ? 4 : 6)
+          ],
+        ),
       );
     grainMesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
   }
   const bubbles: THREE.Mesh[] = [];
   if (spec.shape === "ball" || spec.shape === "mango")
-    for (let i = 0; i < 9; i++) {
+    for (let i = 0; i < (spec.shape === "ball" ? 24 : 9); i++) {
       const b = new THREE.Mesh(
-        new THREE.SphereGeometry(0.045 + (i % 3) * 0.015, 10, 6),
+        new THREE.SphereGeometry(0.025 + (i % 4) * 0.018, 12, 8),
         new THREE.MeshPhysicalMaterial({
-          color: 0xfff1d5,
+          color: 0xeafdf5,
           transparent: true,
-          opacity: 0.42,
+          opacity: 0.45,
           roughness: 0.1,
         }),
       );
@@ -234,18 +257,27 @@ export function createFidget(ctx: ToyContext, spec: FidgetSpec): FidgetToy {
       scene.add(b);
       bubbles.push(b);
     }
+  const bubbleRest = bubbles.map((b) => b.position.clone().sub(blob.position));
   let fitDistance = 5.8;
   const positionCamera = () => {
-    const zoom = spec.family === "viscous" ? Math.max(1, model.stretch.x * .75) : 1;
-    camera.position.copy(target).addScaledVector(new THREE.Vector3(0, 1.25, 2).normalize(), fitDistance * zoom);
-    camera.lookAt(target); camera.updateMatrixWorld();
+    camera.position
+      .copy(target)
+      .addScaledVector(
+        new THREE.Vector3(0, 0.82, 2.2).normalize(),
+        fitDistance *
+          (spec.family === "viscous"
+            ? Math.max(1, 1 + (model.stretch.x - 1) * 0.6)
+            : 1),
+      );
+    camera.lookAt(target);
+    camera.updateMatrixWorld();
   };
   const resize = (w: number, h: number) => {
     camera.aspect = w / h;
     camera.updateProjectionMatrix();
     const dist = Math.max(
       5.8,
-      (spec.width * 1.3) /
+      (spec.width * 1.12) /
         (Math.tan(THREE.MathUtils.degToRad(17)) * camera.aspect * 0.85),
     );
     fitDistance = dist;
@@ -259,7 +291,11 @@ export function createFidget(ctx: ToyContext, spec: FidgetSpec): FidgetToy {
       shell ? [shell, blob] : [blob],
       false,
     )) {
-      if (h.object === shell && fracture && fracture.broken[h.faceIndex ?? 0])
+      if (
+        h.object === shell &&
+        fracture &&
+        fracture.broken[faceToPatch[h.faceIndex ?? 0]]
+      )
         continue;
       return h;
     }
@@ -271,9 +307,13 @@ export function createFidget(ctx: ToyContext, spec: FidgetSpec): FidgetToy {
       if (!h) return;
       const local = h.point.clone().sub(blob.position),
         normal = (h.face?.normal ?? local.clone().normalize()).clone();
+      if (!anchors.size) gestureCamera.copy(camera);
       if (!model.press(e.id, local, normal)) return;
       anchors.set(e.id, h.point.clone());
-      if (spec.family === "wax" && h.object === blob) coreTouches++;
+      if (spec.family === "wax" && h.object === blob) {
+        coreTouches++;
+        corePointers.add(e.id);
+      }
       sound.play(
         spec.family === "wax"
           ? h.object === blob
@@ -287,9 +327,9 @@ export function createFidget(ctx: ToyContext, spec: FidgetSpec): FidgetToy {
     } else if (e.kind === "move") {
       const a = anchors.get(e.id);
       if (!a) return;
-      ray.setFromCamera(ndc(e.x, e.y), camera);
+      ray.setFromCamera(ndc(e.x, e.y), gestureCamera);
       plane.setFromNormalAndCoplanarPoint(
-        camera.getWorldDirection(tmp).negate(),
+        gestureCamera.getWorldDirection(tmp).negate(),
         a,
       );
       const h = ray.ray.intersectPlane(plane, new THREE.Vector3());
@@ -297,6 +337,7 @@ export function createFidget(ctx: ToyContext, spec: FidgetSpec): FidgetToy {
     } else {
       if (!anchors.has(e.id)) return;
       model.release(e.id);
+      corePointers.delete(e.id);
       anchors.delete(e.id);
       if (e.kind === "up") sound.play("release", model.compression);
       ctx.requestFrame();
@@ -318,12 +359,14 @@ export function createFidget(ctx: ToyContext, spec: FidgetSpec): FidgetToy {
     bubbleClock = 0;
     pops = 0;
     coreTouches = 0;
+    corePointers.clear();
     ctx.requestFrame();
   };
   const frame = (dt: number) => {
     frames++;
     let moving = model.step(dt);
     if (spec.family === "viscous") positionCamera();
+
     const held = model.held,
       a = geometry.getAttribute("position") as THREE.BufferAttribute;
     for (let i = 0; i < a.count; i++) {
@@ -338,9 +381,8 @@ export function createFidget(ctx: ToyContext, spec: FidgetSpec): FidgetToy {
       compressClock += dt;
       if (compressClock > 0.28) {
         if (spec.family !== "wax") sound.play("compress", model.compression);
-        else if (fracture && fracture.brokenCount > 0)
-          sound.play("knead", model.compression);
-        compressClock = -0.6;
+        else if (corePointers.size > 0) sound.play("knead", model.compression);
+        compressClock = -100;
       }
     }
     if (fracture && shell && shellBase) {
@@ -372,20 +414,25 @@ export function createFidget(ctx: ToyContext, spec: FidgetSpec): FidgetToy {
             state.velocity.multiplyScalar(0.8);
           }
         }
-        for (let j = 0; j < 3; j++) {
-          const k = i * 3 + j;
+        for (const k of patchVertices[i]) {
           p0.fromArray(shellBase, k * 3);
           p0.sub(c).multiplyScalar(
-            fracture.broken[i] ? 0.84 : 1 - Math.max(0, dam - 0.12) * 0.1,
+            fracture.broken[i] ? 0.94 : 1 - Math.max(0, dam - 0.16) * 0.055,
           );
           if (fracture.broken[i])
             p0.applyAxisAngle(tmp.set(0, 1, 0), state.spin * model.time * 2);
           p0.add(c).add(state.offset);
+          if (!fracture.broken[i] && dam > 0.1)
+            p0.addScaledVector(
+              c,
+              -Math.min(0.06, dam * 0.065) / Math.max(0.01, c.length()),
+            );
           a.setXYZ(k, p0.x, p0.y, p0.z);
         }
       }
       a.needsUpdate = true;
-      shell.geometry.computeVertexNormals();
+      // Authored smooth normals stay continuous across intact curved wax patches.
+      // Detached fragments keep their curved surface rather than becoming flat triangles.
       shell.geometry.computeBoundingSphere();
       if (held.length) moving = true;
     }
@@ -406,7 +453,9 @@ export function createFidget(ctx: ToyContext, spec: FidgetSpec): FidgetToy {
           i * 0.4 + g.velocity.z,
         );
         matrix.scale.setScalar(
-          spec.shape === "soap" && g.integrity <= 0 ? 0.4 : 1,
+          spec.shape === "soap" && g.integrity <= 0
+            ? 0.4
+            : 0.8 + ((i * 17) % 11) * 0.04,
         );
         matrix.updateMatrix();
         grainMesh!.setMatrixAt(i, matrix.matrix);
@@ -441,8 +490,12 @@ export function createFidget(ctx: ToyContext, spec: FidgetSpec): FidgetToy {
         bubbleClock = 0;
       }
     }
-    for (const b of bubbles)
-      if (spec.shape !== "mango" || bubbleClock > 0.25) b.visible = true;
+    for (let i = 0; i < bubbles.length; i++) {
+      model.deform(bubbleRest[i], tmp);
+      bubbles[i].position.copy(tmp).add(blob.position);
+      if (spec.shape !== "mango" || bubbleClock > 0.25)
+        bubbles[i].visible = true;
+    }
     for (const e of model.events.splice(0))
       if (e === "fold") sound.play("fold", 0.7);
     sound.continuous(
@@ -481,6 +534,7 @@ export function createFidget(ctx: ToyContext, spec: FidgetSpec): FidgetToy {
       sound.leave();
       for (const c of model.held) model.release(c.id);
       anchors.clear();
+      corePointers.clear();
     },
     stats() {
       return {
@@ -511,8 +565,10 @@ export function createFidget(ctx: ToyContext, spec: FidgetSpec): FidgetToy {
         coreTouches,
         pops,
         audio: sound.state,
+        audioSource: sound.source,
         vertices: geometry.getAttribute("position").count,
-        visualStatus: "procedural-prototype",
+        visualStatus: visualSource,
+        localReferenceAudio: LOCAL_FIDGETS,
         soundPlays: ctx.audio.playLogs
           .filter((l) => l.name.startsWith(`fg:${spec.id}:`))
           .slice(-20),
