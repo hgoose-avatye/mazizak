@@ -1,0 +1,214 @@
+{
+  "keyboards": {
+    "oil-king": {
+      "starts": 20,
+      "uniqueBuffers": 7,
+      "roles": [
+        "kb:oil-king:down"
+      ],
+      "wavSha256": "9586ab67349a81c713d922d8a2be8fe8bd5b5364aaa53c05196ca1810a89f812",
+      "medianSpectralCentroidHz": 2579.0,
+      "medianRmsDbfs": -43.1,
+      "poolSize": 7
+    },
+    "boba-u4t": {
+      "starts": 20,
+      "uniqueBuffers": 14,
+      "roles": [
+        "kb:oil-king:down",
+        "kb:boba-u4t:down"
+      ],
+      "wavSha256": "4232641cd39f046b02dd33b55e2ed54a7e11a103a866305d25e1d6c2cf6f70f1",
+      "medianSpectralCentroidHz": 2585.0,
+      "medianRmsDbfs": -39.2,
+      "poolSize": 17
+    }
+  },
+  "fidgets": {
+    "S01": {
+      "starts": 4,
+      "loops": 1,
+      "minReductionDb": -2.5334038734436035,
+      "roles": [
+        "fg:S01:press",
+        "fg:S01:compress",
+        "fg:S01:release"
+      ],
+      "oneShots": 3,
+      "maximumScheduledOneShotOverlap": 2
+    },
+    "S02": {
+      "starts": 4,
+      "loops": 1,
+      "minReductionDb": -3.185549020767212,
+      "roles": [
+        "fg:S02:press",
+        "fg:S02:compress",
+        "fg:S02:release"
+      ],
+      "oneShots": 3,
+      "maximumScheduledOneShotOverlap": 2
+    },
+    "S03": {
+      "starts": 4,
+      "loops": 1,
+      "minReductionDb": -3.972086191177368,
+      "roles": [
+        "fg:S03:press",
+        "fg:S03:compress",
+        "fg:S03:release"
+      ],
+      "oneShots": 3,
+      "maximumScheduledOneShotOverlap": 1
+    },
+    "L01": {
+      "starts": 4,
+      "loops": 1,
+      "minReductionDb": -4.067953109741211,
+      "roles": [
+        "fg:L01:press",
+        "fg:L01:compress",
+        "fg:L01:release"
+      ],
+      "oneShots": 3,
+      "maximumScheduledOneShotOverlap": 2
+    },
+    "L02": {
+      "starts": 5,
+      "loops": 1,
+      "minReductionDb": -3.862381935119629,
+      "roles": [
+        "fg:L02:press",
+        "fg:L02:compress",
+        "fg:L02:bubble",
+        "fg:L02:release"
+      ],
+      "oneShots": 4,
+      "maximumScheduledOneShotOverlap": 2
+    },
+    "L03": {
+      "starts": 4,
+      "loops": 1,
+      "minReductionDb": -3.518366813659668,
+      "roles": [
+        "fg:L03:press",
+        "fg:L03:compress",
+        "fg:L03:release"
+      ],
+      "oneShots": 3,
+      "maximumScheduledOneShotOverlap": 3
+    },
+    "W01": {
+      "starts": 25,
+      "loops": 1,
+      "minReductionDb": -7.037717342376709,
+      "roles": [
+        "fg:W01:crack",
+        "fg:W01:crack",
+        "fg:W01:crack",
+        "fg:W01:crack",
+        "fg:W01:crack",
+        "fg:W01:crack",
+        "fg:W01:crack",
+        "fg:W01:crack",
+        "fg:W01:crack",
+        "fg:W01:crack",
+        "fg:W01:crack",
+        "fg:W01:crack",
+        "fg:W01:crack",
+        "fg:W01:crack",
+        "fg:W01:crack",
+        "fg:W01:crack",
+        "fg:W01:crack",
+        "fg:W01:crack",
+        "fg:W01:crack",
+        "fg:W01:release"
+      ],
+      "oneShots": 24,
+      "maximumScheduledOneShotOverlap": 7
+    },
+    "W02": {
+      "starts": 14,
+      "loops": 1,
+      "minReductionDb": -4.846642017364502,
+      "roles": [
+        "fg:W02:press",
+        "fg:W02:crack",
+        "fg:W02:crack",
+        "fg:W02:crack",
+        "fg:W02:crack",
+        "fg:W02:crack",
+        "fg:W02:crack",
+        "fg:W02:crack",
+        "fg:W02:crack",
+        "fg:W02:crack",
+        "fg:W02:crack",
+        "fg:W02:crack",
+        "fg:W02:release"
+      ],
+      "oneShots": 13,
+      "maximumScheduledOneShotOverlap": 3
+    },
+    "C01": {
+      "starts": 16,
+      "loops": 1,
+      "minReductionDb": -4.267863750457764,
+      "roles": [
+        "fg:C01:press",
+        "fg:C01:compress",
+        "fg:C01:crunch",
+        "fg:C01:crunch",
+        "fg:C01:crunch",
+        "fg:C01:crunch",
+        "fg:C01:crunch",
+        "fg:C01:crunch",
+        "fg:C01:crunch",
+        "fg:C01:crunch",
+        "fg:C01:crunch",
+        "fg:C01:crunch",
+        "fg:C01:crunch",
+        "fg:C01:crunch",
+        "fg:C01:release"
+      ],
+      "oneShots": 15,
+      "maximumScheduledOneShotOverlap": 3
+    },
+    "C02": {
+      "starts": 50,
+      "loops": 1,
+      "minReductionDb": -2.203686237335205,
+      "roles": [
+        "fg:C02:crunch",
+        "fg:C02:crunch",
+        "fg:C02:crunch",
+        "fg:C02:crunch",
+        "fg:C02:crunch",
+        "fg:C02:crunch",
+        "fg:C02:crunch",
+        "fg:C02:crunch",
+        "fg:C02:crunch",
+        "fg:C02:crunch",
+        "fg:C02:crunch",
+        "fg:C02:crunch",
+        "fg:C02:crunch",
+        "fg:C02:crunch",
+        "fg:C02:crunch",
+        "fg:C02:crunch",
+        "fg:C02:crunch",
+        "fg:C02:crunch",
+        "fg:C02:crunch",
+        "fg:C02:release"
+      ],
+      "oneShots": 49,
+      "maximumScheduledOneShotOverlap": 7
+    }
+  },
+  "errors": [],
+  "actualKeyboardCrossBufferMatches": 0,
+  "limits": [
+    "Human listening not performed.",
+    "Spectral centroid is a signal descriptor, not a perceptual equivalence test.",
+    "Overlap counts are from source durations at this bounded gesture, not every possible gesture.",
+    "Source package filenames do not verify real recording provenance."
+  ]
+}
