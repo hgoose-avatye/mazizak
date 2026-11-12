@@ -35,7 +35,7 @@
    "stretch": 3,
    "fold": 3
   },
-  "listenerExclusions": 50
+  "listenerExclusions": 52
  },
  "audit": {
   "apple.init": {

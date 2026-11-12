@@ -300,60 +300,111 @@
       "srcStart": 5.64,
       "tol": 0.03,
       "reason": "listener: freesound:594753 @5.64s (2026-11-12)"
+    },
+    {
+      "src": "freesound:403915",
+      "srcStart": 12.3631,
+      "tol": 0.03,
+      "reason": "listener: S03 tap freesound:403915 @12.36s (2026-11-12)"
+    },
+    {
+      "src": "freesound:403915",
+      "srcStart": 11.9725,
+      "tol": 0.03,
+      "reason": "listener: S03 hold freesound:403915 @11.97s (2026-11-12)"
     }
   ],
   "excludeSources": [
     {
       "src": "freesound:195797",
-      "reason": "listener: every judged clip of this source was marked \uc81c\uc678 (2026-11-12 lab-compare)"
+      "reason": "listener: every judged clip of this source was marked 제외 (2026-11-12 lab-compare)"
     },
     {
       "src": "freesound:241813",
-      "reason": "listener: every judged clip of this source was marked \uc81c\uc678 (2026-11-12 lab-compare)"
+      "reason": "listener: every judged clip of this source was marked 제외 (2026-11-12 lab-compare)"
     },
     {
       "src": "freesound:343795",
-      "reason": "listener: every judged clip of this source was marked \uc81c\uc678 (2026-11-12 lab-compare)"
+      "reason": "listener: every judged clip of this source was marked 제외 (2026-11-12 lab-compare)"
     },
     {
       "src": "freesound:344643",
-      "reason": "listener: every judged clip of this source was marked \uc81c\uc678 (2026-11-12 lab-compare)"
+      "reason": "listener: every judged clip of this source was marked 제외 (2026-11-12 lab-compare)"
     },
     {
       "src": "freesound:389657",
-      "reason": "listener: every judged clip of this source was marked \uc81c\uc678 (2026-11-12 lab-compare)"
+      "reason": "listener: every judged clip of this source was marked 제외 (2026-11-12 lab-compare)"
     },
     {
       "src": "freesound:541076",
-      "reason": "listener: every judged clip of this source was marked \uc81c\uc678 (2026-11-12 lab-compare)"
+      "reason": "listener: every judged clip of this source was marked 제외 (2026-11-12 lab-compare)"
     },
     {
       "src": "freesound:559768",
-      "reason": "listener: every judged clip of this source was marked \uc81c\uc678 (2026-11-12 lab-compare)"
+      "reason": "listener: every judged clip of this source was marked 제외 (2026-11-12 lab-compare)"
     },
     {
       "src": "freesound:612769",
-      "reason": "listener: every judged clip of this source was marked \uc81c\uc678 (2026-11-12 lab-compare)"
+      "reason": "listener: every judged clip of this source was marked 제외 (2026-11-12 lab-compare)"
     },
     {
       "src": "freesound:622335",
-      "reason": "listener: every judged clip of this source was marked \uc81c\uc678 (2026-11-12 lab-compare)"
+      "reason": "listener: every judged clip of this source was marked 제외 (2026-11-12 lab-compare)"
     },
     {
       "src": "freesound:655814",
-      "reason": "listener: every judged clip of this source was marked \uc81c\uc678 (2026-11-12 lab-compare)"
+      "reason": "listener: every judged clip of this source was marked 제외 (2026-11-12 lab-compare)"
     },
     {
       "src": "freesound:680447",
-      "reason": "listener: every judged clip of this source was marked \uc81c\uc678 (2026-11-12 lab-compare)"
+      "reason": "listener: every judged clip of this source was marked 제외 (2026-11-12 lab-compare)"
     },
     {
       "src": "freesound:794272",
-      "reason": "listener: every judged clip of this source was marked \uc81c\uc678 (2026-11-12 lab-compare)"
+      "reason": "listener: every judged clip of this source was marked 제외 (2026-11-12 lab-compare)"
     },
     {
       "src": "freesound:824934",
-      "reason": "listener: every judged clip of this source was marked \uc81c\uc678 (2026-11-12 lab-compare)"
+      "reason": "listener: every judged clip of this source was marked 제외 (2026-11-12 lab-compare)"
     }
-  ]
+  ],
+  "keepPools": {
+    "_doc": "listener verdict \"keep the rest as is\": the pool is exactly these clips (src + srcStart), no automatic picking",
+    "mochi.tap": [
+      {
+        "src": "freesound:403915",
+        "srcStart": 7.7895
+      },
+      {
+        "src": "freesound:403915",
+        "srcStart": 16.2978
+      },
+      {
+        "src": "freesound:837964",
+        "srcStart": 14.2761
+      },
+      {
+        "src": "freesound:837964",
+        "srcStart": 16.2592
+      }
+    ],
+    "mochi.hold": [
+      {
+        "src": "freesound:403915",
+        "srcStart": 7.5254
+      },
+      {
+        "src": "freesound:403915",
+        "srcStart": 13.7703
+      },
+      {
+        "src": "freesound:837964",
+        "srcStart": 8.8387
+      },
+      {
+        "src": "freesound:837964",
+        "srcStart": 9.9682
+      }
+    ]
+  }
 }

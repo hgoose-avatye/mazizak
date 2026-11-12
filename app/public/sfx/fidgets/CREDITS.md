@@ -44,7 +44,7 @@ All marked Creative Commons 0 (https://creativecommons.org/publicdomain/zero/1.0
 
 ## Squish (S01–S03 말랑이, L01–L03 슬랑이) — Freesound CC0 1.0
 
-Replaces the earlier shared gel sprite. S01 stress balls / squeeze toy, S02 memory foam / sponge, S03 dough, L01 slime, L02 jelly / goo, L03 shaving foam. Counts: 57 clips from 11 files.
+Replaces the earlier shared gel sprite. S01 stress balls / squeeze toy, S02 memory foam / sponge, S03 dough, L01 slime, L02 jelly / goo, L03 shaving foam. Counts: 55 clips from 11 files.
 
 | id | title | author | url | licence | retrieved | used for | material |
 |---|---|---|---|---|---|---|---|

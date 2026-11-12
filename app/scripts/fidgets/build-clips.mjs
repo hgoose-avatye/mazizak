@@ -141,6 +141,7 @@ const GATE = { minStartDb: -38, maxBoostDb: 18, maxSource: -0.5, maxSparse: 0.55
 const audit = {}; // pool → { candidates, rejected: { reason: count } }
 const EXCL_SRC = (() => { try { return (JSON.parse(fs.readFileSync(path.join(path.dirname(fileURLToPath(import.meta.url)), 'exclusions.json'), 'utf8')).excludeSources ?? []).map((e) => e.src); } catch { return []; } })();
 const EXCL = (() => { try { return JSON.parse(fs.readFileSync(path.join(path.dirname(fileURLToPath(import.meta.url)), 'exclusions.json'), 'utf8')).exclude ?? []; } catch { return []; } })();
+const KEEP = (() => { try { const k = JSON.parse(fs.readFileSync(path.join(path.dirname(fileURLToPath(import.meta.url)), 'exclusions.json'), 'utf8')).keepPools ?? {}; delete k._doc; return k; } catch { return {}; } })();
 const med = (a) => [...a].sort((p, q) => p - q)[Math.floor(a.length / 2)];
 function qc(pool, list) {
   const rej = {};
@@ -214,7 +215,12 @@ function gpool(name, event, material, note, srcIds, usage, { kind, n, len = [50,
   const srcs = own.length ? own : srcIds.map((id) => an(id, usage));
   const cands = srcs.flatMap((a) => kind === 'singles' ? singles(a, { minLen: len[0], maxLen: len[1] }).filter((c) => c.strikePeakDb >= a.maxPeakDb - relFloor) : windows(a, lenMs, { minStrikes }));
   const score = scoreFn ?? (kind === 'singles' ? (c) => c.strikePeakDb : (c) => c.strikes - c.crest * 0.3);
-  addPool(name, event, material, pick(qc(name, cands), n, score, { diverse: true }), note);
+  const passed = qc(name, cands);
+  // a pool the listener kept as is (exclusions.json keepPools): exactly those clips, no unheard replacements
+  const keep = KEEP[name];
+  const chosen = keep ? keep.map((k) => passed.find((c) => c.src.id === k.src && Math.abs(c.a / SR - k.srcStart) <= 0.005)).filter(Boolean) : pick(passed, n, score, { diverse: true });
+  if (keep && chosen.length !== keep.length) throw new Error(`${name}: ${keep.length - chosen.length} kept clip(s) no longer pass the gates`);
+  addPool(name, event, material, chosen, note);
 }
 // ── crunch bank: C01 soap crunch (dry crumbly foam), C02 sugar beads (small hard granules)
 const SOAP = ['560167', '868249', '774262', '389657'];
