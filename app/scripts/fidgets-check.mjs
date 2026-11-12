@@ -49,7 +49,7 @@ try {
     ["슬랑이", 3],
     ["왁뿌볼", 2],
     ["크런치", 2],
-    ["키보드", 8],
+    ["키보드", 11],
   ]) {
     await p.getByRole("button", { name: category, exact: true }).click();
     ok(

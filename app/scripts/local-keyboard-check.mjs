@@ -53,8 +53,8 @@ try {
     });
     await p.waitForTimeout(1600);
     check(
-      `8 selectable presets mobile=${mobile}`,
-      (await p.getByRole("radio").count()) === 8,
+      `11 selectable presets (8 + 몽돌·찌개·도자기) mobile=${mobile}`,
+      (await p.getByRole("radio").count()) === 11,
     );
     check(
       "retired names hidden " + mobile,

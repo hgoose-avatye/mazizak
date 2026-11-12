@@ -22,4 +22,7 @@ export const KEYBOARD_COLORS: Record<KeyPresetId, Colorway> = {
   'boba-u4t': { name: 'Espresso', keys: [0x805645,0xdbc8a5,0xeee1c9, 0xdbc8a5,0x805645,0xdbc8a5, 0xeee1c9,0xc47d45,0x805645, 0x805645], tray: 0xd5b991, metalness: 0, caseRoughness: .6, roughness: .42, clearcoat: .24 },
   'box-jade': { name: 'Rally green', keys: [0xe8e4d6,0x254c3f,0xe8e4d6, 0x254c3f,0xe8e4d6,0x254c3f, 0xe8e4d6,0x254c3f,0xd4d956, 0x254c3f], tray: 0x244a3b, metalness: .35, caseRoughness: .22, roughness: .22, clearcoat: .65 },
   'silent-peach-v3': { name: 'Apricot linen', keys: [0xefdfd4,0xefdfd4,0xc6c3b2, 0xdca48b,0xefdfd4,0xefdfd4, 0xc6c3b2,0xefdfd4,0xefdfd4, 0xdca48b], tray: 0xe4c6b5, metalness: 0, caseRoughness: .78, roughness: .78, clearcoat: 0 },
+  'mongdol-pl87w': { name: 'Pebble white', keys: [0xeeeae2,0xd9d6cf,0xeeeae2, 0xb9b6ae,0xeeeae2,0xd9d6cf, 0xeeeae2,0xb9b6ae,0xeeeae2, 0xd9d6cf], tray: 0xdcd9d1, metalness: 0, caseRoughness: .66, roughness: .52, clearcoat: .18 },
+  'jjigae-topre': { name: 'Stew pot', keys: [0x8f9291,0x646869,0xb5503c, 0x646869,0x8f9291,0x646869, 0x8f9291,0x646869,0x8f9291, 0xb5503c], tray: 0x34383a, metalness: 0, caseRoughness: .7, roughness: .7, clearcoat: 0 },
+  'dojagi-space65': { name: 'Celadon glaze', keys: [0xf2f0e8,0xc9ddd6,0x3e6f8e, 0xc9ddd6,0xf2f0e8,0xc9ddd6, 0xf2f0e8,0xf2f0e8,0x3e6f8e, 0xc9ddd6], tray: 0xe6e4dc, metalness: 0, caseRoughness: .2, roughness: .16, clearcoat: .9 },
 };

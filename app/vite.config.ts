@@ -167,7 +167,7 @@ export default defineConfig(({ command, isPreview }) => {
               configureServer(server) {
                 server.middlewares.use(async (req, res, next) => {
                   const match =
-                    /^\/__local-keyboard\/(oil-king|boba-u4t|box-jade|silent-peach-v3)\.(json|wav)$/.exec(
+                    /^\/__local-keyboard\/(oil-king|boba-u4t|box-jade|silent-peach-v3|mongdol-pl87w|jjigae-topre|dojagi-space65)\.(json|wav)$/.exec(
                       (req.url ?? "").split("?")[0],
                     );
                   if (!match) return next();

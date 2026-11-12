@@ -34,6 +34,34 @@ export const LOCAL_KEY_PRESETS = {
     tags: ["silent", "soft", "muted"],
     classification: "Silent Linear",
   },
+  // Recordings taken from YouTube typing videos chosen by the owner. LOCAL DEVELOPMENT ONLY: never shipped (rights unverified).
+  "mongdol-pl87w": {
+    id: "K11",
+    label: "몽돌 (SPM PL87W)",
+    sensoryExpression: "바둑알 달그락",
+    onomatopoeia: "달그락·톡톡",
+    tags: ["pebble", "poppy", "smooth"],
+    classification: "Linear (HMX 몽돌)",
+    sourceVideo: "https://www.youtube.com/shorts/BgO3pE7VnI8",
+  },
+  "jjigae-topre": {
+    id: "K12",
+    label: "찌개 (RealForce R2 Topre)",
+    sensoryExpression: "보글보글 찌개",
+    onomatopoeia: "보글·퐁퐁",
+    tags: ["topre", "lubed", "deep"],
+    classification: "Topre EC 30g (Krytox 105)",
+    sourceVideo: "https://www.youtube.com/watch?v=TTfTCiwA38c",
+  },
+  "dojagi-space65": {
+    id: "K13",
+    label: "도자기 (SPACE65)",
+    sensoryExpression: "도자기 두드리는 소리",
+    onomatopoeia: "또각·탁",
+    tags: ["ceramic", "clean", "clacky"],
+    classification: "Linear (BSUN RAW)",
+    sourceVideo: "https://www.youtube.com/watch?v=Ry1DJ2xzg6Q&t=10s",
+  },
 } as const;
 export type LocalKeyPresetId = keyof typeof LOCAL_KEY_PRESETS;
 export const isLocalKeyPreset = (id: string): id is LocalKeyPresetId =>
