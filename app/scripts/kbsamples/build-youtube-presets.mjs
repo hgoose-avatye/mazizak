@@ -17,9 +17,10 @@ const FFMPEG = process.env.FFMPEG || 'ffmpeg';
 const ms = (v) => Math.round((v * SR) / 1000);
 /** window = [start, end] seconds of the downloaded file to use (a 1–2 h video: only a typing passage is needed) */
 const PRESETS = [
-  // dense typing (몽돌: an 8 s Short typed fast; 찌개: "FAST ASMR"): a clean strike stands ≥18 dB over the surrounding typing and decays ≥20 dB
+  // dense typing (몽돌: an 8 s Short typed fast): a clean strike stands ≥18 dB over the surrounding typing and decays ≥20 dB
   { id: 'mongdol-pl87w', file: 'mongdol', video: 'https://www.youtube.com/shorts/BgO3pE7VnI8', window: [0, 9], count: 14, isolation: 0.1, gate: { maxLeadDb: -18, decayDb: -20, maxSecondDb: -10 } },
-  { id: 'jjigae-topre', file: 'jjigae', video: 'https://www.youtube.com/watch?v=TTfTCiwA38c', window: [30, 590], count: 16, gate: { maxLeadDb: -18, decayDb: -20, maxSecondDb: -10, minDecayMs: 8 } },
+  // 찌개: the owner heard the neighbouring typing under the first set (lead −18 dB) — strict gates over a longer stretch instead
+  { id: 'jjigae-topre', file: 'jjigae', video: 'https://www.youtube.com/watch?v=TTfTCiwA38c', window: [30, 1190], count: 16, gate: { maxLeadDb: -30, decayDb: -30, maxSecondDb: -15, minDecayMs: 8 } },
   // ceramic keycaps on a POM plate: a sharp clack that decays within ~10 ms is the real sound, not a glitch
   { id: 'dojagi-space65', file: 'dojagi', video: 'https://www.youtube.com/watch?v=Ry1DJ2xzg6Q&t=10s', window: [10, 130], count: 16, gate: { minDecayMs: 6, minLenMs: 40 } },
 ];
