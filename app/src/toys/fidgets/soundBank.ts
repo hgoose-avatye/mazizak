@@ -97,6 +97,8 @@ export const SPRITE_TRIM_DB: Record<FidgetEvent, number> = { init: -10, crack: -
 /** sustained events replace each other instead of stacking */
 export const SUSTAINED: ReadonlySet<FidgetEvent> = new Set<FidgetEvent>(["hold", "stretch", "fold"]);
 export const MIN_INTERVAL_MS: Record<FidgetEvent, number> = { init: 0, tap: 60, hold: 110, release: 80, stretch: 110, fold: 160, crack: 55, crunch: 60 };
+/** a sustained voice with less than this left when the finger lifts is allowed to finish */
+export const KEEP_RINGING_MS = 350;
 export const MAX_SHORT_VOICES = 3;
 export const OVERLAP_DB = -1.5;
 
@@ -176,9 +178,10 @@ export class VoiceGate {
     this.voices.push({ event, start: now, end: now + durationMs, stop });
   }
   /** fade out sustained voices (finger lifted, toy left) */
-  releaseSustained(fadeSec = 0.04) {
-    for (const v of this.voices) if (SUSTAINED.has(v.event)) v.stop?.(fadeSec);
-    this.voices = this.voices.filter((v) => !SUSTAINED.has(v.event));
+  releaseSustained(fadeSec = 0.04, now = Number.NEGATIVE_INFINITY) {
+    // a finger lifting must not chop a short squish in half: only voices that still have a long way to go are faded
+    for (const v of this.voices) if (SUSTAINED.has(v.event) && v.end - now > KEEP_RINGING_MS) v.stop?.(fadeSec);
+    this.voices = this.voices.filter((v) => !SUSTAINED.has(v.event) || v.end - now <= KEEP_RINGING_MS);
   }
   clear(fadeSec = 0.04) {
     for (const v of this.voices) v.stop?.(fadeSec);

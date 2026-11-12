@@ -25,7 +25,7 @@ const PHASES: Record<string, Partial<Record<FidgetEvent, "init" | "short" | "lon
   L02: { tap: "short", hold: "long", stretch: "long", fold: "short" },
   C01: { tap: "short", crunch: "short", hold: "long" },
   C02: { tap: "short", crunch: "short", hold: "long" },
-  S02: { hold: "long" },
+  S02: { tap: "long", hold: "long" }, // the bread squish answers every click in full (tap = short voice, not cut when the finger lifts)
   S01: { tap: "short", hold: "long" },
 };
 

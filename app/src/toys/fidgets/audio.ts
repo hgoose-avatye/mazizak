@@ -350,7 +350,7 @@ export class FidgetAudio {
     return true;
   }
   releaseGesture() {
-    this.gate.releaseSustained(0.04);
+    this.gate.releaseSustained(0.04, this.now());
   }
   stop() {
     this.gate.clear(0.04);

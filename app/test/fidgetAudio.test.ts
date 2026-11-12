@@ -413,10 +413,21 @@ describe("FidgetAudio event routing", () => {
     a.enter(); at(6000); expect(a.play("crunch", 1)).toBe(true);
   });
 
-  it("finger lift: releaseGesture() fades only the sustained voice, short voices keep ringing", async () => {
+  it("finger lift: a sustained voice that is nearly over is not chopped; one with a long way to go is faded", async () => {
+    const { a, stops, at } = await make("L03");
+    at(0); a.play("hold", 1); // 0.6 s window
+    at(400); a.releaseGesture(); // ≈ 200 ms left → rings out
+    expect(stops.length).toBe(0);
+    const b = await make("L03");
+    b.at(0); b.a.play("hold", 1);
+    b.at(50); b.a.releaseGesture(); // ≈ 550 ms left → faded
+    expect(b.stops.length).toBe(1);
+  });
+
+  it("finger lift (old): releaseGesture() fades only the sustained voice, short voices keep ringing", async () => {
     const { a, stops, at } = await make("L03");
     at(0); a.play("fold", 1);
-    at(200); a.play("hold", 1); // rejected: a sustained sound is still playing
+    at(50); a.play("hold", 1); // rejected: a sustained sound is still playing
     a.releaseGesture();
     expect(stops.length).toBe(1);
   });
