@@ -1,7 +1,8 @@
 /**
  * DEV ONLY — stand-in sounds taken from the owner's installed reference app, chosen by the owner:
  *   W01 청사과 → wak/butter · W02 초콜릿 → wak/cake · C01 비누 → crunch/soda · C02 슈가비즈 → crunch/clover (클로버 비즈)
- *   S01 TPR 젤리볼 → crunch/guma · S02 갓 구운 빵(슬로우 라이징 폼) → 뿌왁 앱의 모닝빵(bread) squish_bread_mallang_1/2.wav
+ *   S01 TPR 젤리볼 → crunch/guma (the owner keeps it, 2026-11-12)
+ * S02 슬로우 라이징 폼 used the 뿌왁 app's bread squish (squish_bread_mallang_1/2.wav) until 2026-11-12; the owner chose its public sound (foam.hold).
  * L02 망고 used crunch/rainbow-sharbet until 2026-11-12; the owner preferred the public crunchy-slime sound (mango.tap/hold) and it now plays everywhere.
  * The files are read through the loopback-only dev route (vite.config.ts, MANZIZAK_ORIGINAL_APP_DIR). They are NOT part of the repository
  * or of any build: VITE_ORIGINAL_SOUNDS is "0" outside the dev server, so this whole module is dead code in production (scripts/check-dist.mjs checks).
@@ -17,7 +18,6 @@ export const ORIGINAL_FOLDER: Record<string, string> = {
   W02: "wak/cake",
   C01: "crunch/soda",
   C02: "crunch/clover",
-  S02: "wakppu:bread",
   S01: "crunch/guma",
 };
 /** original phase → MANZIZAK events (short = tap, long = knead/hold, init = first break) */
@@ -26,7 +26,6 @@ const PHASES: Record<string, Partial<Record<FidgetEvent, "init" | "short" | "lon
   W02: { init: "init", tap: "short", hold: "long", crack: "long", crunch: "short" },
   C01: { tap: "short", crunch: "short", hold: "long" },
   C02: { tap: "short", crunch: "short", hold: "long" },
-  S02: { tap: "long", hold: "long" }, // the bread squish answers every click in full (tap = short voice, not cut when the finger lifts)
   S01: { tap: "short", hold: "long" },
 };
 
