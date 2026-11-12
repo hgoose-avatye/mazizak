@@ -1,6 +1,10 @@
-import type { AudioEngine, ContinuousSound } from "../../core/audio";
+import type { AudioEngine } from "../../core/audio";
 import { loadSquishySamples } from "../../audio/squishySamples";
-import { LOCAL_FIDGETS, referenceSounds } from "./references";
+import {
+  LOCAL_FIDGETS,
+  referenceSounds,
+  referenceManifest,
+} from "./references";
 import type { FidgetSpec } from "./catalog";
 const waxCache = new WeakMap<
   BaseAudioContext,
@@ -68,17 +72,51 @@ async function loadWax(ctx: BaseAudioContext) {
 }
 export const preloadFidgetAudio = (audio: AudioEngine) =>
   Promise.all([loadSquishySamples(audio.ctx), loadWax(audio.ctx)]);
+/** Segment at quiet envelope gaps, rather than looping a short impact recording. */
+function gestureCues(ctx: BaseAudioContext, buffer: AudioBuffer) {
+  const x = buffer.getChannelData(0),
+    hop = Math.max(1, Math.round(buffer.sampleRate * 0.005)),
+    rms: number[] = [];
+  for (let i = 0; i < x.length; i += hop) {
+    let e = 0;
+    for (let j = i; j < Math.min(x.length, i + hop); j++) e += x[j] * x[j];
+    rms.push(Math.sqrt(e / Math.min(hop, x.length - i)));
+  }
+  const threshold = Math.max(0.0015, Math.max(...rms) * 0.1),
+    regions: [number, number][] = [];
+  let begin = -1,
+    last = -1;
+  for (let i = 0; i < rms.length; i++) {
+    if (rms[i] > threshold) {
+      if (begin < 0) begin = i;
+      last = i;
+    }
+    if (begin >= 0 && (i - last >= 7 || i === rms.length - 1)) {
+      regions.push([
+        Math.max(0, (begin * hop) / buffer.sampleRate - 0.005),
+        Math.min(
+          buffer.duration,
+          ((last + 1) * hop) / buffer.sampleRate + 0.03,
+        ),
+      ]);
+      begin = -1;
+    }
+  }
+  if (!regions.length) return [buffer];
+  return regions
+    .filter(([a, b]) => b - a >= 0.025)
+    .slice(0, 20)
+    .map(([a, b]) => cut(ctx, buffer, a, b - a));
+}
 export class FidgetAudio {
   state = "loading";
-  source = "CC0 / CC BY recorded foley";
-  private rub: ContinuousSound | null = null;
-  private stretch: ContinuousSound | null = null;
+  source = "";
+  supportedRoles: string[] = [];
   private enabled = false;
-  private last: Record<string, number> = {};
-  private stops: (() => void)[] = [];
-  private crunchUntil = 0;
-  private crunchStop: (() => void) | null = null;
-  private crunchDuration = 0;
+  private busyUntil = 0;
+  private stopVoice: (() => void) | null = null;
+  private durations: Record<string, number> = {};
+  private lastRequest: Record<string, number> = {};
   constructor(
     private audio: AudioEngine,
     readonly spec: FidgetSpec,
@@ -88,75 +126,98 @@ export class FidgetAudio {
   private async prepare() {
     try {
       const sq = await loadSquishySamples(this.audio.ctx),
-        wet = sq.compressGel ?? sq.compress,
-        foam = this.spec.sound === "foam",
-        cream = this.spec.sound === "cream";
-      const register = (r: string, b: AudioBuffer[]) => {
-        this.audio.register(`fg:${this.spec.id}:${r}`, b);
-        if (r === "crunch")
-          this.crunchDuration = Math.max(...b.map((x) => x.duration));
-      };
-      register(
-        "press",
-        this.spec.family === "wax"
-          ? sq.touch
-          : foam
-            ? sq.compress
-            : cream
-              ? sq.touch
-              : wet,
-      );
-      register("compress", foam || cream ? sq.compress : wet);
-      register("release", foam ? sq.recover : sq.touch);
-      register(
-        "fold",
-        this.spec.sound === "cheese"
-          ? [...sq.compress, ...wet]
-          : cream
-            ? sq.touch
-            : wet,
-      );
-      register(
-        "bubble",
-        wet.map((b) =>
-          cut(this.audio.ctx, b, 0.02, Math.min(0.07, b.duration - 0.02)),
-        ),
-      );
-      this.rub = this.audio.createLoop(sq.rub);
-      this.stretch = this.audio.createLoop(sq.stretch);
-      if (this.spec.family === "wax" || this.spec.family === "particles") {
-        const w = await loadWax(this.audio.ctx),
-          choco = this.spec.sound === "chocolate";
-        register("crack", w[choco ? "choco_crack" : "apple_crack"]);
-        register("knead", w[choco ? "choco_knead" : "apple_knead"]);
-        register(
-          "crunch",
-          w[this.spec.sound === "soap" ? "choco_crack" : "apple_crack"].map(
-            (b) =>
-              cut(
-                this.audio.ctx,
-                b,
-                0,
-                this.spec.sound === "soap" ? 0.11 : 0.035,
-              ),
-          ),
-        );
-      }
-      if (LOCAL_FIDGETS) {
-        const local = await referenceSounds(this.audio.ctx, this.spec.id);
-        for (const [role, buffers] of Object.entries(local)) {
-          register(role, buffers);
+        wet = sq.compressGel ?? sq.compress;
+      const local = LOCAL_FIDGETS
+        ? await referenceSounds(this.audio.ctx, this.spec.id)
+        : {};
+      const hasVideoReference =
+        LOCAL_FIDGETS &&
+        this.spec.id === "L01" &&
+        !!(await referenceManifest()).toys.L01?.referenceVideo;
+      const banks: Record<string, AudioBuffer[]> = {};
+      if (this.spec.shape === "foam") {
+        banks.compress = [sq.touch[sq.touch.length - 1]];
+        this.source =
+          "CC0 PU foam contact; exact slow-rise compression recording missing";
+      } else if (this.spec.shape === "cream") {
+        banks.compress = wet;
+        banks.fold = wet;
+        this.source =
+          "CC0 gel contact approximation; cream-specific recording missing";
+      } else if (this.spec.family === "wax") {
+        const wax = await loadWax(this.audio.ctx),
+          choco = this.spec.shape === "chocolate";
+        banks.crack = local.crack ?? wax[choco ? "choco_crack" : "apple_crack"];
+        banks.knead = local.knead ?? wax[choco ? "choco_knead" : "apple_knead"];
+        this.source = LOCAL_FIDGETS
+          ? "installed-app wax/gel reference, local only"
+          : "CC BY apple77771 wax/gel";
+      } else if (this.spec.family === "particles") {
+        const wax = await loadWax(this.audio.ctx);
+        banks.crunch =
+          local.crunch ??
+          wax[this.spec.shape === "soap" ? "choco_crack" : "apple_crack"];
+        this.source = LOCAL_FIDGETS
+          ? "installed-app crunch reference, local only"
+          : "CC BY derived crunch reference";
+      } else {
+        banks.compress = local.compress ?? local.press ?? wet;
+        if (this.spec.family === "viscous") {
+          banks.stretch = local.stretch ?? banks.compress;
+          banks.fold = local.fold ?? banks.compress;
         }
-        const wetLocal = local.knead ?? local.compress ?? local.press;
-        register(
-          "bubble",
-          wetLocal.map((b) =>
-            cut(this.audio.ctx, b, 0, Math.min(0.09, b.duration)),
-          ),
-        );
-        this.rub = this.audio.createLoop(wetLocal[0]);
-        this.stretch = this.audio.createLoop((local.stretch ?? wetLocal)[0]);
-        this.source = "installed app / local development only";
+        this.source = hasVideoReference
+          ? "user video 7WDcH26JU5Q 20–29s; local-only soundtrack cues, acoustic purity unverified"
+          : LOCAL_FIDGETS
+            ? "installed-app skin/gel reference, local only"
+            : "CC0 gel contact approximation";
+      }
+      for (const [role, raw] of Object.entries(banks)) {
+        const targetDb =
+          this.spec.shape === "foam"
+            ? -34
+            : this.spec.shape === "mochi"
+              ? -30
+              : this.spec.shape === "cream"
+                ? -29
+                : role === "crack"
+                  ? -26
+                  : -27;
+        const unique = new Map<string, AudioBuffer>();
+        for (const b of raw)
+          for (const cue of gestureCues(this.audio.ctx, b)) {
+            const x = cue.getChannelData(0);
+            let peak = 0,
+              energy = 0,
+              signature = 2166136261;
+            for (let i = 0; i < x.length; i++) {
+              peak = Math.max(peak, Math.abs(x[i]));
+              energy += x[i] * x[i];
+              signature = Math.imul(
+                signature ^ (Math.round(x[i] * 32767) & 65535),
+                16777619,
+              );
+            }
+            const rms = Math.sqrt(energy / x.length),
+              gain = Math.min(
+                1,
+                Math.pow(10, targetDb / 20) / Math.max(rms, 0.00001),
+                0.7 / Math.max(peak, 0.00001),
+              );
+            const out = this.audio.ctx.createBuffer(
+                1,
+                x.length,
+                cue.sampleRate,
+              ),
+              y = out.getChannelData(0);
+            for (let i = 0; i < x.length; i++) y[i] = x[i] * gain;
+            unique.set(x.length + ":" + signature, out);
+          }
+        const cues = [...unique.values()];
+        if (!cues.length) continue;
+        this.audio.register(`fg:${this.spec.id}:${role}`, cues);
+        this.durations[role] = Math.max(...cues.map((b) => b.duration));
+        this.supportedRoles.push(role);
       }
       this.state = "recorded/derived";
     } catch (e) {
@@ -167,107 +228,42 @@ export class FidgetAudio {
   enter() {
     this.enabled = true;
   }
-  play(role: string, strength = 1) {
-    if (!this.enabled || this.state !== "recorded/derived") return;
-    if (this.spec.family === "particles" && role !== "crunch") return;
+  play(role: string, strength = 0.5) {
     const now = performance.now();
     if (
-      role === "crunch" &&
-      this.spec.family === "particles" &&
-      now < this.crunchUntil
+      !this.enabled ||
+      this.state !== "recorded/derived" ||
+      !this.supportedRoles.includes(role) ||
+      now < this.busyUntil ||
+      now - (this.lastRequest[role] ?? -1000) < 100
     )
-      return;
-    if (
-      now - (this.last[role] ?? -1000) <
-      (role === "crunch"
-        ? 75
-        : role === "crack"
-          ? 110
-          : role === "bubble"
-            ? 140
-            : 70)
-    )
-      return;
-    this.last[role] = now;
-    const t = this.spec.sound,
-      rate =
-        role === "crunch"
-          ? t === "soap"
-            ? 1.45
-            : 2.4
-          : role === "bubble"
-            ? 1.6
-            : t === "foam"
-              ? 0.78
-              : t === "mochi"
-                ? 0.82
-                : t === "cream"
-                  ? 1.22
-                  : t === "cheese"
-                    ? 0.8
-                    : t === "mango"
-                      ? 0.95
-                      : 1.1;
+      return false;
+    this.lastRequest[role] = now;
     const log = this.audio.play(
       `fg:${this.spec.id}:${role}`,
       {
-        rate: LOCAL_FIDGETS ? (role === "bubble" ? 1.12 : 1) : rate,
-        lowpassHz: LOCAL_FIDGETS
-          ? t === "foam"
-            ? 6000
-            : 14000
-          : t === "foam"
-            ? 1800
-            : t === "cream"
-              ? 2200
-              : t === "mochi"
-                ? 2600
-                : role === "crunch"
-                  ? 6500
-                  : 7000,
-        gainDb:
-          this.spec.family === "particles"
-            ? -8 + Math.min(2, strength * 2)
-            : (role === "release" ? -9 : role === "crunch" ? -6 : -2) +
-              Math.min(3, strength * 3),
-        gainJitterDb: 1.3,
-        detuneCents: this.spec.family === "particles" ? 0 : 18,
+        rate: 1,
+        detuneCents: 0,
+        gainJitterDb: 0.3,
+        gainDb: -5 + Math.min(5, Math.max(0, strength) * 5),
       },
       `fidget:${role}`,
     );
-    if (role === "crunch" && this.spec.family === "particles" && log?.stop) {
-      this.crunchUntil = now + this.crunchDuration * 1000 + 35;
-      this.crunchStop = () => log.stop?.(0.06);
-    }
     if (log?.stop) {
-      this.stops.push(() => log.stop?.(0.04));
-      if (this.stops.length > 24) this.stops.shift();
+      this.stopVoice = () => log.stop?.(0.04);
+      this.busyUntil = now + this.durations[role] * 1000 + 25;
     }
-  }
-  continuous(stretch: number, rub: number) {
-    if (this.spec.family === "particles") return;
-    if (this.enabled) {
-      this.stretch?.set(
-        Math.min(LOCAL_FIDGETS ? 0.22 : 0.5, stretch),
-        this.spec.sound === "cream" ? 0.05 : 0.4,
-      );
-      this.rub?.set(
-        Math.min(LOCAL_FIDGETS ? 0.17 : 0.3, rub),
-        this.spec.sound === "beads" ? 0.75 : 0.2,
-      );
-    }
+    return !!log;
   }
   releaseGesture() {
-    this.crunchStop?.();
-    this.crunchStop = null;
-    this.crunchUntil = 0;
+    if (this.stopVoice) {
+      this.stopVoice();
+      this.stopVoice = null;
+      this.busyUntil = performance.now() + 100;
+    }
   }
   stop() {
     this.releaseGesture();
-    this.rub?.set(0, 0);
-    this.stretch?.set(0, 0);
-    for (const stop of this.stops) stop();
-    this.stops = [];
   }
   leave() {
     this.enabled = false;

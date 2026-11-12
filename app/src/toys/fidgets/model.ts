@@ -1,4 +1,5 @@
 import { Vector3 } from "three";
+import { MaterialCage } from "./cage";
 import { Spring } from "../../core/spring";
 import { SquishyModel, DEFAULT_PARAMS } from "../squishy/model";
 import type { FidgetSpec } from "./catalog";
@@ -11,8 +12,11 @@ export interface Contact {
   depth: Spring;
   held: boolean;
   age: number;
+  pressure?: number;
+  surfacePatch?: number;
 }
 export class FidgetModel {
+  readonly cage: MaterialCage;
   readonly contacts = new Map<number, Contact>();
   readonly stretch = new Spring(1, { freq: 3, damping: 1 });
   readonly axis = new Vector3(1, 0, 0);
@@ -23,11 +27,14 @@ export class FidgetModel {
   maxStretch = 1;
   compression = 0;
   motion = 0;
+  frameTravel = 0;
+  private pendingTravel = 0;
   peakCompression = 0;
   events: ("fold" | "bubble")[] = [];
   private pinchStart = 0;
   private foldedGesture = false;
   constructor(readonly spec: FidgetSpec) {
+    this.cage = new MaterialCage(spec);
     this.foam =
       spec.shape === "foam"
         ? new SquishyModel({
@@ -53,16 +60,17 @@ export class FidgetModel {
       const old = [...this.contacts.values()].find((c) => !c.held);
       if (old) this.contacts.delete(old.id);
     }
+    const materialAnchor = this.cage.undeform(anchor, new Vector3());
     this.contacts.set(id, {
       id,
-      anchor: anchor.clone(),
+      anchor: materialAnchor,
       normal: normal.clone(),
       drag: new Vector3(),
       depth: new Spring(0, { freq: 8, damping: 1 }),
       held: true,
       age: 0,
     });
-    this.foam?.press(id, anchor, normal);
+    this.foam?.press(id, materialAnchor, normal);
     return true;
   }
   drag(id: number, delta: Vector3) {
@@ -71,9 +79,19 @@ export class FidgetModel {
     const d = delta
       .clone()
       .clampLength(0, this.spec.family === "viscous" ? 2.8 : 0.65);
+    this.pendingTravel += d.distanceTo(c.drag);
     this.motion = Math.max(this.motion, d.distanceTo(c.drag) * 12);
     c.drag.copy(d);
     this.foam?.drag(id, d);
+  }
+  setSurfacePatch(id: number, patch: number) {
+    const c = this.contacts.get(id);
+    if (c) c.surfacePatch = patch;
+  }
+  setPressure(id: number, pressure: number | undefined) {
+    const c = this.contacts.get(id);
+    if (c && pressure !== undefined && pressure > 0)
+      c.pressure = Math.max(0.05, Math.min(1, pressure));
   }
   release(id: number) {
     const c = this.contacts.get(id);
@@ -100,6 +118,8 @@ export class FidgetModel {
   }
   step(dt: number) {
     this.time += dt;
+    this.frameTravel = this.pendingTravel;
+    this.pendingTravel = 0;
     this.compression = 0;
     let moving = false;
     if (this.foam) {
@@ -121,7 +141,12 @@ export class FidgetModel {
         }
       } else {
         c.depth.target = c.held
-          ? this.spec.press * (0.45 + 0.55 * (1 - Math.exp(-c.age / 1.1)))
+          ? this.spec.press *
+            (c.pressure !== undefined
+              ? 0.2 + 0.8 * c.pressure
+              : this.spec.family === "viscous"
+                ? 0.7 + 0.3 * (1 - Math.exp(-c.age / 0.7))
+                : 0.55 + 0.45 * (1 - Math.exp(-c.age / 0.8)))
           : 0;
         c.depth.params = {
           freq: c.held ? 8 : 1 / this.spec.recovery,
@@ -171,67 +196,20 @@ export class FidgetModel {
     this.stretch.step(dt);
     this.fold.step(dt);
     this.motion *= Math.exp(-dt * 5);
-    return moving || !this.stretch.isSettled() || !this.fold.isSettled();
+    const cageMoving = this.cage.step(dt, this.contacts.values(), this.fold.x);
+    return (
+      moving ||
+      cageMoving ||
+      !this.stretch.isSettled() ||
+      !this.fold.isSettled()
+    );
   }
   deform(p: Vector3, out: Vector3) {
-    out.copy(p);
-    const s = this.spec;
-    for (const c of this.contacts.values()) {
-      const r = p.distanceTo(c.anchor),
-        radius = s.shape === "mochi" ? 0.85 : 0.72;
-      const w = Math.exp(-(r * r) / (radius * radius * 0.64));
-      out.addScaledVector(c.normal, -c.depth.x * w);
-      out.addScaledVector(
-        c.drag,
-        w *
-          (s.family === "viscous"
-            ? this.contacts.size > 1
-              ? 0.12
-              : 0.65
-            : 0.6),
-      );
-      // Pressure redistributes volume around the fingertip, not a uniform scale animation.
-      const ring = Math.exp(-Math.pow((r - radius * 0.85) / (radius * 0.4), 2));
-      out.addScaledVector(
-        p,
-        ((Math.max(0, c.depth.x) * ring) / Math.max(p.length(), 0.01)) *
-          (s.shape === "mochi"
-            ? 0.5
-            : s.shape === "mango"
-              ? 0.65
-              : s.family === "particles"
-                ? 0.42
-                : 0.2),
-      );
-    }
-    if (s.family === "viscous") {
-      const st = Math.max(0.6, this.stretch.x),
-        along = p.dot(this.axis),
-        neck =
-          (1 / Math.sqrt(Math.max(0.6, st))) *
-          (1 - 0.14 * Math.max(0, st - 1) * Math.exp((-along * along) / 0.6));
-      const projection = p.x * this.axis.x + p.z * this.axis.z;
-      const ax = this.axis.x * projection,
-        az = this.axis.z * projection;
-      out.x += ax * st + (p.x - ax) * neck - p.x;
-      out.z += az * st + (p.z - az) * neck - p.z;
-      out.y *=
-        Math.pow(Math.max(st, 1), -0.15) * Math.sqrt(Math.max(0.4, neck));
-      if (this.foldCount) {
-        const f = this.fold.x;
-        out.y +=
-          f *
-          (0.14 + 0.12 * Math.cos(p.x * 5 + this.foldCount)) *
-          Math.exp(-p.z * p.z);
-        out.x *= 1 - f * 0.1;
-        out.z *= 1 - f * 0.09;
-      }
-    }
-    out.y = Math.max(-s.height + 0.04, out.y);
-    return out;
+    return this.cage.deform(p, out);
   }
   reset() {
     this.contacts.clear();
+    this.cage.reset();
     this.foam?.reset();
     this.stretch.snap(1);
     this.fold.snap(0);
@@ -243,6 +221,8 @@ export class FidgetModel {
     this.peakCompression = 0;
     this.events = [];
     this.motion = 0;
+    this.frameTravel = 0;
+    this.pendingTravel = 0;
   }
   get held() {
     return [...this.contacts.values()].filter((c) => c.held);
@@ -264,20 +244,30 @@ export class FractureModel {
   }
   step(dt: number, contacts: Contact[]) {
     const events: number[] = [];
+    // Peak local deformation, not time held, breaks the wax. A stationary hand
+    // cannot keep propagating cracks around the whole shell.
     for (let i = 0; i < this.centers.length; i++) {
       if (this.broken[i]) continue;
-      let load = 0;
+      let strain = 0;
       for (const c of contacts) {
-        const r = this.centers[i].distanceTo(c.anchor);
-        load +=
-          Math.exp((-r * r) / (this.chocolate ? 0.42 : 0.72)) *
-          (0.35 + c.age * 0.35);
+        const distance = this.centers[i].distanceToSquared(c.anchor);
+        strain = Math.max(
+          strain,
+          Math.max(0, c.depth.x) *
+            (c.surfacePatch === i
+              ? 1
+              : Math.exp(-distance / (this.chocolate ? 0.16 : 0.22))),
+        );
       }
+      const strength =
+        (this.chocolate ? 0.24 : 0.18) * (1 + 0.12 * Math.sin(i * 19.7));
+      const target = strain / strength;
       const before = this.damage[i];
-      this.damage[i] = Math.min(
-        1,
-        before + dt * load * (this.chocolate ? 0.65 : 1.5),
-      );
+      if (target > before)
+        this.damage[i] = Math.min(
+          1,
+          before + (target - before) * (1 - Math.exp(-dt * 10)),
+        );
       if (before < 0.22 && this.damage[i] >= 0.22) this.crackEvents++;
       if (this.damage[i] >= 1) {
         this.broken[i] = 1;
@@ -285,15 +275,6 @@ export class FractureModel {
         events.push(i);
       }
     }
-    // Thin wax propagates to nearby faces; chunky chocolate fractures mostly at the contact.
-    if (!this.chocolate)
-      for (const i of events)
-        for (let j = 0; j < this.centers.length; j++)
-          if (
-            !this.broken[j] &&
-            this.centers[i].distanceToSquared(this.centers[j]) < 0.65
-          )
-            this.damage[j] = Math.min(0.98, this.damage[j] + 0.13);
     return events;
   }
   reset() {
@@ -377,13 +358,19 @@ export class GrainModel {
       g.velocity.multiplyScalar(Math.exp(-dt * 7));
       g.pos.addScaledVector(g.velocity, dt);
       if (this.soap && g.integrity > 0) {
-        let load = 0;
+        let strain = 0;
         for (const c of held)
-          load +=
-            Math.exp(-g.rest.distanceToSquared(c.anchor) / 1.1) *
-            (0.3 + c.age * 0.3);
-        g.integrity -= load * dt * 0.8;
-        if (g.integrity <= 0) {
+          strain = Math.max(
+            strain,
+            Math.max(0, c.depth.x) *
+              Math.exp(-g.rest.distanceToSquared(c.anchor) / 0.55),
+          );
+        const threshold =
+          0.16 + 0.05 * Math.sin(g.initial.x * 32 + g.initial.z * 19);
+        const target = Math.max(0, 1 - strain / threshold);
+        if (target < g.integrity)
+          g.integrity += (target - g.integrity) * (1 - Math.exp(-dt * 10));
+        if (g.integrity < 0.01) {
           g.integrity = 0;
           this.crushed++;
           events++;

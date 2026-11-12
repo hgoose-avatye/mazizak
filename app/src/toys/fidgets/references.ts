@@ -62,7 +62,10 @@ export async function referenceSounds(ctx: BaseAudioContext, id: string) {
             );
             const length = Math.min(
               last - first,
-              Math.round(original.sampleRate * 2.4),
+              Math.round(
+                original.sampleRate *
+                  (path.includes("cheese_reference_20_29") ? 9 : 2.4),
+              ),
             );
             const b = ctx.createBuffer(
                 1,

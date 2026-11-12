@@ -49,7 +49,7 @@ try {
     ["슬랑이", 3],
     ["왁뿌볼", 2],
     ["크런치", 2],
-    ["키보드", 10],
+    ["키보드", 8],
   ]) {
     await p.getByRole("button", { name: category, exact: true }).click();
     ok(
@@ -72,6 +72,7 @@ try {
   ]) {
     await open(id);
     const before = await report();
+    const startsBefore = await p.evaluate(() => window.__starts.length);
     await p.mouse.move(195, 420);
     await p.mouse.down();
     await p.waitForTimeout(id[0] === "W" ? 4200 : id === "C01" ? 5000 : 850);
@@ -81,7 +82,7 @@ try {
     ok(id + " local compression", down.peakCompression > 0.02);
     ok(
       id + " gesture sound",
-      down.soundPlays.some((x) => x.outcome === "played"),
+      (await p.evaluate(() => window.__starts.length)) > startsBefore,
     );
     if (id[0] === "W")
       ok(id + " shell fractures", down.brokenFaces > 0 && down.crackEvents > 0);
@@ -106,7 +107,9 @@ try {
     if (id === "S01") ok("TPR fast return", released.compression < 0.02);
     if (id === "S02") ok("foam retains dent", released.compression > 0.08);
     if (id[0] === "L") {
-      const loopBefore = await p.evaluate(() => window.__starts.filter(x => x.loop).length);
+      const loopBefore = await p.evaluate(
+        () => window.__starts.filter((x) => x.loop).length,
+      );
       const cdp = await context.newCDPSession(p);
       await cdp.send("Input.dispatchTouchEvent", {
         type: "touchStart",
@@ -128,10 +131,22 @@ try {
       }
       await p.waitForTimeout(250);
       ok(id + " two-finger stretch", (await report()).stretch > 1.2);
-      await p.screenshot({path: `/private/tmp/manzizak-stretched-${id}.png`});
-      ok(id + " stretch audio is gesture-driven", await p.evaluate(() => window.__starts.filter(x => x.loop).length) > loopBefore);
-      await cdp.send("Input.dispatchTouchEvent", {type:"touchMove",touchPoints:[{x:185,y:420,id:1},{x:205,y:420,id:2}]});
-      await p.waitForTimeout(250);ok(id + " closing fingers folds", (await report()).folds > 0);
+      await p.screenshot({ path: `/private/tmp/manzizak-stretched-${id}.png` });
+      ok(
+        id + " no impact sample loop",
+        (await p.evaluate(
+          () => window.__starts.filter((x) => x.loop).length,
+        )) === loopBefore,
+      );
+      await cdp.send("Input.dispatchTouchEvent", {
+        type: "touchMove",
+        touchPoints: [
+          { x: 185, y: 420, id: 1 },
+          { x: 205, y: 420, id: 2 },
+        ],
+      });
+      await p.waitForTimeout(250);
+      ok(id + " closing fingers folds", (await report()).folds > 0);
       await cdp.send("Input.dispatchTouchEvent", {
         type: "touchEnd",
         touchPoints: [],
@@ -179,7 +194,10 @@ try {
   await p.getByRole("button", { name: "소리 켜기", exact: true }).click();
   await p.goto(URL + "#/keyboard");
   await p.waitForTimeout(1700);
-  ok("keyboard 10 preserved", (await p.getByRole("radio").count()) === 10);
+  ok(
+    "keyboard 8 active and reserved assets preserved",
+    (await p.getByRole("radio").count()) === 8,
+  );
   await p.getByRole("radio", { name: "Topre", exact: true }).click();
   await p.evaluate(() => document.activeElement?.blur());
   await p.keyboard.press("KeyQ");

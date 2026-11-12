@@ -16,6 +16,8 @@ export interface InputEvt {
   /** performance.now() when our handler ran */
   th?: number;
   pointerType: string;
+  /** Optional physical pressure, never inferred from elapsed hold time. */
+  pressure?: number;
 }
 
 const DPR_STEPS = [2, 1.75, 1.5, 1.25, 1];
@@ -217,7 +219,7 @@ export class Runtime {
     const c = this.canvas;
     const toEvt = (kind: PointerKind, ev: PointerEvent): InputEvt => {
       const r = c.getBoundingClientRect();
-      return { kind, id: ev.pointerId, x: ev.clientX - r.left, y: ev.clientY - r.top, t: ev.timeStamp, th: performance.now(), pointerType: ev.pointerType };
+      return { kind, id: ev.pointerId, x: ev.clientX - r.left, y: ev.clientY - r.top, t: ev.timeStamp, th: performance.now(), pointerType: ev.pointerType, pressure: ev.pressure };
     };
     c.addEventListener('pointerdown', (ev) => {
       if (!this.toy) return;

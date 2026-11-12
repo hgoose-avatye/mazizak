@@ -68,7 +68,7 @@ export function bodyGeometry(s: FidgetSpec) {
       z = p.getZ(i);
     const theta = Math.atan2(z, x);
     if (s.shape === "foam" || s.shape === "cheese" || s.shape === "soap") {
-      const pow = s.shape === "cheese" ? 0.42 : s.shape === "soap" ? 0.5 : 0.38;
+      const pow = s.shape === "cheese" ? 0.78 : s.shape === "soap" ? 0.5 : 0.38;
       x = Math.sign(x) * Math.pow(Math.abs(x), pow);
       y = Math.sign(y) * Math.pow(Math.abs(y), pow);
       z = Math.sign(z) * Math.pow(Math.abs(z), pow);
@@ -114,52 +114,165 @@ export interface ShellPatches {
   vertices: number[][];
   faceToPatch: Uint16Array;
 }
+/** Closed curved Voronoi wax cells: straight fracture boundaries, real pale cut edges. */
 export function shellPatches(
-  source: THREE.BufferGeometry,
+  _source: THREE.BufferGeometry,
   spec: FidgetSpec,
 ): ShellPatches {
-  const geometry = source.index ? source.toNonIndexed() : source.clone(),
-    p = geometry.getAttribute("position");
-  const count = spec.shape === "apple" ? 104 : 42;
+  const count = spec.shape === "apple" ? 104 : 42,
+    positions: number[] = [],
+    normals: number[] = [],
+    colors: number[] = [],
+    ids: number[] = [],
+    vertices = Array.from({ length: count }, () => [] as number[]),
+    centers: THREE.Vector3[] = [];
   const seeds = Array.from({ length: count }, (_, i) => {
     const y = 1 - ((i + 0.5) * 2) / count,
       r = Math.sqrt(1 - y * y),
       a = i * 2.399963;
     return new THREE.Vector3(Math.cos(a) * r, y, Math.sin(a) * r);
   });
-  const centers = seeds.map(() => new THREE.Vector3()),
-    vertices = seeds.map(() => [] as number[]),
-    faceToPatch = new Uint16Array(p.count / 3),
-    c = new THREE.Vector3(),
-    v = new THREE.Vector3();
-  for (let i = 0; i < p.count; i += 3) {
-    c.set(0, 0, 0);
-    for (let j = 0; j < 3; j++) c.add(v.fromBufferAttribute(p, i + j));
-    c.multiplyScalar(1 / 3);
-    const n = c
-      .clone()
-      .set(c.x / spec.width, c.y / spec.height, c.z / spec.depth)
+  const outerColor = new THREE.Color(spec.color),
+    innerColor = new THREE.Color(spec.shape === "apple" ? 0xf0e9cc : 0x9d7660),
+    rimColor = innerColor.clone().lerp(outerColor, 0.2),
+    thickness = spec.shape === "apple" ? 0.025 : 0.05;
+  const shape = (unit: THREE.Vector3, inside = false) => {
+    let x = unit.x,
+      y = unit.y,
+      z = unit.z;
+    const theta = Math.atan2(z, x);
+    if (spec.shape === "apple") {
+      const ring = 1 + 0.045 * Math.cos(theta * 5) * (1 - y * y);
+      x *= ring;
+      z *= ring;
+      y -= 0.14 * Math.exp(-(x * x + z * z) / 0.09) * Math.max(0, y);
+    } else {
+      const r = 1 - 0.018 * Math.pow(Math.sin(theta * 4 + y * 9), 12);
+      x *= r;
+      z *= r;
+    }
+    const p = new THREE.Vector3(
+      x * spec.width,
+      y * spec.height,
+      z * spec.depth,
+    ).multiplyScalar(1.035);
+    if (inside)
+      p.addScaledVector(
+        new THREE.Vector3(
+          unit.x / spec.width,
+          unit.y / spec.height,
+          unit.z / spec.depth,
+        ).normalize(),
+        -thickness,
+      );
+    return p;
+  };
+  const emit = (
+    a: THREE.Vector3,
+    b: THREE.Vector3,
+    c: THREE.Vector3,
+    patch: number,
+    color: THREE.Color,
+    curved: boolean,
+    inside = false,
+  ) => {
+    const face = new THREE.Vector3()
+      .subVectors(b, a)
+      .cross(new THREE.Vector3().subVectors(c, a))
       .normalize();
-    let best = 0,
-      score = -Infinity;
-    for (let k = 0; k < count; k++) {
-      const d = n.dot(seeds[k]);
-      if (d > score) {
-        score = d;
-        best = k;
+    for (const p of [a, b, c]) {
+      const i = positions.length / 3;
+      positions.push(p.x, p.y, p.z);
+      vertices[patch].push(i);
+      const n = curved
+        ? new THREE.Vector3(
+            p.x / (spec.width * spec.width),
+            p.y / (spec.height * spec.height),
+            p.z / (spec.depth * spec.depth),
+          )
+            .normalize()
+            .multiplyScalar(inside ? -1 : 1)
+        : face;
+      normals.push(n.x, n.y, n.z);
+      colors.push(color.r, color.g, color.b);
+    }
+    ids.push(patch);
+  };
+  seeds.forEach((seed, patch) => {
+    const u = new THREE.Vector3()
+        .crossVectors(
+          seed,
+          Math.abs(seed.y) > 0.9
+            ? new THREE.Vector3(1, 0, 0)
+            : new THREE.Vector3(0, 1, 0),
+        )
+        .normalize(),
+      v = new THREE.Vector3().crossVectors(seed, u).normalize();
+    let polygon: [number, number][] = [
+      [-2, -2],
+      [2, -2],
+      [2, 2],
+      [-2, 2],
+    ];
+    for (let j = 0; j < count; j++)
+      if (j !== patch) {
+        const plane = seed.clone().sub(seeds[j]),
+          a = plane.dot(u),
+          b = plane.dot(v),
+          c = plane.dot(seed),
+          next: [number, number][] = [];
+        for (let i = 0; i < polygon.length; i++) {
+          const p = polygon[i],
+            q = polygon[(i + 1) % polygon.length],
+            dp = a * p[0] + b * p[1] + c,
+            dq = a * q[0] + b * q[1] + c;
+          if (dp >= -1e-10) next.push(p);
+          if (dp >= 0 !== dq >= 0) {
+            const t = dp / (dp - dq);
+            next.push([p[0] + (q[0] - p[0]) * t, p[1] + (q[1] - p[1]) * t]);
+          }
+        }
+        polygon = next;
+        if (!polygon.length) break;
+      }
+    centers.push(shape(seed));
+    const toUnit = (p: [number, number]) =>
+      seed
+        .clone()
+        .addScaledVector(u, p[0])
+        .addScaledVector(v, p[1])
+        .normalize();
+    for (let i = 0; i < polygon.length; i++) {
+      const a = toUnit(polygon[i]),
+        b = toUnit(polygon[(i + 1) % polygon.length]);
+      for (let k = 0; k < 3; k++) {
+        const ua = a
+            .clone()
+            .lerp(b, k / 3)
+            .normalize(),
+          ub = a
+            .clone()
+            .lerp(b, (k + 1) / 3)
+            .normalize();
+        const oa = shape(ua),
+          ob = shape(ub),
+          ia = shape(ua, true),
+          ib = shape(ub, true);
+        emit(shape(seed), oa, ob, patch, outerColor, true);
+        emit(shape(seed, true), ib, ia, patch, innerColor, true, true);
+        emit(oa, ia, ob, patch, rimColor, false);
+        emit(ob, ia, ib, patch, rimColor, false);
       }
     }
-    faceToPatch[i / 3] = best;
-    for (let j = 0; j < 3; j++) {
-      vertices[best].push(i + j);
-      centers[best].add(v.fromBufferAttribute(p, i + j));
-    }
-  }
-  centers.forEach((c, i) => {
-    if (vertices[i].length) c.multiplyScalar(1 / vertices[i].length);
-    else c.copy(seeds[i]);
   });
-  return { geometry, centers, vertices, faceToPatch };
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute(
+    "position",
+    new THREE.Float32BufferAttribute(positions, 3),
+  );
+  geometry.setAttribute("normal", new THREE.Float32BufferAttribute(normals, 3));
+  geometry.setAttribute("color", new THREE.Float32BufferAttribute(colors, 3));
+  return { geometry, centers, vertices, faceToPatch: new Uint16Array(ids) };
 }
 
 /** Fine embedded sugar grains, based on the user's photo rather than large exposed pearls. */

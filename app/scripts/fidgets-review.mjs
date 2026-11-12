@@ -28,7 +28,7 @@ const ids = [
   "C01",
   "C02",
 ];
-const models = ["S02", "S03", "L01", "L02"];
+const models = ["S02", "S03", "L02"];
 await mkdir("/private/tmp/manzizak-fidget-reference-assets/thumbs", {
   recursive: true,
 });

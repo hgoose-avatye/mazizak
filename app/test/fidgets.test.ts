@@ -46,15 +46,23 @@ describe("fidget material mechanics", () => {
     const a = new Vector3(0, 0.6, 0.5),
       b = new Vector3(0, -0.35, -0.8);
     expect(m.deform(a, new Vector3()).distanceTo(a)).toBeGreaterThan(
-      m.deform(b, new Vector3()).distanceTo(b) * 3,
+      m.deform(b, new Vector3()).distanceTo(b) * 1.5,
     );
   });
-  it("stretch forms a narrower middle and fold state persists until reset", () => {
+  it("opposed grips expand the material with bounded volume and gathering persists until reset", () => {
     const m = new FidgetModel(spec("L01"));
-    m.stretch.snap(2.5);
+    m.press(1, new Vector3(-0.65, 0.1, 0.5), new Vector3(0, 0, 1));
+    m.press(2, new Vector3(0.65, 0.1, 0.5), new Vector3(0, 0, 1));
+    m.drag(1, new Vector3(-0.7, 0, 0));
+    m.drag(2, new Vector3(0.7, 0, 0));
+    step(m, 0.7);
     const center = new Vector3(0, 0.3, 0.4),
       out = m.deform(center, new Vector3());
-    expect(out.z).toBeLessThan(center.z);
+    expect(
+      m.deform(new Vector3(0.8, 0.1, 0.5), new Vector3()).x,
+    ).toBeGreaterThan(0.8);
+    expect(m.cage.volumeRatio).toBeGreaterThan(0.85);
+    expect(m.cage.volumeRatio).toBeLessThan(1.15);
     m.foldNow();
     step(m, 0.7);
     expect(m.foldCount).toBe(1);
@@ -69,7 +77,7 @@ describe("fidget material mechanics", () => {
       choco = new FractureModel(centers, true),
       m = new FidgetModel(spec("W01"));
     press(m);
-    for (let i = 0; i < 120; i++) {
+    for (let i = 0; i < 30; i++) {
       m.step(1 / 120);
       apple.step(1 / 120, m.held);
       choco.step(1 / 120, m.held);

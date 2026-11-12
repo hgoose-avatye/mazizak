@@ -174,9 +174,10 @@ export function createFidget(ctx: ToyContext, spec: FidgetSpec): FidgetToy {
   let frames = 0,
     active = false,
     crunchClock = 0,
-    bubbleClock = 0,
     pops = 0,
-    compressClock = 0,
+    strokeReady = true,
+    dragBudget = 0,
+    idleGesture = 0,
     grainMotion = 0,
     coreTouches = 0;
   const corePointers = new Set<number>();
@@ -185,7 +186,8 @@ export function createFidget(ctx: ToyContext, spec: FidgetSpec): FidgetToy {
       THREE.MeshPhysicalMaterial
     > | null = null,
     fracture: FractureModel | null = null,
-    shellBase: Float32Array | null = null;
+    shellBase: Float32Array | null = null,
+    shellNormals: Float32Array | null = null;
   const shards: {
       offset: THREE.Vector3;
       velocity: THREE.Vector3;
@@ -218,11 +220,13 @@ export function createFidget(ctx: ToyContext, spec: FidgetSpec): FidgetToy {
       })),
     );
     shellBase = Float32Array.from(g.getAttribute("position").array);
+    shellNormals = Float32Array.from(g.getAttribute("normal").array);
     fracture = new FractureModel(centers, spec.shape === "chocolate");
     shell = new THREE.Mesh(
       g,
       new THREE.MeshPhysicalMaterial({
-        color: map ? 0xffffff : spec.color,
+        color: 0xffffff,
+        vertexColors: true,
         map,
         roughness: spec.shape === "apple" ? 0.26 : 0.42,
         clearcoat: spec.shape === "apple" ? 0.75 : 0.3,
@@ -417,22 +421,18 @@ export function createFidget(ctx: ToyContext, spec: FidgetSpec): FidgetToy {
         normal = (h.face?.normal ?? local.clone().normalize()).clone();
       if (!anchors.size) gestureCamera.copy(camera);
       if (!model.press(e.id, local, normal)) return;
+      if (h.object === shell)
+        model.setSurfacePatch(e.id, faceToPatch[h.faceIndex ?? 0]);
+      if (e.pointerType === "pen") model.setPressure(e.id, e.pressure);
       anchors.set(e.id, h.point.clone());
       if (spec.family === "wax" && h.object === blob) {
         coreTouches++;
         corePointers.add(e.id);
       }
-      if (spec.family !== "particles")
-        sound.play(
-          spec.family === "wax"
-            ? h.object === blob
-              ? "knead"
-              : "press"
-            : "press",
-          0.4,
-        );
+      strokeReady = true;
+      dragBudget = 0;
       ctx.haptic(7);
-      compressClock = 0;
+      idleGesture = 0;
     } else if (e.kind === "move") {
       const a = anchors.get(e.id);
       if (!a) return;
@@ -443,20 +443,25 @@ export function createFidget(ctx: ToyContext, spec: FidgetSpec): FidgetToy {
       );
       const h = ray.ray.intersectPlane(plane, new THREE.Vector3());
       if (h) model.drag(e.id, h.sub(a));
+      if (e.pointerType === "pen") model.setPressure(e.id, e.pressure);
     } else {
       if (!anchors.has(e.id)) return;
       model.release(e.id);
       corePointers.delete(e.id);
       anchors.delete(e.id);
-      if (e.kind === "up" && spec.family !== "particles")
-        sound.play("release", model.compression);
-      if (!anchors.size && spec.family === "particles") sound.releaseGesture();
+      if (!anchors.size) sound.releaseGesture();
       ctx.requestFrame();
     }
   };
   const reset = () => {
     model.reset();
     fracture?.reset();
+    if (shell && shellNormals) {
+      (shell.geometry.getAttribute("normal").array as Float32Array).set(
+        shellNormals,
+      );
+      shell.geometry.getAttribute("normal").needsUpdate = true;
+    }
     grains?.reset();
     for (const s of shards) {
       s.offset.set(0, 0, 0);
@@ -466,8 +471,10 @@ export function createFidget(ctx: ToyContext, spec: FidgetSpec): FidgetToy {
     anchors.clear();
     sound.stop();
     for (const b of bubbles) b.visible = true;
-    compressClock = 0;
-    bubbleClock = 0;
+    strokeReady = true;
+    dragBudget = 0;
+    idleGesture = 0;
+
     pops = 0;
     coreTouches = 0;
     corePointers.clear();
@@ -492,26 +499,63 @@ export function createFidget(ctx: ToyContext, spec: FidgetSpec): FidgetToy {
     }
     if (frames % 2 === 0) geometry.computeVertexNormals();
     geometry.computeBoundingSphere();
-    if (held.length) {
-      compressClock += dt;
-      if (compressClock > 0.28) {
-        if (spec.family !== "wax" && spec.family !== "particles")
-          sound.play("compress", model.compression);
-        else if (corePointers.size > 0) sound.play("knead", model.compression);
-        compressClock = -100;
+    dragBudget += model.frameTravel;
+    if (
+      model.frameTravel > 0.0005 ||
+      held.some((c) => Math.abs(c.depth.v) > 0.03)
+    )
+      idleGesture = 0;
+    else idleGesture += dt;
+    if (
+      idleGesture > 0.18 &&
+      held.length &&
+      spec.family !== "wax" &&
+      spec.family !== "particles"
+    )
+      sound.releaseGesture();
+    if (held.length && spec.family !== "wax" && spec.family !== "particles") {
+      if (strokeReady && model.compression > 0.035) {
+        if (
+          sound.play(
+            spec.family === "viscous" && held.length > 1
+              ? "stretch"
+              : "compress",
+            Math.min(1, 0.3 + model.compression),
+          )
+        )
+          strokeReady = false;
+      } else if (model.frameTravel > 0.001 && dragBudget > 0.12) {
+        const role =
+          spec.family === "viscous" && held.some((c) => c.drag.length() > 0.2)
+            ? "stretch"
+            : "compress";
+        if (sound.play(role, Math.min(1, 0.3 + model.motion * 0.2)))
+          dragBudget = 0;
+      }
+    }
+    if (
+      held.length &&
+      spec.family === "wax" &&
+      corePointers.size &&
+      (strokeReady || (model.frameTravel > 0.001 && dragBudget > 0.12))
+    ) {
+      if (sound.play("knead", Math.min(1, 0.3 + model.compression))) {
+        strokeReady = false;
+        dragBudget = 0;
       }
     }
     if (fracture && shell && shellBase) {
       const before = fracture.crackEvents,
         broken = fracture.step(dt, held);
       if (fracture.crackEvents > before || broken.length) {
-        sound.play("crack", Math.min(1, 0.4 + broken.length * 0.1));
+        // Small hairline changes are silent; one grouped material event per audible cue.
+        if (broken.length || fracture.crackEvents - before > 2)
+          sound.play("crack", Math.min(1, 0.4 + broken.length * 0.1));
         ctx.haptic(12);
       }
       for (const i of broken) {
-        const c = centers[i];
-        shards[i].velocity.set(c.x * 0.6, 0.8 + (i % 3) * 0.15, c.z * 0.7);
-        shards[i].spin = (i % 2 ? 1 : -1) * 0.1;
+        shards[i].velocity.set(0, 0, 0);
+        shards[i].spin = (i % 2 ? 1 : -1) * 0.18;
       }
       const a = shell.geometry.getAttribute(
         "position",
@@ -521,32 +565,44 @@ export function createFidget(ctx: ToyContext, spec: FidgetSpec): FidgetToy {
           c = centers[i],
           dam = fracture.damage[i];
         if (fracture.broken[i]) {
-          if (c.y + state.offset.y + shell.position.y > 0.07) {
-            state.velocity.y -= dt * 4;
-            state.offset.addScaledVector(state.velocity, dt);
-            moving = true;
-          } else {
-            state.offset.y = 0.07 - shell.position.y - c.y;
-            state.velocity.multiplyScalar(0.8);
-          }
+          // Crushed wax adheres to the soft core and settles inward, rather than
+          // shooting radially out of the toy like an explosion.
+          const target = c.clone().normalize().multiplyScalar(-0.13);
+          target.y -= 0.07;
+          const delta = tmp.copy(target).sub(state.offset);
+          state.offset.addScaledVector(delta, 1 - Math.exp(-dt * 5));
+          if (delta.lengthSq() > 0.000001) moving = true;
         }
         for (const k of patchVertices[i]) {
           p0.fromArray(shellBase, k * 3);
           p0.sub(c).multiplyScalar(
-            fracture.broken[i] ? 0.94 : 1 - Math.max(0, dam - 0.16) * 0.055,
+            fracture.broken[i] ? 0.72 : 1 - Math.max(0, dam - 0.16) * 0.055,
           );
           if (fracture.broken[i])
-            p0.applyAxisAngle(tmp.set(0, 1, 0), state.spin * model.time * 2);
+            p0.applyAxisAngle(tmp.set(1, 0, 0), state.spin);
           p0.add(c).add(state.offset);
+          if (!fracture.broken[i] && dam > 0.001) {
+            model.deform(p0, tmp);
+            p0.lerp(tmp, Math.min(0.18, dam * 0.2));
+          }
           if (!fracture.broken[i] && dam > 0.1)
             p0.addScaledVector(
               c,
               -Math.min(0.06, dam * 0.065) / Math.max(0.01, c.length()),
             );
           a.setXYZ(k, p0.x, p0.y, p0.z);
+          if (fracture.broken[i] && shellNormals) {
+            tmp
+              .fromArray(shellNormals, k * 3)
+              .applyAxisAngle(p0.set(1, 0, 0), state.spin);
+            (
+              shell.geometry.getAttribute("normal") as THREE.BufferAttribute
+            ).setXYZ(k, tmp.x, tmp.y, tmp.z);
+          }
         }
       }
       a.needsUpdate = true;
+      shell.geometry.getAttribute("normal").needsUpdate = true;
       // Authored smooth normals stay continuous across intact curved wax patches.
       // Detached fragments keep their curved surface rather than becoming flat triangles.
       shell.geometry.computeBoundingSphere();
@@ -587,33 +643,13 @@ export function createFidget(ctx: ToyContext, spec: FidgetSpec): FidgetToy {
       }
       moving = moving || grainMotion > 0.0001;
     }
-    if (spec.shape === "mango" && held.length) {
-      bubbleClock += dt;
-      if (bubbleClock > 0.65) {
-        pops++;
-        sound.play("bubble", 0.5);
-        bubbles[pops % bubbles.length].visible = false;
-        bubbleClock = 0;
-      }
-    }
     for (let i = 0; i < bubbles.length; i++) {
       model.deform(bubbleRest[i], tmp);
-      bubbles[i].position.copy(tmp).add(blob.position);
-      if (spec.shape !== "mango" || bubbleClock > 0.25)
-        bubbles[i].visible = true;
+      tmp.add(blob.position);
+      bubbles[i].position.lerp(tmp, 1 - Math.exp(-dt / 0.12));
     }
-    for (const e of model.events.splice(0))
-      if (e === "fold") sound.play("fold", 0.7);
-    sound.continuous(
-      spec.family === "viscous" && held.length > 1
-        ? Math.min(
-            0.45,
-            Math.abs(model.stretch.target - model.stretch.x) * 0.5 +
-              model.motion * 0.12,
-          )
-        : 0,
-      held.length ? model.motion * 0.07 : 0,
-    );
+    for (const event of model.events.splice(0))
+      if (event === "fold") sound.play("fold", 0.5);
     return active && (moving || held.length > 0);
   };
   return {
@@ -657,9 +693,31 @@ export function createFidget(ctx: ToyContext, spec: FidgetSpec): FidgetToy {
       return {
         id: spec.id,
         family: spec.family,
+        physics: "tetrahedral-dual-layer-cage",
+        cageNodes: model.cage.position.length / 3,
+        volumeRatio: model.cage.volumeRatio,
+        materialSpeed: model.cage.speed,
+        maxShardDisplacement: Math.max(
+          0,
+          ...shards.map((s) => s.offset.length()),
+        ),
         shape: spec.shape,
         contacts: model.held.length,
         compression: model.compression,
+        meshMaxDeformation: (() => {
+          const p = geometry.getAttribute("position");
+          let max = 0;
+          for (let i = 0; i < p.count; i++)
+            max = Math.max(
+              max,
+              Math.hypot(
+                p.getX(i) - base[i * 3],
+                p.getY(i) - base[i * 3 + 1],
+                p.getZ(i) - base[i * 3 + 2],
+              ),
+            );
+          return max;
+        })(),
         peakCompression: model.peakCompression,
         stretch: model.stretch.x,
         folds: model.foldCount,
@@ -681,6 +739,7 @@ export function createFidget(ctx: ToyContext, spec: FidgetSpec): FidgetToy {
         pops,
         audio: sound.state,
         audioSource: sound.source,
+        audioRoles: sound.supportedRoles,
         vertices: geometry.getAttribute("position").count,
         visualStatus: visualSource,
         localReferenceAudio: LOCAL_FIDGETS,
