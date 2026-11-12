@@ -184,6 +184,9 @@ try {
   await p.selectOption(".toy-jump", "L02");
   await p.waitForFunction(() => window.__MANZIZAK__.report().id === "L02");
   ok("quick toy navigation", true);
+  // the mute check needs a toy that has a press sound (L02 only has a stretch pool now)
+  await p.selectOption(".toy-jump", "L03");
+  await p.waitForFunction(() => window.__MANZIZAK__.report().id === "L03");
   await p.getByRole("button", { name: "소리 끄기", exact: true }).click();
   await p.mouse.move(195, 420);
   await p.mouse.down();
