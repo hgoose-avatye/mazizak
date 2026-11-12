@@ -294,6 +294,12 @@
       "srcStart": 23.845,
       "tol": 0.03,
       "reason": "listener: L02 hold freesound:655814 @23.84s"
+    },
+    {
+      "src": "freesound:594753",
+      "srcStart": 5.64,
+      "tol": 0.03,
+      "reason": "listener: freesound:594753 @5.64s (2026-11-12)"
     }
   ],
   "excludeSources": [

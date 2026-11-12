@@ -16,6 +16,11 @@ export default defineConfig(({ command, isPreview }) => {
     command === "serve" && !isPreview
       ? process.env.MANZIZAK_ORIGINAL_APP_DIR
       : undefined;
+  // same idea for the installed 뿌왁 app (squish_<name>_mallang_N.wav at the bundle root)
+  const wakppuDir =
+    command === "serve" && !isPreview
+      ? process.env.MANZIZAK_ORIGINAL_WAKPPU_DIR
+      : undefined;
   const localDir =
     command === "serve" && !isPreview
       ? process.env.MANZIZAK_LOCAL_AUDIO_DIR
@@ -30,7 +35,7 @@ export default defineConfig(({ command, isPreview }) => {
       ),
       // "1" only on the dev server started with MANZIZAK_ORIGINAL_APP_DIR (owner-chosen stand-in sounds from the installed reference app)
       "import.meta.env.VITE_ORIGINAL_SOUNDS": JSON.stringify(
-        originalDir && process.env.MANZIZAK_ORIGINAL_SOUNDS !== "0" ? "1" : "0",
+        (originalDir || wakppuDir) && process.env.MANZIZAK_ORIGINAL_SOUNDS !== "0" ? "1" : "0",
       ),
       // "0": keep the local reference meshes but play only the licensed sound pools
       "import.meta.env.VITE_LOCAL_FIDGET_AUDIO": JSON.stringify(
@@ -57,6 +62,30 @@ export default defineConfig(({ command, isPreview }) => {
                     res.statusCode = 204;
                   } catch { res.statusCode = 400; }
                   res.end();
+                });
+              },
+            },
+          ]
+        : []),
+      ...(wakppuDir
+        ? [
+            {
+              name: "manzizak-original-wakppu-sounds",
+              configureServer(server: import("vite").ViteDevServer) {
+                server.middlewares.use("/__original-wakppu", async (req, res, next) => {
+                  const loop = ["127.0.0.1", "::1", "::ffff:127.0.0.1"].includes(req.socket.remoteAddress ?? "");
+                  if (!loop) { res.statusCode = 403; return res.end("loopback only"); }
+                  const m = /^\/(squish_[a-z]+_mallang_\d+\.wav)$/.exec(decodeURIComponent((req.url ?? "/").split("?")[0]));
+                  if (!m) return next();
+                  try {
+                    const data = await readFile(path.join(wakppuDir, m[1]));
+                    res.setHeader("Content-Type", "audio/wav");
+                    res.setHeader("Cache-Control", "no-store");
+                    res.end(data);
+                  } catch {
+                    res.statusCode = 404;
+                    res.end("unavailable");
+                  }
                 });
               },
             },

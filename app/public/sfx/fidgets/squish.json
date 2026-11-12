@@ -4,7 +4,7 @@
  "sampleRate": 48000,
  "channels": 1,
  "bitDepth": 16,
- "totalSamples": 1000765,
+ "totalSamples": 999901,
  "note": "Clips were picked automatically from the waveform and have NOT been listened to. `recordings` = distinct passages extracted from the source files; `variants` = derived copies (none here — runtime speed/pitch jitter is not counted). Sprite clips are peak-normalised to −1 dBFS; `gain` (≤1) equalises RMS within a pool; relative loudness between event classes is set by the player.",
  "counts": {
   "sourceFiles": 7,
@@ -35,7 +35,7 @@
    "stretch": 3,
    "fold": 3
   },
-  "listenerExclusions": 49
+  "listenerExclusions": 50
  },
  "audit": {
   "tpr.tap": {
@@ -69,12 +69,12 @@
   },
   "foam.hold": {
    "candidates": 202,
-   "passed": 9,
+   "passed": 8,
    "rejected": {
     "BOOST>18dB": 188,
     "SPARSE": 3,
     "SLOW-START": 1,
-    "LISTENER-EXCLUDED": 1
+    "LISTENER-EXCLUDED": 2
    }
   },
   "mochi.tap": {
@@ -479,7 +479,7 @@
      "length": 37056,
      "offset": 3.883271,
      "duration": 0.772,
-     "gain": 0.8413,
+     "gain": 0.8366,
      "src": "freesound:390314",
      "srcStart": 37.8195,
      "srcEnd": 38.5915,
@@ -493,7 +493,7 @@
      "length": 35520,
      "offset": 4.665271,
      "duration": 0.74,
-     "gain": 0.4272,
+     "gain": 0.4248,
      "src": "freesound:390315",
      "srcStart": 6.9543,
      "srcEnd": 7.6943,
@@ -504,15 +504,15 @@
     },
     {
      "start": 259933,
-     "length": 41952,
+     "length": 41088,
      "offset": 5.415271,
-     "duration": 0.874,
+     "duration": 0.856,
      "gain": 1,
      "src": "freesound:594753",
-     "srcStart": 5.6377,
-     "srcEnd": 6.5117,
+     "srcStart": 6.0911,
+     "srcEnd": 6.9471,
      "peakDbSource": -13.5,
-     "centroidHz": 6467,
+     "centroidHz": 5548,
      "strikes": 7,
      "boostDb": 12.5
     }
@@ -527,9 +527,9 @@
    "variants": 0,
    "entries": [
     {
-     "start": 302365,
+     "start": 301501,
      "length": 29664,
-     "offset": 6.299271,
+     "offset": 6.281271,
      "duration": 0.618,
      "gain": 0.635,
      "src": "freesound:794270",
@@ -541,9 +541,9 @@
      "boostDb": 18
     },
     {
-     "start": 332509,
+     "start": 331645,
      "length": 31776,
-     "offset": 6.927271,
+     "offset": 6.909271,
      "duration": 0.662,
      "gain": 0.8907,
      "src": "freesound:794270",
@@ -555,9 +555,9 @@
      "boostDb": 17.5
     },
     {
-     "start": 364765,
+     "start": 363901,
      "length": 32544,
-     "offset": 7.599271,
+     "offset": 7.581271,
      "duration": 0.678,
      "gain": 0.7782,
      "src": "freesound:794270",
@@ -569,9 +569,9 @@
      "boostDb": 15.7
     },
     {
-     "start": 397789,
+     "start": 396925,
      "length": 32640,
-     "offset": 8.287271,
+     "offset": 8.269271,
      "duration": 0.68,
      "gain": 0.3054,
      "src": "freesound:794270",
@@ -583,9 +583,9 @@
      "boostDb": 14.8
     },
     {
-     "start": 430909,
+     "start": 430045,
      "length": 28704,
-     "offset": 8.977271,
+     "offset": 8.959271,
      "duration": 0.598,
      "gain": 0.6739,
      "src": "freesound:794270",
@@ -597,9 +597,9 @@
      "boostDb": 17.5
     },
     {
-     "start": 460093,
+     "start": 459229,
      "length": 32256,
-     "offset": 9.585271,
+     "offset": 9.567271,
      "duration": 0.672,
      "gain": 1,
      "src": "freesound:794270",
@@ -621,9 +621,9 @@
    "variants": 0,
    "entries": [
     {
-     "start": 492829,
+     "start": 491965,
      "length": 41088,
-     "offset": 10.267271,
+     "offset": 10.249271,
      "duration": 0.856,
      "gain": 0.6532,
      "src": "freesound:794270",
@@ -635,9 +635,9 @@
      "boostDb": 18
     },
     {
-     "start": 534397,
+     "start": 533533,
      "length": 45312,
-     "offset": 11.133271,
+     "offset": 11.115271,
      "duration": 0.944,
      "gain": 1,
      "src": "freesound:794270",
@@ -649,9 +649,9 @@
      "boostDb": 17.5
     },
     {
-     "start": 580189,
+     "start": 579325,
      "length": 43488,
-     "offset": 12.087271,
+     "offset": 12.069271,
      "duration": 0.906,
      "gain": 0.839,
      "src": "freesound:794270",
@@ -663,9 +663,9 @@
      "boostDb": 15.7
     },
     {
-     "start": 624157,
+     "start": 623293,
      "length": 43680,
-     "offset": 13.003271,
+     "offset": 12.985271,
      "duration": 0.91,
      "gain": 0.3398,
      "src": "freesound:794270",
@@ -677,9 +677,9 @@
      "boostDb": 14.8
     },
     {
-     "start": 668317,
+     "start": 667453,
      "length": 39552,
-     "offset": 13.923271,
+     "offset": 13.905271,
      "duration": 0.824,
      "gain": 0.6951,
      "src": "freesound:794270",
@@ -701,9 +701,9 @@
    "variants": 0,
    "entries": [
     {
-     "start": 708349,
+     "start": 707485,
      "length": 28992,
-     "offset": 14.757271,
+     "offset": 14.739271,
      "duration": 0.604,
      "gain": 1,
      "src": "freesound:197761",
@@ -715,9 +715,9 @@
      "boostDb": 16
     },
     {
-     "start": 737821,
+     "start": 736957,
      "length": 31584,
-     "offset": 15.371271,
+     "offset": 15.353271,
      "duration": 0.658,
      "gain": 0.775,
      "src": "freesound:197761",
@@ -729,9 +729,9 @@
      "boostDb": 14.3
     },
     {
-     "start": 769885,
+     "start": 769021,
      "length": 32064,
-     "offset": 16.039271,
+     "offset": 16.021271,
      "duration": 0.668,
      "gain": 0.4404,
      "src": "freesound:197761",
@@ -743,9 +743,9 @@
      "boostDb": 16.4
     },
     {
-     "start": 802429,
+     "start": 801565,
      "length": 31968,
-     "offset": 16.717271,
+     "offset": 16.699271,
      "duration": 0.666,
      "gain": 0.8104,
      "src": "freesound:197761",
@@ -757,9 +757,9 @@
      "boostDb": 14.5
     },
     {
-     "start": 834877,
+     "start": 834013,
      "length": 32064,
-     "offset": 17.393271,
+     "offset": 17.375271,
      "duration": 0.668,
      "gain": 0.4921,
      "src": "freesound:849247",
@@ -781,9 +781,9 @@
    "variants": 0,
    "entries": [
     {
-     "start": 867421,
+     "start": 866557,
      "length": 25152,
-     "offset": 18.071271,
+     "offset": 18.053271,
      "duration": 0.524,
      "gain": 0.9294,
      "src": "freesound:197761",
@@ -795,9 +795,9 @@
      "boostDb": 14.3
     },
     {
-     "start": 893053,
+     "start": 892189,
      "length": 26880,
-     "offset": 18.605271,
+     "offset": 18.587271,
      "duration": 0.56,
      "gain": 0.6218,
      "src": "freesound:197761",
@@ -809,9 +809,9 @@
      "boostDb": 16.2
     },
     {
-     "start": 920413,
+     "start": 919549,
      "length": 25824,
-     "offset": 19.175271,
+     "offset": 19.157271,
      "duration": 0.538,
      "gain": 0.7956,
      "src": "freesound:197761",
@@ -823,9 +823,9 @@
      "boostDb": 14.3
     },
     {
-     "start": 946717,
+     "start": 945853,
      "length": 26688,
-     "offset": 19.723271,
+     "offset": 19.705271,
      "duration": 0.556,
      "gain": 1,
      "src": "freesound:197761",
@@ -837,9 +837,9 @@
      "boostDb": 14.5
     },
     {
-     "start": 973885,
+     "start": 973021,
      "length": 26880,
-     "offset": 20.289271,
+     "offset": 20.271271,
      "duration": 0.56,
      "gain": 0.5881,
      "src": "freesound:849247",
