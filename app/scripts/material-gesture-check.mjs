@@ -182,8 +182,8 @@ try {
   await p.goto((process.env.FIDGET_URL ?? "http://127.0.0.1:4354/") + "#/keyboard");
   await p.waitForTimeout(1200);
   ok(
-    "only eight named keyboard choices",
-    (await p.getByRole("radio").count()) === 8,
+    "eleven named keyboard choices (8 + 몽돌·찌개·도자기)",
+    (await p.getByRole("radio").count()) === 11,
   );
   ok(
     "reserved switch names hidden",
