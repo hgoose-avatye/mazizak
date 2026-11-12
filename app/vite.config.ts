@@ -34,6 +34,30 @@ export default defineConfig(({ command, isPreview }) => {
       ),
     },
     plugins: [
+      // dev only, loopback only: lab-compare.html posts the listener's verdicts here so they land in a git-ignored file
+      ...(command === "serve" && !isPreview
+        ? [
+            {
+              name: "manzizak-lab-verdicts",
+              configureServer(server: import("vite").ViteDevServer) {
+                server.middlewares.use("/__lab-verdicts", async (req, res) => {
+                  const loop = ["127.0.0.1", "::1", "::ffff:127.0.0.1"].includes(req.socket.remoteAddress ?? "");
+                  if (!loop || req.method !== "POST") { res.statusCode = loop ? 405 : 403; return res.end(); }
+                  let body = "";
+                  for await (const c of req) { body += c; if (body.length > 2e6) { res.statusCode = 413; return res.end(); } }
+                  try {
+                    JSON.parse(body);
+                    const { mkdir, writeFile } = await import("node:fs/promises");
+                    await mkdir(r("./bench-out"), { recursive: true });
+                    await writeFile(r("./bench-out/lab-verdicts.json"), body);
+                    res.statusCode = 204;
+                  } catch { res.statusCode = 400; }
+                  res.end();
+                });
+              },
+            },
+          ]
+        : []),
       ...(originalDir
         ? [
             {

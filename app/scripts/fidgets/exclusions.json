@@ -1,4 +1,353 @@
 {
   "_doc": "Listener verdicts: clips to leave out of the wax/crunch sprites. Written from the lab-compare page export (\"exclude\" marks). src = source id, srcStart = start time in seconds inside the source file, tol = match tolerance in seconds. Re-run build-clips.mjs after editing.",
-  "exclude": []
+  "exclude": [
+    {
+      "src": "freesound:389657",
+      "srcStart": 4.063,
+      "tol": 0.03,
+      "reason": "listener: C01 hold freesound:389657 @4.06s"
+    },
+    {
+      "src": "freesound:389657",
+      "srcStart": 2.84,
+      "tol": 0.03,
+      "reason": "listener: C01 hold freesound:389657 @2.84s"
+    },
+    {
+      "src": "freesound:195797",
+      "srcStart": 60.535,
+      "tol": 0.03,
+      "reason": "listener: C01 hold freesound:195797 @60.54s"
+    },
+    {
+      "src": "freesound:195797",
+      "srcStart": 44.885,
+      "tol": 0.03,
+      "reason": "listener: C01 hold freesound:195797 @44.88s"
+    },
+    {
+      "src": "freesound:195797",
+      "srcStart": 41.781,
+      "tol": 0.03,
+      "reason": "listener: C01 hold freesound:195797 @41.78s"
+    },
+    {
+      "src": "freesound:541076",
+      "srcStart": 14.983,
+      "tol": 0.03,
+      "reason": "listener: C02 hold freesound:541076 @14.98s"
+    },
+    {
+      "src": "freesound:541076",
+      "srcStart": 15.831,
+      "tol": 0.03,
+      "reason": "listener: C02 hold freesound:541076 @15.83s"
+    },
+    {
+      "src": "freesound:541076",
+      "srcStart": 16.579,
+      "tol": 0.03,
+      "reason": "listener: C02 hold freesound:541076 @16.58s"
+    },
+    {
+      "src": "freesound:541076",
+      "srcStart": 18.374,
+      "tol": 0.03,
+      "reason": "listener: C02 hold freesound:541076 @18.37s"
+    },
+    {
+      "src": "freesound:541076",
+      "srcStart": 19.319,
+      "tol": 0.03,
+      "reason": "listener: C02 hold freesound:541076 @19.32s"
+    },
+    {
+      "src": "freesound:343795",
+      "srcStart": 1.696,
+      "tol": 0.03,
+      "reason": "listener: C02 crunch freesound:343795 @1.70s"
+    },
+    {
+      "src": "freesound:343795",
+      "srcStart": 4.065,
+      "tol": 0.03,
+      "reason": "listener: C02 crunch freesound:343795 @4.07s"
+    },
+    {
+      "src": "freesound:541076",
+      "srcStart": 18.683,
+      "tol": 0.03,
+      "reason": "listener: C02 crunch freesound:541076 @18.68s"
+    },
+    {
+      "src": "freesound:541076",
+      "srcStart": 15.63,
+      "tol": 0.03,
+      "reason": "listener: C02 crunch freesound:541076 @15.63s"
+    },
+    {
+      "src": "freesound:541076",
+      "srcStart": 1.568,
+      "tol": 0.03,
+      "reason": "listener: C02 crunch freesound:541076 @1.57s"
+    },
+    {
+      "src": "freesound:541076",
+      "srcStart": 1.254,
+      "tol": 0.03,
+      "reason": "listener: C02 crunch freesound:541076 @1.25s"
+    },
+    {
+      "src": "freesound:343795",
+      "srcStart": 10.595,
+      "tol": 0.03,
+      "reason": "listener: C02 crunch freesound:343795 @10.60s"
+    },
+    {
+      "src": "freesound:343795",
+      "srcStart": 4.773,
+      "tol": 0.03,
+      "reason": "listener: C02 crunch freesound:343795 @4.77s"
+    },
+    {
+      "src": "freesound:344643",
+      "srcStart": 18.318,
+      "tol": 0.03,
+      "reason": "listener: S01 tap freesound:344643 @18.32s"
+    },
+    {
+      "src": "freesound:344643",
+      "srcStart": 20.817,
+      "tol": 0.03,
+      "reason": "listener: S01 tap freesound:344643 @20.82s"
+    },
+    {
+      "src": "freesound:622335",
+      "srcStart": 7.094,
+      "tol": 0.03,
+      "reason": "listener: S01 tap freesound:622335 @7.09s"
+    },
+    {
+      "src": "freesound:344643",
+      "srcStart": 18.278,
+      "tol": 0.03,
+      "reason": "listener: S01 hold freesound:344643 @18.28s"
+    },
+    {
+      "src": "freesound:344643",
+      "srcStart": 20.642,
+      "tol": 0.03,
+      "reason": "listener: S01 hold freesound:344643 @20.64s"
+    },
+    {
+      "src": "freesound:622335",
+      "srcStart": 4.17,
+      "tol": 0.03,
+      "reason": "listener: S01 hold freesound:622335 @4.17s"
+    },
+    {
+      "src": "freesound:594753",
+      "srcStart": 5.484,
+      "tol": 0.03,
+      "reason": "listener: S02 hold freesound:594753 @5.48s"
+    },
+    {
+      "src": "freesound:241813",
+      "srcStart": 7.746,
+      "tol": 0.03,
+      "reason": "listener: S03 tap freesound:241813 @7.75s"
+    },
+    {
+      "src": "freesound:241813",
+      "srcStart": 14.889,
+      "tol": 0.03,
+      "reason": "listener: S03 tap freesound:241813 @14.89s"
+    },
+    {
+      "src": "freesound:612769",
+      "srcStart": 6.405,
+      "tol": 0.03,
+      "reason": "listener: S03 tap freesound:612769 @6.40s"
+    },
+    {
+      "src": "freesound:241813",
+      "srcStart": 19.089,
+      "tol": 0.03,
+      "reason": "listener: S03 tap freesound:241813 @19.09s"
+    },
+    {
+      "src": "freesound:612769",
+      "srcStart": 6.497,
+      "tol": 0.03,
+      "reason": "listener: S03 hold freesound:612769 @6.50s"
+    },
+    {
+      "src": "freesound:241813",
+      "srcStart": 16.386,
+      "tol": 0.03,
+      "reason": "listener: S03 hold freesound:241813 @16.39s"
+    },
+    {
+      "src": "freesound:241813",
+      "srcStart": 13.758,
+      "tol": 0.03,
+      "reason": "listener: S03 hold freesound:241813 @13.76s"
+    },
+    {
+      "src": "freesound:241813",
+      "srcStart": 2.817,
+      "tol": 0.03,
+      "reason": "listener: S03 hold freesound:241813 @2.82s"
+    },
+    {
+      "src": "freesound:241813",
+      "srcStart": 1.04,
+      "tol": 0.03,
+      "reason": "listener: S03 hold freesound:241813 @1.04s"
+    },
+    {
+      "src": "freesound:824934",
+      "srcStart": 9.458,
+      "tol": 0.03,
+      "reason": "listener: L02 fold freesound:824934 @9.46s"
+    },
+    {
+      "src": "freesound:794272",
+      "srcStart": 17.399,
+      "tol": 0.03,
+      "reason": "listener: L02 fold freesound:794272 @17.40s"
+    },
+    {
+      "src": "freesound:794272",
+      "srcStart": 6.091,
+      "tol": 0.03,
+      "reason": "listener: L02 fold freesound:794272 @6.09s"
+    },
+    {
+      "src": "freesound:794272",
+      "srcStart": 3.736,
+      "tol": 0.03,
+      "reason": "listener: L02 fold freesound:794272 @3.74s"
+    },
+    {
+      "src": "freesound:794272",
+      "srcStart": 0.849,
+      "tol": 0.03,
+      "reason": "listener: L02 fold freesound:794272 @0.85s"
+    },
+    {
+      "src": "freesound:794270",
+      "srcStart": 104.666,
+      "tol": 0.03,
+      "reason": "listener: L01 hold freesound:794270 @104.67s"
+    },
+    {
+      "src": "freesound:680447",
+      "srcStart": 103.974,
+      "tol": 0.03,
+      "reason": "listener: L01 hold freesound:680447 @103.97s"
+    },
+    {
+      "src": "freesound:655814",
+      "srcStart": 14.004,
+      "tol": 0.03,
+      "reason": "listener: L02 hold freesound:655814 @14.00s"
+    },
+    {
+      "src": "freesound:655814",
+      "srcStart": 24.189,
+      "tol": 0.03,
+      "reason": "listener: L01 hold freesound:655814 @24.19s"
+    },
+    {
+      "src": "freesound:680447",
+      "srcStart": 35.93,
+      "tol": 0.03,
+      "reason": "listener: L01 hold freesound:680447 @35.93s"
+    },
+    {
+      "src": "freesound:824934",
+      "srcStart": 88.395,
+      "tol": 0.03,
+      "reason": "listener: L02 hold freesound:824934 @88.39s"
+    },
+    {
+      "src": "freesound:559768",
+      "srcStart": 19.226,
+      "tol": 0.03,
+      "reason": "listener: L02 hold freesound:559768 @19.23s"
+    },
+    {
+      "src": "freesound:559768",
+      "srcStart": 14.15,
+      "tol": 0.03,
+      "reason": "listener: L02 hold freesound:559768 @14.15s"
+    },
+    {
+      "src": "freesound:824934",
+      "srcStart": 103.424,
+      "tol": 0.03,
+      "reason": "listener: L02 hold freesound:824934 @103.42s"
+    },
+    {
+      "src": "freesound:655814",
+      "srcStart": 23.845,
+      "tol": 0.03,
+      "reason": "listener: L02 hold freesound:655814 @23.84s"
+    }
+  ],
+  "excludeSources": [
+    {
+      "src": "freesound:195797",
+      "reason": "listener: every judged clip of this source was marked \uc81c\uc678 (2026-11-12 lab-compare)"
+    },
+    {
+      "src": "freesound:241813",
+      "reason": "listener: every judged clip of this source was marked \uc81c\uc678 (2026-11-12 lab-compare)"
+    },
+    {
+      "src": "freesound:343795",
+      "reason": "listener: every judged clip of this source was marked \uc81c\uc678 (2026-11-12 lab-compare)"
+    },
+    {
+      "src": "freesound:344643",
+      "reason": "listener: every judged clip of this source was marked \uc81c\uc678 (2026-11-12 lab-compare)"
+    },
+    {
+      "src": "freesound:389657",
+      "reason": "listener: every judged clip of this source was marked \uc81c\uc678 (2026-11-12 lab-compare)"
+    },
+    {
+      "src": "freesound:541076",
+      "reason": "listener: every judged clip of this source was marked \uc81c\uc678 (2026-11-12 lab-compare)"
+    },
+    {
+      "src": "freesound:559768",
+      "reason": "listener: every judged clip of this source was marked \uc81c\uc678 (2026-11-12 lab-compare)"
+    },
+    {
+      "src": "freesound:612769",
+      "reason": "listener: every judged clip of this source was marked \uc81c\uc678 (2026-11-12 lab-compare)"
+    },
+    {
+      "src": "freesound:622335",
+      "reason": "listener: every judged clip of this source was marked \uc81c\uc678 (2026-11-12 lab-compare)"
+    },
+    {
+      "src": "freesound:655814",
+      "reason": "listener: every judged clip of this source was marked \uc81c\uc678 (2026-11-12 lab-compare)"
+    },
+    {
+      "src": "freesound:680447",
+      "reason": "listener: every judged clip of this source was marked \uc81c\uc678 (2026-11-12 lab-compare)"
+    },
+    {
+      "src": "freesound:794272",
+      "reason": "listener: every judged clip of this source was marked \uc81c\uc678 (2026-11-12 lab-compare)"
+    },
+    {
+      "src": "freesound:824934",
+      "reason": "listener: every judged clip of this source was marked \uc81c\uc678 (2026-11-12 lab-compare)"
+    }
+  ]
 }

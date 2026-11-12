@@ -4,10 +4,10 @@
  "sampleRate": 48000,
  "channels": 1,
  "bitDepth": 16,
- "totalSamples": 458964,
+ "totalSamples": 450331,
  "note": "Clips were picked automatically from the waveform and have NOT been listened to. `recordings` = distinct passages extracted from the source files; `variants` = derived copies (none here — runtime speed/pitch jitter is not counted). Sprite clips are peak-normalised to −1 dBFS; `gain` (≤1) equalises RMS within a pool; relative loudness between event classes is set by the player.",
  "counts": {
-  "sourceFiles": 11,
+  "sourceFiles": 10,
   "extractedClips": 29,
   "derivedVariants": 0
  },
@@ -35,31 +35,33 @@
    "stretch": 3,
    "fold": 3
   },
-  "listenerExclusions": 0
+  "listenerExclusions": 49
  },
  "audit": {
   "soap.crunch": {
    "candidates": 99,
-   "passed": 72,
+   "passed": 66,
    "rejected": {
     "CLIPPED-SOURCE": 3,
     "SOFTHEAD": 11,
     "BOOST>18dB": 6,
+    "LISTENER-SOURCE": 8,
     "SPARSE": 1,
     "SPECTRUM-OUTLIER": 2,
-    "LENGTH-OUTLIER": 4
+    "LENGTH-OUTLIER": 2
    }
   },
   "soap.hold": {
    "candidates": 224,
-   "passed": 152,
+   "passed": 113,
    "rejected": {
     "SLOW-START": 9,
     "BOOST>18dB": 17,
     "CUTOFF": 5,
     "CLIPPED-SOURCE": 32,
+    "LISTENER-SOURCE": 36,
     "SPARSE": 8,
-    "SPECTRUM-OUTLIER": 1
+    "SPECTRUM-OUTLIER": 4
    }
   },
   "beads.crunch": {
@@ -88,17 +90,6 @@
  },
  "dropped": [],
  "sources": {
-  "freesound:389657": {
-   "title": "Crinkling styrofoam; close.wav",
-   "author": "TylerAM",
-   "url": "https://freesound.org/people/TylerAM/sounds/389657/",
-   "license": "CC0 1.0",
-   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
-   "retrieved": "2026-11-12",
-   "usage": "C01 crunch",
-   "materialMatch": "similar material only (not a recording of the toy)",
-   "originalFile": "bench-out/fidget-src/fs_389657.mp3"
-  },
   "freesound:399002": {
    "title": "glass beads 01.wav",
    "author": "Anthousai",
@@ -221,52 +212,24 @@
    "entries": [
     {
      "start": 0,
-     "length": 3059,
+     "length": 2745,
      "offset": 0,
-     "duration": 0.063729,
-     "gain": 1,
-     "src": "freesound:389657",
-     "srcStart": 1.0853,
-     "srcEnd": 1.149,
-     "peakDbSource": -8.3,
-     "centroidHz": 4442,
+     "duration": 0.057188,
+     "gain": 0.4051,
+     "src": "freesound:560167",
+     "srcStart": 2.209,
+     "srcEnd": 2.2662,
+     "peakDbSource": -4.6,
+     "centroidHz": 4645,
      "strikes": 1,
-     "boostDb": 7.3
+     "boostDb": 3.6
     },
     {
-     "start": 3539,
-     "length": 2804,
-     "offset": 0.073729,
-     "duration": 0.058417,
-     "gain": 0.6894,
-     "src": "freesound:389657",
-     "srcStart": 2.177,
-     "srcEnd": 2.2355,
-     "peakDbSource": -6.6,
-     "centroidHz": 3910,
-     "strikes": 1,
-     "boostDb": 5.6
-    },
-    {
-     "start": 6823,
-     "length": 2160,
-     "offset": 0.142146,
-     "duration": 0.045,
-     "gain": 0.9951,
-     "src": "freesound:389657",
-     "srcStart": 4.885,
-     "srcEnd": 4.93,
-     "peakDbSource": -8.8,
-     "centroidHz": 4861,
-     "strikes": 1,
-     "boostDb": 7.8
-    },
-    {
-     "start": 9463,
+     "start": 3225,
      "length": 3024,
-     "offset": 0.197146,
+     "offset": 0.067188,
      "duration": 0.063,
-     "gain": 0.5895,
+     "gain": 0.3721,
      "src": "freesound:560167",
      "srcStart": 4.3204,
      "srcEnd": 4.3834,
@@ -276,11 +239,11 @@
      "boostDb": 4.3
     },
     {
-     "start": 12967,
+     "start": 6729,
      "length": 2205,
-     "offset": 0.270146,
+     "offset": 0.140188,
      "duration": 0.045938,
-     "gain": 0.7401,
+     "gain": 0.4672,
      "src": "freesound:560167",
      "srcStart": 4.5375,
      "srcEnd": 4.5835,
@@ -290,11 +253,25 @@
      "boostDb": 1.5
     },
     {
-     "start": 15652,
+     "start": 9414,
+     "length": 3252,
+     "offset": 0.196125,
+     "duration": 0.06775,
+     "gain": 0.3356,
+     "src": "freesound:560167",
+     "srcStart": 4.8566,
+     "srcEnd": 4.9244,
+     "peakDbSource": -6.3,
+     "centroidHz": 5559,
+     "strikes": 1,
+     "boostDb": 5.3
+    },
+    {
+     "start": 13146,
      "length": 4260,
-     "offset": 0.326083,
+     "offset": 0.273875,
      "duration": 0.08875,
-     "gain": 0.7586,
+     "gain": 0.4789,
      "src": "freesound:774262",
      "srcStart": 1.1112,
      "srcEnd": 1.1999,
@@ -304,11 +281,11 @@
      "boostDb": 17.3
     },
     {
-     "start": 20392,
+     "start": 17886,
      "length": 2878,
-     "offset": 0.424833,
+     "offset": 0.372625,
      "duration": 0.059958,
-     "gain": 0.7354,
+     "gain": 0.4642,
      "src": "freesound:868249",
      "srcStart": 0.299,
      "srcEnd": 0.359,
@@ -318,11 +295,25 @@
      "boostDb": -0.4
     },
     {
-     "start": 23750,
+     "start": 21244,
+     "length": 3089,
+     "offset": 0.442583,
+     "duration": 0.064354,
+     "gain": 1,
+     "src": "freesound:868249",
+     "srcStart": 1.1951,
+     "srcEnd": 1.2594,
+     "peakDbSource": -1.5,
+     "centroidHz": 7374,
+     "strikes": 1,
+     "boostDb": 0.5
+    },
+    {
+     "start": 24813,
      "length": 2533,
-     "offset": 0.494792,
+     "offset": 0.516938,
      "duration": 0.052771,
-     "gain": 0.9246,
+     "gain": 0.5836,
      "src": "freesound:868249",
      "srcStart": 1.9055,
      "srcEnd": 1.9583,
@@ -342,39 +333,11 @@
    "variants": 0,
    "entries": [
     {
-     "start": 26763,
-     "length": 34080,
-     "offset": 0.557563,
-     "duration": 0.71,
-     "gain": 0.879,
-     "src": "freesound:389657",
-     "srcStart": 2.8397,
-     "srcEnd": 3.5497,
-     "peakDbSource": -12.7,
-     "centroidHz": 3623,
-     "strikes": 9,
-     "boostDb": 11.7
-    },
-    {
-     "start": 61323,
-     "length": 33408,
-     "offset": 1.277563,
-     "duration": 0.696,
-     "gain": 1,
-     "src": "freesound:389657",
-     "srcStart": 4.0625,
-     "srcEnd": 4.7585,
-     "peakDbSource": -8.8,
-     "centroidHz": 4583,
-     "strikes": 9,
-     "boostDb": 7.8
-    },
-    {
-     "start": 95211,
+     "start": 27826,
      "length": 34272,
-     "offset": 1.983563,
+     "offset": 0.579708,
      "duration": 0.714,
-     "gain": 0.3422,
+     "gain": 0.4682,
      "src": "freesound:560167",
      "srcStart": 2.209,
      "srcEnd": 2.923,
@@ -384,11 +347,11 @@
      "boostDb": 3.6
     },
     {
-     "start": 129963,
+     "start": 62578,
      "length": 31872,
-     "offset": 2.707563,
+     "offset": 1.303708,
      "duration": 0.664,
-     "gain": 0.3627,
+     "gain": 0.4962,
      "src": "freesound:560167",
      "srcStart": 2.9463,
      "srcEnd": 3.6103,
@@ -398,11 +361,25 @@
      "boostDb": 3.9
     },
     {
-     "start": 162315,
+     "start": 94930,
+     "length": 31680,
+     "offset": 1.977708,
+     "duration": 0.66,
+     "gain": 0.4286,
+     "src": "freesound:560167",
+     "srcStart": 3.7629,
+     "srcEnd": 4.4229,
+     "peakDbSource": -2.6,
+     "centroidHz": 4909,
+     "strikes": 12,
+     "boostDb": 1.6
+    },
+    {
+     "start": 127090,
      "length": 32640,
-     "offset": 3.381563,
+     "offset": 2.647708,
      "duration": 0.68,
-     "gain": 0.731,
+     "gain": 1,
      "src": "freesound:774262",
      "srcStart": 0.8273,
      "srcEnd": 1.5073,
@@ -412,11 +389,11 @@
      "boostDb": 17.3
     },
     {
-     "start": 195435,
+     "start": 160210,
      "length": 34560,
-     "offset": 4.071562,
+     "offset": 3.337708,
      "duration": 0.72,
-     "gain": 0.348,
+     "gain": 0.4761,
      "src": "freesound:868249",
      "srcStart": 2.6071,
      "srcEnd": 3.3271,
@@ -424,6 +401,20 @@
      "centroidHz": 7045,
      "strikes": 12,
      "boostDb": 6.3
+    },
+    {
+     "start": 195250,
+     "length": 26112,
+     "offset": 4.067708,
+     "duration": 0.544,
+     "gain": 0.5018,
+     "src": "freesound:868249",
+     "srcStart": 3.807,
+     "srcEnd": 4.351,
+     "peakDbSource": -9,
+     "centroidHz": 8354,
+     "strikes": 8,
+     "boostDb": 8
     }
    ]
   },
@@ -436,9 +427,9 @@
    "variants": 0,
    "entries": [
     {
-     "start": 230475,
+     "start": 221842,
      "length": 2447,
-     "offset": 4.801563,
+     "offset": 4.621708,
      "duration": 0.050979,
      "gain": 0.3684,
      "src": "freesound:399002",
@@ -450,9 +441,9 @@
      "boostDb": 11.4
     },
     {
-     "start": 233402,
+     "start": 224769,
      "length": 2891,
-     "offset": 4.862542,
+     "offset": 4.682688,
      "duration": 0.060229,
      "gain": 0.7573,
      "src": "freesound:399002",
@@ -464,9 +455,9 @@
      "boostDb": 11.3
     },
     {
-     "start": 236773,
+     "start": 228140,
      "length": 2051,
-     "offset": 4.932771,
+     "offset": 4.752917,
      "duration": 0.042729,
      "gain": 0.5566,
      "src": "freesound:399006",
@@ -478,9 +469,9 @@
      "boostDb": 14.6
     },
     {
-     "start": 239304,
+     "start": 230671,
      "length": 2273,
-     "offset": 4.9855,
+     "offset": 4.805646,
      "duration": 0.047354,
      "gain": 0.2976,
      "src": "freesound:399006",
@@ -492,9 +483,9 @@
      "boostDb": 11.2
     },
     {
-     "start": 242057,
+     "start": 233424,
      "length": 2436,
-     "offset": 5.042854,
+     "offset": 4.863,
      "duration": 0.05075,
      "gain": 0.7723,
      "src": "freesound:435367",
@@ -506,9 +497,9 @@
      "boostDb": 3.2
     },
     {
-     "start": 244973,
+     "start": 236340,
      "length": 2013,
-     "offset": 5.103604,
+     "offset": 4.92375,
      "duration": 0.041938,
      "gain": 1,
      "src": "freesound:542695",
@@ -520,9 +511,9 @@
      "boostDb": 0.4
     },
     {
-     "start": 247466,
+     "start": 238833,
      "length": 2200,
-     "offset": 5.155542,
+     "offset": 4.975688,
      "duration": 0.045833,
      "gain": 0.4418,
      "src": "freesound:634162",
@@ -534,9 +525,9 @@
      "boostDb": -0.2
     },
     {
-     "start": 250146,
+     "start": 241513,
      "length": 2509,
-     "offset": 5.211375,
+     "offset": 5.031521,
      "duration": 0.052271,
      "gain": 0.3698,
      "src": "freesound:788735",
@@ -548,9 +539,9 @@
      "boostDb": 12.7
     },
     {
-     "start": 253135,
+     "start": 244502,
      "length": 1925,
-     "offset": 5.273646,
+     "offset": 5.093792,
      "duration": 0.040104,
      "gain": 0.502,
      "src": "freesound:829549",
@@ -572,9 +563,9 @@
    "variants": 0,
    "entries": [
     {
-     "start": 255540,
+     "start": 246907,
      "length": 34080,
-     "offset": 5.32375,
+     "offset": 5.143896,
      "duration": 0.71,
      "gain": 0.861,
      "src": "freesound:399002",
@@ -586,9 +577,9 @@
      "boostDb": 11.4
     },
     {
-     "start": 290100,
+     "start": 281467,
      "length": 34368,
-     "offset": 6.04375,
+     "offset": 5.863896,
      "duration": 0.716,
      "gain": 1,
      "src": "freesound:399006",
@@ -600,9 +591,9 @@
      "boostDb": 15.3
     },
     {
-     "start": 324948,
+     "start": 316315,
      "length": 31584,
-     "offset": 6.76975,
+     "offset": 6.589896,
      "duration": 0.658,
      "gain": 0.8208,
      "src": "freesound:435367",
@@ -614,9 +605,9 @@
      "boostDb": 13.9
     },
     {
-     "start": 357012,
+     "start": 348379,
      "length": 32736,
-     "offset": 7.43775,
+     "offset": 7.257896,
      "duration": 0.682,
      "gain": 0.6513,
      "src": "freesound:542695",
@@ -628,9 +619,9 @@
      "boostDb": 8.2
     },
     {
-     "start": 390228,
+     "start": 381595,
      "length": 34272,
-     "offset": 8.12975,
+     "offset": 7.949896,
      "duration": 0.714,
      "gain": 0.7525,
      "src": "freesound:634162",
@@ -642,9 +633,9 @@
      "boostDb": 12.1
     },
     {
-     "start": 424980,
+     "start": 416347,
      "length": 33984,
-     "offset": 8.85375,
+     "offset": 8.673896,
      "duration": 0.708,
      "gain": 0.7235,
      "src": "freesound:788735",

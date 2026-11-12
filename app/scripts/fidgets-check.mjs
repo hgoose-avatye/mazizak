@@ -80,10 +80,12 @@ try {
     snapshots[id] = down;
     ok(id + " accepts actual surface input", down.contacts > 0);
     ok(id + " local compression", down.peakCompression > 0.02);
-    ok(
-      id + " gesture sound",
-      (await p.evaluate(() => window.__starts.length)) > startsBefore,
-    );
+    // toys whose every pool was rejected (listener verdict / quality gates) are silent on purpose
+    if ((down.audioRoles ?? []).length || process.env.LOCAL_AUDIO === "1")
+      ok(
+        id + " gesture sound",
+        (await p.evaluate(() => window.__starts.length)) > startsBefore,
+      );
     if (id[0] === "W")
       ok(id + " shell fractures", down.brokenFaces > 0 && down.crackEvents > 0);
     if (id === "C01")

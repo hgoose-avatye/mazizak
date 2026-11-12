@@ -103,7 +103,10 @@ async function renderRight(folder: string) {
   }
 }
 
+/** dev server copy of the verdicts (git-ignored bench-out/lab-verdicts.json), so they can be applied without copy/paste */
+const push = () => { void fetch("/__lab-verdicts", { method: "POST", body: JSON.stringify({ at: new Date().toISOString(), verdicts }) }).catch(() => undefined); };
 function showOut() {
+  push();
   const drop = Object.entries(verdicts).filter(([, v]) => v.v === "drop"), keep = Object.entries(verdicts).filter(([, v]) => v.v === "keep");
   $("#count").textContent = `제외 ${drop.length} · 유지 ${keep.length}`;
   const exclude = drop.filter(([, v]) => v.src !== undefined).map(([, v]) => ({ src: v.src, srcStart: v.srcStart, tol: 0.03, reason: "listener: " + v.label }));

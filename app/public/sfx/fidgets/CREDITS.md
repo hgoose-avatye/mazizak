@@ -27,11 +27,10 @@ W02 also uses real chocolate-bar snapping/crumbling recordings (Freesound CC0, b
 ## Crunch (C01 비누 크런치, C02 슈가비즈 말랑이) — Freesound CC0 1.0
 
 All marked Creative Commons 0 (https://creativecommons.org/publicdomain/zero/1.0/) on their pages on the retrieval date (public HQ preview MP3s). CC0 needs no attribution; we credit the authors anyway.
-**Not recordings of soap crunch slime or sugar beads** — similar materials: C01 dry floral foam / styrofoam, C02 glass beads, sprinkles, pop rocks, rock candy. Counts: 29 clips from 11 files.
+**Not recordings of soap crunch slime or sugar beads** — similar materials: C01 dry floral foam / styrofoam, C02 glass beads, sprinkles, pop rocks, rock candy. Counts: 29 clips from 10 files.
 
 | id | title | author | url | licence | retrieved | used for | material |
 |---|---|---|---|---|---|---|---|
-| freesound:389657 | Crinkling styrofoam; close.wav | TylerAM | https://freesound.org/people/TylerAM/sounds/389657/ | CC0 1.0 | 2026-11-12 | C01 crunch | similar material only (not a recording of the toy) |
 | freesound:399002 | glass beads 01.wav | Anthousai | https://freesound.org/people/Anthousai/sounds/399002/ | CC0 1.0 | 2026-11-12 | C02 crunch | similar material only (not a recording of the toy) |
 | freesound:399006 | glass beads 02.wav | Anthousai | https://freesound.org/people/Anthousai/sounds/399006/ | CC0 1.0 | 2026-11-12 | C02 crunch | similar material only (not a recording of the toy) |
 | freesound:435367 | Pop rocks popping | giddster | https://freesound.org/people/giddster/sounds/435367/ | CC0 1.0 | 2026-11-12 | C02 crunch | similar material only (not a recording of the toy) |
@@ -45,25 +44,16 @@ All marked Creative Commons 0 (https://creativecommons.org/publicdomain/zero/1.0
 
 ## Squish (S01–S03 말랑이, L01–L03 슬랑이) — Freesound CC0 1.0
 
-Replaces the earlier shared gel sprite. S01 stress balls / squeeze toy, S02 memory foam / sponge, S03 dough, L01 slime, L02 jelly / goo, L03 shaving foam. Counts: 55 clips from 16 files.
+Replaces the earlier shared gel sprite. S01 stress balls / squeeze toy, S02 memory foam / sponge, S03 dough, L01 slime, L02 jelly / goo, L03 shaving foam. Counts: 35 clips from 7 files.
 
 | id | title | author | url | licence | retrieved | used for | material |
 |---|---|---|---|---|---|---|---|
 | freesound:168011 | Stress Ball | gmarchisio | https://freesound.org/people/gmarchisio/sounds/168011/ | CC0 1.0 | 2026-11-12 | S01 tap | similar material only (not a recording of the toy) |
 | freesound:197761 | shaving cream.wav | Yuval | https://freesound.org/people/Yuval/sounds/197761/ | CC0 1.0 | 2026-11-12 | L03 hold | similar material only (not a recording of the toy) |
-| freesound:241813 | Teig ausrollen.wav | gruenebanane | https://freesound.org/people/gruenebanane/sounds/241813/ | CC0 1.0 | 2026-11-12 | S03 tap | similar material only (not a recording of the toy) |
-| freesound:344643 | Chinese stress balls.wav | Chubbers1995 | https://freesound.org/people/Chubbers1995/sounds/344643/ | CC0 1.0 | 2026-11-12 | S01 tap | similar material only (not a recording of the toy) |
 | freesound:390314 | 082816 ASMR.mp3 | pflanigan | https://freesound.org/people/pflanigan/sounds/390314/ | CC0 1.0 | 2026-11-12 | S02 tap | similar material only (not a recording of the toy) |
 | freesound:390315 | 082816 the foam remembers.mp3 | pflanigan | https://freesound.org/people/pflanigan/sounds/390315/ | CC0 1.0 | 2026-11-12 | S02 tap | similar material only (not a recording of the toy) |
-| freesound:559768 | Jello Squish | Fugeni | https://freesound.org/people/Fugeni/sounds/559768/ | CC0 1.0 | 2026-11-12 | L02 hold | similar material only (not a recording of the toy) |
 | freesound:594753 | Pressing down on sponge | emilyneiswonger | https://freesound.org/people/emilyneiswonger/sounds/594753/ | CC0 1.0 | 2026-11-12 | S02 tap | similar material only (not a recording of the toy) |
-| freesound:612769 | Kneading dough in metal pot | jb_stems | https://freesound.org/people/jb_stems/sounds/612769/ | CC0 1.0 | 2026-11-12 | S03 tap | similar material only (not a recording of the toy) |
-| freesound:622335 | SqueezeToy24.wav | sirplus | https://freesound.org/people/sirplus/sounds/622335/ | CC0 1.0 | 2026-11-12 | S01 tap | similar material only (not a recording of the toy) |
-| freesound:655814 | Squishy wet sound of goo.wav | nathvandykOWI | https://freesound.org/people/nathvandykOWI/sounds/655814/ | CC0 1.0 | 2026-11-12 | L01 hold | similar material only (not a recording of the toy) |
-| freesound:680447 | slime - squishing sounds | rubberduck9999 | https://freesound.org/people/rubberduck9999/sounds/680447/ | CC0 1.0 | 2026-11-12 | L01 hold | similar material only (not a recording of the toy) |
 | freesound:794270 | Slime stretching and squeezing | greenlinker | https://freesound.org/people/greenlinker/sounds/794270/ | CC0 1.0 | 2026-11-12 | L01 hold | similar material only (not a recording of the toy) |
-| freesound:794272 | Slime slapping | greenlinker | https://freesound.org/people/greenlinker/sounds/794272/ | CC0 1.0 | 2026-11-12 | L01 fold | similar material only (not a recording of the toy) |
-| freesound:824934 | squish_comp_09_25 | cera.stes | https://freesound.org/people/cera.stes/sounds/824934/ | CC0 1.0 | 2026-11-12 | L01 fold | similar material only (not a recording of the toy) |
 | freesound:849247 | Shaving cream oozing out of the tin | _javier_rodas | https://freesound.org/people/_javier_rodas/sounds/849247/ | CC0 1.0 | 2026-11-12 | L03 hold | similar material only (not a recording of the toy) |
 
 ## Counting

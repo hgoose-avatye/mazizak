@@ -139,6 +139,7 @@ function pick(cands, n, score, { diverse = false } = {}) {
 // ───────── quality gates (objective only — nobody has listened) ─────────
 const GATE = { minStartDb: -38, maxBoostDb: 18, maxSource: -0.5, maxSparse: 0.55, maxTailDb: -16, minHeadShare: 0.45, centroid: [0.45, 2.2], length: [0.5, 2] };
 const audit = {}; // pool → { candidates, rejected: { reason: count } }
+const EXCL_SRC = (() => { try { return (JSON.parse(fs.readFileSync(path.join(path.dirname(fileURLToPath(import.meta.url)), 'exclusions.json'), 'utf8')).excludeSources ?? []).map((e) => e.src); } catch { return []; } })();
 const EXCL = (() => { try { return JSON.parse(fs.readFileSync(path.join(path.dirname(fileURLToPath(import.meta.url)), 'exclusions.json'), 'utf8')).exclude ?? []; } catch { return []; } })();
 const med = (a) => [...a].sort((p, q) => p - q)[Math.floor(a.length / 2)];
 function qc(pool, list) {
@@ -150,6 +151,7 @@ function qc(pool, list) {
     if (c.sparse > GATE.maxSparse) return 'SPARSE';
     if (c.window && c.tailDb > GATE.maxTailDb) return 'CUTOFF';
     if (!c.window && c.headShare < GATE.minHeadShare && c.b - c.a > ms(120)) return 'SOFTHEAD';
+    if (EXCL_SRC.includes(c.src.id)) return 'LISTENER-SOURCE';
     if (EXCL.some((e) => e.src === c.src.id && Math.abs(e.srcStart - c.a / SR) <= (e.tol ?? 0.03))) return 'LISTENER-EXCLUDED';
     return null;
   };
@@ -200,8 +202,16 @@ for (const kind of ['apple', 'choco']) {
 }
 
 // generic pool: strikes → singles (tap/crunch/fold hits) or windows (hold/stretch/fold passages)
+const OWN_DIR = path.join(ROOT, 'scripts/fidgets/own');
+/** the project owner's own recordings: scripts/fidgets/own/<pool>/*.wav|mp3|m4a — when present they REPLACE the stand-in sources of that pool */
+function ownSources(pool, usage) {
+  const d = path.join(OWN_DIR, pool);
+  if (!fs.existsSync(d)) return [];
+  return fs.readdirSync(d).filter((f) => /\.(wav|mp3|m4a|flac|aiff?)$/i.test(f)).sort().map((f) => ANALYSED[`own:${pool}/${f}`] ??= analyse({ id: `own:${pool}/${f}`, file: path.join(d, f), title: f, author: 'project owner', url: 'own recording', license: 'Own recording (project owner)', licenseUrl: 'https://creativecommons.org/publicdomain/zero/1.0/', retrieved: new Date().toISOString().slice(0, 10), usage, materialMatch: 'recording of the actual toy' }));
+}
 function gpool(name, event, material, note, srcIds, usage, { kind, n, len = [50, 200], lenMs = 600, minStrikes = 3, relFloor = 14, scoreFn } = {}) {
-  const srcs = srcIds.map((id) => an(id, usage));
+  const own = ownSources(name, usage);
+  const srcs = own.length ? own : srcIds.map((id) => an(id, usage));
   const cands = srcs.flatMap((a) => kind === 'singles' ? singles(a, { minLen: len[0], maxLen: len[1] }).filter((c) => c.strikePeakDb >= a.maxPeakDb - relFloor) : windows(a, lenMs, { minStrikes }));
   const score = scoreFn ?? (kind === 'singles' ? (c) => c.strikePeakDb : (c) => c.strikes - c.crest * 0.3);
   addPool(name, event, material, pick(qc(name, cands), n, score, { diverse: true }), note);
