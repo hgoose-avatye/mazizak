@@ -200,8 +200,8 @@ try {
   await p.goto(URL + "#/keyboard");
   await p.waitForTimeout(1700);
   ok(
-    "keyboard 8 active and reserved assets preserved",
-    (await p.getByRole("radio").count()) === 8,
+    "keyboard 11 presets (8 + 몽돌·찌개·도자기) and reserved assets preserved",
+    (await p.getByRole("radio").count()) === 11,
   );
   await p.getByRole("radio", { name: "Topre", exact: true }).click();
   await p.evaluate(() => document.activeElement?.blur());
