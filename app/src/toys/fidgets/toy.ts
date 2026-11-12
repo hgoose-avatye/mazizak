@@ -44,6 +44,46 @@ export function createFidget(ctx: ToyContext, spec: FidgetSpec): FidgetToy {
     sheenRoughness: 0.8,
     side: THREE.DoubleSide,
   });
+  // wax balls: once every piece is broken, kneading mixes the wax into the core — flecks of the wax colour appear in the core
+  // and spread as `mix` goes 0 → 1 (3-D noise on the core surface, so it works on any core mesh)
+  const mixU = { value: 0 };
+  let mix = 0;
+  if (spec.family === "wax") {
+    const waxColor = { value: new THREE.Color(spec.color) };
+    material.customProgramCacheKey = () => "wax-mix";
+    material.onBeforeCompile = (sh) => {
+      sh.uniforms.uMix = mixU;
+      sh.uniforms.uWax = waxColor;
+      sh.vertexShader = sh.vertexShader
+        .replace("#include <common>", "#include <common>\nvarying vec3 vMixPos;")
+        .replace("#include <begin_vertex>", "#include <begin_vertex>\nvMixPos = position;");
+      sh.fragmentShader = sh.fragmentShader
+        .replace(
+          "#include <common>",
+          `#include <common>
+varying vec3 vMixPos;
+uniform float uMix;
+uniform vec3 uWax;
+float mxHash(vec3 p) { p = fract(p * 0.3183099 + 0.1); p *= 17.0; return fract(p.x * p.y * p.z * (p.x + p.y + p.z)); }
+float mxNoise(vec3 x) {
+  vec3 i = floor(x), f = fract(x);
+  f = f * f * (3.0 - 2.0 * f);
+  return mix(mix(mix(mxHash(i), mxHash(i + vec3(1, 0, 0)), f.x), mix(mxHash(i + vec3(0, 1, 0)), mxHash(i + vec3(1, 1, 0)), f.x), f.y),
+             mix(mix(mxHash(i + vec3(0, 0, 1)), mxHash(i + vec3(1, 0, 1)), f.x), mix(mxHash(i + vec3(0, 1, 1)), mxHash(i + vec3(1, 1, 1)), f.x), f.y), f.z);
+}`,
+        )
+        .replace(
+          "#include <color_fragment>",
+          `#include <color_fragment>
+if (uMix > 0.0) {
+  float n = mxNoise(vMixPos * 9.0) * 0.6 + mxNoise(vMixPos * 21.0 + 3.7) * 0.4;
+  float edge = 1.0 - uMix * 0.48;
+  float fleck = smoothstep(edge, edge + 0.035, n);
+  diffuseColor.rgb = mix(diffuseColor.rgb, uWax, max(fleck * 0.9, uMix * 0.14));
+}`,
+        );
+    };
+  }
   if (spec.shape === "ball") {
     material.opacity = 1;
     material.transparent = false;
@@ -489,6 +529,7 @@ export function createFidget(ctx: ToyContext, spec: FidgetSpec): FidgetToy {
     model.reset();
     fracture?.reset();
     choco?.reset();
+    mix = mixU.value = 0;
     if (shell && shellNormals) {
       (shell.geometry.getAttribute("normal").array as Float32Array).set(
         shellNormals,
@@ -570,6 +611,18 @@ export function createFidget(ctx: ToyContext, spec: FidgetSpec): FidgetToy {
           dragBudget = 0;
       }
     }
+    if (spec.family === "wax" && fracture) {
+      // (nearly) every piece broken — the apple's craze leaves a few stubborn patches — kneading the core mixes the pieces in
+      // (about 5 s of kneading to fully mix); the stubborn patches come off as soon as mixing starts
+      const allBroken = fracture.brokenCount >= centers.length * 0.9;
+      if (allBroken && held.length && corePointers.size && model.frameTravel > 0.0004) {
+        if (mix === 0) for (let i = 0; i < centers.length; i++) fracture.forceBreak(i);
+        mix = Math.min(1, mix + dt * 0.2);
+      }
+      mixU.value = mix;
+      sound.mixed = allBroken && mix > 0;
+      if (held.length && mix > 0 && mix < 1) moving = true;
+    }
     if (
       held.length &&
       spec.family === "wax" &&
@@ -636,7 +689,8 @@ export function createFidget(ctx: ToyContext, spec: FidgetSpec): FidgetToy {
           const bar = spec.shape === "chocolate";
           // wax shards settle inward; a snapped chocolate piece is hidden and replaced by its Voronoi shards (chocolate.ts),
           // which stay stuck on the core where it broke
-          const target = bar ? tmp.set(0, 0, 0) : c.clone().normalize().multiplyScalar(-0.13);
+          // mixing pulls the crumbs deeper into the core and breaks them smaller
+          const target = bar ? tmp.set(0, 0, 0) : c.clone().normalize().multiplyScalar(-(0.13 + 0.24 * mix));
           if (!bar) target.y -= 0.07;
           const delta = tmp.copy(target).sub(state.offset);
           state.offset.addScaledVector(delta, 1 - Math.exp(-dt * 5));
@@ -645,11 +699,16 @@ export function createFidget(ctx: ToyContext, spec: FidgetSpec): FidgetToy {
         for (const k of patchVertices[i]) {
           p0.fromArray(shellBase, k * 3);
           p0.sub(c).multiplyScalar(
-            fracture.broken[i] ? (spec.shape === "chocolate" ? 0.0001 : 0.72) : 1 - Math.max(0, dam - 0.16) * (fracture.crazing ? 0.17 : 0.055), // a crazed shell shows its polygon network: patches shrink apart
+            fracture.broken[i] ? (spec.shape === "chocolate" ? 0.0001 : 0.72 - 0.47 * mix) : 1 - Math.max(0, dam - 0.16) * (fracture.crazing ? 0.17 : 0.055), // a crazed shell shows its polygon network: patches shrink apart
           );
           if (fracture.broken[i])
             p0.applyAxisAngle(spec.shape === "chocolate" ? tmp.set(0, 0, 1) : tmp.set(1, 0, 0), spec.shape === "chocolate" ? state.spin * 0.8 : state.spin);
           p0.add(c).add(state.offset);
+          if (fracture.broken[i] && mix > 0) {
+            // mixed-in crumbs ride the kneaded core
+            model.deform(p0, tmp);
+            p0.lerp(tmp, mix);
+          }
           if (!fracture.broken[i] && dam > 0.001) {
             model.deform(p0, tmp);
             p0.lerp(tmp, Math.min(0.18, dam * 0.2));
@@ -680,6 +739,7 @@ export function createFidget(ctx: ToyContext, spec: FidgetSpec): FidgetToy {
     if (choco && fracture) {
       const { rub, popping } = choco.step(dt, {
         allBroken: fracture.brokenCount === centers.length,
+        mix,
         kneading: held.length > 0 && corePointers.size > 0 && model.frameTravel > 0.0004,
         deform: (p, o) => model.deform(p, o),
       });
@@ -810,6 +870,8 @@ export function createFidget(ctx: ToyContext, spec: FidgetSpec): FidgetToy {
         brokenFaces: fracture?.brokenCount ?? 0,
         chocoState: choco?.state ?? null,
         chocoShards: choco?.shards.length ?? 0,
+        waxMix: mix,
+        mixedSound: sound.mixed,
         crackEvents: fracture?.crackEvents ?? 0,
         totalFaces: centers.length,
         crushedParticles: grains?.crushed ?? 0,

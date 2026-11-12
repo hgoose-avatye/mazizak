@@ -6,7 +6,7 @@ import {
 } from "./references";
 import type { FidgetSpec } from "./catalog";
 import { loadSprite, type LoadedSprite } from "./fidgetSprites";
-import { ORIGINAL_SOUNDS, loadOriginalEvents } from "./originalMap";
+import { ORIGINAL_SOUNDS, loadOriginalEvents, loadOriginalMix } from "./originalMap";
 /** dev only: installed-app reference sounds override the licensed pools. Off in production builds, and off when MANZIZAK_LOCAL_FIDGET_AUDIO=0 (meshes stay local, sounds are the shippable ones). */
 const LOCAL_AUDIO = LOCAL_FIDGETS && import.meta.env.VITE_LOCAL_FIDGET_AUDIO !== "0";
 import {
@@ -135,8 +135,11 @@ export interface ResolvedEvent {
   rate: [number, number];
   origin: string;
 }
+/** wax balls after every piece is broken and kneaded into the core: the sounds that replace tap/hold ("mixed" phase) */
+export type MixEvent = "tap" | "hold";
 export interface ResolvedToy {
   events: Partial<Record<FidgetEvent, ResolvedEvent>>;
+  mix?: Partial<Record<MixEvent, ResolvedEvent>>;
   source: string;
 }
 /** Resolve every event of a toy to its decoded clips (single source of truth for the player and the listening lab). */
@@ -212,7 +215,13 @@ export async function resolveToy(ctx: BaseAudioContext, spec: FidgetSpec): Promi
         const list = orig[e];
         if (list?.length) events[e] = { ref: null, main: list.map((c) => ({ buffer: c.buffer, label: c.label, info: "installed reference app (dev only, not shippable)" })), baseDb: CLASS_LEVEL_DB[e], rate: [0.98, 1.02], origin: "ORIGINAL-APP (dev only)" };
       }
-      return { events, source: `ORIGINAL-APP stand-in sounds (dev only, not shippable): ${[...new Set(EVENTS.map((e) => events[e]?.main[0]?.label.split("/").slice(0, 2).join("/")).filter(Boolean))].join(", ")}` };
+      const mixOrig = await loadOriginalMix(ctx, spec.id);
+      const mix: ResolvedToy["mix"] = {};
+      for (const e of ["tap", "hold"] as const) {
+        const list = mixOrig?.[e];
+        if (list?.length) mix[e] = { ref: null, main: list.map((c) => ({ buffer: c.buffer, label: c.label, info: "installed reference app (dev only, not shippable)" })), baseDb: CLASS_LEVEL_DB[e], rate: [0.98, 1.02], origin: "ORIGINAL-APP (dev only)" };
+      }
+      return { events, mix, source: `ORIGINAL-APP stand-in sounds (dev only, not shippable): ${[...new Set(EVENTS.map((e) => events[e]?.main[0]?.label.split("/").slice(0, 2).join("/")).filter(Boolean))].join(", ")}` };
     }
   }
   const kinds = new Set(EVENTS.map((e) => events[e]?.origin).filter(Boolean) as string[]);
@@ -242,6 +251,9 @@ export class FidgetAudio {
   supportedRoles: string[] = [];
   private enabled = false;
   private sets: Partial<Record<FidgetEvent, PlayableSet>> = {};
+  private mixSets: Partial<Record<MixEvent, PlayableSet>> = {};
+  /** wax balls: every piece broken and being kneaded into the core */
+  mixed = false;
   private gate = new VoiceGate();
   private picker = new ClipPicker(() => this.rng());
   private firstCrackDone = false;
@@ -270,6 +282,14 @@ export class FidgetAudio {
     try {
       const r = await resolveToy(this.audio.ctx, this.spec);
       this.source = r.source;
+      for (const [event, e] of Object.entries(r.mix ?? {}) as [MixEvent, ResolvedEvent][]) {
+        const set: PlayableSet = { ref: null, main: [], durations: {}, baseDb: e.baseDb, rate: e.rate, origin: e.origin };
+        for (const [name, d] of this.register(event, "mix", e.main.map((c) => c.buffer))) {
+          set.main.push(name);
+          set.durations[name] = d;
+        }
+        this.mixSets[event] = set;
+      }
       for (const event of EVENTS) {
         const e = r.events[event];
         if (!e) continue;
@@ -302,7 +322,7 @@ export class FidgetAudio {
   }
   /** events with their own pool (no fallback) */
   hasOwn(event: FidgetEvent) {
-    return !!this.sets[event];
+    return !!this.sets[event] || (this.mixed && (event === "tap" || event === "hold") && !!this.mixSets[event]);
   }
   enter() {
     this.enabled = true;
@@ -310,6 +330,7 @@ export class FidgetAudio {
   /** restore per-object state (first crack) — call on toy reset */
   reset() {
     this.firstCrackDone = false;
+    this.mixed = false;
     this.picker.reset();
     this.gate.clear();
   }
@@ -319,19 +340,24 @@ export class FidgetAudio {
     let ev: FidgetEvent = event;
     // the first crack after a reset is the "init" sound when the toy has one
     if (ev === "crack" && !this.firstCrackDone && this.sets.init) ev = "init";
-    if (!this.sets[ev]) {
+    // mixed wax ball: its own "completed" sounds when there are any (dev reference); otherwise the knead sounds,
+    // muffled and a little slower — wax crumbs buried in soft clay
+    const mixSet = this.mixed && (ev === "tap" || ev === "hold") ? this.mixSets[ev] : undefined;
+    if (!mixSet && !this.sets[ev]) {
       const fb = FALLBACK[ev];
       if (!fb || !this.sets[fb]) return false;
       ev = fb;
     }
-    const set = this.sets[ev]!,
+    const muffle = this.mixed && !mixSet && (ev === "hold" || ev === "tap");
+    if (muffle) extra = { rate: (extra.rate ?? 1) * 0.93, lowpassHz: Math.min(extra.lowpassHz ?? 1600, 1600) };
+    const set = mixSet ?? this.sets[ev]!,
       now = this.now(),
       d = this.gate.decide(ev, now, interrupt);
     if (!d.ok) return false;
     for (const v of d.evict ?? []) v.stop?.(0.03);
     const useAlt = !!set.alt && strength >= (set.altMin ?? 1);
     const names = useAlt ? set.alt! : set.main;
-    const name = names[this.picker.pick(`${ev}:${useAlt ? "a" : "m"}`, names.length)];
+    const name = names[this.picker.pick(`${ev}:${mixSet ? "mix" : useAlt ? "a" : "m"}`, names.length)];
     const rate = between(this.rng, set.rate) * (extra.rate ?? 1);
     const log = this.audio.play(
       name,
@@ -339,7 +365,7 @@ export class FidgetAudio {
         rate,
         detuneCents: 0,
         gainJitterDb: 0.4,
-        gainDb: set.baseDb + strengthDb(strength) + d.attenuationDb,
+        gainDb: set.baseDb + strengthDb(strength) + d.attenuationDb + (muffle ? -2 : 0),
         ...(extra.lowpassHz ? { lowpassHz: extra.lowpassHz } : {}),
         ...(delaySec > 0 ? { delaySec } : {}),
       },

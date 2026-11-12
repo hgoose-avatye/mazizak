@@ -1,5 +1,4 @@
 import * as THREE from "three";
-import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
 import { mergeVertices } from "three/addons/utils/BufferGeometryUtils.js";
 import type { FidgetSpec } from "./catalog";
 export const STAGES: Record<string, number> = {
@@ -39,6 +38,25 @@ export function surfaceTexture(shape: string) {
   t.repeat.set(3, 2);
   return t;
 }
+/** box with rounded edges and an even vertex grid on every face (shared vertices merged, so deformation never tears a seam) */
+function roundedSlab(w: number, h: number, d: number, r: number, sx: number, sy: number, sz: number) {
+  let g: THREE.BufferGeometry = new THREE.BoxGeometry(w, h, d, sx, sy, sz);
+  g.deleteAttribute("normal");
+  g.deleteAttribute("uv");
+  g = mergeVertices(g);
+  const p = g.getAttribute("position"),
+    hx = w / 2 - r,
+    hy = h / 2 - r,
+    hz = d / 2 - r;
+  for (let i = 0; i < p.count; i++) {
+    const x = p.getX(i), y = p.getY(i), z = p.getZ(i);
+    const ix = THREE.MathUtils.clamp(x, -hx, hx), iy = THREE.MathUtils.clamp(y, -hy, hy), iz = THREE.MathUtils.clamp(z, -hz, hz);
+    const nx = x - ix, ny = y - iy, nz = z - iz, nl = Math.hypot(nx, ny, nz) || 1;
+    p.setXYZ(i, ix + (nx / nl) * r, iy + (ny / nl) * r, iz + (nz / nl) * r);
+  }
+  g.computeVertexNormals();
+  return g;
+}
 /** Chocolate bar: 2 columns × 3 rows = 6 pieces. Half-extents come from the spec (width, height, depth). */
 export const BAR = { cols: 2, rows: 3, gap: 0.02, shellThickness: 0.12, dome: 0.03 };
 export function bodyGeometry(s: FidgetSpec) {
@@ -47,7 +65,9 @@ export function bodyGeometry(s: FidgetSpec) {
     const w = s.width * 2 * 0.985,
       h = s.height * 2 * 0.985,
       d = s.depth * 2 - BAR.shellThickness;
-    const g = new RoundedBoxGeometry(w, h, d, 5, 0.05);
+    // an evenly subdivided rounded slab (RoundedBoxGeometry packs its vertices into the rounded edges and leaves the big front
+    // face as one flat quad, which cannot show a dent — the shards stuck on it then sank out of sight)
+    const g = roundedSlab(w, h, d, 0.05, 44, 60, 8);
     g.translate(0, 0, -(BAR.shellThickness * 0.5));
     return g;
   }

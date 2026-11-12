@@ -9,7 +9,8 @@ import { BAR, barPieceRect } from "./visuals";
  *              into Voronoi shards seeded around the press point and stretched along the drag direction; the pink core is exposed
  *              The shards stay stuck to the core where they broke (like the original wax ball): a short pop at the snap, a small
  *              permanent tilt so the cracks catch the light, then they ride the core's deformation — nothing flies off or falls.
- *   kneaded    once every piece is broken and the core keeps being kneaded, the shards sink a little into the core
+ *   kneaded    once every piece is broken and the core keeps being kneaded, the shards sink a little into the core and are then
+ *              mixed in (toy.ts `mix`: they shrink and sink out of sight while chocolate flecks spread through the pink core)
  * Audio is driven by what moves: shatter on each snap (pitch from shard size), friction crunch from the shards rubbing as the core moves,
  * squish/flow from the core displacement (see toy.ts).
  */
@@ -109,7 +110,7 @@ export class ChocolateBar {
     return areaSum / Math.max(1, n);
   }
   /** advance shards (they ride the core); returns the area-weighted speed of the shards rubbing against each other this frame */
-  step(dt: number, opts: { allBroken: boolean; kneading: boolean; deform: (p: THREE.Vector3, out: THREE.Vector3) => void }) {
+  step(dt: number, opts: { allBroken: boolean; kneading: boolean; mix: number; deform: (p: THREE.Vector3, out: THREE.Vector3) => void }) {
     if (opts.allBroken && opts.kneading) this.kneadT += dt;
     if (this.state === "fracturing" && opts.allBroken && this.kneadT > 1.2) this.state = "kneaded";
     const base = new THREE.Vector3(), shown = new THREE.Vector3(), q = new THREE.Quaternion();
@@ -120,12 +121,18 @@ export class ChocolateBar {
       s.pop *= Math.exp(-dt * 9);
       if (s.pop < 0.002) s.pop = 0;
       popping += s.pop;
-      base.copy(s.rest);
-      if (this.state === "kneaded") s.rest.z += (this.spec.depth - BAR.shellThickness - s.sink - s.rest.z) * sinkK;
-      // follow the core the way the core itself is shown (it is partly rigid while fracturing)
+      // kneaded: sink a little into the core; mixing (opts.mix 0 → 1) pulls them all the way in and breaks them smaller
+      // (the shard is 0.12 thick: half of `sink` before mixing, out of sight only near the end of the mix)
+      const zIn = this.spec.depth - BAR.shellThickness;
+      if (this.state === "kneaded") s.rest.z += (zIn - s.sink * 0.5 - 0.13 * opts.mix ** 1.5 - s.rest.z) * sinkK;
+      s.mesh.scale.setScalar(1 - 0.5 * opts.mix);
+      // follow the core surface the way the core itself is shown (it is partly rigid while fracturing), then sink below it:
+      // deforming the sunk point itself would let the bulging surface swallow the shard
+      base.set(s.rest.x, s.rest.y, zIn);
       opts.deform(base, shown);
       shown.lerp(base, this.rigidity);
-      if (dt > 0) rub += (s.area * shown.distanceTo(s.last)) / dt;
+      shown.z -= zIn - s.rest.z;
+      if (dt > 0) rub += ((1 - opts.mix) * s.area * shown.distanceTo(s.last)) / dt; // mixed-in crumbs no longer grind
       s.last.copy(shown);
       shown.z += s.pop * 0.05; // the snap lifts it off the core for an instant
       s.mesh.position.copy(shown).add(this.origin);
