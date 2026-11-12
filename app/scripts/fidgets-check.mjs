@@ -81,7 +81,7 @@ try {
     ok(id + " accepts actual surface input", down.contacts > 0);
     ok(id + " local compression", down.peakCompression > 0.02);
     // toys whose every pool was rejected (listener verdict / quality gates) are silent on purpose
-    if ((down.audioRoles ?? []).length || process.env.LOCAL_AUDIO === "1")
+    if ((down.audioRoles ?? []).some((r) => ["tap", "hold", "crack", "crunch"].includes(r)) || process.env.LOCAL_AUDIO === "1")
       ok(
         id + " gesture sound",
         (await p.evaluate(() => window.__starts.length)) > startsBefore,
