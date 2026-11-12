@@ -185,6 +185,7 @@ function buildVariants(id: string): void {
       b.onclick = () => {
         settings.set('keyPreset', p);
         toys.keyboard?.setPreset?.(p);
+        b.blur(); // the keyboard toy ignores key presses while a button has focus: give the physical keys back right away
         if (isLocalKeyPreset(p) || p === 'turquoise-tealios' || p === 'ibm-buckling-spring') {
           b.dataset.loadState = 'loading';
           b.textContent = `${KEY_PRESET_INFO[p].label} · 로딩 중`;
