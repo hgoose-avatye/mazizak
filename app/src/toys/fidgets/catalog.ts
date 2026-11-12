@@ -238,7 +238,7 @@ export const FIDGETS: readonly FidgetSpec[] = [
     damping: 0.82,
     stretch: 1.35,
     sound: "beads",
-    hint: "투명한 볼을 누르고 문질러보세요 · 작은 비즈가 안에서 자리를 바꿔요",
+    hint: "알록달록 작은 비즈 알갱이를 눌러보세요 · 알갱이가 자리를 바꿔요",
   },
 ];
 export const findFidget = (id: string) => FIDGETS.find((f) => f.id === id);

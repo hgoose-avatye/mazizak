@@ -74,7 +74,10 @@ export function createFidget(ctx: ToyContext, spec: FidgetSpec): FidgetToy {
     material.side = THREE.FrontSide;
     material.clearcoat = 0.05;
     material.roughness = 0.45;
-    material.depthWrite = false;
+    // a solid base ball in the sugar colours; the rainbow beads sit on it like the installed app's 클로버 비즈 (a ball covered in small glossy beads)
+    material.transparent = false;
+    material.opacity = 1;
+    material.depthWrite = true;
   }
 
   if (spec.family === "wax") geometry.scale(0.88, 0.88, 0.88);
@@ -94,7 +97,7 @@ export function createFidget(ctx: ToyContext, spec: FidgetSpec): FidgetToy {
       new THREE.MeshPhysicalMaterial({
         color: 0xffffff,
         transparent: true,
-        opacity: 0.42,
+        opacity: 0.08,
         envMap: scene.environment,
         envMapIntensity: 3,
         roughness: 0.025,
@@ -146,6 +149,8 @@ export function createFidget(ctx: ToyContext, spec: FidgetSpec): FidgetToy {
       softboxRest.clone().normalize(),
     );
     softbox.renderOrder = 4;
+    // the clear-skin reflection box looked like a white square on the bead-covered ball: the beads carry their own gloss
+    softbox.visible = false;
     scene.add(softbox);
   }
 
@@ -310,21 +315,29 @@ export function createFidget(ctx: ToyContext, spec: FidgetSpec): FidgetToy {
     visualParents: number[] = [],
     flowOffsets: THREE.Vector3[] = [];
   if (grains && spec.shape === "beads") {
-    const count = 1400;
+    // Like the installed app's 클로버 비즈: the ball is covered by a dense layer of small glossy beads (here round grains), each its own
+    // colour. Rainbow palette = the current sugar-bead colours (blue, purple, pink, yellow) plus red, orange and green.
+    const count = 1900;
+    const palette = [0xe5484d, 0xf29f4c, 0xefc45b, 0x5fbf74, 0x299fc5, 0xa888cf, 0xe98bab].map((c) => new THREE.Color(c));
     grainMesh = new THREE.InstancedMesh(
-      new THREE.IcosahedronGeometry(0.0075, 0),
-      new THREE.MeshPhysicalMaterial({ roughness: 0.3, clearcoat: 0.4 }),
+      new THREE.IcosahedronGeometry(0.05, 1),
+      new THREE.MeshPhysicalMaterial({ roughness: 0.16, clearcoat: 1, clearcoatRoughness: 0.05, envMapIntensity: 1.5 }),
       count,
     );
     grainMesh.count = count;
     grainMesh.position.copy(blob.position);
     grainMesh.frustumCulled = false;
     scene.add(grainMesh);
+    const hash = (n: number) => {
+      const x = Math.sin(n * 12.9898) * 43758.5453;
+      return x - Math.floor(x);
+    };
     for (let i = 0; i < count; i++) {
       const y = 1 - 2 * ((i + 0.5) / count),
         r = Math.sqrt(1 - y * y),
         angle = i * 2.399963,
-        radius = 0.91 * Math.cbrt(0.08 + 0.92 * ((i * 0.75487766) % 1));
+        // mostly one surface layer; a few sit a little deeper so the base colour peeks through the gaps
+        radius = 0.975 - (hash(i + 7) < 0.12 ? 0.05 : 0);
       const rest = new THREE.Vector3(
         Math.cos(angle) * r * radius,
         y * radius,
@@ -341,13 +354,7 @@ export function createFidget(ctx: ToyContext, spec: FidgetSpec): FidgetToy {
         }
       });
       visualParents.push(closest);
-      grainMesh.setColorAt(
-        i,
-        sugarColor(rest.x, rest.y, rest.z).lerp(
-          new THREE.Color(0xffffff),
-          0.12 + (i % 4) * 0.08,
-        ),
-      );
+      grainMesh.setColorAt(i, palette[Math.floor(hash(i * 3.1) * palette.length)]);
     }
     grains.grains.forEach(() => flowOffsets.push(new THREE.Vector3()));
     grainMesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
@@ -671,7 +678,7 @@ export function createFidget(ctx: ToyContext, spec: FidgetSpec): FidgetToy {
           model.deform(rest, tmp);
           matrix.position.copy(tmp).add(flowOffsets[visualParents[i]]);
           matrix.rotation.set(i * 0.7, i * 0.3, i * 0.4);
-          matrix.scale.setScalar(0.65 + ((i * 17) % 13) * 0.065);
+          matrix.scale.setScalar(spec.shape === "beads" ? 0.82 + ((i * 17) % 13) * 0.03 : 0.65 + ((i * 17) % 13) * 0.065);
           matrix.updateMatrix();
           grainMesh!.setMatrixAt(i, matrix.matrix);
         });
@@ -767,7 +774,7 @@ export function createFidget(ctx: ToyContext, spec: FidgetSpec): FidgetToy {
           spec.shape === "soap"
             ? "concealed-filling"
             : spec.shape === "beads"
-              ? "fine-embedded-rainbow"
+              ? "surface-bead-layer-rainbow"
               : null,
         visibleMicroGrains: visualGrains.length,
         internalRearrangements: grains?.rearrangements ?? 0,

@@ -83,9 +83,9 @@ try {
       );
     else
       ok(
-        "sugar has fine embedded grains",
-        down.report.visibleMicroGrains === 1400 &&
-          down.report.grainPresentation === "fine-embedded-rainbow",
+        "sugar beads cover the ball as a rainbow bead layer",
+        down.report.visibleMicroGrains === 1900 &&
+          down.report.grainPresentation === "surface-bead-layer-rainbow",
       );
     await p.screenshot({
       path: "/private/tmp/manzizak-photo-pressed-" + id + ".png",
