@@ -177,6 +177,8 @@ export function createFidget(ctx: ToyContext, spec: FidgetSpec): FidgetToy {
     pops = 0,
     strokeReady = true,
     dragBudget = 0,
+    /** deepest compression of the current gesture (drives the release sound) */
+    gestureDepth = 0,
     idleGesture = 0,
     grainMotion = 0,
     coreTouches = 0;
@@ -449,7 +451,12 @@ export function createFidget(ctx: ToyContext, spec: FidgetSpec): FidgetToy {
       model.release(e.id);
       corePointers.delete(e.id);
       anchors.delete(e.id);
-      if (!anchors.size) sound.releaseGesture();
+      if (!anchors.size) {
+        sound.releaseGesture();
+        // finger lifted after a real press: the "release" sound (only toys that have one play it)
+        if (gestureDepth > 0.15) sound.play("release", Math.min(1, gestureDepth));
+        gestureDepth = 0;
+      }
       ctx.requestFrame();
     }
   };
@@ -470,6 +477,8 @@ export function createFidget(ctx: ToyContext, spec: FidgetSpec): FidgetToy {
     }
     anchors.clear();
     sound.stop();
+    sound.reset();
+    gestureDepth = 0;
     for (const b of bubbles) b.visible = true;
     strokeReady = true;
     dragBudget = 0;
@@ -514,21 +523,22 @@ export function createFidget(ctx: ToyContext, spec: FidgetSpec): FidgetToy {
     )
       sound.releaseGesture();
     if (held.length && spec.family !== "wax" && spec.family !== "particles") {
+      gestureDepth = Math.max(gestureDepth, model.compression);
       if (strokeReady && model.compression > 0.035) {
-        if (
-          sound.play(
-            spec.family === "viscous" && held.length > 1
-              ? "stretch"
-              : "compress",
-            Math.min(1, 0.3 + model.compression),
-          )
-        )
+        // contact: a two-finger slime grab is a stretch, a short "tap" if the toy has one, else the sustained sound
+        const first =
+          spec.family === "viscous" && held.length > 1
+            ? "stretch"
+            : sound.hasOwn("tap")
+              ? "tap"
+              : "hold";
+        if (sound.play(first, Math.min(1, 0.3 + model.compression)))
           strokeReady = false;
       } else if (model.frameTravel > 0.001 && dragBudget > 0.12) {
         const role =
           spec.family === "viscous" && held.some((c) => c.drag.length() > 0.2)
             ? "stretch"
-            : "compress";
+            : "hold";
         if (sound.play(role, Math.min(1, 0.3 + model.motion * 0.2)))
           dragBudget = 0;
       }
@@ -539,7 +549,7 @@ export function createFidget(ctx: ToyContext, spec: FidgetSpec): FidgetToy {
       corePointers.size &&
       (strokeReady || (model.frameTravel > 0.001 && dragBudget > 0.12))
     ) {
-      if (sound.play("knead", Math.min(1, 0.3 + model.compression))) {
+      if (sound.play("hold", Math.min(1, 0.3 + model.compression))) {
         strokeReady = false;
         dragBudget = 0;
       }
@@ -613,14 +623,17 @@ export function createFidget(ctx: ToyContext, spec: FidgetSpec): FidgetToy {
         events = grains.step(dt, model);
       crunchClock -= dt;
       const pressureWork = grains.contactWork > 0.006;
-      if (
-        held.length &&
-        crunchClock <= 0 &&
-        (grains.crushed > beforeCrush ||
-          (pressureWork && (events > 0 || model.compression > 0.025)))
-      ) {
-        sound.play("crunch", Math.min(1, 0.3 + grains.contactWork));
-        crunchClock = 0.18;
+      if (held.length) gestureDepth = Math.max(gestureDepth, model.compression);
+      if (held.length && crunchClock <= 0) {
+        if (grains.crushed > beforeCrush || (pressureWork && events > 0)) {
+          // grains actually crushed / colliding: short, repeated crunch
+          sound.play("crunch", Math.min(1, 0.3 + grains.contactWork));
+          crunchClock = 0.18;
+        } else if (pressureWork && model.compression > 0.025) {
+          // steady squeeze without new crushing: sustained compression sound
+          if (sound.play("hold", Math.min(1, 0.3 + model.compression)))
+            crunchClock = 0.3;
+        }
       }
       grainMotion = 0;
       grains.grains.forEach((g, i) => {
