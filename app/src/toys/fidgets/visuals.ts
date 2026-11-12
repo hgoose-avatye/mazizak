@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
 import type { FidgetSpec } from "./catalog";
 export const STAGES: Record<string, number> = {
   S01: 0xe8f0ef,
@@ -37,7 +38,18 @@ export function surfaceTexture(shape: string) {
   t.repeat.set(3, 2);
   return t;
 }
+/** Chocolate bar: 2 columns × 3 rows = 6 pieces. Half-extents come from the spec (width, height, depth). */
+export const BAR = { cols: 2, rows: 3, gap: 0.02, shellThickness: 0.12, dome: 0.03 };
 export function bodyGeometry(s: FidgetSpec) {
+  if (s.shape === "chocolate") {
+    // the soft pink core behind the chocolate pieces: a plate as wide and tall as the bar, a little thinner than it
+    const w = s.width * 2 * 0.985,
+      h = s.height * 2 * 0.985,
+      d = s.depth * 2 - BAR.shellThickness;
+    const g = new RoundedBoxGeometry(w, h, d, 5, 0.05);
+    g.translate(0, 0, -(BAR.shellThickness * 0.5));
+    return g;
+  }
   if (s.shape === "cream") {
     // A piped rosette: a broad base, rising spiral and an asymmetric tapered tip.
     const g = new THREE.SphereGeometry(1, 96, 56),
@@ -74,11 +86,6 @@ export function bodyGeometry(s: FidgetSpec) {
       z = Math.sign(z) * Math.pow(Math.abs(z), pow);
       if (s.shape === "foam") y += 0.04 * Math.cos(x * 6) * Math.cos(z * 6);
     }
-    if (s.shape === "chocolate") {
-      const r = 1 - 0.018 * Math.pow(Math.sin(theta * 4 + y * 9), 12);
-      x *= r;
-      z *= r;
-    }
     if (s.shape === "mango") {
       x *= 1 + 0.18 * y;
       y *= 0.9;
@@ -114,11 +121,94 @@ export interface ShellPatches {
   vertices: number[][];
   faceToPatch: Uint16Array;
 }
+/** Chocolate bar shell: six slightly domed pieces (2 × 3) with thin grooves between them and pale cut edges. */
+function chocolateBarPatches(spec: FidgetSpec): ShellPatches {
+  const { cols, rows, gap, shellThickness, dome } = BAR;
+  const positions: number[] = [],
+    normals: number[] = [],
+    colors: number[] = [],
+    ids: number[] = [],
+    centers: THREE.Vector3[] = [],
+    vertices = Array.from({ length: cols * rows }, () => [] as number[]);
+  const outer = new THREE.Color(spec.color),
+    cut = new THREE.Color(0x9d7660),
+    rim = cut.clone().lerp(outer, 0.2);
+  const hx = spec.width,
+    hy = spec.height,
+    zOut = spec.depth, // front surface (pieces sit on top of the core, which ends at zOut − shellThickness)
+    zIn = spec.depth - shellThickness;
+  const tw = (2 * hx) / cols,
+    th = (2 * hy) / rows;
+  const tri = (a: THREE.Vector3, b: THREE.Vector3, c: THREE.Vector3, patch: number, color: THREE.Color, na?: THREE.Vector3, nb?: THREE.Vector3, nc?: THREE.Vector3) => {
+    const face = new THREE.Vector3().subVectors(b, a).cross(new THREE.Vector3().subVectors(c, a)).normalize();
+    [a, b, c].forEach((p, k) => {
+      const i = positions.length / 3;
+      positions.push(p.x, p.y, p.z);
+      vertices[patch].push(i);
+      const n = [na, nb, nc][k] ?? face;
+      normals.push(n.x, n.y, n.z);
+      colors.push(color.r, color.g, color.b);
+    });
+    ids.push(patch);
+  };
+  for (let r = 0; r < rows; r++)
+    for (let c = 0; c < cols; c++) {
+      const patch = r * cols + c;
+      const x0 = -hx + c * tw + gap / 2,
+        x1 = -hx + (c + 1) * tw - gap / 2,
+        y1 = hy - r * th - gap / 2,
+        y0 = hy - (r + 1) * th + gap / 2;
+      centers.push(new THREE.Vector3((x0 + x1) / 2, (y0 + y1) / 2, zOut));
+      const N = 6;
+      // domed top: raised in the middle, falling to the edge, with a soft bevel
+      const top = (u: number, v: number) => {
+        const du = 1 - Math.pow(2 * u - 1, 2),
+          dv = 1 - Math.pow(2 * v - 1, 2);
+        return new THREE.Vector3(x0 + (x1 - x0) * u, y0 + (y1 - y0) * v, zOut + dome * Math.sqrt(Math.max(0, du * dv)) - dome * 0.55);
+      };
+      const nrm = (u: number, v: number) => {
+        const e = 1e-3,
+          p = top(u, v),
+          pu = top(Math.min(1, u + e), v).sub(top(Math.max(0, u - e), v)),
+          pv = top(u, Math.min(1, v + e)).sub(top(u, Math.max(0, v - e)));
+        void p;
+        return pu.cross(pv).normalize();
+      };
+      for (let i = 0; i < N; i++)
+        for (let j = 0; j < N; j++) {
+          const u0 = i / N, u1 = (i + 1) / N, v0 = j / N, v1 = (j + 1) / N;
+          const a = top(u0, v0), b = top(u1, v0), cc = top(u1, v1), d = top(u0, v1);
+          tri(a, b, cc, patch, outer, nrm(u0, v0), nrm(u1, v0), nrm(u1, v1));
+          tri(a, cc, d, patch, outer, nrm(u0, v0), nrm(u1, v1), nrm(u0, v1));
+        }
+      // underside (faces the core) and the four cut walls
+      const ia = new THREE.Vector3(x0, y0, zIn), ib = new THREE.Vector3(x1, y0, zIn), ic = new THREE.Vector3(x1, y1, zIn), id = new THREE.Vector3(x0, y1, zIn);
+      const back = new THREE.Vector3(0, 0, -1);
+      tri(ia, ic, ib, patch, cut, back, back, back);
+      tri(ia, id, ic, patch, cut, back, back, back);
+      const edge = (u0: number, v0: number, u1: number, v1: number, p0: THREE.Vector3, p1: THREE.Vector3) => {
+        const t0 = top(u0, v0), t1 = top(u1, v1);
+        tri(t0, p0, t1, patch, rim);
+        tri(t1, p0, p1, patch, rim);
+      };
+      edge(0, 0, 1, 0, ia, ib);
+      edge(1, 0, 1, 1, ib, ic);
+      edge(1, 1, 0, 1, ic, id);
+      edge(0, 1, 0, 0, id, ia);
+    }
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
+  geometry.setAttribute("normal", new THREE.Float32BufferAttribute(normals, 3));
+  geometry.setAttribute("color", new THREE.Float32BufferAttribute(colors, 3));
+  return { geometry, centers, vertices, faceToPatch: new Uint16Array(ids) };
+}
+
 /** Closed curved Voronoi wax cells: straight fracture boundaries, real pale cut edges. */
 export function shellPatches(
   _source: THREE.BufferGeometry,
   spec: FidgetSpec,
 ): ShellPatches {
+  if (spec.shape === "chocolate") return chocolateBarPatches(spec);
   const count = spec.shape === "apple" ? 104 : 42,
     positions: number[] = [],
     normals: number[] = [],

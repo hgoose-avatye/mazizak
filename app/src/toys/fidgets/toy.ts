@@ -80,7 +80,7 @@ export function createFidget(ctx: ToyContext, spec: FidgetSpec): FidgetToy {
     material.depthWrite = false;
   }
 
-  if (spec.family === "wax") geometry.scale(0.88, 0.88, 0.88);
+  if (spec.family === "wax" && spec.shape !== "chocolate") geometry.scale(0.88, 0.88, 0.88);
   let base = Float32Array.from(geometry.getAttribute("position").array);
   const blob = new THREE.Mesh(geometry, material);
   let visualSource = "reconstructed-material";
@@ -249,7 +249,7 @@ export function createFidget(ctx: ToyContext, spec: FidgetSpec): FidgetToy {
   };
   if (spec.family === "wax") {
     const g = bodyGeometry(spec);
-    g.scale(1.035, 1.035, 1.035);
+    if (spec.shape !== "chocolate") g.scale(1.035, 1.035, 1.035);
     buildShell(g);
     g.dispose();
     if (spec.shape === "apple") {
@@ -608,8 +608,12 @@ export function createFidget(ctx: ToyContext, spec: FidgetSpec): FidgetToy {
         if (fracture.broken[i]) {
           // Crushed wax adheres to the soft core and settles inward, rather than
           // shooting radially out of the toy like an explosion.
-          const target = c.clone().normalize().multiplyScalar(-0.13);
-          target.y -= 0.07;
+          const bar = spec.shape === "chocolate";
+          // chocolate pieces pop off the bar toward the viewer and slump down; wax shards settle inward
+          const target = bar
+            ? tmp.set(c.x * 0.1, -0.12 - 0.06 * ((i * 7) % 5), 0.16)
+            : c.clone().normalize().multiplyScalar(-0.13);
+          if (!bar) target.y -= 0.07;
           const delta = tmp.copy(target).sub(state.offset);
           state.offset.addScaledVector(delta, 1 - Math.exp(-dt * 5));
           if (delta.lengthSq() > 0.000001) moving = true;
@@ -617,10 +621,10 @@ export function createFidget(ctx: ToyContext, spec: FidgetSpec): FidgetToy {
         for (const k of patchVertices[i]) {
           p0.fromArray(shellBase, k * 3);
           p0.sub(c).multiplyScalar(
-            fracture.broken[i] ? 0.72 : 1 - Math.max(0, dam - 0.16) * (fracture.crazing ? 0.17 : 0.055), // a crazed shell shows its polygon network: patches shrink apart
+            fracture.broken[i] ? (spec.shape === "chocolate" ? 0.92 : 0.72) : 1 - Math.max(0, dam - 0.16) * (fracture.crazing ? 0.17 : 0.055), // a crazed shell shows its polygon network: patches shrink apart
           );
           if (fracture.broken[i])
-            p0.applyAxisAngle(tmp.set(1, 0, 0), state.spin);
+            p0.applyAxisAngle(spec.shape === "chocolate" ? tmp.set(0, 0, 1) : tmp.set(1, 0, 0), spec.shape === "chocolate" ? state.spin * 0.8 : state.spin);
           p0.add(c).add(state.offset);
           if (!fracture.broken[i] && dam > 0.001) {
             model.deform(p0, tmp);

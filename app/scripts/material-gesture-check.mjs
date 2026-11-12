@@ -108,7 +108,7 @@ try {
       // observed in the installed 왁뿌볼 app: a held press crazes the whole shell and most patches fall away within a few seconds, a few flakes stay
       ok(
         id + " held press crazes the shell and most patches fall (a few flakes remain)",
-        held.brokenFaces >= held.totalFaces * (id === "W02" ? 0.3 : 0.6) && held.brokenFaces <= held.totalFaces * 0.97,
+        held.brokenFaces >= held.totalFaces * (id === "W02" ? 0.3 : 0.6) && held.brokenFaces <= held.totalFaces * (id === "W02" ? 1 : 0.97), // the 6-piece chocolate bar may lose every piece
       );
     }
     await p.screenshot({

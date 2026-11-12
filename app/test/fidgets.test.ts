@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { Vector3 } from "three";
 import { FIDGETS } from "../src/toys/fidgets/catalog";
+import { bodyGeometry, shellPatches } from "../src/toys/fidgets/visuals";
 import {
   FidgetModel,
   FractureModel,
@@ -202,5 +203,21 @@ describe("shell craze cascade (observed in the installed 왁뿌볼 app)", () => 
     expect(g.brokenCount).toBe(0);
     expect(g.crazing).toBe(false);
     expect(g.crazeEvents).toBe(0);
+  });
+});
+
+describe("W02 chocolate bar: 6 pieces in a 2 × 3 grid", () => {
+  it("has exactly six patches laid out as 2 columns × 3 rows on the front of the bar, each with its own triangles", () => {
+    const spec = FIDGETS.find((f) => f.id === "W02")!;
+    const body = bodyGeometry(spec), p = shellPatches(body, spec);
+    expect(p.centers).toHaveLength(6);
+    expect(new Set(p.centers.map((c) => c.x.toFixed(3))).size).toBe(2);
+    expect(new Set(p.centers.map((c) => c.y.toFixed(3))).size).toBe(3);
+    const perPatch = new Map<number, number>();
+    p.faceToPatch.forEach((id) => perPatch.set(id, (perPatch.get(id) ?? 0) + 1));
+    expect([...perPatch.keys()].sort()).toEqual([0, 1, 2, 3, 4, 5]);
+    for (const n of perPatch.values()) expect(n).toBeGreaterThan(40);
+    // the whole bar fits the portrait frame: wider than a piece, taller than wide
+    expect(spec.height).toBeGreaterThan(spec.width);
   });
 });

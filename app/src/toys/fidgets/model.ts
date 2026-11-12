@@ -290,7 +290,7 @@ export class FractureModel {
           const d = Math.min(1, this.centers[i].distanceTo(anchor) / 1.6);
           // nearer patches go first; flakes (≈10–15 %) never fall by themselves
           this.breakAt[i] = (choc ? 0.5 : 0.25) + d * (choc ? 1.2 : 0.7) + this.rnd(i, 1) * (choc ? 1.5 : 1.1);
-          this.survivor[i] = this.rnd(i, 2) < (choc ? 0.15 : 0.1) ? 1 : 0;
+          this.survivor[i] = this.centers.length >= 20 && this.rnd(i, 2) < (choc ? 0.15 : 0.1) ? 1 : 0;
         }
       }
     } else {
