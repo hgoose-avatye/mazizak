@@ -263,6 +263,7 @@ class FakeBuffer {
   getChannelData() { return this.d; }
 }
 function makeEngine() {
+  const stops: string[] = [];
   const plays: { name: string; opts: Record<string, number>; type: string }[] = [];
   const registered = new Map<string, FakeBuffer[]>();
   const ctx = {
@@ -273,9 +274,9 @@ function makeEngine() {
   const engine = {
     ctx,
     register: (n: string, b: FakeBuffer[]) => registered.set(n, b),
-    play: (name: string, opts: Record<string, number>, type: string) => { plays.push({ name, opts, type }); return { stop: () => {} }; },
+    play: (name: string, opts: Record<string, number>, type: string) => { plays.push({ name, opts, type }); return { stop: () => { stops.push(name); } }; },
   };
-  return { engine, plays, registered };
+  return { engine, plays, registered, stops };
 }
 const stubFetch = () =>
   vi.stubGlobal("fetch", vi.fn(async (url: string) => {
@@ -285,12 +286,12 @@ const stubFetch = () =>
   }));
 async function make(id: string) {
   stubFetch();
-  const { engine, plays } = makeEngine();
+  const { engine, plays, stops } = makeEngine();
   let t = 0;
   const a = new FidgetAudio(engine as never, FIDGETS.find((f) => f.id === id)!, () => t);
   for (let i = 0; i < 200 && a.state === "loading"; i++) await new Promise((r) => setTimeout(r, 5));
   a.enter();
-  return { a, plays, at: (ms: number) => (t = ms) };
+  return { a, plays, stops, at: (ms: number) => (t = ms) };
 }
 
 describe("FidgetAudio event routing", () => {
@@ -350,6 +351,25 @@ describe("FidgetAudio event routing", () => {
     const l03 = await make("L03");
     expect(l03.a.hasOwn("stretch")).toBe(false);
     expect(l03.a.has("stretch")).toBe(true);
+  });
+
+  it("switching toys: leave() fades out running voices and a left toy is silent; re-entering plays again", async () => {
+    const { a, plays, stops, at } = await make("C01");
+    at(0); expect(a.play("hold", 1)).toBe(true); // sustained, 0.64 s
+    at(200); expect(a.play("crunch", 1)).toBe(true); // short, overlapping it
+    expect(plays.length).toBe(2);
+    a.leave();
+    expect(stops.length).toBe(2); // both voices were stopped
+    at(5000); expect(a.play("crunch", 1)).toBe(false);
+    a.enter(); at(6000); expect(a.play("crunch", 1)).toBe(true);
+  });
+
+  it("finger lift: releaseGesture() fades only the sustained voice, short voices keep ringing", async () => {
+    const { a, stops, at } = await make("L01");
+    at(0); a.play("fold", 1);
+    at(200); a.play("hold", 1); // rejected: a sustained sound is still playing
+    a.releaseGesture();
+    expect(stops.length).toBe(1);
   });
 
   it("stress: 10 plays/s for 5 s never exceeds the voice caps; every play gets a small rate jitter and bounded gain", async () => {
