@@ -1,0 +1,4 @@
+{
+  "_doc": "Listener verdicts: clips to leave out of the wax/crunch sprites. Written from the lab-compare page export (\"exclude\" marks). src = source id, srcStart = start time in seconds inside the source file, tol = match tolerance in seconds. Re-run build-clips.mjs after editing.",
+  "exclude": []
+}

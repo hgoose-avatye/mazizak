@@ -61,7 +61,13 @@ function tailEnd(x, a, maxEnd) {
 const crest = (c) => peakOf(c) / Math.max(rmsOf(c), 1e-9);
 function clipOf(an, a, b, extra = {}) {
   const raw = an.x.slice(a, b);
-  return { src: an.src, a, b, raw, peakDb: db(peakOf(raw)), centroid: centroid(raw, 0, Math.min(2048, raw.length >> 1 << 1)), strikes: an.strikes.filter((s) => s.start >= a && s.start < b).length, crest: crest(raw), ...extra };
+  const pk = peakOf(raw), hop = ms(5);
+  let quiet = 0, frames = 0;
+  for (let i = 0; i + hop <= raw.length; i += hop) { frames++; if (rmsOf(raw.subarray(i, i + hop)) < pk * 0.01) quiet++; }
+  let head = 0, tot = 0;
+  for (let i = 0; i < raw.length; i++) { tot += raw[i] * raw[i]; if (i < ms(30)) head += raw[i] * raw[i]; }
+  const tail = db(rmsOf(raw.subarray(Math.max(0, raw.length - ms(60)), Math.max(1, raw.length - ms(12)))) / Math.max(pk, 1e-9));
+  return { src: an.src, a, b, raw, peakDb: db(pk), centroid: centroid(raw, 0, Math.min(2048, raw.length >> 1 << 1)), strikes: an.strikes.filter((s) => s.start >= a && s.start < b).length, crest: crest(raw), sparse: frames ? quiet / frames : 0, headShare: head / Math.max(tot, 1e-12), tailDb: tail, ...extra };
 }
 const overlaps = (list, c, pad = ms(20)) => list.some((o) => o.src === c.src && c.a < o.b + pad && c.b > o.a - pad);
 
@@ -82,9 +88,13 @@ function singles(an, { minLen = 60, maxLen = 240, isolation = 0 } = {}) {
 function windows(an, lenMs, { minStrikes = 3 } = {}) {
   const out = [];
   for (const s of an.strikes) {
-    const b = s.start + ms(lenMs);
-    if (b > an.x.length) continue;
-    const c = clipOf(an, s.start, b, { strikePeakDb: s.peakDb });
+    const nominal = s.start + ms(lenMs);
+    if (nominal + ms(80) > an.x.length) continue;
+    // end the window at the quietest 5 ms point near its nominal end instead of cutting through a loud passage
+    let b = nominal, bv = Infinity;
+    for (let e = nominal - ms(100); e <= nominal + ms(80); e += ms(2)) { const v = rmsOf(an.x.subarray(e - ms(5), e)); if (v < bv) { bv = v; b = e; } }
+    if (b - s.start < ms(300)) continue;
+    const c = clipOf(an, s.start, b, { strikePeakDb: s.peakDb, window: true });
     if (c.strikes >= minStrikes) out.push(c);
   }
   return out;
@@ -107,19 +117,61 @@ function pick(cands, n, score, { diverse = false } = {}) {
   return chosen.sort((p, q) => p.src.id.localeCompare(q.src.id) || p.a - q.a);
 }
 
+
+// ───────── quality gates (objective only — nobody has listened) ─────────
+const GATE = { maxBoostDb: 18, maxSource: -0.5, maxSparse: 0.55, maxTailDb: -16, minHeadShare: 0.45, centroid: [0.45, 2.2], length: [0.5, 2] };
+const audit = {}; // pool → { candidates, rejected: { reason: count } }
+const EXCL = (() => { try { return JSON.parse(fs.readFileSync(path.join(path.dirname(fileURLToPath(import.meta.url)), 'exclusions.json'), 'utf8')).exclude ?? []; } catch { return []; } })();
+const med = (a) => [...a].sort((p, q) => p - q)[Math.floor(a.length / 2)];
+function qc(pool, list) {
+  const rej = {};
+  const why = (c) => {
+    if (c.peakDb < -1 - GATE.maxBoostDb) return 'BOOST>18dB';
+    if (c.peakDb > GATE.maxSource) return 'CLIPPED-SOURCE';
+    if (c.sparse > GATE.maxSparse) return 'SPARSE';
+    if (c.window && c.tailDb > GATE.maxTailDb) return 'CUTOFF';
+    if (!c.window && c.headShare < GATE.minHeadShare && c.b - c.a > ms(120)) return 'SOFTHEAD';
+    if (EXCL.some((e) => e.src === c.src.id && Math.abs(e.srcStart - c.a / SR) <= (e.tol ?? 0.03))) return 'LISTENER-EXCLUDED';
+    return null;
+  };
+  let kept = list.filter((c) => { const r = why(c); if (r) rej[r] = (rej[r] ?? 0) + 1; return !r; });
+  if (kept.length >= 3) {
+    const mc = med(kept.map((c) => c.centroid)), md = med(kept.map((c) => c.b - c.a));
+    kept = kept.filter((c) => {
+      let r = null;
+      if (c.centroid < GATE.centroid[0] * mc || c.centroid > GATE.centroid[1] * mc) r = 'SPECTRUM-OUTLIER';
+      else if (!c.window && ((c.b - c.a) < GATE.length[0] * md || (c.b - c.a) > GATE.length[1] * md)) r = 'LENGTH-OUTLIER';
+      if (r) rej[r] = (rej[r] ?? 0) + 1;
+      return !r;
+    });
+  }
+  if (kept.length === 2 && Math.max(kept[0].centroid, kept[1].centroid) / Math.min(kept[0].centroid, kept[1].centroid) > GATE.centroid[1]) {
+    rej['SPECTRUM-OUTLIER'] = (rej['SPECTRUM-OUTLIER'] ?? 0) + 2; // two clips that sound like different things cannot form a pool
+    kept = [];
+  }
+  audit[pool] = { candidates: list.length, passed: kept.length, rejected: rej };
+  return kept;
+}
+// a pool needs enough independent clips to avoid an audible loop; otherwise the event is dropped (the player then falls back or stays silent)
+const MIN_CLIPS = { init: 2, crack: 3, crunch: 3, hold: 3 };
+const dropped = [];
+
 // ───────── pools ─────────
 const pools = {};
-function addPool(name, event, material, clips, note) { pools[name] = { event, material, note, clips }; }
+function addPool(name, event, material, clips, note) {
+  if (clips.length < MIN_CLIPS[event]) { dropped.push({ pool: name, event, kept: clips.length, minimum: MIN_CLIPS[event], reason: 'too few clips passed the quality gates' }); return; }
+  pools[name] = { event, material, note, clips };
+}
 
 const wax = SOURCES.wax.map(analyse);
 for (const kind of ['apple', 'choco']) {
   const crackFiles = wax.filter((a) => a.src.title.startsWith(`${kind}_crack`)), kneadFiles = wax.filter((a) => a.src.title.startsWith(`${kind}_knead`));
-  const hits = crackFiles.flatMap((a) => singles(a, { minLen: 70, maxLen: 260, isolation: 140 }).filter((c) => c.strikePeakDb >= a.maxPeakDb - 10));
+  const hits = qc(`${kind}.init`, crackFiles.flatMap((a) => singles(a, { minLen: 70, maxLen: 260, isolation: 140 }).filter((c) => c.strikePeakDb >= a.maxPeakDb - 10)));
   const init = pick(hits, 3, (c) => c.strikePeakDb);
   const rest = hits.filter((c) => !init.includes(c));
-  const crack = pick(crackFiles.flatMap((a) => singles(a, { minLen: 60, maxLen: 200 }).filter((c) => c.strikePeakDb >= a.maxPeakDb - 22 && c.strikePeakDb <= a.maxPeakDb - 2)).filter((c) => !init.some((i) => i.src === c.src && Math.abs(i.a - c.a) < ms(300))), 6, (c) => c.strikePeakDb - Math.abs(c.peakDb + 20) * 0.1);
-  const burst = pick(crackFiles.flatMap((a) => windows(a, 420, { minStrikes: 4 }).filter((c) => c.peakDb >= -20)), 3, (c) => c.strikes);
-  const knead = pick(kneadFiles.flatMap((a) => windows(a, 560, { minStrikes: 3 })), 6, (c) => c.strikes - c.crest * 0.15);
+  const crack = pick(qc(`${kind}.crack`, crackFiles.flatMap((a) => singles(a, { minLen: 60, maxLen: 200 }).filter((c) => c.strikePeakDb >= a.maxPeakDb - 22 && c.strikePeakDb <= a.maxPeakDb - 2))).filter((c) => !init.some((i) => i.src === c.src && Math.abs(i.a - c.a) < ms(300))), 6, (c) => c.strikePeakDb - Math.abs(c.peakDb + 20) * 0.1);
+  const burst = pick(qc(`${kind}.burst`, crackFiles.flatMap((a) => windows(a, 420, { minStrikes: 4 }).filter((c) => c.peakDb >= -20))), 3, (c) => c.strikes);
+  const knead = pick(qc(`${kind}.knead`, kneadFiles.flatMap((a) => windows(a, 560, { minStrikes: 3 }))), 6, (c) => c.strikes - c.crest * 0.15);
   void rest;
   addPool(`${kind}.init`, 'init', 'wax', init, 'strongest isolated first-break hits');
   addPool(`${kind}.crack`, 'crack', 'wax', crack, 'single crack hits');
@@ -132,10 +184,10 @@ const by = (id) => cr.find((a) => a.src.id === id);
 const soapSrc = [by('freesound:389657'), by('freesound:195797')];
 const beadSrc = [by('freesound:541076'), by('freesound:343795')];
 const sugarSrc = [by('freesound:567534')];
-addPool('soap.crunch', 'crunch', 'styrofoam', pick(soapSrc.flatMap((a) => singles(a, { minLen: 50, maxLen: 190 }).filter((c) => c.strikePeakDb >= a.maxPeakDb - 14)), 8, (c) => c.strikePeakDb, { diverse: true }), 'short crushing hits (styrofoam)');
-addPool('soap.hold', 'hold', 'styrofoam', pick(soapSrc.flatMap((a) => windows(a, 640, { minStrikes: 5 }).filter((c) => c.peakDb <= a.maxPeakDb - 0)), 5, (c) => c.strikes - c.crest * 0.3, { diverse: true }), 'dense continuous crinkle windows (styrofoam)');
-addPool('beads.crunch', 'crunch', 'plastic beads', pick(beadSrc.flatMap((a) => singles(a, { minLen: 35, maxLen: 150 }).filter((c) => c.strikePeakDb >= a.maxPeakDb - 14)), 8, (c) => c.strikePeakDb, { diverse: true }), 'short bead collisions (plastic beads)');
-addPool('beads.hold', 'hold', 'sugar granules + plastic beads', pick([...sugarSrc, by('freesound:541076')].flatMap((a) => windows(a, 640, { minStrikes: 4 })), 5, (c) => c.strikes - c.crest * 0.3, { diverse: true }), 'grainy friction / rattle windows (sugar granules, plastic beads)');
+addPool('soap.crunch', 'crunch', 'styrofoam', pick(qc('soap.crunch', soapSrc.flatMap((a) => singles(a, { minLen: 50, maxLen: 190 }).filter((c) => c.strikePeakDb >= a.maxPeakDb - 14))), 8, (c) => c.strikePeakDb, { diverse: true }), 'short crushing hits (styrofoam)');
+addPool('soap.hold', 'hold', 'styrofoam', pick(qc('soap.hold', soapSrc.flatMap((a) => windows(a, 640, { minStrikes: 5 }))), 5, (c) => c.strikes - c.crest * 0.3, { diverse: true }), 'dense continuous crinkle windows (styrofoam)');
+addPool('beads.crunch', 'crunch', 'plastic beads', pick(qc('beads.crunch', beadSrc.flatMap((a) => singles(a, { minLen: 35, maxLen: 150 }).filter((c) => c.strikePeakDb >= a.maxPeakDb - 14))), 8, (c) => c.strikePeakDb, { diverse: true }), 'short bead collisions (plastic beads)');
+addPool('beads.hold', 'hold', 'sugar granules + plastic beads', pick(qc('beads.hold', [...sugarSrc, by('freesound:541076')].flatMap((a) => windows(a, 640, { minStrikes: 4 }))), 5, (c) => c.strikes - c.crest * 0.3, { diverse: true }), 'grainy friction / rattle windows (sugar granules, plastic beads)');
 
 // ───────── write sprites ─────────
 const CLASS = { init: 'impact', crack: 'impact', crunch: 'impact', hold: 'continuous' };
@@ -148,7 +200,8 @@ function level(y, cls) {
   for (let i = 0; i + n <= h.length || i === 0; i += ms(5)) { let e = 0; const k = Math.min(n, h.length - i); for (let j = i; j < i + k; j++) e += h[j] * h[j]; m = Math.max(m, e / Math.max(1, k)); if (i + n > h.length) break; }
   return Math.sqrt(m);
 }
-function build(file, groupNames, srcList) {
+function build(file, allNames, srcList) {
+  const groupNames = allNames.filter((n) => pools[n]);
   // fade + peak-normalise each clip to −1 dBFS
   const prepared = {};
   for (const name of groupNames) prepared[name] = pools[name].clips.map((c) => {
@@ -195,10 +248,14 @@ function build(file, groupNames, srcList) {
     version: 1, file: `${file}.wav`, sampleRate: SR, channels: 1, bitDepth: 16, totalSamples: sprite.length,
     note: 'Clips were picked automatically from the waveform and have NOT been listened to. `recordings` = distinct passages extracted from the source files; `variants` = derived copies (none here — runtime speed/pitch jitter is not counted). Sprite clips are peak-normalised to −1 dBFS; `gain` (≤1) equalises RMS within a pool; relative loudness between event classes is set by the player.',
     counts: { sourceFiles: Object.keys(sources).length, extractedClips: recordings, derivedVariants: 0 },
+    qualityGates: { ...GATE, minClips: MIN_CLIPS, listenerExclusions: EXCL.length },
+    audit: Object.fromEntries(Object.entries(audit).filter(([n]) => allNames.includes(n))),
+    dropped: dropped.filter((d) => allNames.includes(d.pool)),
     sources, pools: outPools,
   };
   fs.writeFileSync(path.join(OUT, `${file}.json`), JSON.stringify(map, null, 1) + '\n');
   console.log(`\n${file}: ${sprite.length} samples (${(sprite.length / SR).toFixed(2)} s), ${wav.length} bytes, ${recordings} clips from ${Object.keys(sources).length} source files`);
+  for (const d of dropped.filter((d) => allNames.includes(d.pool))) console.log(`  DROPPED ${d.pool}: only ${d.kept} clip(s) passed the gates (min ${d.minimum})`);
   for (const [n, p] of Object.entries(outPools)) console.log(`  ${n.padEnd(14)} ${p.event.padEnd(6)} src=${[...new Set(p.entries.map((e) => e.src.replace('freesound:', 'fs').replace('wax:', '')))].join(',')} n=${String(p.entries.length).padStart(2)} dur ${Math.min(...p.entries.map((e) => e.duration)).toFixed(2)}–${Math.max(...p.entries.map((e) => e.duration)).toFixed(2)}s centroid ${Math.round(p.entries.reduce((s, e) => s + e.centroidHz, 0) / p.entries.length)}Hz  gain ${Math.min(...p.entries.map((e) => e.gain)).toFixed(2)}–1  max boost +${Math.max(...p.entries.map((e) => e.boostDb)).toFixed(1)}dB`);
 }
 build('wax', ['apple.init', 'apple.crack', 'apple.burst', 'apple.knead', 'choco.init', 'choco.crack', 'choco.burst', 'choco.knead'], SOURCES.wax);

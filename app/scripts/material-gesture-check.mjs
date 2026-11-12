@@ -87,12 +87,12 @@ try {
     if (id === "S02")
       ok(
         "foam uses PU contact without synthetic recover",
-        JSON.stringify(down.audioRoles) === '["tap","hold"]',
+        JSON.stringify(down.audioRoles) === '["hold"]',
       );
     if (id === "S03")
       ok(
         "mochi has no generic release or rub role",
-        JSON.stringify(down.audioRoles) === '["tap","hold"]',
+        JSON.stringify(down.audioRoles) === '["hold"]',
       );
     if (id === "L01")
       ok(

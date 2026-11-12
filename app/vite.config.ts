@@ -10,6 +10,12 @@ export default defineConfig(({ command, isPreview }) => {
     command === "serve" && !isPreview
       ? process.env.MANZIZAK_LOCAL_FIDGET_DIR
       : undefined;
+  // read-only, loopback-only window onto the sounds of an installed reference app, for listening comparisons in lab-compare.html.
+  // Nothing is copied into the repository or the build (scripts/check-dist.mjs forbids the route name in dist/).
+  const originalDir =
+    command === "serve" && !isPreview
+      ? process.env.MANZIZAK_ORIGINAL_APP_DIR
+      : undefined;
   const localDir =
     command === "serve" && !isPreview
       ? process.env.MANZIZAK_LOCAL_AUDIO_DIR
@@ -28,6 +34,41 @@ export default defineConfig(({ command, isPreview }) => {
       ),
     },
     plugins: [
+      ...(originalDir
+        ? [
+            {
+              name: "manzizak-original-app-sounds",
+              configureServer(server: import("vite").ViteDevServer) {
+                server.middlewares.use("/__original-wak", async (req, res, next) => {
+                  const loop = ["127.0.0.1", "::1", "::ffff:127.0.0.1"].includes(req.socket.remoteAddress ?? "");
+                  if (!loop) { res.statusCode = 403; return res.end("loopback only"); }
+                  const url = decodeURIComponent((req.url ?? "/").split("?")[0]);
+                  try {
+                    if (url === "/index.json") {
+                      const { readdir } = await import("node:fs/promises");
+                      const out: Record<string, string[]> = {};
+                      for (const cat of ["wak", "crunch"])
+                        for (const d of await readdir(path.join(originalDir, cat), { withFileTypes: true }))
+                          if (d.isDirectory()) out[`${cat}/${d.name}`] = (await readdir(path.join(originalDir, cat, d.name))).filter((f) => /\.(mp3|wav)$/i.test(f)).sort();
+                      res.setHeader("Content-Type", "application/json");
+                      res.setHeader("Cache-Control", "no-store");
+                      return res.end(JSON.stringify(out));
+                    }
+                    const m = /^\/((?:wak|crunch)\/[a-z0-9_-]+\/[A-Za-z0-9_.-]+\.(?:mp3|wav))$/i.exec(url);
+                    if (!m) return next();
+                    const data = await readFile(path.join(originalDir, m[1]));
+                    res.setHeader("Content-Type", /\.wav$/i.test(m[1]) ? "audio/wav" : "audio/mpeg");
+                    res.setHeader("Cache-Control", "no-store");
+                    res.end(data);
+                  } catch {
+                    res.statusCode = 404;
+                    res.end("unavailable");
+                  }
+                });
+              },
+            },
+          ]
+        : []),
       ...(fidgetDir
         ? [
             {

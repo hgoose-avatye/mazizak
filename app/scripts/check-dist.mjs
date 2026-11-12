@@ -9,7 +9,7 @@ const files = [];
 (function walk(d) { for (const n of fs.readdirSync(d)) { const p = path.join(d, n); fs.statSync(p).isDirectory() ? walk(p) : files.push(p); } })(dist);
 const problems = [];
 // 1) forbidden strings in text assets
-const FORBIDDEN = ['__local-fidgets', 'MANZIZAK_LOCAL', 'manzizak-fidget-reference', 'manzizak-local-presets', '/private/tmp/', 'installed-app', '7WDcH26JU5Q'];
+const FORBIDDEN = ['__original-wak', 'MANZIZAK_ORIGINAL_APP_DIR', '/Applications/Runner.app', '__local-fidgets', 'MANZIZAK_LOCAL', 'manzizak-fidget-reference', 'manzizak-local-presets', '/private/tmp/', 'installed-app', '7WDcH26JU5Q'];
 for (const f of files.filter((f) => /\.(js|css|html|json|md|map)$/.test(f))) {
   const t = fs.readFileSync(f, 'utf8');
   for (const s of FORBIDDEN) if (t.includes(s)) problems.push(`${path.relative(dist, f)} contains "${s}"`);

@@ -5,6 +5,7 @@ import {
   CLASS_LEVEL_DB,
   ClipPicker,
   EVENTS,
+  EXCLUDED,
   FALLBACK,
   FIDGET_SOUND,
   MAX_SHORT_VOICES,
@@ -54,6 +55,7 @@ interface Entry { start: number; length: number; offset: number; duration: numbe
 interface SpriteMap {
   file: string; sampleRate: number; totalSamples: number;
   counts: { sourceFiles: number; extractedClips: number; derivedVariants: number };
+  dropped: { pool: string }[];
   sources: Record<string, { license: string; licenseUrl: string; author: string; usage: string; originalFile: string; materialMatch: string }>;
   pools: Record<string, { event: string; loudnessClass: string; recordings: number; variants: number; entries: Entry[] }>;
 }
@@ -71,8 +73,8 @@ describe("event → pool mapping", () => {
   });
 
   it("sprite pools referenced by the map exist; squishy pools and slices are valid", () => {
-    const sq = new Set(["touch", "compress", "compressGel", "recover", "stretchWindows"]);
-    const sqCount: Record<string, number> = { touch: 5, compress: 6, compressGel: 5, recover: 2, stretchWindows: 3 };
+    const sq = new Set(["touch", "compress", "compressGel", "recover"]);
+    const sqCount: Record<string, number> = { touch: 5, compress: 6, compressGel: 5, recover: 2 };
     for (const [id, toy] of Object.entries(FIDGET_SOUND))
       for (const e of EVENTS) {
         const r = toy[e] as PoolRef | null;
@@ -83,6 +85,7 @@ describe("event → pool mapping", () => {
             if (r.slice) { expect(r.slice[0]).toBeGreaterThanOrEqual(0); expect(r.slice[1]).toBeLessThanOrEqual(sqCount[pool]); expect(r.slice[1]).toBeGreaterThan(r.slice[0]); }
           } else {
             const s = r.source === "wax" ? sprites.wax : sprites.crunch;
+            if (s.dropped.some((d) => d.pool === pool)) { expect(s.pools[pool], `${pool} is listed as dropped`).toBeUndefined(); return; }
             expect(s.pools[pool], `${id}.${e} ${r.source}/${pool}`).toBeTruthy();
             expect(s.pools[pool].event === e || (e === "crack" && s.pools[pool].event === "crack") || (e === "init" && s.pools[pool].event === "init")).toBe(true);
           }
@@ -107,11 +110,31 @@ describe("event → pool mapping", () => {
     }
   });
 
+  it("every mapped event rests on enough independent clips (≥3, init ≥2); the only single-clip event is the declared legacy S02.hold", () => {
+    const sqCount: Record<string, number> = { touch: 5, compress: 6, compressGel: 5, recover: 2 };
+    const legacy = new Set(["S02.hold"]);
+    for (const [id, toy] of Object.entries(FIDGET_SOUND))
+      for (const e of EVENTS) {
+        const r = toy[e];
+        if (!r) continue;
+        let n: number;
+        if (r.source === "squishy") n = r.slice ? r.slice[1] - r.slice[0] : sqCount[r.pool];
+        else {
+          const s = r.source === "wax" ? sprites.wax : sprites.crunch;
+          if (s.dropped.some((d) => d.pool === r.pool)) continue; // dropped pool: the event has no sound of its own
+          n = s.pools[r.pool].entries.length;
+        }
+        if (legacy.has(`${id}.${e}`)) { expect(n).toBe(1); continue; }
+        expect(n, `${id}.${e}`).toBeGreaterThanOrEqual(e === "init" ? 2 : 3);
+      }
+  });
+
   it("derived / proxy sources are labelled, never claimed as recordings of the toy", () => {
     for (const toy of Object.values(FIDGET_SOUND)) for (const e of EVENTS) expect(toy[e]?.kind, "derived (reversed/slowed) audio is not used for any fidget event").not.toBe("derived");
     expect(FIDGET_SOUND.S02.release).toBeNull(); // no synthetic foam "recover"
     for (const id of ["C01", "C02"]) for (const e of ["hold", "crunch"] as const) expect(FIDGET_SOUND[id][e]!.kind).toBe("proxy");
-    expect(FIDGET_SOUND.L01.stretch!.kind).toBe("proxy");
+    expect(FIDGET_SOUND.L01.stretch).toBeNull(); // rubber-glove stretch windows were removed in the quality pass
+    expect(EXCLUDED.length).toBeGreaterThan(5);
   });
 
   it("class levels keep impacts above touches above releases", () => {
@@ -231,8 +254,11 @@ describe("shipped wax / crunch sprites", () => {
     });
   }
   it("wax pools have enough independent strikes per event, and all clips come from distinct passages", () => {
-    const min: Record<string, number> = { init: 2, crack: 4, burst: 3, knead: 6 };
-    for (const k of ["apple", "choco"]) for (const [suffix, n] of Object.entries(min)) expect(sprites.wax.pools[`${k}.${suffix}`].entries.length, `${k}.${suffix}`).toBeGreaterThanOrEqual(n);
+    const min: Record<string, number> = { "apple.init": 2, "apple.crack": 3, "apple.burst": 3, "apple.knead": 6, "choco.crack": 3, "choco.burst": 3, "choco.knead": 6 };
+    for (const [pool, n] of Object.entries(min)) expect(sprites.wax.pools[pool].entries.length, pool).toBeGreaterThanOrEqual(n);
+    // pools that could not reach the minimum after the quality gates are dropped, not padded
+    expect(sprites.wax.dropped.map((d) => d.pool).sort()).toEqual(["choco.init"]);
+    for (const p of Object.values(sprites.wax.pools)) expect(p.entries.length).toBeGreaterThanOrEqual(p.event === "init" ? 2 : 3);
     for (const p of Object.values(sprites.wax.pools)) {
       const keys = p.entries.map((e) => `${e.src}@${(e as unknown as { srcStart: number }).srcStart}`);
       expect(new Set(keys).size).toBe(keys.length);
@@ -336,21 +362,26 @@ describe("FidgetAudio event routing", () => {
     }
   });
 
-  it("squishy toys: tap / hold / release / stretch / fold come from different clips; L03 has no stretch of its own", async () => {
+  it("squishy toys keep a sustained gel sound; only L03 has a separate fold; others fall back to hold", async () => {
     const l01 = await make("L01");
     expect(l01.a.state).toBe("recorded/derived");
-    for (const e of ["hold", "stretch", "fold"]) expect(l01.a.hasOwn(e as never)).toBe(true);
-    for (const e of ["tap", "release"]) expect(l01.a.hasOwn(e as never)).toBe(false);
-    expect(l01.a.has("tap")).toBe(true); // tap → hold fallback
-    const s01 = await make("S01");
-    for (const e of ["tap", "hold"]) expect(s01.a.hasOwn(e as never)).toBe(true);
-    const s02 = await make("S02");
-    expect(s02.a.hasOwn("release")).toBe(false);
-    expect(s02.a.hasOwn("tap")).toBe(true);
-    expect(s02.a.hasOwn("hold")).toBe(true);
+    expect(l01.a.supportedRoles).toEqual(["hold"]);
+    for (const e of ["tap", "stretch", "fold"] as const) { expect(l01.a.hasOwn(e)).toBe(false); expect(l01.a.has(e)).toBe(true); }
     const l03 = await make("L03");
-    expect(l03.a.hasOwn("stretch")).toBe(false);
+    expect(l03.a.supportedRoles).toEqual(["hold", "fold"]);
     expect(l03.a.has("stretch")).toBe(true);
+    const s02 = await make("S02");
+    expect(s02.a.supportedRoles).toEqual(["hold"]);
+    expect(s02.a.hasOwn("release")).toBe(false);
+  });
+
+  it("W02: no init pool (dropped by the audit) → the first crack plays the normal crack pool; strong breaking the burst pool", async () => {
+    const { a, plays, at } = await make("W02");
+    expect(a.hasOwn("init")).toBe(false);
+    at(0); expect(a.play("crack", 0.5)).toBe(true);
+    at(400); expect(a.play("crack", 0.9)).toBe(true);
+    expect(plays[0].name).toMatch(/^fg:W02:crack:m:/);
+    expect(plays[1].name).toMatch(/^fg:W02:crack:a:/);
   });
 
   it("switching toys: leave() fades out running voices and a left toy is silent; re-entering plays again", async () => {
@@ -365,7 +396,7 @@ describe("FidgetAudio event routing", () => {
   });
 
   it("finger lift: releaseGesture() fades only the sustained voice, short voices keep ringing", async () => {
-    const { a, stops, at } = await make("L01");
+    const { a, stops, at } = await make("L03");
     at(0); a.play("fold", 1);
     at(200); a.play("hold", 1); // rejected: a sustained sound is still playing
     a.releaseGesture();

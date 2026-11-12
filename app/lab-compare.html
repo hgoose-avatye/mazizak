@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <link rel="icon" type="image/png" href="./icons/icon-192.png" />
+    <title>피젯 소리 비교 · 만지작 개발용</title>
+    <style>
+      body { position: static !important; overflow: auto !important; user-select: auto !important; -webkit-user-select: auto !important; padding: 14px 14px 90px; max-width: 980px; margin: 0 auto; line-height: 1.45; }
+      h1 { font-size: 19px; margin: 4px 0; } h2 { font-size: 15px; margin: 18px 0 6px; } h3 { font-size: 13px; margin: 12px 0 4px; }
+      small, .muted { color: #6c645b; font-size: 12.5px; }
+      .warn { background: #fff4d0; padding: 8px 10px; border-radius: 8px; font-size: 13px; margin: 6px 0; }
+      .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+      @media (max-width: 760px) { .cols { grid-template-columns: 1fr; } }
+      .col { background: #fff8; border-radius: 12px; padding: 8px 10px; }
+      .row { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; margin: 4px 0; }
+      .row button, .row select, .row input[type='text'] { font-size: 13px; padding: 6px 9px; border-radius: 8px; border: 1px solid #0002; background: #fff; }
+      .clip { display: flex; gap: 6px; align-items: center; padding: 4px 0; border-top: 1px solid #0001; font-size: 12.5px; }
+      .clip .play { min-width: 44px; min-height: 36px; border: 0; border-radius: 8px; background: #2a2724; color: #fff; }
+      .clip .lab { flex: 1; word-break: break-all; }
+      .clip .v { min-width: 38px; min-height: 30px; font-size: 12px; border: 1px solid #0002; border-radius: 6px; background: #fff; }
+      .clip .v[aria-pressed='true'].keep { background: #2d7a46; color: #fff; }
+      .clip .v[aria-pressed='true'].drop { background: #b23b3b; color: #fff; }
+      .evt { background: #0000000a; border-radius: 8px; padding: 4px 8px; margin: 8px 0; }
+      #out { font: 11.5px/1.4 ui-monospace, Menlo, monospace; white-space: pre-wrap; background: #0000000d; padding: 8px; border-radius: 8px; max-height: 240px; overflow: auto; }
+    </style>
+  </head>
+  <body>
+    <h1>피젯 소리 비교 (개발용)</h1>
+    <p class="muted">왼쪽 = MANZIZAK(이 코드가 실제로 재생하는 클립 · 앱과 같은 엔진·음량), 오른쪽 = 설치된 원본 왁뿌볼 앱의 소리 파일(앱 폴더에서 읽기만 하며 복사·저장하지 않습니다). 원본 앱도 켜 두었으니 같은 장난감을 직접 만지며 나란히 들어보세요. 마음에 안 드는 클립은 <b>제외</b>로 표시하면 JSON으로 내보낼 수 있고, 그대로 `scripts/fidgets/exclusions.json`에 반영해 다시 빌드합니다. <b>청취 전에는 어떤 클립도 "좋음"으로 확정되지 않습니다.</b></p>
+    <div class="warn" id="status">불러오는 중…</div>
+    <div class="row">
+      <label>장난감 <select id="toy"></select></label>
+      <label>원본 폴더 <select id="orig"></select></label>
+      <label><input type="checkbox" id="match" /> 음량 맞춤(양쪽 피크 −12 dBFS)</label>
+      <button id="stop">■ 정지</button>
+    </div>
+    <div class="cols">
+      <div class="col"><h2 id="lt">MANZIZAK</h2><div id="left"></div></div>
+      <div class="col"><h2 id="rt">원본 왁뿌볼</h2><div id="right"></div></div>
+    </div>
+    <h2>판정 내보내기</h2>
+    <div class="row"><button id="copy">제외 목록 JSON 복사</button><button id="clear">판정 지우기</button><small id="count"></small></div>
+    <pre id="out"></pre>
+    <script type="module" src="/src/lab/compare-fidgets.ts"></script>
+  </body>
+</html>

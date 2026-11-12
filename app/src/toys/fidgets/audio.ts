@@ -85,13 +85,6 @@ function gestureCues(ctx: BaseAudioContext, buffer: AudioBuffer) {
     .slice(0, 20)
     .map(([a, b]) => cut(ctx, buffer, a, b - a));
 }
-/** three fixed 0.8 s windows of the 2.4 s rubber-glove loop, with fades: stand-ins for "stretching" one-shots */
-function stretchWindows(ctx: BaseAudioContext, loop: AudioBuffer) {
-  const w = 0.8;
-  return [0, 1, 2]
-    .filter((i) => (i + 1) * w <= loop.duration + 0.01)
-    .map((i) => cut(ctx, loop, i * w, w));
-}
 const SHAPE_TARGET_DB: Record<string, number> = { foam: -34, mochi: -30, cream: -29 };
 /** squishy clips keep their previous RMS normalisation (shape target, never boosted, peak ≤ 0.7) */
 function normaliseRaw(ctx: BaseAudioContext, raw: AudioBuffer[], targetDb: number) {
@@ -122,6 +115,110 @@ function normaliseRaw(ctx: BaseAudioContext, raw: AudioBuffer[], targetDb: numbe
       unique.set(x.length + ":" + signature, out);
     }
   return [...unique.values()];
+}
+
+export interface ResolvedClip {
+  buffer: AudioBuffer;
+  /** where the clip comes from, e.g. "wax:apple_crack_1 @1.24s" or "squishy/compressGel[1,4) cue 0" */
+  label: string;
+  /** sprite clips only: source id and start time (seconds) inside the source file — the key used by scripts/fidgets/exclusions.json */
+  src?: string;
+  srcStart?: number;
+  /** short objective facts for the listening lab */
+  info?: string;
+}
+export interface ResolvedEvent {
+  ref: PoolRef | null;
+  main: ResolvedClip[];
+  alt?: ResolvedClip[];
+  altMin?: number;
+  baseDb: number;
+  rate: [number, number];
+  origin: string;
+}
+export interface ResolvedToy {
+  events: Partial<Record<FidgetEvent, ResolvedEvent>>;
+  source: string;
+}
+/** Resolve every event of a toy to its decoded clips (single source of truth for the player and the listening lab). */
+export async function resolveToy(ctx: BaseAudioContext, spec: FidgetSpec): Promise<ResolvedToy> {
+  const map = FIDGET_SOUND[spec.id];
+  if (!map) throw Error(`no sound map for ${spec.id}`);
+  const needs = (s: PoolRef["source"]) => EVENTS.some((e) => map[e]?.source === s);
+  const sq: SquishySoundsV2 | null = needs("squishy") ? await loadSquishySamples(ctx) : null;
+  const sprites: Partial<Record<"wax" | "crunch", LoadedSprite>> = {};
+  if (needs("wax")) sprites.wax = await loadSprite(ctx, "wax");
+  if (needs("crunch")) sprites.crunch = await loadSprite(ctx, "crunch");
+  const local = LOCAL_AUDIO ? await referenceSounds(ctx, spec.id) : {};
+  const hasVideoReference = LOCAL_AUDIO && spec.id === "L01" && !!(await referenceManifest()).toys.L01?.referenceVideo;
+  // dev-only local reference override (old role names → events); never present in production builds
+  // (same coverage as before the event model: foam and cream never used the local sounds)
+  const sh = spec.shape;
+  const localFor: Partial<Record<FidgetEvent, AudioBuffer[]>> =
+    sh === "foam" || sh === "cream"
+      ? {}
+      : spec.family === "wax"
+        ? { crack: local.crack, hold: local.knead }
+        : spec.family === "particles"
+          ? { crunch: local.crunch }
+          : { hold: local.compress ?? local.press, ...(spec.family === "viscous" ? { stretch: local.stretch, fold: local.fold } : {}) };
+  const shapeDb = SHAPE_TARGET_DB[spec.shape] ?? -27;
+  const events: ResolvedToy["events"] = {};
+  for (const event of EVENTS) {
+    const ref = map[event];
+    const poolsOf = (r: PoolRef, name: string): ResolvedClip[] => {
+      if (r.source === "squishy") {
+        const raw = name === "touch" ? sq!.touch : name === "compress" ? sq!.compress : name === "compressGel" ? (sq!.compressGel ?? sq!.compress) : sq!.recover;
+        const sel = r.slice ? raw.slice(r.slice[0], r.slice[1]) : raw;
+        const target = shapeDb + (event === "tap" ? -2 : event === "release" ? -6 : 0);
+        return normaliseRaw(ctx, sel, target).map((buffer, i) => ({ buffer, label: `squishy/${name}${r.slice ? `[${r.slice[0]},${r.slice[1]})` : ""} cue ${i}` }));
+      }
+      const sprite = sprites[r.source]!;
+      const p = sprite.pools[name];
+      if (!p) return []; // pool dropped by the clip audit: the event simply has no sound
+      const entries = sprite.json.pools[name].entries;
+      return p.map((buffer, i) => ({ buffer, label: `${entries[i].src} @${entries[i].srcStart.toFixed(2)}s`, src: entries[i].src, srcStart: entries[i].srcStart, info: `${(entries[i].duration * 1000).toFixed(0)} ms · ${(entries[i] as unknown as { centroidHz: number }).centroidHz} Hz · boost +${(entries[i] as unknown as { boostDb: number }).boostDb} dB` }));
+    };
+    const override = LOCAL_AUDIO ? localFor[event] : undefined;
+    if (!ref && !override?.length) continue;
+    let origin = ref ? `${ref.source}/${ref.pool}[${ref.kind}]` : "";
+    let main: ResolvedClip[];
+    let rate: [number, number] = ref?.rate ?? [0.98, 1.02];
+    if (override?.length) {
+      main = normaliseRaw(ctx, override, shapeDb).map((buffer, i) => ({ buffer, label: `local-reference cue ${i}` }));
+      origin = "local-reference";
+      rate = [0.98, 1.02];
+    } else main = poolsOf(ref!, ref!.pool);
+    let promoted = false;
+    if (!main.length && ref?.alt && !override?.length) {
+      // the single-hit pool was dropped by the clip audit: the dense pool answers every event of this kind
+      main = poolsOf(ref, ref.alt.pool);
+      promoted = true;
+    }
+    if (!main.length) continue;
+    const e: ResolvedEvent = {
+      ref: override?.length ? null : ref,
+      main,
+      baseDb: (ref && ref.source !== "squishy" && !override?.length ? SPRITE_TRIM_DB[event] : CLASS_LEVEL_DB[event]) + (ref?.trimDb ?? 0),
+      rate,
+      origin,
+    };
+    if (ref?.alt && !override?.length && !promoted) {
+      const alt = poolsOf(ref, ref.alt.pool);
+      if (alt.length) {
+        e.alt = alt;
+        e.altMin = ref.alt.minStrength;
+      }
+    }
+    events[event] = e;
+  }
+  const kinds = new Set(EVENTS.map((e) => events[e]?.origin).filter(Boolean) as string[]);
+  const source = LOCAL_AUDIO
+    ? hasVideoReference
+      ? "local reference (incl. user video 7WDcH26JU5Q 20–29s soundtrack cues, rights unverified); local only"
+      : `local reference overrides + licensed pools: ${[...kinds].join(", ")}`
+    : `licensed pools: ${[...kinds].join(", ")}`;
+  return { events, source };
 }
 
 interface PlayableSet {
@@ -168,90 +265,20 @@ export class FidgetAudio {
   }
   private async prepare() {
     try {
-      const map = FIDGET_SOUND[this.spec.id];
-      if (!map) throw Error(`no sound map for ${this.spec.id}`);
-      const ctx = this.audio.ctx,
-        needs = (s: PoolRef["source"]) => EVENTS.some((e) => map[e]?.source === s);
-      const sq: SquishySoundsV2 | null = needs("squishy") ? await loadSquishySamples(ctx) : null;
-      const sprites: Partial<Record<"wax" | "crunch", LoadedSprite>> = {};
-      if (needs("wax")) sprites.wax = await loadSprite(ctx, "wax");
-      if (needs("crunch")) sprites.crunch = await loadSprite(ctx, "crunch");
-      const local = LOCAL_AUDIO ? await referenceSounds(ctx, this.spec.id) : {};
-      const hasVideoReference =
-        LOCAL_AUDIO &&
-        this.spec.id === "L01" &&
-        !!(await referenceManifest()).toys.L01?.referenceVideo;
-      // dev-only local reference override (old role names → events); never present in production builds
-      // (same coverage as before the event model: foam and cream never used the local sounds)
-      const sh = this.spec.shape;
-      const localFor: Partial<Record<FidgetEvent, AudioBuffer[]>> =
-        sh === "foam" || sh === "cream"
-          ? {}
-          : this.spec.family === "wax"
-            ? { crack: local.crack, hold: local.knead }
-            : this.spec.family === "particles"
-              ? { crunch: local.crunch }
-              : {
-                  hold: local.compress ?? local.press,
-                  ...(this.spec.family === "viscous"
-                    ? { stretch: local.stretch, fold: local.fold }
-                    : {}),
-                };
-      const used = new Set<string>();
-      const shapeDb = SHAPE_TARGET_DB[this.spec.shape] ?? -27;
+      const r = await resolveToy(this.audio.ctx, this.spec);
+      this.source = r.source;
       for (const event of EVENTS) {
-        const ref = map[event];
-        const poolsOf = (r: PoolRef, name: string): AudioBuffer[] => {
-          if (r.source === "squishy") {
-            const raw =
-              name === "touch"
-                ? sq!.touch
-                : name === "compress"
-                  ? sq!.compress
-                  : name === "compressGel"
-                    ? (sq!.compressGel ?? sq!.compress)
-                    : name === "recover"
-                      ? sq!.recover
-                      : stretchWindows(ctx, sq!.stretch);
-            const sel = r.slice ? raw.slice(r.slice[0], r.slice[1]) : raw;
-            const target = shapeDb + (event === "tap" ? -2 : event === "release" ? -6 : 0);
-            return normaliseRaw(ctx, sel, target);
-          }
-          const sprite = sprites[r.source]!;
-          const p = sprite.pools[name];
-          if (!p) throw Error(`${this.spec.id}.${event}: pool ${name} missing in ${r.source} sprite`);
-          used.add(`${r.source}:${name}`);
-          return p;
-        };
-        const override = LOCAL_AUDIO ? localFor[event] : undefined;
-        if (!ref && !override?.length) continue;
-        let origin = ref ? `${ref.source}/${ref.pool}[${ref.kind}]` : "";
-        let main: AudioBuffer[];
-        let rate: [number, number] = ref?.rate ?? [0.98, 1.02];
-        if (override?.length) {
-          main = normaliseRaw(ctx, override, shapeDb);
-          origin = "local-reference";
-          rate = [0.98, 1.02];
-        } else main = poolsOf(ref!, ref!.pool);
-        if (!main.length) continue;
-        const set: PlayableSet = {
-          ref: override?.length ? null : ref,
-          main: [],
-          durations: {},
-          baseDb:
-            (ref && ref.source !== "squishy" && !override?.length ? SPRITE_TRIM_DB[event] : CLASS_LEVEL_DB[event]) +
-            (ref?.trimDb ?? 0),
-          rate,
-          origin,
-        };
-        for (const [name, d] of this.register(event, "m", main)) {
+        const e = r.events[event];
+        if (!e) continue;
+        const set: PlayableSet = { ref: e.ref, main: [], durations: {}, baseDb: e.baseDb, rate: e.rate, origin: e.origin };
+        for (const [name, d] of this.register(event, "m", e.main.map((c) => c.buffer))) {
           set.main.push(name);
           set.durations[name] = d;
         }
-        if (ref?.alt && !override?.length) {
+        if (e.alt) {
           set.alt = [];
-          set.altMin = ref.alt.minStrength;
-          for (const [name, d] of this.register(event, "a", poolsOf(ref, ref.alt.pool))) {
+          set.altMin = e.altMin;
+          for (const [name, d] of this.register(event, "a", e.alt.map((c) => c.buffer))) {
             set.alt.push(name);
             set.durations[name] = d;
           }
@@ -259,14 +286,6 @@ export class FidgetAudio {
         this.sets[event] = set;
         this.supportedRoles.push(event);
       }
-      const kinds = new Set(
-        EVENTS.map((e) => this.sets[e]?.origin).filter(Boolean) as string[],
-      );
-      this.source = LOCAL_AUDIO
-        ? hasVideoReference
-          ? "local reference (incl. user video 7WDcH26JU5Q 20–29s soundtrack cues, rights unverified); local only"
-          : `local reference overrides + licensed pools: ${[...kinds].join(", ")}`
-        : `licensed pools: ${[...kinds].join(", ")}`;
       this.state = "recorded/derived";
     } catch (e) {
       this.state = "failed";

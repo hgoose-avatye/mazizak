@@ -56,50 +56,23 @@ const waxToy = (k: "apple" | "choco"): ToySound => ({
 const WET = "CC0 gel squelch recordings (not the exact toy)";
 
 export const FIDGET_SOUND: Record<string, ToySound> = {
-  S01: {
-    init: NONE,
-    tap: sq("compressGel", "recording", "shortest CC0 gel squelch as a short elastic press", { slice: [0, 1], rate: jitter(0.06) }),
-    hold: sq("compressGel", "recording", WET, { slice: [1, 4] }),
-    release: NONE, stretch: NONE, fold: NONE, crack: NONE, crunch: NONE,
-  },
+  // Quality pass: events that would loop one or two clips, or that rest on a mismatched material, were removed (see EXCLUDED).
+  // Toys then keep the sustained gel sound they had before the event model.
+  S01: { init: NONE, tap: NONE, hold: sq("compressGel", "recording", WET, { slice: [1, 4] }), release: NONE, stretch: NONE, fold: NONE, crack: NONE, crunch: NONE },
   S02: {
-    // unchanged policy from the earlier foam work: the PU-foam contact clip, no synthetic "recover" (no real slow-rise recording exists)
-    init: NONE,
-    tap: sq("touch", "recording", "CC0 soft pillow-hit contact", { slice: [3, 4], rate: jitter(0.06) }),
+    // the only real PU-foam contact clip (#680000); single clip = legacy exception, kept because it is the previous behaviour
+    init: NONE, tap: NONE,
     hold: sq("touch", "recording", "CC0 PU acoustic-foam contact (#680000)", { slice: [4, 5], rate: jitter(0.05) }),
     release: NONE, stretch: NONE, fold: NONE, crack: NONE, crunch: NONE,
   },
-  S03: {
-    init: NONE,
-    tap: sq("compressGel", "recording", "shortest CC0 gel squelch, slowed slightly for a softer, localised press", { slice: [0, 1], rate: [0.9, 0.96] }),
-    hold: sq("compressGel", "recording", WET, { slice: [2, 5], rate: [0.92, 0.97] }),
-    release: NONE, stretch: NONE, fold: NONE, crack: NONE, crunch: NONE,
-  },
-  L01: {
-    init: NONE,
-    tap: NONE, // sticky contact: the first press already plays the sustained sound
-    hold: sq("compressGel", "recording", WET, { slice: [0, 3], rate: [0.94, 0.99] }),
-    release: NONE,
-    stretch: sq("stretchWindows", "proxy", "CC0 rubber-glove stretching in fixed windows (not slime)"),
-    fold: sq("compressGel", "recording", WET, { slice: [3, 5], rate: [0.86, 0.9] }),
-    crack: NONE, crunch: NONE,
-  },
-  L02: {
-    init: NONE,
-    tap: NONE,
-    hold: sq("compressGel", "recording", WET, { slice: [0, 4] }),
-    release: NONE,
-    stretch: sq("stretchWindows", "proxy", "CC0 rubber-glove stretching in fixed windows (not slime)", { trimDb: -3 }),
-    fold: sq("compressGel", "recording", WET, { slice: [3, 5], rate: [0.9, 0.95] }),
-    crack: NONE, crunch: NONE,
-  },
+  S03: { init: NONE, tap: NONE, hold: sq("compressGel", "recording", WET, { slice: [2, 5], rate: [0.92, 0.97] }), release: NONE, stretch: NONE, fold: NONE, crack: NONE, crunch: NONE },
+  L01: { init: NONE, tap: NONE, hold: sq("compressGel", "recording", WET, { slice: [0, 3], rate: [0.94, 0.99] }), release: NONE, stretch: NONE, fold: NONE, crack: NONE, crunch: NONE },
+  L02: { init: NONE, tap: NONE, hold: sq("compressGel", "recording", WET, { slice: [0, 4] }), release: NONE, stretch: NONE, fold: NONE, crack: NONE, crunch: NONE },
   L03: {
-    init: NONE,
-    tap: NONE,
+    init: NONE, tap: NONE,
     hold: sq("compressGel", "recording", WET, { slice: [1, 4], rate: [0.9, 0.95] }),
-    release: NONE,
-    stretch: NONE, // no stretch recording for cream: falls back to hold
-    fold: sq("compressGel", "recording", WET, { slice: [3, 5], rate: [0.88, 0.93] }),
+    release: NONE, stretch: NONE,
+    fold: sq("compressGel", "recording", WET, { slice: [2, 5], rate: [0.88, 0.93] }),
     crack: NONE, crunch: NONE,
   },
   W01: waxToy("apple"),
@@ -117,6 +90,18 @@ export const FIDGET_SOUND: Record<string, ToySound> = {
     crunch: crunch("beads.crunch", "short plastic-bead collisions (similar material only)", { rate: jitter(0.05) }),
   },
 };
+
+/** What was taken out in the quality pass and why (objective facts; nobody has listened). */
+export const EXCLUDED: { what: string; why: string }[] = [
+  { what: "squishy stretch loop windows (rubber glove) for L01/L02 stretch", why: "the source needed +21 dB of gain from a 128 kbps recording, is latex rather than slime, and the three windows were fixed 0.8 s cuts" },
+  { what: "pillow-hit touch clip as S02 tap", why: "a pillow thump on a foam ball (material mismatch), single clip" },
+  { what: "single-gel-clip taps for S01/S03", why: "one clip repeated on every touch is an audible loop; the sustained gel sound plays at contact instead (previous behaviour)" },
+  { what: "2-clip fold pools for L01/L02", why: "fewer than 3 independent clips; fold falls back to the sustained gel sound" },
+  { what: "squishy cushion (couch-sitting) compress and derived reversed recover pools", why: "body-contact thump / reversed derived audio, not matching any toy; no fidget event uses them" },
+  { what: "wax/crunch candidate clips failing the waveform gates", why: "amplification > 18 dB, clipped source passage, mostly silence, abrupt window end, spectral or length outlier within the pool (see scripts/fidgets/build-clips.mjs, `audit` in the sprite JSON)" },
+  { what: "pool choco.init (W02 first-break hits)", why: "only 2 clips passed the gates and they sound unlike each other (spectral centroid ≈ 2.3 kHz vs 7.8 kHz); W02's first crack uses its crack pool" },
+  { what: "sugar-granule windows in C02 hold", why: "the source is so quiet that every clip needed > 18 dB of gain" },
+];
 
 /** used when a toy has no pool for an event but a neighbouring one makes sense (`null` = stay silent) */
 export const FALLBACK: Record<FidgetEvent, FidgetEvent | null> = { init: null, tap: "hold", hold: null, release: null, stretch: "hold", fold: "hold", crack: null, crunch: null };
