@@ -1,7 +1,7 @@
 /**
  * DEV ONLY — stand-in sounds taken from the owner's installed reference app, chosen by the owner:
  *   W01 청사과 → wak/butter · W02 초콜릿 → wak/cake · L02 망고 → crunch/rainbow-sharbet · C01 비누 → crunch/soda · C02 슈가비즈 → crunch/watermelon
- *   S02 갓 구운 빵(슬로우 라이징 폼) → 뿌왁 앱의 모닝빵(bread) squish_bread_mallang_1/2.wav
+ *   S01 TPR 젤리볼 → crunch/guma · S02 갓 구운 빵(슬로우 라이징 폼) → 뿌왁 앱의 모닝빵(bread) squish_bread_mallang_1/2.wav
  * The files are read through the loopback-only dev route (vite.config.ts, MANZIZAK_ORIGINAL_APP_DIR). They are NOT part of the repository
  * or of any build: VITE_ORIGINAL_SOUNDS is "0" outside the dev server, so this whole module is dead code in production (scripts/check-dist.mjs checks).
  * Their redistribution rights are unverified — replace with licensed or own recordings before release.
@@ -16,6 +16,7 @@ export const ORIGINAL_FOLDER: Record<string, string> = {
   C01: "crunch/soda",
   C02: "crunch/watermelon",
   S02: "wakppu:bread",
+  S01: "crunch/guma",
 };
 /** original phase → MANZIZAK events (short = tap, long = knead/hold, init = first break) */
 const PHASES: Record<string, Partial<Record<FidgetEvent, "init" | "short" | "long">>> = {
@@ -25,6 +26,7 @@ const PHASES: Record<string, Partial<Record<FidgetEvent, "init" | "short" | "lon
   C01: { tap: "short", crunch: "short", hold: "long" },
   C02: { tap: "short", crunch: "short", hold: "long" },
   S02: { hold: "long" },
+  S01: { tap: "short", hold: "long" },
 };
 
 let index: Promise<Record<string, string[]>> | undefined;
