@@ -49,7 +49,8 @@ const waxToy = (k: "apple" | "choco"): ToySound => ({
   stretch: NONE,
   fold: NONE,
   crack: wax(`${k}.crack`, "single crack hits", { alt: { pool: `${k}.burst`, minStrength: 0.7 } }),
-  crunch: NONE,
+  // chocolate bar: shards rubbing / tumbling (friction layer)
+  crunch: k === "choco" ? wax("choco.burst", "dense crackle runs as shard friction", { rate: jitter(0.04) }) : NONE,
 });
 
 export const FIDGET_SOUND: Record<string, ToySound> = {

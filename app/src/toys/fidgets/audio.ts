@@ -314,7 +314,7 @@ export class FidgetAudio {
     this.gate.clear();
   }
   /** `delaySec` only places the sound later in an offline render (tests); the app always plays immediately */
-  play(event: FidgetEvent, strength = 0.5, delaySec = 0, interrupt = false) {
+  play(event: FidgetEvent, strength = 0.5, delaySec = 0, interrupt = false, extra: { rate?: number; lowpassHz?: number } = {}) {
     if (!this.enabled || this.state !== "recorded/derived") return false;
     let ev: FidgetEvent = event;
     // the first crack after a reset is the "init" sound when the toy has one
@@ -332,7 +332,7 @@ export class FidgetAudio {
     const useAlt = !!set.alt && strength >= (set.altMin ?? 1);
     const names = useAlt ? set.alt! : set.main;
     const name = names[this.picker.pick(`${ev}:${useAlt ? "a" : "m"}`, names.length)];
-    const rate = between(this.rng, set.rate);
+    const rate = between(this.rng, set.rate) * (extra.rate ?? 1);
     const log = this.audio.play(
       name,
       {
@@ -340,6 +340,7 @@ export class FidgetAudio {
         detuneCents: 0,
         gainJitterDb: 0.4,
         gainDb: set.baseDb + strengthDb(strength) + d.attenuationDb,
+        ...(extra.lowpassHz ? { lowpassHz: extra.lowpassHz } : {}),
         ...(delaySec > 0 ? { delaySec } : {}),
       },
       `fidget:${ev}`,

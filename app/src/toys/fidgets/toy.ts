@@ -5,6 +5,7 @@ import { radialShadowTexture, studioEnvironment } from "../../core/studio";
 import type { FidgetSpec } from "./catalog";
 import { FidgetModel, FractureModel, GrainModel } from "./model";
 import { FidgetAudio } from "./audio";
+import { ChocolateBar } from "./chocolate";
 import {
   STAGES,
   surfaceTexture,
@@ -87,6 +88,9 @@ export function createFidget(ctx: ToyContext, spec: FidgetSpec): FidgetToy {
   blob.position.y = spec.height * 0.94;
   blob.frustumCulled = false;
   scene.add(blob);
+  // W02: solid → fracturing → kneaded state machine with runtime Voronoi shards (chocolate.ts)
+  const choco = spec.shape === "chocolate" ? new ChocolateBar(scene, blob.position, spec) : null;
+  let frictionClock = 0;
   let softbox: THREE.Mesh | null = null;
   const softboxRest = new THREE.Vector3(-0.09, 0.45, 0.89)
     .normalize()
@@ -484,6 +488,7 @@ export function createFidget(ctx: ToyContext, spec: FidgetSpec): FidgetToy {
   const reset = () => {
     model.reset();
     fracture?.reset();
+    choco?.reset();
     if (shell && shellNormals) {
       (shell.geometry.getAttribute("normal").array as Float32Array).set(
         shellNormals,
@@ -520,6 +525,7 @@ export function createFidget(ctx: ToyContext, spec: FidgetSpec): FidgetToy {
     for (let i = 0; i < a.count; i++) {
       p0.fromArray(base, i * 3);
       model.deform(p0, tmp);
+      if (choco) tmp.lerp(p0, choco.rigidity); // a solid bar barely gives; the exposed core is soft
       a.setXYZ(i, tmp.x, tmp.y, tmp.z);
     }
     a.needsUpdate = true;
@@ -570,7 +576,8 @@ export function createFidget(ctx: ToyContext, spec: FidgetSpec): FidgetToy {
       corePointers.size &&
       (strokeReady || (model.frameTravel > 0.001 && dragBudget > 0.12))
     ) {
-      if (sound.play("hold", Math.min(1, 0.3 + model.compression))) {
+      // squish/flow layer: brighter the harder the core is squeezed (displacement-driven low-pass)
+      if (sound.play("hold", Math.min(1, 0.3 + model.compression), 0, false, choco ? { lowpassHz: 500 + 5000 * Math.min(1, model.compression * 2.5) } : {})) {
         strokeReady = false;
         dragBudget = 0;
       }
@@ -580,7 +587,25 @@ export function createFidget(ctx: ToyContext, spec: FidgetSpec): FidgetToy {
         crazeBefore = fracture.crazeEvents,
         broken = fracture.step(dt, held);
       crackClock -= dt;
-      if (fracture.crazeEvents > crazeBefore) {
+      if (choco) {
+        // line fracture: a snapped piece takes its row-mate across the seam; both are cut into Voronoi shards at the press point
+        const snapped = [...broken];
+        for (const i of broken) {
+          const mate = i % 2 ? i - 1 : i + 1;
+          if (fracture.forceBreak(mate)) snapped.push(mate);
+        }
+        if (snapped.length) {
+          let press = centers[snapped[0]], dir = new THREE.Vector2();
+          let best = Infinity;
+          for (const h of held) { const d = h.anchor.distanceToSquared(centers[snapped[0]]); if (d < best) { best = d; press = h.anchor; dir = new THREE.Vector2(h.drag.x, h.drag.y); } }
+          let area = 0;
+          for (const i of snapped) area += choco.snap(i, press, dir);
+          area /= snapped.length;
+          // shatter layer: one sharp cue per snap; smaller shards → higher pitch
+          sound.play("crack", Math.min(1, 0.6 + snapped.length * 0.15), 0, false, { rate: THREE.MathUtils.clamp(1.12 - area * 1.2, 0.92, 1.12) });
+          ctx.haptic(14);
+        }
+      } else if (fracture.crazeEvents > crazeBefore) {
         // the whole shell crazes: the "first break" sound (long, loud)
         sound.play("crack", 0.85);
         crackClock = 0.45;
@@ -610,9 +635,8 @@ export function createFidget(ctx: ToyContext, spec: FidgetSpec): FidgetToy {
           // shooting radially out of the toy like an explosion.
           const bar = spec.shape === "chocolate";
           // chocolate pieces pop off the bar toward the viewer and slump down; wax shards settle inward
-          const target = bar
-            ? tmp.set(c.x * 0.1, -0.12 - 0.06 * ((i * 7) % 5), 0.16)
-            : c.clone().normalize().multiplyScalar(-0.13);
+          // (a snapped chocolate piece is hidden and replaced by its Voronoi shards in chocolate.ts, so it stays put)
+          const target = bar ? tmp.set(0, 0, 0) : c.clone().normalize().multiplyScalar(-0.13);
           if (!bar) target.y -= 0.07;
           const delta = tmp.copy(target).sub(state.offset);
           state.offset.addScaledVector(delta, 1 - Math.exp(-dt * 5));
@@ -621,7 +645,7 @@ export function createFidget(ctx: ToyContext, spec: FidgetSpec): FidgetToy {
         for (const k of patchVertices[i]) {
           p0.fromArray(shellBase, k * 3);
           p0.sub(c).multiplyScalar(
-            fracture.broken[i] ? (spec.shape === "chocolate" ? 0.92 : 0.72) : 1 - Math.max(0, dam - 0.16) * (fracture.crazing ? 0.17 : 0.055), // a crazed shell shows its polygon network: patches shrink apart
+            fracture.broken[i] ? (spec.shape === "chocolate" ? 0.0001 : 0.72) : 1 - Math.max(0, dam - 0.16) * (fracture.crazing ? 0.17 : 0.055), // a crazed shell shows its polygon network: patches shrink apart
           );
           if (fracture.broken[i])
             p0.applyAxisAngle(spec.shape === "chocolate" ? tmp.set(0, 0, 1) : tmp.set(1, 0, 0), spec.shape === "chocolate" ? state.spin * 0.8 : state.spin);
@@ -652,6 +676,21 @@ export function createFidget(ctx: ToyContext, spec: FidgetSpec): FidgetToy {
       // Detached fragments keep their curved surface rather than becoming flat triangles.
       shell.geometry.computeBoundingSphere();
       if (held.length) moving = true;
+    }
+    if (choco && fracture) {
+      const { ke, impact } = choco.step(dt, {
+        allBroken: fracture.brokenCount === centers.length,
+        kneading: held.length > 0 && corePointers.size > 0 && model.frameTravel > 0.0004,
+        deform: (p, o) => model.deform(p, o),
+      });
+      frictionClock -= dt;
+      // friction layer: shards landing on the pile (impact) or, once embedded, rubbing in the kneaded core (kneading motion)
+      const energy = choco.state === "kneaded" ? (held.length ? model.motion * 0.02 : 0) : impact;
+      if (energy > 0.004 && frictionClock <= 0) {
+        sound.play("crunch", Math.min(1, 0.35 + energy * 12));
+        frictionClock = 0.2;
+      }
+      if (ke > 1e-5 || choco.state === "kneaded") moving = true;
     }
     if (grains) {
       const beforeCrush = grains.crushed,
@@ -770,6 +809,8 @@ export function createFidget(ctx: ToyContext, spec: FidgetSpec): FidgetToy {
         stretch: model.stretch.x,
         folds: model.foldCount,
         brokenFaces: fracture?.brokenCount ?? 0,
+        chocoState: choco?.state ?? null,
+        chocoShards: choco?.shards.length ?? 0,
         crackEvents: fracture?.crackEvents ?? 0,
         totalFaces: centers.length,
         crushedParticles: grains?.crushed ?? 0,

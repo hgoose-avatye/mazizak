@@ -190,9 +190,12 @@ describe("shell craze cascade (observed in the installed 왁뿌볼 app)", () => 
     expect(f.brokenCount).toBeLessThan(80 * 0.97);
     expect(log.every((v, i) => i === 0 || v >= log[i - 1])).toBe(true); // monotone: pieces only fall
   });
-  it("chocolate breaks in slower, coarser steps than thin apple wax", () => {
+  it("chocolate never crazes as a whole: it breaks piece by piece where it is pressed (line fractures are added by the bar)", () => {
     const apple = run(false, 1.5, 10).f, choco = run(true, 1.5, 10).f;
-    expect(choco.brokenCount).toBeLessThan(apple.brokenCount);
+    expect(apple.crazeEvents).toBe(1);
+    expect(choco.crazeEvents).toBe(0);
+    expect(choco.crazing).toBe(false);
+    expect(choco.forceBreak(0) || choco.broken[0] === 1).toBe(true);
   });
   it("a very short tap does not craze the shell, and reset restores everything", () => {
     const { f } = run(false, 2, 0.02);

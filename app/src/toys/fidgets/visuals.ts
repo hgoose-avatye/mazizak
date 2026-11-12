@@ -121,6 +121,11 @@ export interface ShellPatches {
   vertices: number[][];
   faceToPatch: Uint16Array;
 }
+/** rectangle [x0, x1] × [y0, y1] of bar piece `i` (row-major, 2 columns) in body-local coordinates */
+export function barPieceRect(spec: FidgetSpec, i: number) {
+  const tw = (2 * spec.width) / BAR.cols, th = (2 * spec.height) / BAR.rows, c = i % BAR.cols, r = Math.floor(i / BAR.cols);
+  return { x0: -spec.width + c * tw + BAR.gap / 2, x1: -spec.width + (c + 1) * tw - BAR.gap / 2, y1: spec.height - r * th - BAR.gap / 2, y0: spec.height - (r + 1) * th + BAR.gap / 2, row: r, col: c };
+}
 /** Chocolate bar shell: six slightly domed pieces (2 × 3) with thin grooves between them and pale cut edges. */
 function chocolateBarPatches(spec: FidgetSpec): ShellPatches {
   const { cols, rows, gap, shellThickness, dome } = BAR;

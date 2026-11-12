@@ -21,7 +21,7 @@ export const ORIGINAL_FOLDER: Record<string, string> = {
 /** original phase → MANZIZAK events (short = tap, long = knead/hold, init = first break) */
 const PHASES: Record<string, Partial<Record<FidgetEvent, "init" | "short" | "long">>> = {
   W01: { tap: "short", hold: "long", crack: "long" },
-  W02: { init: "init", tap: "short", hold: "long", crack: "long" },
+  W02: { init: "init", tap: "short", hold: "long", crack: "long", crunch: "short" },
   L02: { tap: "short", hold: "long", stretch: "long", fold: "short" },
   C01: { tap: "short", crunch: "short", hold: "long" },
   C02: { tap: "short", crunch: "short", hold: "long" },

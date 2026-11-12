@@ -279,7 +279,7 @@ export class FractureModel {
         deepest = c.depth.x;
         anchor = c.anchor;
       }
-    if (!this.crazing) {
+    if (!this.crazing && !choc) {
       this.pressT = deepest > 0.02 ? this.pressT + dt : Math.max(0, this.pressT - dt * 2);
       if (this.pressT > (choc ? 0.25 : 0.07) && anchor) {
         this.cascadeT = 0;
@@ -293,7 +293,7 @@ export class FractureModel {
           this.survivor[i] = this.centers.length >= 20 && this.rnd(i, 2) < (choc ? 0.15 : 0.1) ? 1 : 0;
         }
       }
-    } else {
+    } else if (this.crazing) {
       // the cascade keeps running while the finger is down and, more slowly, after it lifts
       this.cascadeT += dt * (deepest > 0.05 ? 1 : 0.35);
     }
@@ -307,7 +307,7 @@ export class FractureModel {
           Math.max(0, c.depth.x) *
             (c.surfacePatch === i
               ? 1
-              : Math.exp(-distance / (choc ? 0.16 : 0.22))),
+              : Math.exp(-distance / (choc ? 0.3 : 0.22))), // chocolate: a press on a groove loads the pieces on both sides (bending at the seam)
         );
       }
       const strength =
@@ -334,6 +334,14 @@ export class FractureModel {
       }
     }
     return events;
+  }
+  /** break a patch outright (a line fracture carrying on along the weakest seam); returns true if it was intact */
+  forceBreak(i: number) {
+    if (this.broken[i]) return false;
+    this.damage[i] = 1;
+    this.broken[i] = 1;
+    this.breakEvents++;
+    return true;
   }
   reset() {
     this.damage.fill(0);
