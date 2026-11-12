@@ -20,8 +20,9 @@ const PRESETS = [
   // dense typing (몽돌: an 8 s Short typed fast): a clean strike stands ≥18 dB over the surrounding typing and decays ≥20 dB
   { id: 'mongdol-pl87w', file: 'mongdol', video: 'https://www.youtube.com/shorts/BgO3pE7VnI8', window: [0, 9], count: 14, isolation: 0.1, gate: { maxLeadDb: -18, decayDb: -20, maxSecondDb: -10 } },
   // 찌개: the owner heard the neighbouring typing under the first set (lead −18 dB) — strict gates over a longer stretch instead;
-  // then a steady hiss (the recording's floor is only ~37 dB under a strike): clips end above the hiss, a gentle expander, strikes ≥38 dB over the hiss
-  { id: 'jjigae-topre', file: 'jjigae', video: 'https://www.youtube.com/watch?v=TTfTCiwA38c', window: [30, 1735], count: 16, gate: { maxLeadDb: -30, decayDb: -30, maxSecondDb: -15, minDecayMs: 8, denoise: true, minSnrDb: 38, maxTailDb: -24 } },
+  // then a steady hiss (the recording's floor is only ~37 dB under a strike): clips end 12 dB above the hiss, a gentle expander,
+  // strikes ≥38 dB over the hiss; then a short "sss" on every press: the high band of each strike's tail is faded (tameTail)
+  { id: 'jjigae-topre', file: 'jjigae', video: 'https://www.youtube.com/watch?v=TTfTCiwA38c', window: [30, 1735], count: 16, gate: { maxLeadDb: -30, decayDb: -30, maxSecondDb: -15, minDecayMs: 8, denoise: true, minSnrDb: 38, maxTailDb: -24, minLenMs: 45 } },
   // ceramic keycaps on a POM plate: a sharp clack that decays within ~10 ms is the real sound, not a glitch
   { id: 'dojagi-space65', file: 'dojagi', video: 'https://www.youtube.com/watch?v=Ry1DJ2xzg6Q&t=10s', window: [10, 130], count: 16, gate: { minDecayMs: 6, minLenMs: 40 } },
 ];
@@ -34,6 +35,17 @@ function decode(file, [a, b]) {
   return new Float32Array(buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.length));
 }
 const peakOf = (x) => x.reduce((m, v) => Math.max(m, Math.abs(v)), 0);
+/** 찌개: the short "sss" after each strike is high-frequency sound in the strike's own tail (room / codec noise lifted by the boost,
+ *  ~20 dB above the recording's steady hiss, so spectral hiss subtraction cannot reach it). Keep the attack's first `keepMs` intact,
+ *  then fade only the part above ~2.5 kHz (τ 5 ms, to −26 dB); the low thock body is untouched. */
+function tameTail(y, keepMs = 8) {
+  const a = Math.exp((-2 * Math.PI * 2500) / SR), low = new Float32Array(y.length);
+  let s1 = 0, s2 = 0;
+  for (let i = 0; i < y.length; i++) { s1 = (1 - a) * y[i] + a * s1; s2 = (1 - a) * s1 + a * s2; low[i] = s2; }
+  const keep = ms(keepMs), tau = ms(5);
+  for (let i = 0; i < y.length; i++) { const g = i < keep ? 1 : Math.max(0.05, Math.exp(-(i - keep) / tau)); y[i] = low[i] + (y[i] - low[i]) * g; }
+  return y;
+}
 
 fs.mkdirSync(OUT, { recursive: true });
 let built = 0;
@@ -60,7 +72,7 @@ for (const P of PRESETS) {
     const nf = (() => { const w = ms(10), v = []; for (let i = Math.max(0, a - ms(1500)); i + w <= Math.min(x.length, a + ms(1500)); i += w) { let e = 0; for (let j = i; j < i + w; j++) e += x[j] * x[j]; v.push(Math.sqrt(e / w)); } v.sort((p, q) => p - q); return v[Math.floor(v.length * 0.05)] ?? 1e-6; })();
     const seg = x.subarray(a, cap), pk = peakOf(seg), h = ms(2);
     // end the clip when it falls to −40 dB or (denoise) to 6 dB above the hiss, so it does not carry a hiss tail
-    const thr = Math.max(pk * 0.01, GATE.denoise ? nf * 2 : 0);
+    const thr = Math.max(pk * 0.01, GATE.denoise ? nf * 4 : 0); // denoise: end 12 dB above the hiss
     let end = seg.length;
     for (let i = seg.length - h; i >= 0; i -= h) { let e = 0; for (let j = i; j < i + h; j++) e += seg[j] * seg[j]; if (Math.sqrt(e / h) > thr) { end = Math.min(seg.length, i + h + ms(4)); break; } }
     const raw = seg.subarray(0, Math.max(ms(40), end));
@@ -92,7 +104,8 @@ for (const P of PRESETS) {
   picked.sort((p, q) => p.s.t - q.s.t);
   console.log(`${P.id}: ${cand.length} isolated strikes, ${passed.length} pass the gates (rejected ${JSON.stringify(rej)}), ${picked.length} used`);
   const clips = picked.map((c) => {
-    const y = Float32Array.from(c.raw);
+    let y = Float32Array.from(c.raw);
+    if (GATE.denoise) y = tameTail(y);
     if (GATE.denoise) {
       // gentle downward expander: 2 ms frames within 12 dB of the hiss are turned down 2:1 (smoothed), the strike itself is untouched
       const h2 = ms(2), knee = c.noiseFloor * 4, g = [];
