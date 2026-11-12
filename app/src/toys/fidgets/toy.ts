@@ -74,10 +74,10 @@ export function createFidget(ctx: ToyContext, spec: FidgetSpec): FidgetToy {
     material.side = THREE.FrontSide;
     material.clearcoat = 0.05;
     material.roughness = 0.45;
-    // a solid base ball in the sugar colours; the rainbow beads sit on it like the installed app's 클로버 비즈 (a ball covered in small glossy beads)
-    material.transparent = false;
-    material.opacity = 1;
-    material.depthWrite = true;
+    // the sugar-coloured clear filling; the rainbow beads packed inside it (like the installed app's 클로버 비즈, a ball made of small glossy beads), all wrapped in a clear membrane
+    material.transparent = true;
+    material.opacity = 0.15; // a tinted clear filling: the beads inside show through it
+    material.depthWrite = false;
   }
 
   if (spec.family === "wax") geometry.scale(0.88, 0.88, 0.88);
@@ -97,7 +97,7 @@ export function createFidget(ctx: ToyContext, spec: FidgetSpec): FidgetToy {
       new THREE.MeshPhysicalMaterial({
         color: 0xffffff,
         transparent: true,
-        opacity: 0.08,
+        opacity: 0.2,
         envMap: scene.environment,
         envMapIntensity: 3,
         roughness: 0.025,
@@ -109,7 +109,8 @@ export function createFidget(ctx: ToyContext, spec: FidgetSpec): FidgetToy {
       }),
     );
     skin.position.copy(blob.position);
-    skin.scale.setScalar(1.009);
+    // beads: a clear membrane wraps the whole ball a little outside the bead layer (the beads sit INSIDE it)
+    skin.scale.setScalar(spec.shape === "beads" ? 1.03 : 1.009);
     skin.frustumCulled = false;
     skin.renderOrder = 3;
     blob.renderOrder = 2;
@@ -315,7 +316,7 @@ export function createFidget(ctx: ToyContext, spec: FidgetSpec): FidgetToy {
     visualParents: number[] = [],
     flowOffsets: THREE.Vector3[] = [];
   if (grains && spec.shape === "beads") {
-    // Like the installed app's 클로버 비즈: the ball is covered by a dense layer of small glossy beads (here round grains), each its own
+    // Like the installed app's 클로버 비즈: the ball is covered by a dense layer of small glossy beads (here round grains) wrapped in a clear membrane, each its own
     // colour. Rainbow palette = the current sugar-bead colours (blue, purple, pink, yellow) plus red, orange and green.
     const count = 1900;
     const palette = [0xe5484d, 0xf29f4c, 0xefc45b, 0x5fbf74, 0x299fc5, 0xa888cf, 0xe98bab].map((c) => new THREE.Color(c));
@@ -337,7 +338,7 @@ export function createFidget(ctx: ToyContext, spec: FidgetSpec): FidgetToy {
         r = Math.sqrt(1 - y * y),
         angle = i * 2.399963,
         // mostly one surface layer; a few sit a little deeper so the base colour peeks through the gaps
-        radius = 0.975 - (hash(i + 7) < 0.12 ? 0.05 : 0);
+        radius = 0.925 - (hash(i + 7) < 0.12 ? 0.05 : 0);
       const rest = new THREE.Vector3(
         Math.cos(angle) * r * radius,
         y * radius,
