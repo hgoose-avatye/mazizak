@@ -22,6 +22,10 @@ export default defineConfig(({ command, isPreview }) => {
       "import.meta.env.VITE_LOCAL_FIDGETS": JSON.stringify(
         fidgetDir ? "1" : "0",
       ),
+      // "0": keep the local reference meshes but play only the licensed sound pools
+      "import.meta.env.VITE_LOCAL_FIDGET_AUDIO": JSON.stringify(
+        process.env.MANZIZAK_LOCAL_FIDGET_AUDIO === "0" ? "0" : "1",
+      ),
     },
     plugins: [
       ...(fidgetDir

@@ -40,7 +40,7 @@ await p.addInitScript(() => {
 });
 const report = () => p.evaluate(() => window.__MANZIZAK__.report());
 const open = async (id) => {
-  await p.goto("http://127.0.0.1:4354/#/" + id);
+  await p.goto((process.env.FIDGET_URL ?? "http://127.0.0.1:4354/") + "#/" + id);
   await p.waitForFunction(
     (id) =>
       window.__MANZIZAK__?.report()?.id === id &&
@@ -181,7 +181,7 @@ try {
     touchPoints: [],
   });
   await cdp.detach();
-  await p.goto("http://127.0.0.1:4354/#/keyboard");
+  await p.goto((process.env.FIDGET_URL ?? "http://127.0.0.1:4354/") + "#/keyboard");
   await p.waitForTimeout(1200);
   ok(
     "only eight named keyboard choices",

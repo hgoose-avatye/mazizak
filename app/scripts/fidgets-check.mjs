@@ -100,7 +100,7 @@ try {
       ok(
         id + " exposed core accepts input",
         core.coreTouches > 0 &&
-          core.soundPlays.some((x) => x.name.endsWith(":knead")),
+          core.soundPlays.some((x) => x.name.includes(":hold:")),
       );
       await p.mouse.up();
     }

@@ -7,6 +7,8 @@ import {
 } from "./references";
 import type { FidgetSpec } from "./catalog";
 import { loadSprite, type LoadedSprite } from "./fidgetSprites";
+/** dev only: installed-app reference sounds override the licensed pools. Off in production builds, and off when MANZIZAK_LOCAL_FIDGET_AUDIO=0 (meshes stay local, sounds are the shippable ones). */
+const LOCAL_AUDIO = LOCAL_FIDGETS && import.meta.env.VITE_LOCAL_FIDGET_AUDIO !== "0";
 import {
   CLASS_LEVEL_DB,
   ClipPicker,
@@ -174,20 +176,27 @@ export class FidgetAudio {
       const sprites: Partial<Record<"wax" | "crunch", LoadedSprite>> = {};
       if (needs("wax")) sprites.wax = await loadSprite(ctx, "wax");
       if (needs("crunch")) sprites.crunch = await loadSprite(ctx, "crunch");
-      const local = LOCAL_FIDGETS ? await referenceSounds(ctx, this.spec.id) : {};
+      const local = LOCAL_AUDIO ? await referenceSounds(ctx, this.spec.id) : {};
       const hasVideoReference =
-        LOCAL_FIDGETS &&
+        LOCAL_AUDIO &&
         this.spec.id === "L01" &&
         !!(await referenceManifest()).toys.L01?.referenceVideo;
       // dev-only local reference override (old role names → events); never present in production builds
-      const localFor: Partial<Record<FidgetEvent, AudioBuffer[]>> = {
-        tap: local.press,
-        hold: local.knead ?? local.compress,
-        stretch: local.stretch,
-        fold: local.fold,
-        crack: local.crack,
-        crunch: local.crunch,
-      };
+      // (same coverage as before the event model: foam and cream never used the local sounds)
+      const sh = this.spec.shape;
+      const localFor: Partial<Record<FidgetEvent, AudioBuffer[]>> =
+        sh === "foam" || sh === "cream"
+          ? {}
+          : this.spec.family === "wax"
+            ? { crack: local.crack, hold: local.knead }
+            : this.spec.family === "particles"
+              ? { crunch: local.crunch }
+              : {
+                  hold: local.compress ?? local.press,
+                  ...(this.spec.family === "viscous"
+                    ? { stretch: local.stretch, fold: local.fold }
+                    : {}),
+                };
       const used = new Set<string>();
       const shapeDb = SHAPE_TARGET_DB[this.spec.shape] ?? -27;
       for (const event of EVENTS) {
@@ -214,7 +223,7 @@ export class FidgetAudio {
           used.add(`${r.source}:${name}`);
           return p;
         };
-        const override = LOCAL_FIDGETS ? localFor[event] : undefined;
+        const override = LOCAL_AUDIO ? localFor[event] : undefined;
         if (!ref && !override?.length) continue;
         let origin = ref ? `${ref.source}/${ref.pool}[${ref.kind}]` : "";
         let main: AudioBuffer[];
@@ -253,7 +262,7 @@ export class FidgetAudio {
       const kinds = new Set(
         EVENTS.map((e) => this.sets[e]?.origin).filter(Boolean) as string[],
       );
-      this.source = LOCAL_FIDGETS
+      this.source = LOCAL_AUDIO
         ? hasVideoReference
           ? "local reference (incl. user video 7WDcH26JU5Q 20–29s soundtrack cues, rights unverified); local only"
           : `local reference overrides + licensed pools: ${[...kinds].join(", ")}`
@@ -282,7 +291,8 @@ export class FidgetAudio {
     this.picker.reset();
     this.gate.clear();
   }
-  play(event: FidgetEvent, strength = 0.5) {
+  /** `delaySec` only places the sound later in an offline render (tests); the app always plays immediately */
+  play(event: FidgetEvent, strength = 0.5, delaySec = 0) {
     if (!this.enabled || this.state !== "recorded/derived") return false;
     let ev: FidgetEvent = event;
     // the first crack after a reset is the "init" sound when the toy has one
@@ -307,6 +317,7 @@ export class FidgetAudio {
         detuneCents: 0,
         gainJitterDb: 0.4,
         gainDb: set.baseDb + strengthDb(strength) + d.attenuationDb,
+        ...(delaySec > 0 ? { delaySec } : {}),
       },
       `fidget:${ev}`,
     );

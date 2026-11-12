@@ -30,11 +30,13 @@ Recordings from Freesound, all marked Creative Commons 0 (https://creativecommon
 
 **These are NOT recordings of soap crunch slime or sugar beads.** They are similar materials used as stand-ins:
 C01 uses styrofoam crushing/cracking; C02 uses plastic beads (collisions) and sugar granules (friction). Clips were picked automatically from the
-waveform and **have not been listened to**. Changes: cut at detected strikes (26 clips from 3 files), faded, peak-normalised to −1 dBFS, loudness-matched within each pool.
+waveform and **have not been listened to**. Changes: cut at detected strikes (26 clips from 5 files), faded, peak-normalised to −1 dBFS, loudness-matched within each pool.
 
 | id | title | author | url | licence | retrieved | material |
 |---|---|---|---|---|---|---|
+| freesound:389657 | Crinkling styrofoam; close.wav | TylerAM | https://freesound.org/people/TylerAM/sounds/389657/ | CC0 1.0 | 2026-11-12 | similar material only (not a recording of the toy) |
 | freesound:195797 | styrofoam_polysterne_polysteren_cracks_cracking_plastic.wav | ondondvo | https://freesound.org/people/ondondvo/sounds/195797/ | CC0 1.0 | 2026-11-12 | similar material only (not a recording of the toy) |
+| freesound:541076 | Beads.wav | Chelly01 | https://freesound.org/people/Chelly01/sounds/541076/ | CC0 1.0 | 2026-11-12 | similar material only (not a recording of the toy) |
 | freesound:343795 | Beads.wav | zmadyun | https://freesound.org/people/zmadyun/sounds/343795/ | CC0 1.0 | 2026-11-12 | similar material only (not a recording of the toy) |
 | freesound:567534 | sugar granules.wav | Tnext54 | https://freesound.org/people/Tnext54/sounds/567534/ | CC0 1.0 | 2026-11-12 | similar material only (not a recording of the toy) |
 

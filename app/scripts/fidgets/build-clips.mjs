@@ -91,11 +91,19 @@ function windows(an, lenMs, { minStrikes = 3 } = {}) {
 }
 /** pick `n` clips by descending score, no overlap within a source, spread over time */
 const MAX_BOOST_DB = 24;
-function pick(cands, n, score) {
+function pick(cands, n, score, { diverse = false } = {}) {
   cands = cands.filter((c) => c.peakDb >= -1 - MAX_BOOST_DB); // never amplify a clip by more than 24 dB to reach −1 dBFS
-  const sorted = [...cands].sort((p, q) => score(q) - score(p) || p.a - q.a);
+  const byScore = (p, q) => score(q) - score(p) || p.a - q.a;
   const chosen = [];
-  for (const c of sorted) { if (chosen.length >= n) break; if (!overlaps(chosen, c)) chosen.push(c); }
+  if (diverse) {
+    // round-robin over the source files so one recording cannot dominate a pool
+    const groups = [...new Set(cands.map((c) => c.src.id))].sort().map((id) => cands.filter((c) => c.src.id === id).sort(byScore));
+    for (let round = 0; chosen.length < n && groups.some((g) => g.length); round++)
+      for (const g of groups) {
+        while (g.length && overlaps(chosen, g[0])) g.shift();
+        if (g.length && chosen.length < n) chosen.push(g.shift());
+      }
+  } else for (const c of [...cands].sort(byScore)) { if (chosen.length >= n) break; if (!overlaps(chosen, c)) chosen.push(c); }
   return chosen.sort((p, q) => p.src.id.localeCompare(q.src.id) || p.a - q.a);
 }
 
@@ -124,10 +132,10 @@ const by = (id) => cr.find((a) => a.src.id === id);
 const soapSrc = [by('freesound:389657'), by('freesound:195797')];
 const beadSrc = [by('freesound:541076'), by('freesound:343795')];
 const sugarSrc = [by('freesound:567534')];
-addPool('soap.crunch', 'crunch', 'styrofoam', pick(soapSrc.flatMap((a) => singles(a, { minLen: 50, maxLen: 190 }).filter((c) => c.strikePeakDb >= a.maxPeakDb - 14)), 8, (c) => c.strikePeakDb), 'short crushing hits (styrofoam)');
-addPool('soap.hold', 'hold', 'styrofoam', pick(soapSrc.flatMap((a) => windows(a, 640, { minStrikes: 5 }).filter((c) => c.peakDb <= a.maxPeakDb - 0)), 5, (c) => c.strikes - c.crest * 0.3), 'dense continuous crinkle windows (styrofoam)');
-addPool('beads.crunch', 'crunch', 'plastic beads', pick(beadSrc.flatMap((a) => singles(a, { minLen: 35, maxLen: 150 }).filter((c) => c.strikePeakDb >= a.maxPeakDb - 14)), 8, (c) => c.strikePeakDb), 'short bead collisions (plastic beads)');
-addPool('beads.hold', 'hold', 'sugar granules', pick(sugarSrc.flatMap((a) => windows(a, 640, { minStrikes: 4 })), 5, (c) => c.strikes - c.crest * 0.3), 'grainy friction windows (sugar granules)');
+addPool('soap.crunch', 'crunch', 'styrofoam', pick(soapSrc.flatMap((a) => singles(a, { minLen: 50, maxLen: 190 }).filter((c) => c.strikePeakDb >= a.maxPeakDb - 14)), 8, (c) => c.strikePeakDb, { diverse: true }), 'short crushing hits (styrofoam)');
+addPool('soap.hold', 'hold', 'styrofoam', pick(soapSrc.flatMap((a) => windows(a, 640, { minStrikes: 5 }).filter((c) => c.peakDb <= a.maxPeakDb - 0)), 5, (c) => c.strikes - c.crest * 0.3, { diverse: true }), 'dense continuous crinkle windows (styrofoam)');
+addPool('beads.crunch', 'crunch', 'plastic beads', pick(beadSrc.flatMap((a) => singles(a, { minLen: 35, maxLen: 150 }).filter((c) => c.strikePeakDb >= a.maxPeakDb - 14)), 8, (c) => c.strikePeakDb, { diverse: true }), 'short bead collisions (plastic beads)');
+addPool('beads.hold', 'hold', 'sugar granules + plastic beads', pick([...sugarSrc, by('freesound:541076')].flatMap((a) => windows(a, 640, { minStrikes: 4 })), 5, (c) => c.strikes - c.crest * 0.3, { diverse: true }), 'grainy friction / rattle windows (sugar granules, plastic beads)');
 
 // ───────── write sprites ─────────
 const CLASS = { init: 'impact', crack: 'impact', crunch: 'impact', hold: 'continuous' };

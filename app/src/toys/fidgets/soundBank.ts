@@ -121,10 +121,10 @@ export const FIDGET_SOUND: Record<string, ToySound> = {
 /** used when a toy has no pool for an event but a neighbouring one makes sense (`null` = stay silent) */
 export const FALLBACK: Record<FidgetEvent, FidgetEvent | null> = { init: null, tap: "hold", hold: null, release: null, stretch: "hold", fold: "hold", crack: null, crunch: null };
 
-/** relative loudness of the event classes (dB, peak-ish). Clips are NOT forced to one level: impacts stay louder than touches. */
-export const CLASS_LEVEL_DB: Record<FidgetEvent, number> = { init: 0, crack: 0, crunch: -2, tap: -4, hold: -4, stretch: -4, fold: -4, release: -8 };
-/** absolute trim for the peak-normalised (−1 dBFS) wax/crunch sprite clips, per event class */
-export const SPRITE_TRIM_DB: Record<FidgetEvent, number> = { init: -8, crack: -9, crunch: -11, tap: -13, hold: -14, stretch: -14, fold: -14, release: -18 };
+/** relative loudness of the event classes in dB, anchored to the loudness the squishy/wax toys had before the event model. Clips are NOT forced to one level: impacts stay louder than touches. */
+export const CLASS_LEVEL_DB: Record<FidgetEvent, number> = { init: 1, crack: 1, crunch: 0, tap: -1, hold: 0, stretch: 0, fold: 0, release: -4 };
+/** absolute trim for the peak-normalised (−1 dBFS) wax/crunch sprite clips, per event class (calibrated so that average peaks match the old runtime-sliced wax at strength 1: ≈ −16 dBFS) */
+export const SPRITE_TRIM_DB: Record<FidgetEvent, number> = { init: -10, crack: -11, crunch: -11, tap: -13, hold: -12, stretch: -12, fold: -12, release: -18 };
 
 /** sustained events replace each other instead of stacking */
 export const SUSTAINED: ReadonlySet<FidgetEvent> = new Set<FidgetEvent>(["hold", "stretch", "fold"]);
@@ -132,8 +132,8 @@ export const MIN_INTERVAL_MS: Record<FidgetEvent, number> = { init: 0, tap: 60, 
 export const MAX_SHORT_VOICES = 3;
 export const OVERLAP_DB = -1.5;
 
-/** strength 0..1 → dB: soft touches are quieter, but never silent */
-export const strengthDb = (strength: number) => -6 + 6 * Math.min(1, Math.max(0, strength));
+/** strength 0..1 → dB (−5…0, as before the event model): soft touches are quieter, but never silent */
+export const strengthDb = (strength: number) => -5 + 5 * Math.min(1, Math.max(0, strength));
 
 /** avoid repeating a clip within the last min(2, n-1) picks; fully deterministic given `rng` */
 export class ClipPicker {

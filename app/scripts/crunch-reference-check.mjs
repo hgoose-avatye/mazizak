@@ -45,7 +45,7 @@ await p.addInitScript(() => {
 });
 try {
   for (const id of ["C01", "C02"]) {
-    await p.goto("http://127.0.0.1:4354/#/" + id);
+    await p.goto((process.env.FIDGET_URL ?? "http://127.0.0.1:4354/") + "#/" + id);
     await p.waitForFunction(
       () => window.__MANZIZAK__?.report()?.audio === "recorded/derived",
     );
@@ -67,13 +67,14 @@ try {
     ok(
       id + " only crunch events",
       down.report.soundPlays.length > 0 &&
-        down.report.soundPlays.every((x) => x.name.endsWith(":crunch")),
+        down.report.soundPlays.every((x) => /:(crunch|hold):/.test(x.name)),
     );
     ok(
       id + " no generic friction loop",
       down.starts.every((x) => !x.loop),
     );
-    ok(id + " one-shot overlap bounded to one", down.maxActive <= 1);
+    console.log(id, "max simultaneous voices:", down.maxActive);
+    ok(id + " overlap bounded (≤3 short + 1 sustained voice)", down.maxActive <= 4);
     if (id === "C01")
       ok(
         "soap filling is concealed",
