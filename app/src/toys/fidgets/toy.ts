@@ -634,8 +634,8 @@ export function createFidget(ctx: ToyContext, spec: FidgetSpec): FidgetToy {
           // Crushed wax adheres to the soft core and settles inward, rather than
           // shooting radially out of the toy like an explosion.
           const bar = spec.shape === "chocolate";
-          // chocolate pieces pop off the bar toward the viewer and slump down; wax shards settle inward
-          // (a snapped chocolate piece is hidden and replaced by its Voronoi shards in chocolate.ts, so it stays put)
+          // wax shards settle inward; a snapped chocolate piece is hidden and replaced by its Voronoi shards (chocolate.ts),
+          // which stay stuck on the core where it broke
           const target = bar ? tmp.set(0, 0, 0) : c.clone().normalize().multiplyScalar(-0.13);
           if (!bar) target.y -= 0.07;
           const delta = tmp.copy(target).sub(state.offset);
@@ -678,19 +678,18 @@ export function createFidget(ctx: ToyContext, spec: FidgetSpec): FidgetToy {
       if (held.length) moving = true;
     }
     if (choco && fracture) {
-      const { ke, impact } = choco.step(dt, {
+      const { rub, popping } = choco.step(dt, {
         allBroken: fracture.brokenCount === centers.length,
         kneading: held.length > 0 && corePointers.size > 0 && model.frameTravel > 0.0004,
         deform: (p, o) => model.deform(p, o),
       });
       frictionClock -= dt;
-      // friction layer: shards landing on the pile (impact) or, once embedded, rubbing in the kneaded core (kneading motion)
-      const energy = choco.state === "kneaded" ? (held.length ? model.motion * 0.02 : 0) : impact;
-      if (energy > 0.004 && frictionClock <= 0) {
-        sound.play("crunch", Math.min(1, 0.35 + energy * 12));
+      // friction layer: the shards stuck on the core grind against each other as the core is pushed around
+      if (held.length && rub > 0.02 && frictionClock <= 0) {
+        sound.play("crunch", Math.min(1, 0.35 + rub * 4));
         frictionClock = 0.2;
       }
-      if (ke > 1e-5 || choco.state === "kneaded") moving = true;
+      if (popping > 0 || held.length || choco.state === "kneaded") moving = true;
     }
     if (grains) {
       const beforeCrush = grains.crushed,

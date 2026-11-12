@@ -188,7 +188,7 @@ export class FidgetModel {
       this.stretch.target = Math.min(this.spec.stretch, Math.max(0.75, ratio));
       this.maxStretch = Math.max(this.maxStretch, this.stretch.target);
       if (
-        this.maxStretch > 1.35 &&
+        this.maxStretch > 1.3 &&
         distance < this.pinchStart * 0.82 &&
         !this.foldedGesture
       ) {

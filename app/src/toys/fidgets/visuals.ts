@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
+import { mergeVertices } from "three/addons/utils/BufferGeometryUtils.js";
 import type { FidgetSpec } from "./catalog";
 export const STAGES: Record<string, number> = {
   S01: 0xe8f0ef,
@@ -50,6 +51,48 @@ export function bodyGeometry(s: FidgetSpec) {
     g.translate(0, 0, -(BAR.shellThickness * 0.5));
     return g;
   }
+  if (s.shape === "cheese") {
+    // A cheese wedge seen from the front: flat bottom, a top sloping from the tall rind (right) down to a thin edge (left),
+    // and round holes punched into the faces. Built from a subdivided rounded box (even grid on every face, so the holes stay
+    // round), with shared vertices merged so the slime deformation never tears a seam.
+    let g: THREE.BufferGeometry = new THREE.BoxGeometry(2, 2, 2, 72, 48, 36);
+    g.deleteAttribute("normal");
+    g.deleteAttribute("uv");
+    g = mergeVertices(g);
+    const p = g.getAttribute("position");
+    // [face, u, v, radius] — front/back use (x, y) in wedge space, the rind uses (z, y)
+    const holes: [string, number, number, number][] = [
+      ["front", 0.45, -0.3, 0.27], ["front", -0.25, -0.62, 0.19], ["front", 0.78, 0.4, 0.16], ["front", 0.12, 0.05, 0.11], ["front", -0.68, -0.8, 0.09],
+      ["back", 0.4, -0.3, 0.24], ["back", -0.2, -0.65, 0.16],
+      ["rind", 0.3, 0.2, 0.22], ["rind", -0.4, -0.5, 0.16],
+    ];
+    const R = 0.22; // edge rounding
+    for (let i = 0; i < p.count; i++) {
+      const bx = p.getX(i), by = p.getY(i), bz = p.getZ(i);
+      const face = bz > 0.999 ? "front" : bz < -0.999 ? "back" : bx > 0.999 ? "rind" : "";
+      // rounded box: push each point out from the clamped inner box
+      const ix = THREE.MathUtils.clamp(bx, R - 1, 1 - R), iy = THREE.MathUtils.clamp(by, R - 1, 1 - R), iz = THREE.MathUtils.clamp(bz, R - 1, 1 - R);
+      const nx = bx - ix, ny = by - iy, nz = bz - iz, nl = Math.hypot(nx, ny, nz) || 1;
+      let x = ix + (nx / nl) * R, y = iy + (ny / nl) * R, z = iz + (nz / nl) * R;
+      const t = (x + 1) / 2; // 0 at the thin edge, 1 at the rind
+      y = -1 + (y + 1) * (0.3 + 0.7 * t);
+      x += 0.08 * t * t;
+      for (const [hf, u, w, r] of holes) {
+        if (hf !== face) continue;
+        const d = hf === "rind" ? Math.hypot(z - u, y - w) : Math.hypot(x - u, y - w);
+        if (d >= r) continue;
+        // a bowl with a softened rim
+        const k = d / r, depth = r * 0.85 * Math.sqrt(1 - k * k) * Math.min(1, (1 - k) * 6);
+        if (hf === "front") z -= depth;
+        else if (hf === "back") z += depth;
+        else x -= depth;
+      }
+      p.setXYZ(i, x * s.width, (y + 0.3) * s.height, z * s.depth); // +0.3: centre the wedge's mass so the thin end stays under the fingers
+    }
+    g.rotateY(0.25);
+    g.computeVertexNormals();
+    return g;
+  }
   if (s.shape === "cream") {
     // A piped rosette: a broad base, rising spiral and an asymmetric tapered tip.
     const g = new THREE.SphereGeometry(1, 96, 56),
@@ -79,8 +122,8 @@ export function bodyGeometry(s: FidgetSpec) {
       y = p.getY(i),
       z = p.getZ(i);
     const theta = Math.atan2(z, x);
-    if (s.shape === "foam" || s.shape === "cheese" || s.shape === "soap") {
-      const pow = s.shape === "cheese" ? 0.78 : s.shape === "soap" ? 0.5 : 0.38;
+    if (s.shape === "foam" || s.shape === "soap") {
+      const pow = s.shape === "soap" ? 0.5 : 0.38;
       x = Math.sign(x) * Math.pow(Math.abs(x), pow);
       y = Math.sign(y) * Math.pow(Math.abs(y), pow);
       z = Math.sign(z) * Math.pow(Math.abs(z), pow);

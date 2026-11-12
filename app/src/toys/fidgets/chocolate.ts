@@ -7,19 +7,22 @@ import { BAR, barPieceRect } from "./visuals";
  *   solid      rigid bar; the core barely deforms until a piece's stress threshold is crossed
  *   fracturing a piece snaps (line fracture: its row-mate across the seam goes with it) and the snapped pieces are cut at runtime
  *              into Voronoi shards seeded around the press point and stretched along the drag direction; the pink core is exposed
- *   kneaded    once every piece is off and the core keeps being kneaded, the shards sink into the core and ride its deformation
- * Audio is driven by what moves: shatter on each snap (pitch from shard size), friction crunch from the shards' kinetic energy,
+ *              The shards stay stuck to the core where they broke (like the original wax ball): a short pop at the snap, a small
+ *              permanent tilt so the cracks catch the light, then they ride the core's deformation — nothing flies off or falls.
+ *   kneaded    once every piece is broken and the core keeps being kneaded, the shards sink a little into the core
+ * Audio is driven by what moves: shatter on each snap (pitch from shard size), friction crunch from the shards rubbing as the core moves,
  * squish/flow from the core displacement (see toy.ts).
  */
 export type ChocoState = "solid" | "fracturing" | "kneaded";
 interface Shard {
   mesh: THREE.Mesh;
-  pos: THREE.Vector3; // body-local
-  vel: THREE.Vector3;
-  spin: number;
-  rot: number;
+  rest: THREE.Vector3; // body-local position where it broke
+  last: THREE.Vector3; // last displayed body-local position (for the rubbing measure)
+  pop: number; // 1 at the snap, decays to 0
+  tilt: THREE.Quaternion; // small permanent tilt
+  popAxis: THREE.Vector3;
   area: number;
-  anchor: THREE.Vector3; // where it sinks into the core (body-local)
+  sink: number; // how deep it sinks into a kneaded core
 }
 const rand = (n: number) => {
   const x = Math.sin(n * 91.345 + 7.13) * 43758.5453;
@@ -84,58 +87,52 @@ export class ChocolateBar {
       const mesh = new THREE.Mesh(geo, [this.top, this.cut]);
       this.scene.add(mesh);
       const out = new THREE.Vector2(cx - px, cy - py);
-      const sp = 0.25 + rand(this.seed++) * 0.35;
+      if (out.lengthSq() < 1e-6) out.set(d.x, d.y);
+      out.normalize();
+      // tilt about the in-plane axis across the outward direction: the edge near the press point dips, the far edge lifts
+      const axis = new THREE.Vector3(-out.y, out.x, 0);
+      const rest = new THREE.Vector3(cx, cy, zIn);
+      mesh.position.copy(rest).add(this.origin);
       this.shards.push({
         mesh,
-        pos: new THREE.Vector3(cx, cy, zIn),
-        vel: new THREE.Vector3(out.x * 3 + d.x * 0.3, out.y * 3 + 0.25, sp),
-        spin: (rand(this.seed++) - 0.5) * 3,
-        rot: 0,
+        rest,
+        last: rest.clone(),
+        pop: 1,
+        tilt: new THREE.Quaternion().setFromAxisAngle(axis, 0.05 + rand(this.seed++) * 0.07),
+        popAxis: axis,
         area,
-        anchor: new THREE.Vector3(cx * 0.9, cy * 0.9, zIn - 0.05 - rand(this.seed++) * 0.06),
+        sink: 0.04 + rand(this.seed++) * 0.04,
       });
       areaSum += area;
     });
     if (this.state === "solid") this.state = "fracturing";
     return areaSum / Math.max(1, n);
   }
-  /** advance shards; returns kinetic energy (∝ Σ area·v²) and the impact of shards landing on each other / the table this frame (friction-crunch layer) */
+  /** advance shards (they ride the core); returns the area-weighted speed of the shards rubbing against each other this frame */
   step(dt: number, opts: { allBroken: boolean; kneading: boolean; deform: (p: THREE.Vector3, out: THREE.Vector3) => void }) {
     if (opts.allBroken && opts.kneading) this.kneadT += dt;
     if (this.state === "fracturing" && opts.allBroken && this.kneadT > 1.2) this.state = "kneaded";
-    const zIn = this.spec.depth - BAR.shellThickness, floor = -this.spec.height * 0.98;
-    const tmp = new THREE.Vector3();
-    let ke = 0,
-      impact = 0;
+    const base = new THREE.Vector3(), shown = new THREE.Vector3(), q = new THREE.Quaternion();
+    const sinkK = 1 - Math.exp(-dt * 2);
+    let rub = 0,
+      popping = 0;
     for (const s of this.shards) {
-      if (this.state === "kneaded") {
-        // embedded: slide into the core and then ride its deformation
-        s.pos.lerp(s.anchor, 1 - Math.exp(-dt * 3));
-        s.vel.multiplyScalar(Math.exp(-dt * 8));
-        opts.deform(s.pos, tmp);
-        s.mesh.position.copy(tmp).add(this.origin);
-        s.mesh.scale.setScalar(THREE.MathUtils.lerp(s.mesh.scale.x || 1, 0.85, 1 - Math.exp(-dt * 2)));
-      } else {
-        s.vel.y -= 2.4 * dt; // fall
-        s.vel.z += (zIn + 0.04 - s.pos.z) * 10 * dt; // stay against the bar's front
-        s.vel.multiplyScalar(Math.exp(-dt * 2.2)); // friction
-        s.pos.addScaledVector(s.vel, dt);
-        if (s.pos.y < floor) {
-          if (s.vel.y < -0.15) impact += s.area * -s.vel.y; // a shard lands on the pile
-          s.pos.y = floor;
-          s.vel.y *= -0.2;
-          s.vel.x *= 0.6;
-          s.spin *= 0.6;
-        }
-        s.pos.x = THREE.MathUtils.clamp(s.pos.x, -this.spec.width * 1.3, this.spec.width * 1.3);
-        s.rot += s.spin * dt;
-        s.spin *= Math.exp(-dt * 2);
-        s.mesh.position.copy(s.pos).add(this.origin);
-        s.mesh.rotation.set(0, 0, s.rot);
-      }
-      ke += s.area * s.vel.lengthSq();
+      s.pop *= Math.exp(-dt * 9);
+      if (s.pop < 0.002) s.pop = 0;
+      popping += s.pop;
+      base.copy(s.rest);
+      if (this.state === "kneaded") s.rest.z += (this.spec.depth - BAR.shellThickness - s.sink - s.rest.z) * sinkK;
+      // follow the core the way the core itself is shown (it is partly rigid while fracturing)
+      opts.deform(base, shown);
+      shown.lerp(base, this.rigidity);
+      if (dt > 0) rub += (s.area * shown.distanceTo(s.last)) / dt;
+      s.last.copy(shown);
+      shown.z += s.pop * 0.05; // the snap lifts it off the core for an instant
+      s.mesh.position.copy(shown).add(this.origin);
+      q.setFromAxisAngle(s.popAxis, s.pop * 0.35);
+      s.mesh.quaternion.copy(s.tilt).premultiply(q);
     }
-    return { ke, impact };
+    return { rub, popping };
   }
   reset() {
     for (const s of this.shards) {
