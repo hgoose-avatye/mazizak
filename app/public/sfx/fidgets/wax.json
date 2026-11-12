@@ -4,14 +4,15 @@
  "sampleRate": 48000,
  "channels": 1,
  "bitDepth": 16,
- "totalSamples": 523281,
+ "totalSamples": 583975,
  "note": "Clips were picked automatically from the waveform and have NOT been listened to. `recordings` = distinct passages extracted from the source files; `variants` = derived copies (none here — runtime speed/pitch jitter is not counted). Sprite clips are peak-normalised to −1 dBFS; `gain` (≤1) equalises RMS within a pool; relative loudness between event classes is set by the player.",
  "counts": {
-  "sourceFiles": 8,
-  "extractedClips": 27,
+  "sourceFiles": 10,
+  "extractedClips": 34,
   "derivedVariants": 0
  },
  "qualityGates": {
+  "minStartDb": -38,
   "maxBoostDb": 18,
   "maxSource": -0.5,
   "maxSparse": 0.55,
@@ -29,7 +30,10 @@
    "init": 2,
    "crack": 3,
    "crunch": 3,
-   "hold": 3
+   "tap": 3,
+   "hold": 3,
+   "stretch": 3,
+   "fold": 3
   },
   "listenerExclusions": 0
  },
@@ -70,49 +74,46 @@
    }
   },
   "choco.init": {
-   "candidates": 2,
-   "passed": 0,
+   "candidates": 4,
+   "passed": 2,
    "rejected": {
-    "SPECTRUM-OUTLIER": 2
+    "CLIPPED-SOURCE": 1,
+    "SPECTRUM-OUTLIER": 1
    }
   },
   "choco.crack": {
-   "candidates": 10,
-   "passed": 3,
+   "candidates": 15,
+   "passed": 7,
    "rejected": {
     "BOOST>18dB": 6,
-    "SPARSE": 1
+    "SPARSE": 1,
+    "SPECTRUM-OUTLIER": 1
    }
   },
   "choco.burst": {
-   "candidates": 47,
-   "passed": 32,
+   "candidates": 124,
+   "passed": 62,
    "rejected": {
-    "SPARSE": 7,
-    "BOOST>18dB": 3,
+    "SPARSE": 16,
+    "SLOW-START": 22,
+    "BOOST>18dB": 11,
     "CUTOFF": 1,
+    "CLIPPED-SOURCE": 8,
     "SPECTRUM-OUTLIER": 4
    }
   },
   "choco.knead": {
    "candidates": 88,
-   "passed": 52,
+   "passed": 48,
    "rejected": {
-    "SPARSE": 28,
+    "SPARSE": 22,
+    "SLOW-START": 10,
     "BOOST>18dB": 5,
     "SPECTRUM-OUTLIER": 3
    }
   }
  },
- "dropped": [
-  {
-   "pool": "choco.init",
-   "event": "init",
-   "kept": 0,
-   "minimum": 2,
-   "reason": "too few clips passed the quality gates"
-  }
- ],
+ "dropped": [],
  "sources": {
   "wax:apple_crack_1": {
    "title": "apple_crack_1",
@@ -201,6 +202,28 @@
    "usage": "fidget W01/W02 wax crack + knead",
    "materialMatch": "recording of the simulated wax ball (maintainer’s claim)",
    "originalFile": "public/sfx/wax/choco_knead_2.mp3"
+  },
+  "freesound:660866": {
+   "title": "Chocolate Crumble and Snapping / Cutting ( Moderately thick and hard dark chocolate ).wav",
+   "author": "Finnssound",
+   "url": "https://freesound.org/people/Finnssound/sounds/660866/",
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "retrieved": "2026-11-12",
+   "usage": "W02 chocolate snap/crumble",
+   "materialMatch": "real chocolate (bar) — similar to a chocolate wax shell, not the toy",
+   "originalFile": "bench-out/fidget-src/fs_660866.mp3"
+  },
+  "freesound:851574": {
+   "title": "choc_unwrap_break",
+   "author": "pbeare70",
+   "url": "https://freesound.org/people/pbeare70/sounds/851574/",
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "retrieved": "2026-11-12",
+   "usage": "W02 chocolate snap",
+   "materialMatch": "real chocolate (bar) — similar to a chocolate wax shell, not the toy",
+   "originalFile": "bench-out/fidget-src/fs_851574.mp3"
   }
  },
  "pools": {
@@ -313,7 +336,7 @@
    "loudnessClass": "impact",
    "material": "wax",
    "note": "dense runs of ≥4 strikes (continuous breaking)",
-   "recordings": 3,
+   "recordings": 4,
    "variants": 0,
    "entries": [
     {
@@ -321,7 +344,7 @@
      "length": 22464,
      "offset": 0.540625,
      "duration": 0.468,
-     "gain": 1,
+     "gain": 0.9361,
      "src": "wax:apple_crack_1",
      "srcStart": 1.2351,
      "srcEnd": 1.7031,
@@ -332,10 +355,24 @@
     },
     {
      "start": 48894,
-     "length": 23328,
+     "length": 22368,
      "offset": 1.018625,
+     "duration": 0.466,
+     "gain": 1,
+     "src": "wax:apple_crack_1",
+     "srcStart": 2.6626,
+     "srcEnd": 3.1286,
+     "peakDbSource": -13.8,
+     "centroidHz": 3428,
+     "strikes": 9,
+     "boostDb": 12.8
+    },
+    {
+     "start": 71742,
+     "length": 23328,
+     "offset": 1.494625,
      "duration": 0.486,
-     "gain": 0.9283,
+     "gain": 0.869,
      "src": "wax:apple_crack_2",
      "srcStart": 0.3509,
      "srcEnd": 0.8369,
@@ -345,11 +382,11 @@
      "boostDb": 15.1
     },
     {
-     "start": 72702,
+     "start": 95550,
      "length": 21600,
-     "offset": 1.514625,
+     "offset": 1.990625,
      "duration": 0.45,
-     "gain": 0.6785,
+     "gain": 0.6351,
      "src": "wax:apple_crack_2",
      "srcStart": 1.0347,
      "srcEnd": 1.4847,
@@ -369,9 +406,9 @@
    "variants": 0,
    "entries": [
     {
-     "start": 94782,
+     "start": 117630,
      "length": 26976,
-     "offset": 1.974625,
+     "offset": 2.450625,
      "duration": 0.562,
      "gain": 0.4617,
      "src": "wax:apple_knead_1",
@@ -383,9 +420,9 @@
      "boostDb": 14.4
     },
     {
-     "start": 122238,
+     "start": 145086,
      "length": 27360,
-     "offset": 2.546625,
+     "offset": 3.022625,
      "duration": 0.57,
      "gain": 0.3615,
      "src": "wax:apple_knead_1",
@@ -397,9 +434,9 @@
      "boostDb": 14.1
     },
     {
-     "start": 150078,
+     "start": 172926,
      "length": 30720,
-     "offset": 3.126625,
+     "offset": 3.602625,
      "duration": 0.64,
      "gain": 0.7158,
      "src": "wax:apple_knead_2",
@@ -411,9 +448,9 @@
      "boostDb": 11.1
     },
     {
-     "start": 181278,
+     "start": 204126,
      "length": 30624,
-     "offset": 3.776625,
+     "offset": 4.252625,
      "duration": 0.638,
      "gain": 0.6193,
      "src": "wax:apple_knead_2",
@@ -425,9 +462,9 @@
      "boostDb": 12.1
     },
     {
-     "start": 212382,
+     "start": 235230,
      "length": 30720,
-     "offset": 4.424625,
+     "offset": 4.900625,
      "duration": 0.64,
      "gain": 0.5516,
      "src": "wax:apple_knead_2",
@@ -439,9 +476,9 @@
      "boostDb": 13.1
     },
     {
-     "start": 243582,
+     "start": 266430,
      "length": 23424,
-     "offset": 5.074625,
+     "offset": 5.550625,
      "duration": 0.488,
      "gain": 1,
      "src": "wax:apple_knead_2",
@@ -454,20 +491,100 @@
     }
    ]
   },
+  "choco.init": {
+   "event": "init",
+   "loudnessClass": "impact",
+   "material": "wax",
+   "note": "strongest isolated first-break hits",
+   "recordings": 2,
+   "variants": 0,
+   "entries": [
+    {
+     "start": 290334,
+     "length": 3360,
+     "offset": 6.048625,
+     "duration": 0.07,
+     "gain": 0.9857,
+     "src": "freesound:660866",
+     "srcStart": 20.9764,
+     "srcEnd": 21.0464,
+     "peakDbSource": -1.3,
+     "centroidHz": 1538,
+     "strikes": 1,
+     "boostDb": 0.3
+    },
+    {
+     "start": 294174,
+     "length": 4792,
+     "offset": 6.128625,
+     "duration": 0.099833,
+     "gain": 1,
+     "src": "wax:choco_crack_2",
+     "srcStart": 1.998,
+     "srcEnd": 2.0979,
+     "peakDbSource": -13.4,
+     "centroidHz": 2295,
+     "strikes": 1,
+     "boostDb": 12.4
+    }
+   ]
+  },
   "choco.crack": {
    "event": "crack",
    "loudnessClass": "impact",
    "material": "wax",
    "note": "single crack hits",
-   "recordings": 3,
+   "recordings": 6,
    "variants": 0,
    "entries": [
     {
-     "start": 267486,
+     "start": 299446,
      "length": 2880,
-     "offset": 5.572625,
+     "offset": 6.238458,
      "duration": 0.06,
+     "gain": 0.9683,
+     "src": "freesound:660866",
+     "srcStart": 16.6069,
+     "srcEnd": 16.6669,
+     "peakDbSource": -8.4,
+     "centroidHz": 2908,
+     "strikes": 1,
+     "boostDb": 7.4
+    },
+    {
+     "start": 302806,
+     "length": 4080,
+     "offset": 6.308458,
+     "duration": 0.085,
+     "gain": 0.6581,
+     "src": "freesound:851574",
+     "srcStart": 0.8441,
+     "srcEnd": 0.9291,
+     "peakDbSource": -15.9,
+     "centroidHz": 4428,
+     "strikes": 1,
+     "boostDb": 14.9
+    },
+    {
+     "start": 307366,
+     "length": 3630,
+     "offset": 6.403458,
+     "duration": 0.075625,
      "gain": 1,
+     "src": "freesound:851574",
+     "srcStart": 1.0382,
+     "srcEnd": 1.1139,
+     "peakDbSource": -14.1,
+     "centroidHz": 4698,
+     "strikes": 1,
+     "boostDb": 13.1
+    },
+    {
+     "start": 311476,
+     "length": 2880,
+     "offset": 6.489083,
+     "duration": 0.06,
+     "gain": 0.5934,
      "src": "wax:choco_crack_1",
      "srcStart": 4.3252,
      "srcEnd": 4.3852,
@@ -477,11 +594,11 @@
      "boostDb": 12.9
     },
     {
-     "start": 270846,
+     "start": 314836,
      "length": 2880,
-     "offset": 5.642625,
+     "offset": 6.559083,
      "duration": 0.06,
-     "gain": 0.9614,
+     "gain": 0.5705,
      "src": "wax:choco_crack_2",
      "srcStart": 1.616,
      "srcEnd": 1.676,
@@ -491,11 +608,11 @@
      "boostDb": 13.1
     },
     {
-     "start": 274206,
+     "start": 318196,
      "length": 3411,
-     "offset": 5.712625,
+     "offset": 6.629083,
      "duration": 0.071063,
-     "gain": 0.6,
+     "gain": 0.356,
      "src": "wax:choco_crack_2",
      "srcStart": 3.9737,
      "srcEnd": 4.0447,
@@ -511,15 +628,43 @@
    "loudnessClass": "impact",
    "material": "wax",
    "note": "dense runs of ≥4 strikes (continuous breaking)",
-   "recordings": 3,
+   "recordings": 4,
    "variants": 0,
    "entries": [
     {
-     "start": 278097,
-     "length": 23520,
-     "offset": 5.793688,
-     "duration": 0.49,
+     "start": 322087,
+     "length": 23040,
+     "offset": 6.710146,
+     "duration": 0.48,
+     "gain": 0.6825,
+     "src": "freesound:660866",
+     "srcStart": 6.3281,
+     "srcEnd": 6.8081,
+     "peakDbSource": -16.7,
+     "centroidHz": 5000,
+     "strikes": 9,
+     "boostDb": 15.7
+    },
+    {
+     "start": 345607,
+     "length": 24000,
+     "offset": 7.200146,
+     "duration": 0.5,
      "gain": 1,
+     "src": "freesound:851574",
+     "srcStart": 0.0799,
+     "srcEnd": 0.5799,
+     "peakDbSource": -8.5,
+     "centroidHz": 5891,
+     "strikes": 9,
+     "boostDb": 7.5
+    },
+    {
+     "start": 370087,
+     "length": 23520,
+     "offset": 7.710146,
+     "duration": 0.49,
+     "gain": 0.346,
      "src": "wax:choco_crack_1",
      "srcStart": 4.3932,
      "srcEnd": 4.8832,
@@ -529,30 +674,16 @@
      "boostDb": 11.7
     },
     {
-     "start": 302097,
-     "length": 23520,
-     "offset": 6.293688,
-     "duration": 0.49,
-     "gain": 0.9833,
+     "start": 394087,
+     "length": 23904,
+     "offset": 8.210146,
+     "duration": 0.498,
+     "gain": 0.247,
      "src": "wax:choco_crack_2",
-     "srcStart": 1.6843,
-     "srcEnd": 2.1743,
-     "peakDbSource": -12.8,
-     "centroidHz": 2944,
-     "strikes": 8,
-     "boostDb": 11.8
-    },
-    {
-     "start": 326097,
-     "length": 23040,
-     "offset": 6.793688,
-     "duration": 0.48,
-     "gain": 0.7123,
-     "src": "wax:choco_crack_2",
-     "srcStart": 4.2689,
-     "srcEnd": 4.7489,
+     "srcStart": 4.3358,
+     "srcEnd": 4.8338,
      "peakDbSource": -14.9,
-     "centroidHz": 5532,
+     "centroidHz": 2288,
      "strikes": 9,
      "boostDb": 13.9
     }
@@ -567,9 +698,9 @@
    "variants": 0,
    "entries": [
     {
-     "start": 349617,
+     "start": 418471,
      "length": 22464,
-     "offset": 7.283688,
+     "offset": 8.718146,
      "duration": 0.468,
      "gain": 1,
      "src": "wax:choco_knead_1",
@@ -581,23 +712,23 @@
      "boostDb": 11.7
     },
     {
-     "start": 372561,
-     "length": 30432,
-     "offset": 7.761688,
-     "duration": 0.634,
-     "gain": 0.3576,
+     "start": 441415,
+     "length": 22272,
+     "offset": 9.196146,
+     "duration": 0.464,
+     "gain": 0.3061,
      "src": "wax:choco_knead_1",
-     "srcStart": 3.0811,
-     "srcEnd": 3.7151,
+     "srcStart": 3.2782,
+     "srcEnd": 3.7422,
      "peakDbSource": -15.3,
-     "centroidHz": 4952,
-     "strikes": 8,
+     "centroidHz": 6856,
+     "strikes": 7,
      "boostDb": 14.3
     },
     {
-     "start": 403473,
+     "start": 464167,
      "length": 27456,
-     "offset": 8.405688,
+     "offset": 9.670146,
      "duration": 0.572,
      "gain": 0.6629,
      "src": "wax:choco_knead_1",
@@ -609,9 +740,9 @@
      "boostDb": 15.4
     },
     {
-     "start": 431409,
+     "start": 492103,
      "length": 30624,
-     "offset": 8.987688,
+     "offset": 10.252146,
      "duration": 0.638,
      "gain": 0.5381,
      "src": "wax:choco_knead_2",
@@ -623,9 +754,9 @@
      "boostDb": 12
     },
     {
-     "start": 462513,
+     "start": 523207,
      "length": 30336,
-     "offset": 9.635688,
+     "offset": 10.900146,
      "duration": 0.632,
      "gain": 0.5043,
      "src": "wax:choco_knead_2",
@@ -637,9 +768,9 @@
      "boostDb": 13.5
     },
     {
-     "start": 493329,
+     "start": 554023,
      "length": 29952,
-     "offset": 10.277688,
+     "offset": 11.542146,
      "duration": 0.624,
      "gain": 0.8336,
      "src": "wax:choco_knead_2",

@@ -1,5 +1,4 @@
 import type { AudioEngine } from "../../core/audio";
-import { loadSquishySamples, type SquishySoundsV2 } from "../../audio/squishySamples";
 import {
   LOCAL_FIDGETS,
   referenceSounds,
@@ -43,12 +42,11 @@ function cut(
       Math.max(0, Math.min(1, i / 48, (n - i - 1) / (b.sampleRate * 0.015)));
   return out;
 }
-export const preloadFidgetAudio = (audio: AudioEngine) =>
-  Promise.all([
-    loadSquishySamples(audio.ctx),
-    loadSprite(audio.ctx, "wax"),
-    loadSprite(audio.ctx, "crunch"),
-  ]);
+/** warm the sprite cache a little after start-up (a toy loads what it needs itself; this only shortens the wait) */
+export const preloadFidgetAudio = async (audio: AudioEngine) => {
+  await new Promise((r) => setTimeout(r, 2500));
+  for (const n of ["squish", "wax", "crunch"] as const) await loadSprite(audio.ctx, n);
+};
 /** Segment at quiet envelope gaps, rather than looping a short impact recording. */
 function gestureCues(ctx: BaseAudioContext, buffer: AudioBuffer) {
   const x = buffer.getChannelData(0),
@@ -145,10 +143,8 @@ export async function resolveToy(ctx: BaseAudioContext, spec: FidgetSpec): Promi
   const map = FIDGET_SOUND[spec.id];
   if (!map) throw Error(`no sound map for ${spec.id}`);
   const needs = (s: PoolRef["source"]) => EVENTS.some((e) => map[e]?.source === s);
-  const sq: SquishySoundsV2 | null = needs("squishy") ? await loadSquishySamples(ctx) : null;
-  const sprites: Partial<Record<"wax" | "crunch", LoadedSprite>> = {};
-  if (needs("wax")) sprites.wax = await loadSprite(ctx, "wax");
-  if (needs("crunch")) sprites.crunch = await loadSprite(ctx, "crunch");
+  const sprites: Partial<Record<"wax" | "crunch" | "squish", LoadedSprite>> = {};
+  for (const k of ["wax", "crunch", "squish"] as const) if (needs(k)) sprites[k] = await loadSprite(ctx, k);
   const local = LOCAL_AUDIO ? await referenceSounds(ctx, spec.id) : {};
   const hasVideoReference = LOCAL_AUDIO && spec.id === "L01" && !!(await referenceManifest()).toys.L01?.referenceVideo;
   // dev-only local reference override (old role names → events); never present in production builds
@@ -167,12 +163,6 @@ export async function resolveToy(ctx: BaseAudioContext, spec: FidgetSpec): Promi
   for (const event of EVENTS) {
     const ref = map[event];
     const poolsOf = (r: PoolRef, name: string): ResolvedClip[] => {
-      if (r.source === "squishy") {
-        const raw = name === "touch" ? sq!.touch : name === "compress" ? sq!.compress : name === "compressGel" ? (sq!.compressGel ?? sq!.compress) : sq!.recover;
-        const sel = r.slice ? raw.slice(r.slice[0], r.slice[1]) : raw;
-        const target = shapeDb + (event === "tap" ? -2 : event === "release" ? -6 : 0);
-        return normaliseRaw(ctx, sel, target).map((buffer, i) => ({ buffer, label: `squishy/${name}${r.slice ? `[${r.slice[0]},${r.slice[1]})` : ""} cue ${i}` }));
-      }
       const sprite = sprites[r.source]!;
       const p = sprite.pools[name];
       if (!p) return []; // pool dropped by the clip audit: the event simply has no sound
@@ -199,7 +189,7 @@ export async function resolveToy(ctx: BaseAudioContext, spec: FidgetSpec): Promi
     const e: ResolvedEvent = {
       ref: override?.length ? null : ref,
       main,
-      baseDb: (ref && ref.source !== "squishy" && !override?.length ? SPRITE_TRIM_DB[event] : CLASS_LEVEL_DB[event]) + (ref?.trimDb ?? 0),
+      baseDb: (ref && !override?.length ? SPRITE_TRIM_DB[event] : CLASS_LEVEL_DB[event]) + (ref?.trimDb ?? 0),
       rate,
       origin,
     };

@@ -1,0 +1,1241 @@
+{
+ "version": 1,
+ "file": "squish.wav",
+ "sampleRate": 48000,
+ "channels": 1,
+ "bitDepth": 16,
+ "totalSamples": 1398977,
+ "note": "Clips were picked automatically from the waveform and have NOT been listened to. `recordings` = distinct passages extracted from the source files; `variants` = derived copies (none here — runtime speed/pitch jitter is not counted). Sprite clips are peak-normalised to −1 dBFS; `gain` (≤1) equalises RMS within a pool; relative loudness between event classes is set by the player.",
+ "counts": {
+  "sourceFiles": 16,
+  "extractedClips": 55,
+  "derivedVariants": 0
+ },
+ "qualityGates": {
+  "minStartDb": -38,
+  "maxBoostDb": 18,
+  "maxSource": -0.5,
+  "maxSparse": 0.55,
+  "maxTailDb": -16,
+  "minHeadShare": 0.45,
+  "centroid": [
+   0.45,
+   2.2
+  ],
+  "length": [
+   0.5,
+   2
+  ],
+  "minClips": {
+   "init": 2,
+   "crack": 3,
+   "crunch": 3,
+   "tap": 3,
+   "hold": 3,
+   "stretch": 3,
+   "fold": 3
+  },
+  "listenerExclusions": 0
+ },
+ "audit": {
+  "tpr.tap": {
+   "candidates": 23,
+   "passed": 10,
+   "rejected": {
+    "SPARSE": 3,
+    "BOOST>18dB": 2,
+    "SOFTHEAD": 3,
+    "LENGTH-OUTLIER": 5
+   }
+  },
+  "tpr.hold": {
+   "candidates": 161,
+   "passed": 46,
+   "rejected": {
+    "BOOST>18dB": 74,
+    "SLOW-START": 24,
+    "SPARSE": 14,
+    "CUTOFF": 1,
+    "SPECTRUM-OUTLIER": 2
+   }
+  },
+  "foam.tap": {
+   "candidates": 27,
+   "passed": 1,
+   "rejected": {
+    "BOOST>18dB": 26
+   }
+  },
+  "foam.hold": {
+   "candidates": 202,
+   "passed": 10,
+   "rejected": {
+    "BOOST>18dB": 188,
+    "SPARSE": 3,
+    "SLOW-START": 1
+   }
+  },
+  "mochi.tap": {
+   "candidates": 5,
+   "passed": 4,
+   "rejected": {
+    "SOFTHEAD": 1
+   }
+  },
+  "mochi.hold": {
+   "candidates": 252,
+   "passed": 54,
+   "rejected": {
+    "CUTOFF": 6,
+    "BOOST>18dB": 152,
+    "SLOW-START": 12,
+    "SPARSE": 9,
+    "SPECTRUM-OUTLIER": 19
+   }
+  },
+  "slime.hold": {
+   "candidates": 572,
+   "passed": 144,
+   "rejected": {
+    "BOOST>18dB": 317,
+    "SLOW-START": 39,
+    "SPARSE": 29,
+    "CLIPPED-SOURCE": 19,
+    "CUTOFF": 10,
+    "SPECTRUM-OUTLIER": 14
+   }
+  },
+  "slime.stretch": {
+   "candidates": 215,
+   "passed": 11,
+   "rejected": {
+    "BOOST>18dB": 173,
+    "SLOW-START": 18,
+    "SPARSE": 13
+   }
+  },
+  "slime.fold": {
+   "candidates": 6,
+   "passed": 5,
+   "rejected": {
+    "SPARSE": 1
+   }
+  },
+  "gel.hold": {
+   "candidates": 553,
+   "passed": 123,
+   "rejected": {
+    "SLOW-START": 59,
+    "BOOST>18dB": 304,
+    "SPARSE": 34,
+    "CLIPPED-SOURCE": 3,
+    "CUTOFF": 2,
+    "SPECTRUM-OUTLIER": 28
+   }
+  },
+  "gel.fold": {
+   "candidates": 11,
+   "passed": 2,
+   "rejected": {
+    "BOOST>18dB": 8,
+    "LENGTH-OUTLIER": 1
+   }
+  },
+  "cream.hold": {
+   "candidates": 189,
+   "passed": 61,
+   "rejected": {
+    "SLOW-START": 22,
+    "SPARSE": 50,
+    "BOOST>18dB": 54,
+    "SPECTRUM-OUTLIER": 2
+   }
+  },
+  "cream.fold": {
+   "candidates": 190,
+   "passed": 59,
+   "rejected": {
+    "BOOST>18dB": 65,
+    "SLOW-START": 19,
+    "SPARSE": 43,
+    "SPECTRUM-OUTLIER": 4
+   }
+  }
+ },
+ "dropped": [
+  {
+   "pool": "foam.tap",
+   "event": "tap",
+   "kept": 1,
+   "minimum": 3,
+   "reason": "too few clips passed the quality gates"
+  },
+  {
+   "pool": "gel.fold",
+   "event": "fold",
+   "kept": 2,
+   "minimum": 3,
+   "reason": "too few clips passed the quality gates"
+  }
+ ],
+ "sources": {
+  "freesound:168011": {
+   "title": "Stress Ball",
+   "author": "gmarchisio",
+   "url": "https://freesound.org/people/gmarchisio/sounds/168011/",
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "retrieved": "2026-11-12",
+   "usage": "S01 tap",
+   "materialMatch": "similar material only (not a recording of the toy)",
+   "originalFile": "bench-out/fidget-src/fs_168011.mp3"
+  },
+  "freesound:197761": {
+   "title": "shaving cream.wav",
+   "author": "Yuval",
+   "url": "https://freesound.org/people/Yuval/sounds/197761/",
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "retrieved": "2026-11-12",
+   "usage": "L03 hold",
+   "materialMatch": "similar material only (not a recording of the toy)",
+   "originalFile": "bench-out/fidget-src/fs_197761.mp3"
+  },
+  "freesound:241813": {
+   "title": "Teig ausrollen.wav",
+   "author": "gruenebanane",
+   "url": "https://freesound.org/people/gruenebanane/sounds/241813/",
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "retrieved": "2026-11-12",
+   "usage": "S03 tap",
+   "materialMatch": "similar material only (not a recording of the toy)",
+   "originalFile": "bench-out/fidget-src/fs_241813.mp3"
+  },
+  "freesound:344643": {
+   "title": "Chinese stress balls.wav",
+   "author": "Chubbers1995",
+   "url": "https://freesound.org/people/Chubbers1995/sounds/344643/",
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "retrieved": "2026-11-12",
+   "usage": "S01 tap",
+   "materialMatch": "similar material only (not a recording of the toy)",
+   "originalFile": "bench-out/fidget-src/fs_344643.mp3"
+  },
+  "freesound:390314": {
+   "title": "082816 ASMR.mp3",
+   "author": "pflanigan",
+   "url": "https://freesound.org/people/pflanigan/sounds/390314/",
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "retrieved": "2026-11-12",
+   "usage": "S02 tap",
+   "materialMatch": "similar material only (not a recording of the toy)",
+   "originalFile": "bench-out/fidget-src/fs_390314.mp3"
+  },
+  "freesound:390315": {
+   "title": "082816 the foam remembers.mp3",
+   "author": "pflanigan",
+   "url": "https://freesound.org/people/pflanigan/sounds/390315/",
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "retrieved": "2026-11-12",
+   "usage": "S02 tap",
+   "materialMatch": "similar material only (not a recording of the toy)",
+   "originalFile": "bench-out/fidget-src/fs_390315.mp3"
+  },
+  "freesound:559768": {
+   "title": "Jello Squish",
+   "author": "Fugeni",
+   "url": "https://freesound.org/people/Fugeni/sounds/559768/",
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "retrieved": "2026-11-12",
+   "usage": "L02 hold",
+   "materialMatch": "similar material only (not a recording of the toy)",
+   "originalFile": "bench-out/fidget-src/fs_559768.mp3"
+  },
+  "freesound:594753": {
+   "title": "Pressing down on sponge",
+   "author": "emilyneiswonger",
+   "url": "https://freesound.org/people/emilyneiswonger/sounds/594753/",
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "retrieved": "2026-11-12",
+   "usage": "S02 tap",
+   "materialMatch": "similar material only (not a recording of the toy)",
+   "originalFile": "bench-out/fidget-src/fs_594753.mp3"
+  },
+  "freesound:612769": {
+   "title": "Kneading dough in metal pot",
+   "author": "jb_stems",
+   "url": "https://freesound.org/people/jb_stems/sounds/612769/",
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "retrieved": "2026-11-12",
+   "usage": "S03 tap",
+   "materialMatch": "similar material only (not a recording of the toy)",
+   "originalFile": "bench-out/fidget-src/fs_612769.mp3"
+  },
+  "freesound:622335": {
+   "title": "SqueezeToy24.wav",
+   "author": "sirplus",
+   "url": "https://freesound.org/people/sirplus/sounds/622335/",
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "retrieved": "2026-11-12",
+   "usage": "S01 tap",
+   "materialMatch": "similar material only (not a recording of the toy)",
+   "originalFile": "bench-out/fidget-src/fs_622335.mp3"
+  },
+  "freesound:655814": {
+   "title": "Squishy wet sound of goo.wav",
+   "author": "nathvandykOWI",
+   "url": "https://freesound.org/people/nathvandykOWI/sounds/655814/",
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "retrieved": "2026-11-12",
+   "usage": "L01 hold",
+   "materialMatch": "similar material only (not a recording of the toy)",
+   "originalFile": "bench-out/fidget-src/fs_655814.mp3"
+  },
+  "freesound:680447": {
+   "title": "slime - squishing sounds",
+   "author": "rubberduck9999",
+   "url": "https://freesound.org/people/rubberduck9999/sounds/680447/",
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "retrieved": "2026-11-12",
+   "usage": "L01 hold",
+   "materialMatch": "similar material only (not a recording of the toy)",
+   "originalFile": "bench-out/fidget-src/fs_680447.mp3"
+  },
+  "freesound:794270": {
+   "title": "Slime stretching and squeezing",
+   "author": "greenlinker",
+   "url": "https://freesound.org/people/greenlinker/sounds/794270/",
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "retrieved": "2026-11-12",
+   "usage": "L01 hold",
+   "materialMatch": "similar material only (not a recording of the toy)",
+   "originalFile": "bench-out/fidget-src/fs_794270.mp3"
+  },
+  "freesound:794272": {
+   "title": "Slime slapping",
+   "author": "greenlinker",
+   "url": "https://freesound.org/people/greenlinker/sounds/794272/",
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "retrieved": "2026-11-12",
+   "usage": "L01 fold",
+   "materialMatch": "similar material only (not a recording of the toy)",
+   "originalFile": "bench-out/fidget-src/fs_794272.mp3"
+  },
+  "freesound:824934": {
+   "title": "squish_comp_09_25",
+   "author": "cera.stes",
+   "url": "https://freesound.org/people/cera.stes/sounds/824934/",
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "retrieved": "2026-11-12",
+   "usage": "L01 fold",
+   "materialMatch": "similar material only (not a recording of the toy)",
+   "originalFile": "bench-out/fidget-src/fs_824934.mp3"
+  },
+  "freesound:849247": {
+   "title": "Shaving cream oozing out of the tin",
+   "author": "_javier_rodas",
+   "url": "https://freesound.org/people/_javier_rodas/sounds/849247/",
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "retrieved": "2026-11-12",
+   "usage": "L03 hold",
+   "materialMatch": "similar material only (not a recording of the toy)",
+   "originalFile": "bench-out/fidget-src/fs_849247.mp3"
+  }
+ },
+ "pools": {
+  "tpr.tap": {
+   "event": "tap",
+   "loudnessClass": "impact",
+   "material": "stress balls / squeeze toy",
+   "note": "short squeezes",
+   "recordings": 6,
+   "variants": 0,
+   "entries": [
+    {
+     "start": 0,
+     "length": 6781,
+     "offset": 0,
+     "duration": 0.141271,
+     "gain": 0.5912,
+     "src": "freesound:168011",
+     "srcStart": 4.6511,
+     "srcEnd": 4.7924,
+     "peakDbSource": -6,
+     "centroidHz": 3105,
+     "strikes": 1,
+     "boostDb": 5
+    },
+    {
+     "start": 7261,
+     "length": 11520,
+     "offset": 0.151271,
+     "duration": 0.24,
+     "gain": 0.4645,
+     "src": "freesound:168011",
+     "srcStart": 4.9493,
+     "srcEnd": 5.1893,
+     "peakDbSource": -5.9,
+     "centroidHz": 4370,
+     "strikes": 1,
+     "boostDb": 4.9
+    },
+    {
+     "start": 19261,
+     "length": 11520,
+     "offset": 0.401271,
+     "duration": 0.24,
+     "gain": 0.5265,
+     "src": "freesound:168011",
+     "srcStart": 5.4556,
+     "srcEnd": 5.6956,
+     "peakDbSource": -6,
+     "centroidHz": 4678,
+     "strikes": 1,
+     "boostDb": 5
+    },
+    {
+     "start": 31261,
+     "length": 11520,
+     "offset": 0.651271,
+     "duration": 0.24,
+     "gain": 1,
+     "src": "freesound:344643",
+     "srcStart": 18.3183,
+     "srcEnd": 18.5583,
+     "peakDbSource": -18.8,
+     "centroidHz": 3052,
+     "strikes": 1,
+     "boostDb": 17.8
+    },
+    {
+     "start": 43261,
+     "length": 11424,
+     "offset": 0.901271,
+     "duration": 0.238,
+     "gain": 0.8152,
+     "src": "freesound:344643",
+     "srcStart": 20.8172,
+     "srcEnd": 21.0552,
+     "peakDbSource": -17.8,
+     "centroidHz": 2355,
+     "strikes": 1,
+     "boostDb": 16.8
+    },
+    {
+     "start": 55165,
+     "length": 11520,
+     "offset": 1.149271,
+     "duration": 0.24,
+     "gain": 0.2683,
+     "src": "freesound:622335",
+     "srcStart": 7.0942,
+     "srcEnd": 7.3342,
+     "peakDbSource": -10,
+     "centroidHz": 6845,
+     "strikes": 1,
+     "boostDb": 9
+    }
+   ]
+  },
+  "tpr.hold": {
+   "event": "hold",
+   "loudnessClass": "continuous",
+   "material": "stress balls / squeeze toy",
+   "note": "sustained squeezing",
+   "recordings": 5,
+   "variants": 0,
+   "entries": [
+    {
+     "start": 67165,
+     "length": 21216,
+     "offset": 1.399271,
+     "duration": 0.442,
+     "gain": 0.4023,
+     "src": "freesound:168011",
+     "srcStart": 2.9069,
+     "srcEnd": 3.3489,
+     "peakDbSource": -6.9,
+     "centroidHz": 6336,
+     "strikes": 3,
+     "boostDb": 5.9
+    },
+    {
+     "start": 88861,
+     "length": 22560,
+     "offset": 1.851271,
+     "duration": 0.47,
+     "gain": 0.2974,
+     "src": "freesound:168011",
+     "srcStart": 4.5811,
+     "srcEnd": 5.0511,
+     "peakDbSource": -5.8,
+     "centroidHz": 5803,
+     "strikes": 4,
+     "boostDb": 4.8
+    },
+    {
+     "start": 111901,
+     "length": 26208,
+     "offset": 2.331271,
+     "duration": 0.546,
+     "gain": 1,
+     "src": "freesound:344643",
+     "srcStart": 18.2781,
+     "srcEnd": 18.8241,
+     "peakDbSource": -18.8,
+     "centroidHz": 4241,
+     "strikes": 3,
+     "boostDb": 17.8
+    },
+    {
+     "start": 138589,
+     "length": 28224,
+     "offset": 2.887271,
+     "duration": 0.588,
+     "gain": 0.8217,
+     "src": "freesound:344643",
+     "srcStart": 20.6419,
+     "srcEnd": 21.2299,
+     "peakDbSource": -17.8,
+     "centroidHz": 3346,
+     "strikes": 2,
+     "boostDb": 16.8
+    },
+    {
+     "start": 167293,
+     "length": 21888,
+     "offset": 3.485271,
+     "duration": 0.456,
+     "gain": 0.2175,
+     "src": "freesound:622335",
+     "srcStart": 4.1699,
+     "srcEnd": 4.6259,
+     "peakDbSource": -7.1,
+     "centroidHz": 6003,
+     "strikes": 9,
+     "boostDb": 6.1
+    }
+   ]
+  },
+  "foam.hold": {
+   "event": "hold",
+   "loudnessClass": "continuous",
+   "material": "memory foam / sponge",
+   "note": "long slow presses",
+   "recordings": 3,
+   "variants": 0,
+   "entries": [
+    {
+     "start": 189661,
+     "length": 37056,
+     "offset": 3.951271,
+     "duration": 0.772,
+     "gain": 0.8417,
+     "src": "freesound:390314",
+     "srcStart": 37.8195,
+     "srcEnd": 38.5915,
+     "peakDbSource": -17.7,
+     "centroidHz": 6043,
+     "strikes": 7,
+     "boostDb": 16.7
+    },
+    {
+     "start": 227197,
+     "length": 35520,
+     "offset": 4.733271,
+     "duration": 0.74,
+     "gain": 0.4274,
+     "src": "freesound:390315",
+     "srcStart": 6.9543,
+     "srcEnd": 7.6943,
+     "peakDbSource": -13.3,
+     "centroidHz": 5385,
+     "strikes": 4,
+     "boostDb": 12.3
+    },
+    {
+     "start": 263197,
+     "length": 41760,
+     "offset": 5.483271,
+     "duration": 0.87,
+     "gain": 1,
+     "src": "freesound:594753",
+     "srcStart": 5.4842,
+     "srcEnd": 6.3542,
+     "peakDbSource": -13.5,
+     "centroidHz": 3274,
+     "strikes": 7,
+     "boostDb": 12.5
+    }
+   ]
+  },
+  "mochi.tap": {
+   "event": "tap",
+   "loudnessClass": "impact",
+   "material": "soft dough",
+   "note": "short dough presses",
+   "recordings": 4,
+   "variants": 0,
+   "entries": [
+    {
+     "start": 305437,
+     "length": 4175,
+     "offset": 6.363271,
+     "duration": 0.086979,
+     "gain": 1,
+     "src": "freesound:241813",
+     "srcStart": 7.7461,
+     "srcEnd": 7.8331,
+     "peakDbSource": -3.1,
+     "centroidHz": 2762,
+     "strikes": 1,
+     "boostDb": 2.1
+    },
+    {
+     "start": 310092,
+     "length": 2915,
+     "offset": 6.46025,
+     "duration": 0.060729,
+     "gain": 0.7036,
+     "src": "freesound:241813",
+     "srcStart": 14.8891,
+     "srcEnd": 14.9499,
+     "peakDbSource": -2.9,
+     "centroidHz": 1511,
+     "strikes": 1,
+     "boostDb": 1.9
+    },
+    {
+     "start": 313487,
+     "length": 3235,
+     "offset": 6.530979,
+     "duration": 0.067396,
+     "gain": 0.6602,
+     "src": "freesound:241813",
+     "srcStart": 19.0886,
+     "srcEnd": 19.156,
+     "peakDbSource": -5.2,
+     "centroidHz": 1302,
+     "strikes": 1,
+     "boostDb": 4.2
+    },
+    {
+     "start": 317202,
+     "length": 4149,
+     "offset": 6.608375,
+     "duration": 0.086438,
+     "gain": 0.8134,
+     "src": "freesound:612769",
+     "srcStart": 6.4046,
+     "srcEnd": 6.4911,
+     "peakDbSource": -6,
+     "centroidHz": 1332,
+     "strikes": 1,
+     "boostDb": 5
+    }
+   ]
+  },
+  "mochi.hold": {
+   "event": "hold",
+   "loudnessClass": "continuous",
+   "material": "soft dough",
+   "note": "kneading / rolling windows",
+   "recordings": 5,
+   "variants": 0,
+   "entries": [
+    {
+     "start": 321831,
+     "length": 34560,
+     "offset": 6.704813,
+     "duration": 0.72,
+     "gain": 0.3558,
+     "src": "freesound:241813",
+     "srcStart": 1.0402,
+     "srcEnd": 1.7602,
+     "peakDbSource": -12.6,
+     "centroidHz": 2461,
+     "strikes": 11,
+     "boostDb": 11.6
+    },
+    {
+     "start": 356871,
+     "length": 33696,
+     "offset": 7.434813,
+     "duration": 0.702,
+     "gain": 0.5346,
+     "src": "freesound:241813",
+     "srcStart": 2.8165,
+     "srcEnd": 3.5185,
+     "peakDbSource": -4.4,
+     "centroidHz": 960,
+     "strikes": 13,
+     "boostDb": 3.4
+    },
+    {
+     "start": 391047,
+     "length": 34368,
+     "offset": 8.146812,
+     "duration": 0.716,
+     "gain": 0.5261,
+     "src": "freesound:241813",
+     "srcStart": 13.7575,
+     "srcEnd": 14.4735,
+     "peakDbSource": -10.4,
+     "centroidHz": 890,
+     "strikes": 9,
+     "boostDb": 9.4
+    },
+    {
+     "start": 425895,
+     "length": 32832,
+     "offset": 8.872813,
+     "duration": 0.684,
+     "gain": 0.4241,
+     "src": "freesound:241813",
+     "srcStart": 16.3857,
+     "srcEnd": 17.0697,
+     "peakDbSource": -17.8,
+     "centroidHz": 819,
+     "strikes": 10,
+     "boostDb": 16.8
+    },
+    {
+     "start": 459207,
+     "length": 28224,
+     "offset": 9.566813,
+     "duration": 0.588,
+     "gain": 1,
+     "src": "freesound:612769",
+     "srcStart": 6.4971,
+     "srcEnd": 7.0851,
+     "peakDbSource": -17.5,
+     "centroidHz": 983,
+     "strikes": 5,
+     "boostDb": 16.5
+    }
+   ]
+  },
+  "slime.hold": {
+   "event": "hold",
+   "loudnessClass": "continuous",
+   "material": "slime",
+   "note": "squishing windows",
+   "recordings": 6,
+   "variants": 0,
+   "entries": [
+    {
+     "start": 487911,
+     "length": 28992,
+     "offset": 10.164813,
+     "duration": 0.604,
+     "gain": 0.6287,
+     "src": "freesound:655814",
+     "srcStart": 14.0042,
+     "srcEnd": 14.6082,
+     "peakDbSource": -17.3,
+     "centroidHz": 3961,
+     "strikes": 9,
+     "boostDb": 16.3
+    },
+    {
+     "start": 517383,
+     "length": 31104,
+     "offset": 10.778813,
+     "duration": 0.648,
+     "gain": 0.3105,
+     "src": "freesound:655814",
+     "srcStart": 24.1894,
+     "srcEnd": 24.8374,
+     "peakDbSource": -14.5,
+     "centroidHz": 2039,
+     "strikes": 10,
+     "boostDb": 13.5
+    },
+    {
+     "start": 548967,
+     "length": 32544,
+     "offset": 11.436813,
+     "duration": 0.678,
+     "gain": 0.1645,
+     "src": "freesound:680447",
+     "srcStart": 35.9297,
+     "srcEnd": 36.6077,
+     "peakDbSource": -14.8,
+     "centroidHz": 3182,
+     "strikes": 13,
+     "boostDb": 13.8
+    },
+    {
+     "start": 581991,
+     "length": 27840,
+     "offset": 12.124813,
+     "duration": 0.58,
+     "gain": 0.244,
+     "src": "freesound:680447",
+     "srcStart": 103.9738,
+     "srcEnd": 104.5538,
+     "peakDbSource": -14.9,
+     "centroidHz": 3609,
+     "strikes": 12,
+     "boostDb": 13.9
+    },
+    {
+     "start": 610311,
+     "length": 32640,
+     "offset": 12.714813,
+     "duration": 0.68,
+     "gain": 0.4297,
+     "src": "freesound:794270",
+     "srcStart": 99.8519,
+     "srcEnd": 100.5319,
+     "peakDbSource": -15.8,
+     "centroidHz": 6178,
+     "strikes": 13,
+     "boostDb": 14.8
+    },
+    {
+     "start": 643431,
+     "length": 31776,
+     "offset": 13.404813,
+     "duration": 0.662,
+     "gain": 1,
+     "src": "freesound:794270",
+     "srcStart": 104.6661,
+     "srcEnd": 105.3281,
+     "peakDbSource": -10.6,
+     "centroidHz": 4432,
+     "strikes": 14,
+     "boostDb": 9.6
+    }
+   ]
+  },
+  "slime.stretch": {
+   "event": "stretch",
+   "loudnessClass": "continuous",
+   "material": "slime",
+   "note": "slime stretching passages",
+   "recordings": 5,
+   "variants": 0,
+   "entries": [
+    {
+     "start": 675687,
+     "length": 41088,
+     "offset": 14.076813,
+     "duration": 0.856,
+     "gain": 0.6532,
+     "src": "freesound:794270",
+     "srcStart": 84.5131,
+     "srcEnd": 85.3691,
+     "peakDbSource": -19,
+     "centroidHz": 2950,
+     "strikes": 16,
+     "boostDb": 18
+    },
+    {
+     "start": 717255,
+     "length": 45312,
+     "offset": 14.942813,
+     "duration": 0.944,
+     "gain": 1,
+     "src": "freesound:794270",
+     "srcStart": 85.5771,
+     "srcEnd": 86.5211,
+     "peakDbSource": -18.5,
+     "centroidHz": 5204,
+     "strikes": 20,
+     "boostDb": 17.5
+    },
+    {
+     "start": 763047,
+     "length": 43488,
+     "offset": 15.896813,
+     "duration": 0.906,
+     "gain": 0.839,
+     "src": "freesound:794270",
+     "srcStart": 91.2953,
+     "srcEnd": 92.2013,
+     "peakDbSource": -16.7,
+     "centroidHz": 5565,
+     "strikes": 18,
+     "boostDb": 15.7
+    },
+    {
+     "start": 807015,
+     "length": 43680,
+     "offset": 16.812813,
+     "duration": 0.91,
+     "gain": 0.3398,
+     "src": "freesound:794270",
+     "srcStart": 99.8519,
+     "srcEnd": 100.7619,
+     "peakDbSource": -15.8,
+     "centroidHz": 6178,
+     "strikes": 15,
+     "boostDb": 14.8
+    },
+    {
+     "start": 851175,
+     "length": 39552,
+     "offset": 17.732813,
+     "duration": 0.824,
+     "gain": 0.6951,
+     "src": "freesound:794270",
+     "srcStart": 114.3003,
+     "srcEnd": 115.1243,
+     "peakDbSource": -18.5,
+     "centroidHz": 6459,
+     "strikes": 17,
+     "boostDb": 17.5
+    }
+   ]
+  },
+  "slime.fold": {
+   "event": "fold",
+   "loudnessClass": "continuous",
+   "material": "slime",
+   "note": "slime slaps / folds",
+   "recordings": 5,
+   "variants": 0,
+   "entries": [
+    {
+     "start": 891207,
+     "length": 3840,
+     "offset": 18.566813,
+     "duration": 0.08,
+     "gain": 0.6346,
+     "src": "freesound:794272",
+     "srcStart": 0.8486,
+     "srcEnd": 0.9286,
+     "peakDbSource": -10.9,
+     "centroidHz": 5598,
+     "strikes": 1,
+     "boostDb": 9.9
+    },
+    {
+     "start": 895527,
+     "length": 3840,
+     "offset": 18.656813,
+     "duration": 0.08,
+     "gain": 0.5272,
+     "src": "freesound:794272",
+     "srcStart": 3.7355,
+     "srcEnd": 3.8155,
+     "peakDbSource": -9.4,
+     "centroidHz": 5105,
+     "strikes": 1,
+     "boostDb": 8.4
+    },
+    {
+     "start": 899847,
+     "length": 3840,
+     "offset": 18.746813,
+     "duration": 0.08,
+     "gain": 0.6344,
+     "src": "freesound:794272",
+     "srcStart": 6.0909,
+     "srcEnd": 6.1709,
+     "peakDbSource": -5,
+     "centroidHz": 5455,
+     "strikes": 1,
+     "boostDb": 4
+    },
+    {
+     "start": 904167,
+     "length": 4054,
+     "offset": 18.836813,
+     "duration": 0.084458,
+     "gain": 0.9826,
+     "src": "freesound:794272",
+     "srcStart": 17.3992,
+     "srcEnd": 17.4836,
+     "peakDbSource": -3.5,
+     "centroidHz": 3954,
+     "strikes": 1,
+     "boostDb": 2.5
+    },
+    {
+     "start": 908701,
+     "length": 5380,
+     "offset": 18.931271,
+     "duration": 0.112083,
+     "gain": 1,
+     "src": "freesound:824934",
+     "srcStart": 9.4575,
+     "srcEnd": 9.5696,
+     "peakDbSource": -11.9,
+     "centroidHz": 8509,
+     "strikes": 1,
+     "boostDb": 10.9
+    }
+   ]
+  },
+  "gel.hold": {
+   "event": "hold",
+   "loudnessClass": "continuous",
+   "material": "jelly / gooey gel",
+   "note": "wet gel squishing windows",
+   "recordings": 6,
+   "variants": 0,
+   "entries": [
+    {
+     "start": 914561,
+     "length": 32640,
+     "offset": 19.053354,
+     "duration": 0.68,
+     "gain": 1,
+     "src": "freesound:559768",
+     "srcStart": 14.1501,
+     "srcEnd": 14.8301,
+     "peakDbSource": -13.5,
+     "centroidHz": 8358,
+     "strikes": 15,
+     "boostDb": 12.5
+    },
+    {
+     "start": 947681,
+     "length": 31584,
+     "offset": 19.743354,
+     "duration": 0.658,
+     "gain": 0.8896,
+     "src": "freesound:559768",
+     "srcStart": 19.2263,
+     "srcEnd": 19.8843,
+     "peakDbSource": -12.8,
+     "centroidHz": 7433,
+     "strikes": 14,
+     "boostDb": 11.8
+    },
+    {
+     "start": 979745,
+     "length": 28992,
+     "offset": 20.411354,
+     "duration": 0.604,
+     "gain": 0.9249,
+     "src": "freesound:655814",
+     "srcStart": 14.0042,
+     "srcEnd": 14.6082,
+     "peakDbSource": -17.3,
+     "centroidHz": 3961,
+     "strikes": 9,
+     "boostDb": 16.3
+    },
+    {
+     "start": 1009217,
+     "length": 31872,
+     "offset": 21.025354,
+     "duration": 0.664,
+     "gain": 0.5641,
+     "src": "freesound:655814",
+     "srcStart": 23.8448,
+     "srcEnd": 24.5088,
+     "peakDbSource": -14.9,
+     "centroidHz": 7021,
+     "strikes": 9,
+     "boostDb": 13.9
+    },
+    {
+     "start": 1041569,
+     "length": 32544,
+     "offset": 21.699354,
+     "duration": 0.678,
+     "gain": 0.1709,
+     "src": "freesound:824934",
+     "srcStart": 88.3946,
+     "srcEnd": 89.0726,
+     "peakDbSource": -17.8,
+     "centroidHz": 5558,
+     "strikes": 11,
+     "boostDb": 16.8
+    },
+    {
+     "start": 1074593,
+     "length": 31488,
+     "offset": 22.387354,
+     "duration": 0.656,
+     "gain": 0.3542,
+     "src": "freesound:824934",
+     "srcStart": 103.4235,
+     "srcEnd": 104.0795,
+     "peakDbSource": -13.8,
+     "centroidHz": 4381,
+     "strikes": 13,
+     "boostDb": 12.8
+    }
+   ]
+  },
+  "cream.hold": {
+   "event": "hold",
+   "loudnessClass": "continuous",
+   "material": "shaving foam / cream",
+   "note": "foam squashing windows",
+   "recordings": 5,
+   "variants": 0,
+   "entries": [
+    {
+     "start": 1106561,
+     "length": 28992,
+     "offset": 23.053354,
+     "duration": 0.604,
+     "gain": 1,
+     "src": "freesound:197761",
+     "srcStart": 5.5433,
+     "srcEnd": 6.1473,
+     "peakDbSource": -17,
+     "centroidHz": 5850,
+     "strikes": 10,
+     "boostDb": 16
+    },
+    {
+     "start": 1136033,
+     "length": 31584,
+     "offset": 23.667354,
+     "duration": 0.658,
+     "gain": 0.775,
+     "src": "freesound:197761",
+     "srcStart": 8.6181,
+     "srcEnd": 9.2761,
+     "peakDbSource": -15.3,
+     "centroidHz": 10844,
+     "strikes": 11,
+     "boostDb": 14.3
+    },
+    {
+     "start": 1168097,
+     "length": 32064,
+     "offset": 24.335354,
+     "duration": 0.668,
+     "gain": 0.4404,
+     "src": "freesound:197761",
+     "srcStart": 21.223,
+     "srcEnd": 21.891,
+     "peakDbSource": -17.4,
+     "centroidHz": 10971,
+     "strikes": 8,
+     "boostDb": 16.4
+    },
+    {
+     "start": 1200641,
+     "length": 31968,
+     "offset": 25.013354,
+     "duration": 0.666,
+     "gain": 0.8104,
+     "src": "freesound:197761",
+     "srcStart": 22.4596,
+     "srcEnd": 23.1256,
+     "peakDbSource": -15.5,
+     "centroidHz": 7900,
+     "strikes": 10,
+     "boostDb": 14.5
+    },
+    {
+     "start": 1233089,
+     "length": 32064,
+     "offset": 25.689354,
+     "duration": 0.668,
+     "gain": 0.4921,
+     "src": "freesound:849247",
+     "srcStart": 0.1681,
+     "srcEnd": 0.8361,
+     "peakDbSource": -4.1,
+     "centroidHz": 4789,
+     "strikes": 9,
+     "boostDb": 3.1
+    }
+   ]
+  },
+  "cream.fold": {
+   "event": "fold",
+   "loudnessClass": "continuous",
+   "material": "shaving foam / cream",
+   "note": "foam folding windows",
+   "recordings": 5,
+   "variants": 0,
+   "entries": [
+    {
+     "start": 1265633,
+     "length": 25152,
+     "offset": 26.367354,
+     "duration": 0.524,
+     "gain": 0.9294,
+     "src": "freesound:197761",
+     "srcStart": 8.7548,
+     "srcEnd": 9.2788,
+     "peakDbSource": -15.3,
+     "centroidHz": 8501,
+     "strikes": 9,
+     "boostDb": 14.3
+    },
+    {
+     "start": 1291265,
+     "length": 26880,
+     "offset": 26.901354,
+     "duration": 0.56,
+     "gain": 0.6218,
+     "src": "freesound:197761",
+     "srcStart": 20.9857,
+     "srcEnd": 21.5457,
+     "peakDbSource": -17.2,
+     "centroidHz": 9924,
+     "strikes": 8,
+     "boostDb": 16.2
+    },
+    {
+     "start": 1318625,
+     "length": 25824,
+     "offset": 27.471354,
+     "duration": 0.538,
+     "gain": 0.7956,
+     "src": "freesound:197761",
+     "srcStart": 21.5957,
+     "srcEnd": 22.1337,
+     "peakDbSource": -15.3,
+     "centroidHz": 11862,
+     "strikes": 7,
+     "boostDb": 14.3
+    },
+    {
+     "start": 1344929,
+     "length": 26688,
+     "offset": 28.019354,
+     "duration": 0.556,
+     "gain": 1,
+     "src": "freesound:197761",
+     "srcStart": 22.6504,
+     "srcEnd": 23.2064,
+     "peakDbSource": -15.5,
+     "centroidHz": 6915,
+     "strikes": 8,
+     "boostDb": 14.5
+    },
+    {
+     "start": 1372097,
+     "length": 26880,
+     "offset": 28.585354,
+     "duration": 0.56,
+     "gain": 0.5881,
+     "src": "freesound:849247",
+     "srcStart": 0.1681,
+     "srcEnd": 0.7281,
+     "peakDbSource": -4.1,
+     "centroidHz": 4789,
+     "strikes": 9,
+     "boostDb": 3.1
+    }
+   ]
+  }
+ }
+}

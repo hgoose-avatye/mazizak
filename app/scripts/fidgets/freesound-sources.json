@@ -1,0 +1,847 @@
+{
+ "_doc": "Freesound CC0 sources used by scripts/fidgets/build-clips.mjs. Previews are downloaded into bench-out/fidget-src/ (git-ignored) when missing and verified against sha256.",
+ "sources": {
+  "freesound:794270": {
+   "title": "Slime stretching and squeezing",
+   "author": "greenlinker",
+   "page": "https://freesound.org/people/greenlinker/sounds/794270/",
+   "preview": "https://cdn.freesound.org/previews/794/794270_6812548-hq.mp3",
+   "sha256": "dc0a15979c55a5596f8ccc370cbf7dbd950e3277bb02852fc8e79ca69ca6a02a",
+   "tags": [
+    "goo",
+    "gooey",
+    "goopy",
+    "gore",
+    "gross",
+    "horror",
+    "mush",
+    "ooze",
+    "slime",
+    "slimy",
+    "sludge",
+    "squelch"
+   ],
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "retrieved": "2026-11-12"
+  },
+  "freesound:794272": {
+   "title": "Slime slapping",
+   "author": "greenlinker",
+   "page": "https://freesound.org/people/greenlinker/sounds/794272/",
+   "preview": "https://cdn.freesound.org/previews/794/794272_6812548-hq.mp3",
+   "sha256": "f0315949343bbd9eb20b09334016877f03039a6d8bd5fab72bd8c108acb54aaa",
+   "tags": [
+    "goo",
+    "gooey",
+    "gore",
+    "gross",
+    "impact",
+    "slap",
+    "slime",
+    "squelch",
+    "squish"
+   ],
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "retrieved": "2026-11-12"
+  },
+  "freesound:680447": {
+   "title": "slime - squishing sounds",
+   "author": "rubberduck9999",
+   "page": "https://freesound.org/people/rubberduck9999/sounds/680447/",
+   "preview": "https://cdn.freesound.org/previews/680/680447_14687392-hq.mp3",
+   "sha256": "c22328967019c8f781613f1aba8da88eaf05779f5af4a95ab4ce05c208bf6869",
+   "tags": [
+    "alien",
+    "creature",
+    "creepy",
+    "flesh",
+    "foley",
+    "goo",
+    "gross",
+    "guts",
+    "horror",
+    "impact",
+    "insect",
+    "maggot"
+   ],
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "retrieved": "2026-11-12"
+  },
+  "freesound:442772": {
+   "title": "Slime Squish",
+   "author": "qubodup",
+   "page": "https://freesound.org/people/qubodup/sounds/442772/",
+   "preview": "https://cdn.freesound.org/previews/442/442772_71257-hq.mp3",
+   "sha256": "72521df6208f6a93518ece50dd2451f3769e0b78f5fc66837e39159eb9b3b8bf",
+   "tags": [
+    "attack",
+    "damage",
+    "dink",
+    "fantasy",
+    "freedink",
+    "game",
+    "hit",
+    "jelly",
+    "monster",
+    "punch",
+    "rpg",
+    "slime"
+   ],
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "retrieved": "2026-11-12"
+  },
+  "freesound:433840": {
+   "title": "Slime 27.wav",
+   "author": "Archos",
+   "page": "https://freesound.org/people/Archos/sounds/433840/",
+   "preview": "https://cdn.freesound.org/previews/433/433840_652422-hq.mp3",
+   "sha256": "fed27847ad4d3661ec1df0bae2de324c187feca75dfda7426bbb83d30e9233b8",
+   "tags": [
+    "blood",
+    "bones",
+    "brain",
+    "flesh",
+    "foley",
+    "goo",
+    "gore",
+    "gross",
+    "horror",
+    "horror-effects",
+    "mush",
+    "slime"
+   ],
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "retrieved": "2026-11-12"
+  },
+  "freesound:559768": {
+   "title": "Jello Squish",
+   "author": "Fugeni",
+   "page": "https://freesound.org/people/Fugeni/sounds/559768/",
+   "preview": "https://cdn.freesound.org/previews/559/559768_6857156-hq.mp3",
+   "sha256": "b1be709693980d9ec1a8182e924b3ab3b09038313ebd9f25534e6933ac6e36b7",
+   "tags": [
+    "bowl",
+    "food",
+    "gelatin",
+    "goo",
+    "gooey",
+    "gross",
+    "guts",
+    "jello",
+    "liquid",
+    "mush",
+    "mushy",
+    "shake"
+   ],
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "retrieved": "2026-11-12"
+  },
+  "freesound:824934": {
+   "title": "squish_comp_09_25",
+   "author": "cera.stes",
+   "page": "https://freesound.org/people/cera.stes/sounds/824934/",
+   "preview": "https://cdn.freesound.org/previews/824/824934_15102983-hq.mp3",
+   "sha256": "fb59595726fb820286aba9d61b89ccb8b0c0bb7314405d95145bd5f8b555d9ed",
+   "tags": [
+    "guts",
+    "slime",
+    "smush",
+    "squish"
+   ],
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "retrieved": "2026-11-12"
+  },
+  "freesound:655814": {
+   "title": "Squishy wet sound of goo.wav",
+   "author": "nathvandykOWI",
+   "page": "https://freesound.org/people/nathvandykOWI/sounds/655814/",
+   "preview": "https://cdn.freesound.org/previews/655/655814_13723358-hq.mp3",
+   "sha256": "53625adc1a092cebaf582b83c5bf9f194fc0f209627d35467d2f678f8b6cbc45",
+   "tags": [
+    "owi",
+    "slime",
+    "squash",
+    "squishy",
+    "wet"
+   ],
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "retrieved": "2026-11-12"
+  },
+  "freesound:759537": {
+   "title": "Bouncing putty",
+   "author": "Valerie-Vivegnis",
+   "page": "https://freesound.org/people/Valerie-Vivegnis/sounds/759537/",
+   "preview": "https://cdn.freesound.org/previews/759/759537_15375955-hq.mp3",
+   "sha256": "fa5d0d69893be7d0c2b29fd5c0f2c5738298f6dc943462a4b25b59b3cba07f4d",
+   "tags": [
+    "bounce",
+    "bouncing",
+    "footsteps",
+    "kneading",
+    "mud",
+    "mush",
+    "putty",
+    "squelch",
+    "squish",
+    "wet"
+   ],
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "retrieved": "2026-11-12"
+  },
+  "freesound:590032": {
+   "title": "SFX_SQUELCH_slayer_impulse_164.wav",
+   "author": "MrFossy",
+   "page": "https://freesound.org/people/MrFossy/sounds/590032/",
+   "preview": "https://cdn.freesound.org/previews/590/590032_129727-hq.mp3",
+   "sha256": "871df81208780832f7fd8228f479bf84c1669e474bcfaa0bc9641bd235a40c00",
+   "tags": [
+    "GUI",
+    "UI",
+    "button",
+    "goo",
+    "goop",
+    "hand",
+    "impulse",
+    "rubber",
+    "rubbery",
+    "short",
+    "squash",
+    "squashy"
+   ],
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "retrieved": "2026-11-12"
+  },
+  "freesound:168011": {
+   "title": "Stress Ball",
+   "author": "gmarchisio",
+   "page": "https://freesound.org/people/gmarchisio/sounds/168011/",
+   "preview": "https://cdn.freesound.org/previews/168/168011_2597829-hq.mp3",
+   "sha256": "b4464d837ab822344ba78c12fb0911254a3377d641fa42eae784d443c18af9a3",
+   "tags": [
+    "beads",
+    "pressure",
+    "rubber"
+   ],
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "retrieved": "2026-11-12"
+  },
+  "freesound:344643": {
+   "title": "Chinese stress balls.wav",
+   "author": "Chubbers1995",
+   "page": "https://freesound.org/people/Chubbers1995/sounds/344643/",
+   "preview": "https://cdn.freesound.org/previews/344/344643_6073969-hq.mp3",
+   "sha256": "a236a7e734ac6320b2c9b0dcd15a96d8883c74ad9c8f3640751f3d4f295a92bb",
+   "tags": [
+    "Chinese-stress-balls",
+    "meditation",
+    "stress-balls"
+   ],
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "retrieved": "2026-11-12"
+  },
+  "freesound:622335": {
+   "title": "SqueezeToy24.wav",
+   "author": "sirplus",
+   "page": "https://freesound.org/people/sirplus/sounds/622335/",
+   "preview": "https://cdn.freesound.org/previews/622/622335_30374-hq.mp3",
+   "sha256": "42e3303d543437c84645580bb1e1713d6b62c9e993f5dfe378b3258beda98a35",
+   "tags": [
+    "airy",
+    "deflating",
+    "squeeze"
+   ],
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "retrieved": "2026-11-12"
+  },
+  "freesound:390315": {
+   "title": "082816 the foam remembers.mp3",
+   "author": "pflanigan",
+   "page": "https://freesound.org/people/pflanigan/sounds/390315/",
+   "preview": "https://cdn.freesound.org/previews/390/390315_6132202-hq.mp3",
+   "sha256": "a0c6713d5773947be905500d1a33deb0150062cf90a3c0ca5be09b9a38f96c91",
+   "tags": [
+    "asmr",
+    "cut",
+    "field-recording",
+    "foam"
+   ],
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "retrieved": "2026-11-12"
+  },
+  "freesound:390314": {
+   "title": "082816 ASMR.mp3",
+   "author": "pflanigan",
+   "page": "https://freesound.org/people/pflanigan/sounds/390314/",
+   "preview": "https://cdn.freesound.org/previews/390/390314_6132202-hq.mp3",
+   "sha256": "414ba8d5ed2ed65d2c4884b2eb3f918027baf3b043e2d217066eddad4f7c2693",
+   "tags": [
+    "asmr",
+    "cut",
+    "field-recording",
+    "foam"
+   ],
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "retrieved": "2026-11-12"
+  },
+  "freesound:234872": {
+   "title": "Sponge Being Squeezed.wav",
+   "author": "mlsulli",
+   "page": "https://freesound.org/people/mlsulli/sounds/234872/",
+   "preview": "https://cdn.freesound.org/previews/234/234872_3883507-hq.mp3",
+   "sha256": "160daf7548e8983e33f7dfa6408b450bbb71bab1ff346846df0677391c6ea915",
+   "tags": [
+    "sponge",
+    "squeeze",
+    "squish",
+    "water"
+   ],
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "retrieved": "2026-11-12"
+  },
+  "freesound:594753": {
+   "title": "Pressing down on sponge",
+   "author": "emilyneiswonger",
+   "page": "https://freesound.org/people/emilyneiswonger/sounds/594753/",
+   "preview": "https://cdn.freesound.org/previews/594/594753_13373365-hq.mp3",
+   "sha256": "e3ff77c7b337ce66fbb2527f99df40a943bdfee56c9a9b97ad42878cea968309",
+   "tags": [
+    "sponge",
+    "squeeze",
+    "squish"
+   ],
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "retrieved": "2026-11-12"
+  },
+  "freesound:516866": {
+   "title": "Wet Sponge Squeezed 04.wav",
+   "author": "LilMati",
+   "page": "https://freesound.org/people/LilMati/sounds/516866/",
+   "preview": "https://cdn.freesound.org/previews/516/516866_6142149-hq.mp3",
+   "sha256": "b6f659c71bbbac8dc0db8deb13ae4a5082afbd0e8417c66141ffa06693b47622",
+   "tags": [
+    "Pressed",
+    "Soft",
+    "Sponge",
+    "Squeezed",
+    "Water",
+    "Wet",
+    "pressed",
+    "soft",
+    "sponge",
+    "squeezed",
+    "water",
+    "wet"
+   ],
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "retrieved": "2026-11-12"
+  },
+  "freesound:516156": {
+   "title": "Wet Sponge Squeezed 03.wav",
+   "author": "LilMati",
+   "page": "https://freesound.org/people/LilMati/sounds/516156/",
+   "preview": "https://cdn.freesound.org/previews/516/516156_6142149-hq.mp3",
+   "sha256": "764337bf0ecea794256efeee06b817ff9cfbaa6b95a19d5beb5782b385fd5f92",
+   "tags": [
+    "Pressed",
+    "Soft",
+    "Sponge",
+    "Squeezed",
+    "Water",
+    "Wet",
+    "pressed",
+    "soft",
+    "sponge",
+    "squeezed",
+    "water",
+    "wet"
+   ],
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "retrieved": "2026-11-12"
+  },
+  "freesound:612769": {
+   "title": "Kneading dough in metal pot",
+   "author": "jb_stems",
+   "page": "https://freesound.org/people/jb_stems/sounds/612769/",
+   "preview": "https://cdn.freesound.org/previews/612/612769_1056843-hq.mp3",
+   "sha256": "98e7f5e4222ddfa770c3a7b546ba940977a71863216d42219a9b549c36332dd6",
+   "tags": [
+    "amasando",
+    "dough",
+    "foley",
+    "hands",
+    "knead",
+    "kneading",
+    "maiz",
+    "masa",
+    "metal",
+    "olla",
+    "pot",
+    "recording"
+   ],
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "retrieved": "2026-11-12"
+  },
+  "freesound:241813": {
+   "title": "Teig ausrollen.wav",
+   "author": "gruenebanane",
+   "page": "https://freesound.org/people/gruenebanane/sounds/241813/",
+   "preview": "https://cdn.freesound.org/previews/241/241813_3958763-hq.mp3",
+   "sha256": "a03a1b3244aff6a0e0942477da2abaf22f52196f6933504c9ac5cd90d5adae00",
+   "tags": [
+    "baking",
+    "cake",
+    "cookies",
+    "cooking",
+    "dough",
+    "food",
+    "home",
+    "kitchen",
+    "rolling-pin"
+   ],
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "retrieved": "2026-11-12"
+  },
+  "freesound:578463": {
+   "title": "Shaving foam on hand (version2)",
+   "author": "MicheleFalleri",
+   "page": "https://freesound.org/people/MicheleFalleri/sounds/578463/",
+   "preview": "https://cdn.freesound.org/previews/578/578463_13048145-hq.mp3",
+   "sha256": "8c2cc9944879459d58502659250e3a912b64fc7228bce6dcfdab2c6d7b3a73a3",
+   "tags": [
+    "Foley",
+    "bathroom",
+    "cream",
+    "face",
+    "foam",
+    "hair",
+    "hand",
+    "shave",
+    "shaving"
+   ],
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "retrieved": "2026-11-12"
+  },
+  "freesound:578460": {
+   "title": "Shaving foam on hand (version1)",
+   "author": "MicheleFalleri",
+   "page": "https://freesound.org/people/MicheleFalleri/sounds/578460/",
+   "preview": "https://cdn.freesound.org/previews/578/578460_13048145-hq.mp3",
+   "sha256": "316e5a70019c6049fbf5b4ed95b2f3bd7ce892c236fdab73c9ed1754fd8bc450",
+   "tags": [
+    "Foley",
+    "bathroom",
+    "cream",
+    "face",
+    "foam",
+    "hair",
+    "hand",
+    "shave",
+    "shaving"
+   ],
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "retrieved": "2026-11-12"
+  },
+  "freesound:849247": {
+   "title": "Shaving cream oozing out of the tin",
+   "author": "_javier_rodas",
+   "page": "https://freesound.org/people/_javier_rodas/sounds/849247/",
+   "preview": "https://cdn.freesound.org/previews/849/849247_14702296-hq.mp3",
+   "sha256": "427f67f1afa34a6d827afc6bb60ea3981e5a7bc29bf940565530cbb40a8b00fc",
+   "tags": [
+    "Shaving",
+    "cream",
+    "oozing",
+    "out",
+    "tin"
+   ],
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "retrieved": "2026-11-12"
+  },
+  "freesound:197761": {
+   "title": "shaving cream.wav",
+   "author": "Yuval",
+   "page": "https://freesound.org/people/Yuval/sounds/197761/",
+   "preview": "https://cdn.freesound.org/previews/197/197761_770707-hq.mp3",
+   "sha256": "c10ca0da038c508b22dc87b2e17b5bf476e485f8896b2fda09eefa08a351dca4",
+   "tags": [
+    "Foley",
+    "bathroom",
+    "cream",
+    "desensitize",
+    "face",
+    "facial-hair",
+    "foam",
+    "gel",
+    "hair",
+    "lubricate",
+    "shave",
+    "shaving"
+   ],
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "retrieved": "2026-11-12"
+  },
+  "freesound:181409": {
+   "title": "whipping_cream.aif",
+   "author": "elizagoode",
+   "page": "https://freesound.org/people/elizagoode/sounds/181409/",
+   "preview": "https://cdn.freesound.org/previews/181/181409_3374615-hq.mp3",
+   "sha256": "666388c75468f435af0f511f17c16bd2281391d3ef7671c61c2ea6a9cbd5b127",
+   "tags": [
+    "cream",
+    "mixer",
+    "whipped",
+    "whipping"
+   ],
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "retrieved": "2026-11-12"
+  },
+  "freesound:660866": {
+   "title": "Chocolate Crumble and Snapping / Cutting ( Moderately thick and hard dark chocolate ).wav",
+   "author": "Finnssound",
+   "page": "https://freesound.org/people/Finnssound/sounds/660866/",
+   "preview": "https://cdn.freesound.org/previews/660/660866_13884075-hq.mp3",
+   "sha256": "0f572066bbe0e4d5190ca16aa2c7c537ac1bfef2f5dfbe8c8b942fd9b59988ae",
+   "tags": [
+    "Cocoa",
+    "bar",
+    "bonbon",
+    "candy",
+    "chocolate",
+    "crinkle",
+    "crumble",
+    "kaakao",
+    "plastic",
+    "snap",
+    "suklaa",
+    "suklaalevy"
+   ],
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "retrieved": "2026-11-12"
+  },
+  "freesound:443064": {
+   "title": "Opening_Lindt_Chocolate_Bar.WAV",
+   "author": "AmberdeMeillon",
+   "page": "https://freesound.org/people/AmberdeMeillon/sounds/443064/",
+   "preview": "https://cdn.freesound.org/previews/443/443064_8282799-hq.mp3",
+   "sha256": "c07c960be6195d4877ed3bc1f69affb35c6c890ffd54936aa54ee4b980344996",
+   "tags": [
+    "Box",
+    "Chocolate",
+    "Chocolates",
+    "Delicious",
+    "Expensive",
+    "Fancy",
+    "Fancy-Chocolate",
+    "First",
+    "Foil",
+    "Lindor",
+    "Lindt",
+    "Metal"
+   ],
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "retrieved": "2026-11-12"
+  },
+  "freesound:851574": {
+   "title": "choc_unwrap_break",
+   "author": "pbeare70",
+   "page": "https://freesound.org/people/pbeare70/sounds/851574/",
+   "preview": "https://cdn.freesound.org/previews/851/851574_6762129-hq.mp3",
+   "sha256": "f5074a64c5237502fd863ff79f43b3e7601dd6e406f9abf0e68f434848ca56df",
+   "tags": [
+    "break",
+    "chocolate",
+    "food",
+    "snap",
+    "unwrap",
+    "unwrapping"
+   ],
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "retrieved": "2026-11-12"
+  },
+  "freesound:336633": {
+   "title": "egg - shell crunch - wide - dried - consolidated.wav",
+   "author": "Anthousai",
+   "page": "https://freesound.org/people/Anthousai/sounds/336633/",
+   "preview": "https://cdn.freesound.org/previews/336/336633_5923045-hq.mp3",
+   "sha256": "001f7873f51dff2cdf2f0eabf8c07aea06569f52647257c73f043be0f612bab3",
+   "tags": [
+    "break",
+    "crack",
+    "crunch",
+    "crush",
+    "egg",
+    "egg-shell",
+    "foley",
+    "shell",
+    "stereo",
+    "wide"
+   ],
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "retrieved": "2026-11-12"
+  },
+  "freesound:336613": {
+   "title": "egg - crack 01.wav",
+   "author": "Anthousai",
+   "page": "https://freesound.org/people/Anthousai/sounds/336613/",
+   "preview": "https://cdn.freesound.org/previews/336/336613_5923045-hq.mp3",
+   "sha256": "ba9f016ebb37e4c6aee2ecaba79a23faf412ac8cdc2345bf8e1e527d3961c683",
+   "tags": [
+    "crack",
+    "egg",
+    "egg-shell",
+    "shell"
+   ],
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "retrieved": "2026-11-12"
+  },
+  "freesound:560167": {
+   "title": "Floral foam.wav",
+   "author": "Yajhaira",
+   "page": "https://freesound.org/people/Yajhaira/sounds/560167/",
+   "preview": "https://cdn.freesound.org/previews/560/560167_12494249-hq.mp3",
+   "sha256": "1bb7e19ac63f246b213d7a3ad8694a24a7ccb1fda9ef3041465a6740dcf3a625",
+   "tags": [
+    "coarse",
+    "dry",
+    "foam"
+   ],
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "retrieved": "2026-11-12"
+  },
+  "freesound:868249": {
+   "title": "Styrofoam Crush Crumple Break Squeaky Crinkle Short",
+   "author": "ChristopherJngs",
+   "page": "https://freesound.org/people/ChristopherJngs/sounds/868249/",
+   "preview": "https://cdn.freesound.org/previews/868/868249_8154783-hq.mp3",
+   "sha256": "08aa54332d053faa76dd332c2a94ad409fe1fe5c904b6a1ca967b57690bbbef5",
+   "tags": [
+    "break",
+    "crinkle",
+    "crumple",
+    "crush",
+    "foam",
+    "rough",
+    "rub",
+    "rubbing",
+    "samples",
+    "squeak",
+    "styrofoam",
+    "texture"
+   ],
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "retrieved": "2026-11-12"
+  },
+  "freesound:774262": {
+   "title": "stryofoam_crush",
+   "author": "loganzsound",
+   "page": "https://freesound.org/people/loganzsound/sounds/774262/",
+   "preview": "https://cdn.freesound.org/previews/774/774262_16682330-hq.mp3",
+   "sha256": "7729728cb10fc6912d93f59c1fb9051acda3dce527996393daf0eaa6f77f3b7d",
+   "tags": [
+    "Friction",
+    "Packaging",
+    "Styrofoam",
+    "Unboxing"
+   ],
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "retrieved": "2026-11-12"
+  },
+  "freesound:399002": {
+   "title": "glass beads 01.wav",
+   "author": "Anthousai",
+   "page": "https://freesound.org/people/Anthousai/sounds/399002/",
+   "preview": "https://cdn.freesound.org/previews/399/399002_5923045-hq.mp3",
+   "sha256": "0d5944e38a0d8f1c74669d8733e7359d9a47a5c227ffe78bb9dcf60e364adc42",
+   "tags": [
+    "beads",
+    "glass",
+    "glass-beads",
+    "jewelry",
+    "rattling",
+    "rummaging"
+   ],
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "retrieved": "2026-11-12"
+  },
+  "freesound:399006": {
+   "title": "glass beads 02.wav",
+   "author": "Anthousai",
+   "page": "https://freesound.org/people/Anthousai/sounds/399006/",
+   "preview": "https://cdn.freesound.org/previews/399/399006_5923045-hq.mp3",
+   "sha256": "e2849a74c18553ec15d7ac3d37842696281385fcb2f9ca6fe91f00e836f3ca6c",
+   "tags": [
+    "beads",
+    "glass",
+    "glass-beads",
+    "jewelry",
+    "rattling"
+   ],
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "retrieved": "2026-11-12"
+  },
+  "freesound:829549": {
+   "title": "Shaking hagelslag (chocolate sprinkles) HZA",
+   "author": "hz37",
+   "page": "https://freesound.org/people/hz37/sounds/829549/",
+   "preview": "https://cdn.freesound.org/previews/829/829549_123355-hq.mp3",
+   "sha256": "cfe31bf1918c00df5381f124f903b5924dda87404bd4470d6a37548f0e433546",
+   "tags": [
+    "pieces",
+    "rattling",
+    "shaking",
+    "sprinkles"
+   ],
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "retrieved": "2026-11-12"
+  },
+  "freesound:803174": {
+   "title": "Sprinkles",
+   "author": "AlanFlores02",
+   "page": "https://freesound.org/people/AlanFlores02/sounds/803174/",
+   "preview": "https://cdn.freesound.org/previews/803/803174_10838469-hq.mp3",
+   "sha256": "a82b3dc58c3737316f052d3f1c127bcc192d00a0e1667d9a17d1f1a224fb2925",
+   "tags": [
+    "Drop",
+    "Small",
+    "Sprinkles"
+   ],
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "retrieved": "2026-11-12"
+  },
+  "freesound:788735": {
+   "title": "pop rocks candy in a cup",
+   "author": "music_is_wiggly_air",
+   "page": "https://freesound.org/people/music_is_wiggly_air/sounds/788735/",
+   "preview": "https://cdn.freesound.org/previews/788/788735_16749461-hq.mp3",
+   "sha256": "f7bf7813aa2a2d2402748cbc8930cafe98eb7a7dd01a5909e32e0b767b815529",
+   "tags": [
+    "candy",
+    "cup",
+    "noise",
+    "pop",
+    "rocks",
+    "water"
+   ],
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "retrieved": "2026-11-12"
+  },
+  "freesound:435367": {
+   "title": "Pop rocks popping",
+   "author": "giddster",
+   "page": "https://freesound.org/people/giddster/sounds/435367/",
+   "preview": "https://cdn.freesound.org/previews/435/435367_1738686-hq.mp3",
+   "sha256": "a208052e00ec2704bf546e09c56453d152e980bd16aa5a4b17b213ebcb96f602",
+   "tags": [
+    "Poprocks",
+    "candy",
+    "crackle",
+    "eat",
+    "eating",
+    "human",
+    "male",
+    "mouth",
+    "pop",
+    "rocks",
+    "sizzle",
+    "sound"
+   ],
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "retrieved": "2026-11-12"
+  },
+  "freesound:634162": {
+   "title": "Movement of Rock Candy in a Glass",
+   "author": "Erbsland-Music",
+   "page": "https://freesound.org/people/Erbsland-Music/sounds/634162/",
+   "preview": "https://cdn.freesound.org/previews/634/634162_522747-hq.mp3",
+   "sha256": "b7236adc83717d41f487fcdd84a84ef96f19385fdd46291e82411d253846de33",
+   "tags": [
+    "candy",
+    "erbsland",
+    "erbsland-music",
+    "field-recording",
+    "glass",
+    "high-quality",
+    "kitchen",
+    "move",
+    "movement",
+    "rock",
+    "rock-candy",
+    "rock-sugar"
+   ],
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "retrieved": "2026-11-12"
+  },
+  "freesound:542695": {
+   "title": "pearls rubbing together.wav",
+   "author": "BonginkosiMakhubu190225",
+   "page": "https://freesound.org/people/BonginkosiMakhubu190225/sounds/542695/",
+   "preview": "https://cdn.freesound.org/previews/542/542695_10965995-hq.mp3",
+   "sha256": "56ac6630f97398a4806dd2f1db4f2d314bbd825e61c1c18a585ece3959ad463e",
+   "tags": [
+    "OWI",
+    "pearls",
+    "tinkling"
+   ],
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "retrieved": "2026-11-12"
+  },
+  "freesound:389657": {
+   "title": "Crinkling styrofoam; close.wav",
+   "author": "TylerAM",
+   "page": "https://freesound.org/people/TylerAM/sounds/389657/",
+   "preview": "https://cdn.freesound.org/previews/389/389657_7158173-hq.mp3",
+   "sha256": "a21e84adda30cfb599ce9c0cf65a94795303f398eeacb53022ef9d3157593f79",
+   "tags": [
+    "break",
+    "crinkle",
+    "crunch",
+    "styrofoam"
+   ],
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "retrieved": "2026-11-12"
+  }
+ }
+}

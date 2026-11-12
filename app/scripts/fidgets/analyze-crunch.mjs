@@ -1,4 +1,4 @@
-// Quick report of the candidate crunch sources (scripts/fidgets/source/crunch/*.mp3).
+// Quick report of the candidate crunch sources (scripts/fidgets/*.mp3).
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';

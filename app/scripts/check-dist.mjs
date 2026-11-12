@@ -21,7 +21,7 @@ for (const f of files) {
   if ((/(^|\/)thumbs\/[A-Z]\d+\.png$/.test(rel) || /(^|\/)audio\//.test(rel)) && !rel.startsWith('sfx/')) problems.push(`reference asset shipped: ${rel}`);
 }
 // 3) every shipped fidget sprite pool has a source with an allowed licence and a usage note
-for (const k of ['wax', 'crunch']) {
+for (const k of ['wax', 'crunch', 'squish']) {
   const j = JSON.parse(fs.readFileSync(path.join(dist, `sfx/fidgets/${k}.json`), 'utf8'));
   for (const [n, p] of Object.entries(j.pools)) for (const e of p.entries) {
     const s = j.sources[e.src];

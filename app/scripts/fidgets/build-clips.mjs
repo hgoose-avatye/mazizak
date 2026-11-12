@@ -10,6 +10,8 @@
 // Raw recordings and derived variants are counted separately: this script only EXTRACTS (variants = 0). Runtime
 // speed/pitch jitter is applied by the player and is not counted as a recording.
 import fs from 'node:fs';
+import { spawnSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { decode, SR, db, env, onsets, peakOf, rmsOf } from './lib.mjs';
@@ -22,16 +24,26 @@ const GAP = ms(10);
 const PEAK = Math.pow(10, -1 / 20);
 
 const WAX_LICENSE = { license: 'CC BY 4.0', licenseUrl: 'https://creativecommons.org/licenses/by/4.0/', author: 'apple77771', url: 'https://github.com/apple77771/wakppuball-simulator', retrieved: '2026-11-11', usage: 'fidget W01/W02 wax crack + knead' };
-const SOURCES = {
-  wax: ['apple_crack_1', 'apple_crack_2', 'apple_knead_1', 'apple_knead_2', 'choco_crack_1', 'choco_crack_2', 'choco_knead_1', 'choco_knead_2'].map((n) => ({ id: `wax:${n}`, file: path.join(ROOT, `public/sfx/wax/${n}.mp3`), title: n, ...WAX_LICENSE, materialMatch: 'recording of the simulated wax ball (maintainer’s claim)' })),
-  crunch: [
-    { id: 'freesound:389657', file: 'fs_389657.mp3', title: 'Crinkling styrofoam; close.wav', author: 'TylerAM', url: 'https://freesound.org/people/TylerAM/sounds/389657/', tags: 'break crinkle crunch styrofoam' },
-    { id: 'freesound:195797', file: 'fs_195797.mp3', title: 'styrofoam_polysterne_polysteren_cracks_cracking_plastic.wav', author: 'ondondvo', url: 'https://freesound.org/people/ondondvo/sounds/195797/', tags: 'cracking cracks plastic polystyrene styrofoam' },
-    { id: 'freesound:541076', file: 'fs_541076.mp3', title: 'Beads.wav', author: 'Chelly01', url: 'https://freesound.org/people/Chelly01/sounds/541076/', tags: 'Beads Crunching Dropping Plastic Rattling Shaking' },
-    { id: 'freesound:343795', file: 'fs_343795.mp3', title: 'Beads.wav', author: 'zmadyun', url: 'https://freesound.org/people/zmadyun/sounds/343795/', tags: 'multiple plastic sharp' },
-    { id: 'freesound:567534', file: 'fs_567534.mp3', title: 'sugar granules.wav', author: 'Tnext54', url: 'https://freesound.org/people/Tnext54/sounds/567534/', tags: 'grainy granules sand sound-design sugar' },
-  ].map((s) => ({ ...s, file: path.join(ROOT, 'scripts/fidgets/source/crunch', s.file), license: 'CC0 1.0', licenseUrl: 'https://creativecommons.org/publicdomain/zero/1.0/', retrieved: '2026-11-12', usage: 'fidget C01/C02 crunch', materialMatch: 'similar material only (not a recording of the toy)' })),
-};
+const FS_MANIFEST = JSON.parse(fs.readFileSync(path.join(path.dirname(fileURLToPath(import.meta.url)), 'freesound-sources.json'), 'utf8')).sources;
+const CACHE = path.join(ROOT, 'bench-out/fidget-src');
+/** a Freesound CC0 preview, downloaded into the git-ignored cache when missing and verified against the manifest sha256 */
+function fsSource(id, usage, materialMatch) {
+  const m = FS_MANIFEST[`freesound:${id}`];
+  if (!m) throw new Error(`freesound:${id} not in freesound-sources.json`);
+  const file = path.join(CACHE, `fs_${id}.mp3`);
+  if (!fs.existsSync(file)) {
+    fs.mkdirSync(CACHE, { recursive: true });
+    const r = spawnSync('curl', ['-s', '-m', '120', '-A', 'Mozilla/5.0', '-o', file, m.preview]);
+    if (r.status !== 0) throw new Error(`download failed: ${m.preview}`);
+  }
+  const sha = createHash('sha256').update(fs.readFileSync(file)).digest('hex');
+  if (sha !== m.sha256) throw new Error(`freesound:${id}: sha256 mismatch (${sha})`);
+  return { id: `freesound:${id}`, file, title: m.title, author: m.author, url: m.page, license: m.license, licenseUrl: m.licenseUrl, retrieved: m.retrieved, usage, materialMatch };
+}
+const WAX_SOURCES = ['apple_crack_1', 'apple_crack_2', 'apple_knead_1', 'apple_knead_2', 'choco_crack_1', 'choco_crack_2', 'choco_knead_1', 'choco_knead_2'].map((n) => ({ id: `wax:${n}`, file: path.join(ROOT, `public/sfx/wax/${n}.mp3`), title: n, ...WAX_LICENSE, materialMatch: 'recording of the simulated wax ball (maintainer\u2019s claim)' }));
+const ANALYSED = {};
+const SIMILAR = 'similar material only (not a recording of the toy)';
+function an(id, usage, match = SIMILAR) { return (ANALYSED[id] ??= analyse(fsSource(id, usage, match))); }
 
 // ───────── analysis ─────────
 function analyse(src) {
@@ -67,15 +79,19 @@ function clipOf(an, a, b, extra = {}) {
   let head = 0, tot = 0;
   for (let i = 0; i < raw.length; i++) { tot += raw[i] * raw[i]; if (i < ms(30)) head += raw[i] * raw[i]; }
   const tail = db(rmsOf(raw.subarray(Math.max(0, raw.length - ms(60)), Math.max(1, raw.length - ms(12)))) / Math.max(pk, 1e-9));
-  return { src: an.src, a, b, raw, peakDb: db(pk), centroid: centroid(raw, 0, Math.min(2048, raw.length >> 1 << 1)), strikes: an.strikes.filter((s) => s.start >= a && s.start < b).length, crest: crest(raw), sparse: frames ? quiet / frames : 0, headShare: head / Math.max(tot, 1e-12), tailDb: tail, ...extra };
+  const startDb = db(rmsOf(raw.subarray(0, Math.min(raw.length, ms(15)))) / Math.max(pk, 1e-9));
+  return { src: an.src, a, b, raw, peakDb: db(pk), centroid: centroid(raw, 0, Math.min(2048, raw.length >> 1 << 1)), strikes: an.strikes.filter((s) => s.start >= a && s.start < b).length, crest: crest(raw), sparse: frames ? quiet / frames : 0, headShare: head / Math.max(tot, 1e-12), tailDb: tail, startDb, ...extra };
 }
 const overlaps = (list, c, pad = ms(20)) => list.some((o) => o.src === c.src && c.a < o.b + pad && c.b > o.a - pad);
 
 // ───────── candidate generators ─────────
 /** one isolated hit: from its start to the decay end, ending before the next strike */
-function singles(an, { minLen = 60, maxLen = 240, isolation = 0 } = {}) {
+function singles(an, { minLen = 60, maxLen = 240, isolation = 0, cap = 250 } = {}) {
   const out = [];
+  // long recordings: only the strongest `cap` strikes are considered
+  const floor = [...an.strikes].map((s) => s.peakDb).sort((p, q) => q - p)[Math.min(cap, an.strikes.length) - 1] ?? -200;
   for (const s of an.strikes) {
+    if (s.peakDb < floor) continue;
     if (s.prev < isolation) continue;
     const cap = Math.min(an.x.length, s.start + ms(maxLen), s.start + s.next - ms(6));
     if (cap - s.start < ms(minLen)) continue;
@@ -85,9 +101,11 @@ function singles(an, { minLen = 60, maxLen = 240, isolation = 0 } = {}) {
   return out;
 }
 /** fixed-length window starting at a strike */
-function windows(an, lenMs, { minStrikes = 3 } = {}) {
+function windows(an, lenMs, { minStrikes = 3, cap = 220 } = {}) {
   const out = [];
-  for (const s of an.strikes) {
+  const stride = Math.max(1, Math.ceil(an.strikes.length / cap)); // long recordings: sample the strikes evenly
+  for (const [k, s] of an.strikes.entries()) {
+    if (k % stride) continue;
     const nominal = s.start + ms(lenMs);
     if (nominal + ms(80) > an.x.length) continue;
     // end the window at the quietest 5 ms point near its nominal end instead of cutting through a loud passage
@@ -119,7 +137,7 @@ function pick(cands, n, score, { diverse = false } = {}) {
 
 
 // ───────── quality gates (objective only — nobody has listened) ─────────
-const GATE = { maxBoostDb: 18, maxSource: -0.5, maxSparse: 0.55, maxTailDb: -16, minHeadShare: 0.45, centroid: [0.45, 2.2], length: [0.5, 2] };
+const GATE = { minStartDb: -38, maxBoostDb: 18, maxSource: -0.5, maxSparse: 0.55, maxTailDb: -16, minHeadShare: 0.45, centroid: [0.45, 2.2], length: [0.5, 2] };
 const audit = {}; // pool → { candidates, rejected: { reason: count } }
 const EXCL = (() => { try { return JSON.parse(fs.readFileSync(path.join(path.dirname(fileURLToPath(import.meta.url)), 'exclusions.json'), 'utf8')).exclude ?? []; } catch { return []; } })();
 const med = (a) => [...a].sort((p, q) => p - q)[Math.floor(a.length / 2)];
@@ -128,6 +146,7 @@ function qc(pool, list) {
   const why = (c) => {
     if (c.peakDb < -1 - GATE.maxBoostDb) return 'BOOST>18dB';
     if (c.peakDb > GATE.maxSource) return 'CLIPPED-SOURCE';
+    if (c.startDb < GATE.minStartDb) return 'SLOW-START'; // the sound would begin late after the touch
     if (c.sparse > GATE.maxSparse) return 'SPARSE';
     if (c.window && c.tailDb > GATE.maxTailDb) return 'CUTOFF';
     if (!c.window && c.headShare < GATE.minHeadShare && c.b - c.a > ms(120)) return 'SOFTHEAD';
@@ -153,7 +172,7 @@ function qc(pool, list) {
   return kept;
 }
 // a pool needs enough independent clips to avoid an audible loop; otherwise the event is dropped (the player then falls back or stays silent)
-const MIN_CLIPS = { init: 2, crack: 3, crunch: 3, hold: 3 };
+const MIN_CLIPS = { init: 2, crack: 3, crunch: 3, tap: 3, hold: 3, stretch: 3, fold: 3 };
 const dropped = [];
 
 // ───────── pools ─────────
@@ -163,34 +182,60 @@ function addPool(name, event, material, clips, note) {
   pools[name] = { event, material, note, clips };
 }
 
-const wax = SOURCES.wax.map(analyse);
+const wax = WAX_SOURCES.map(analyse);
+// W02 additionally uses real chocolate-bar snapping / crumbling (Freesound CC0) next to the simulator's chocolate-shell recordings
+const CHOC = (id, usage) => an(id, usage, 'real chocolate (bar) — similar to a chocolate wax shell, not the toy');
+const chocSnaps = [CHOC('660866', 'W02 chocolate snap/crumble'), CHOC('851574', 'W02 chocolate snap')];
 for (const kind of ['apple', 'choco']) {
-  const crackFiles = wax.filter((a) => a.src.title.startsWith(`${kind}_crack`)), kneadFiles = wax.filter((a) => a.src.title.startsWith(`${kind}_knead`));
+  const crackFiles = [...wax.filter((a) => a.src.title.startsWith(`${kind}_crack`)), ...(kind === 'choco' ? chocSnaps : [])], kneadFiles = wax.filter((a) => a.src.title.startsWith(`${kind}_knead`));
   const hits = qc(`${kind}.init`, crackFiles.flatMap((a) => singles(a, { minLen: 70, maxLen: 260, isolation: 140 }).filter((c) => c.strikePeakDb >= a.maxPeakDb - 10)));
-  const init = pick(hits, 3, (c) => c.strikePeakDb);
-  const rest = hits.filter((c) => !init.includes(c));
-  const crack = pick(qc(`${kind}.crack`, crackFiles.flatMap((a) => singles(a, { minLen: 60, maxLen: 200 }).filter((c) => c.strikePeakDb >= a.maxPeakDb - 22 && c.strikePeakDb <= a.maxPeakDb - 2))).filter((c) => !init.some((i) => i.src === c.src && Math.abs(i.a - c.a) < ms(300))), 6, (c) => c.strikePeakDb - Math.abs(c.peakDb + 20) * 0.1);
-  const burst = pick(qc(`${kind}.burst`, crackFiles.flatMap((a) => windows(a, 420, { minStrikes: 4 }).filter((c) => c.peakDb >= -20))), 3, (c) => c.strikes);
+  const init = pick(hits, 4, (c) => c.strikePeakDb, { diverse: true });
+  const crack = pick(qc(`${kind}.crack`, crackFiles.flatMap((a) => singles(a, { minLen: 60, maxLen: 200 }).filter((c) => c.strikePeakDb >= a.maxPeakDb - 22 && c.strikePeakDb <= a.maxPeakDb - 2))).filter((c) => !init.some((i) => i.src === c.src && Math.abs(i.a - c.a) < ms(300))), 7, (c) => c.strikePeakDb - Math.abs(c.peakDb + 20) * 0.1, { diverse: true });
+  const burst = pick(qc(`${kind}.burst`, crackFiles.flatMap((a) => windows(a, 420, { minStrikes: 4 }).filter((c) => c.peakDb >= -20))), 4, (c) => c.strikes, { diverse: true });
   const knead = pick(qc(`${kind}.knead`, kneadFiles.flatMap((a) => windows(a, 560, { minStrikes: 3 }))), 6, (c) => c.strikes - c.crest * 0.15);
-  void rest;
   addPool(`${kind}.init`, 'init', 'wax', init, 'strongest isolated first-break hits');
   addPool(`${kind}.crack`, 'crack', 'wax', crack, 'single crack hits');
   addPool(`${kind}.burst`, 'crack', 'wax', burst, 'dense runs of ≥4 strikes (continuous breaking)');
   addPool(`${kind}.knead`, 'hold', 'wax', knead, 'crackle runs of the knead recordings');
 }
-const cr = SOURCES.crunch.map(analyse);
-const by = (id) => cr.find((a) => a.src.id === id);
-// C01 soap crunch: styrofoam (similar dry brittle foam), C02 sugar beads: plastic beads + sugar granules
-const soapSrc = [by('freesound:389657'), by('freesound:195797')];
-const beadSrc = [by('freesound:541076'), by('freesound:343795')];
-const sugarSrc = [by('freesound:567534')];
-addPool('soap.crunch', 'crunch', 'styrofoam', pick(qc('soap.crunch', soapSrc.flatMap((a) => singles(a, { minLen: 50, maxLen: 190 }).filter((c) => c.strikePeakDb >= a.maxPeakDb - 14))), 8, (c) => c.strikePeakDb, { diverse: true }), 'short crushing hits (styrofoam)');
-addPool('soap.hold', 'hold', 'styrofoam', pick(qc('soap.hold', soapSrc.flatMap((a) => windows(a, 640, { minStrikes: 5 }))), 5, (c) => c.strikes - c.crest * 0.3, { diverse: true }), 'dense continuous crinkle windows (styrofoam)');
-addPool('beads.crunch', 'crunch', 'plastic beads', pick(qc('beads.crunch', beadSrc.flatMap((a) => singles(a, { minLen: 35, maxLen: 150 }).filter((c) => c.strikePeakDb >= a.maxPeakDb - 14))), 8, (c) => c.strikePeakDb, { diverse: true }), 'short bead collisions (plastic beads)');
-addPool('beads.hold', 'hold', 'sugar granules + plastic beads', pick(qc('beads.hold', [...sugarSrc, by('freesound:541076')].flatMap((a) => windows(a, 640, { minStrikes: 4 }))), 5, (c) => c.strikes - c.crest * 0.3, { diverse: true }), 'grainy friction / rattle windows (sugar granules, plastic beads)');
+
+// generic pool: strikes → singles (tap/crunch/fold hits) or windows (hold/stretch/fold passages)
+function gpool(name, event, material, note, srcIds, usage, { kind, n, len = [50, 200], lenMs = 600, minStrikes = 3, relFloor = 14, scoreFn } = {}) {
+  const srcs = srcIds.map((id) => an(id, usage));
+  const cands = srcs.flatMap((a) => kind === 'singles' ? singles(a, { minLen: len[0], maxLen: len[1] }).filter((c) => c.strikePeakDb >= a.maxPeakDb - relFloor) : windows(a, lenMs, { minStrikes }));
+  const score = scoreFn ?? (kind === 'singles' ? (c) => c.strikePeakDb : (c) => c.strikes - c.crest * 0.3);
+  addPool(name, event, material, pick(qc(name, cands), n, score, { diverse: true }), note);
+}
+// ── crunch bank: C01 soap crunch (dry crumbly foam), C02 sugar beads (small hard granules)
+const SOAP = ['560167', '868249', '774262', '389657'];
+gpool('soap.crunch', 'crunch', 'dry floral foam + styrofoam', 'short dry crushing hits', SOAP, 'C01 crunch', { kind: 'singles', n: 8, len: [45, 190] });
+gpool('soap.hold', 'hold', 'dry floral foam + styrofoam', 'dense continuous crumbling windows', SOAP, 'C01 hold', { kind: 'windows', n: 6, lenMs: 640, minStrikes: 5 });
+const BEADS = ['399002', '399006', '829549', '788735', '435367', '634162', '542695'];
+gpool('beads.crunch', 'crunch', 'glass beads, sprinkles, pop-rocks, rock candy', 'short bead / granule collisions', BEADS, 'C02 crunch', { kind: 'singles', n: 9, len: [30, 150] });
+gpool('beads.hold', 'hold', 'glass beads, sprinkles, pop-rocks, rock candy', 'continuous granule rattle / crackle windows', BEADS, 'C02 hold', { kind: 'windows', n: 6, lenMs: 640, minStrikes: 4 });
+// ── squish bank (S01–S03 elastic, L01–L03 viscous)
+const TPR = ['168011', '344643', '622335'];
+gpool('tpr.tap', 'tap', 'stress balls / squeeze toy', 'short squeezes', TPR, 'S01 tap', { kind: 'singles', n: 6, len: [60, 240] });
+gpool('tpr.hold', 'hold', 'stress balls / squeeze toy', 'sustained squeezing', TPR, 'S01 hold', { kind: 'windows', n: 5, lenMs: 520, minStrikes: 2 });
+const FOAM = ['390315', '390314', '594753'];
+gpool('foam.tap', 'tap', 'memory foam / sponge', 'short presses', FOAM, 'S02 tap', { kind: 'singles', n: 5, len: [80, 260] });
+gpool('foam.hold', 'hold', 'memory foam / sponge', 'long slow presses', FOAM, 'S02 hold', { kind: 'windows', n: 5, lenMs: 800, minStrikes: 2 });
+const MOCHI = ['241813', '612769'];
+gpool('mochi.tap', 'tap', 'soft dough', 'short dough presses', MOCHI, 'S03 tap', { kind: 'singles', n: 5, len: [60, 240] });
+gpool('mochi.hold', 'hold', 'soft dough', 'kneading / rolling windows', MOCHI, 'S03 hold', { kind: 'windows', n: 5, lenMs: 640, minStrikes: 3 });
+const SLIME = ['794270', '680447', '655814'];
+gpool('slime.hold', 'hold', 'slime', 'squishing windows', SLIME, 'L01 hold', { kind: 'windows', n: 6, lenMs: 600, minStrikes: 3 });
+gpool('slime.stretch', 'stretch', 'slime', 'slime stretching passages', ['794270'], 'L01 stretch', { kind: 'windows', n: 5, lenMs: 900, minStrikes: 2 });
+gpool('slime.fold', 'fold', 'slime', 'slime slaps / folds', ['794272', '824934'], 'L01 fold', { kind: 'singles', n: 6, len: [80, 280] });
+const GEL = ['559768', '655814', '824934'];
+gpool('gel.hold', 'hold', 'jelly / gooey gel', 'wet gel squishing windows', GEL, 'L02 hold', { kind: 'windows', n: 6, lenMs: 600, minStrikes: 3 });
+gpool('gel.fold', 'fold', 'jelly / gooey gel', 'short wet gel squelches', GEL, 'L02 fold', { kind: 'singles', n: 6, len: [80, 280] });
+const CREAM = ['578460', '578463', '197761', '849247'];
+gpool('cream.hold', 'hold', 'shaving foam / cream', 'foam squashing windows', CREAM, 'L03 hold', { kind: 'windows', n: 5, lenMs: 600, minStrikes: 2 });
+gpool('cream.fold', 'fold', 'shaving foam / cream', 'foam folding windows', CREAM, 'L03 fold', { kind: 'windows', n: 5, lenMs: 480, minStrikes: 2 });
 
 // ───────── write sprites ─────────
-const CLASS = { init: 'impact', crack: 'impact', crunch: 'impact', hold: 'continuous' };
+const CLASS = { init: 'impact', crack: 'impact', crunch: 'impact', tap: 'impact', hold: 'continuous', stretch: 'continuous', fold: 'continuous' };
 /** impact clips: max 20 ms RMS after a 150 Hz one-pole high-pass (same idea as sfx.ts loudness()); continuous clips: whole-clip RMS */
 function level(y, cls) {
   if (cls === 'continuous') return rmsOf(y);
@@ -258,48 +303,53 @@ function build(file, allNames, srcList) {
   for (const d of dropped.filter((d) => allNames.includes(d.pool))) console.log(`  DROPPED ${d.pool}: only ${d.kept} clip(s) passed the gates (min ${d.minimum})`);
   for (const [n, p] of Object.entries(outPools)) console.log(`  ${n.padEnd(14)} ${p.event.padEnd(6)} src=${[...new Set(p.entries.map((e) => e.src.replace('freesound:', 'fs').replace('wax:', '')))].join(',')} n=${String(p.entries.length).padStart(2)} dur ${Math.min(...p.entries.map((e) => e.duration)).toFixed(2)}–${Math.max(...p.entries.map((e) => e.duration)).toFixed(2)}s centroid ${Math.round(p.entries.reduce((s, e) => s + e.centroidHz, 0) / p.entries.length)}Hz  gain ${Math.min(...p.entries.map((e) => e.gain)).toFixed(2)}–1  max boost +${Math.max(...p.entries.map((e) => e.boostDb)).toFixed(1)}dB`);
 }
-build('wax', ['apple.init', 'apple.crack', 'apple.burst', 'apple.knead', 'choco.init', 'choco.crack', 'choco.burst', 'choco.knead'], SOURCES.wax);
-build('crunch', ['soap.crunch', 'soap.hold', 'beads.crunch', 'beads.hold'], SOURCES.crunch);
+const usedFs = Object.values(ANALYSED).map((a) => a.src);
+build('wax', ['apple.init', 'apple.crack', 'apple.burst', 'apple.knead', 'choco.init', 'choco.crack', 'choco.burst', 'choco.knead'], [...WAX_SOURCES, ...usedFs]);
+build('crunch', ['soap.crunch', 'soap.hold', 'beads.crunch', 'beads.hold'], usedFs);
+build('squish', ['tpr.tap', 'tpr.hold', 'foam.tap', 'foam.hold', 'mochi.tap', 'mochi.hold', 'slime.hold', 'slime.stretch', 'slime.fold', 'gel.hold', 'gel.fold', 'cream.hold', 'cream.fold'], usedFs);
 
 // ───────── credits (generated, so they cannot drift from the sprite metadata) ─────────
 {
-  const w = JSON.parse(fs.readFileSync(path.join(OUT, 'wax.json'), 'utf8')), c = JSON.parse(fs.readFileSync(path.join(OUT, 'crunch.json'), 'utf8'));
-  const row = (id, s) => `| ${id} | ${s.title} | ${s.author} | ${s.url} | ${s.license} | ${s.retrieved} | ${s.materialMatch} |`;
-  const t = `# Fidget sound credits (wax + crunch clips)
+  const rd = (n) => JSON.parse(fs.readFileSync(path.join(OUT, `${n}.json`), 'utf8'));
+  const w = rd('wax'), c = rd('crunch'), q = rd('squish');
+  const row = (id, s) => `| ${id} | ${s.title} | ${s.author} | ${s.url} | ${s.license} | ${s.retrieved} | ${s.usage} | ${s.materialMatch} |`;
+  const head = '| id | title | author | url | licence | retrieved | used for | material |\n|---|---|---|---|---|---|---|---|';
+  const tbl = (o, filt = () => true) => Object.entries(o.sources).filter(([id, s]) => filt(id, s)).map(([id, s]) => row(id, s)).join('\n');
+  const t = `# Fidget sound credits (wax, crunch, squish clips)
 
-Generated by \`scripts/fidgets/build-clips.mjs\` — do not edit by hand. Pools, clip times and counts are in \`wax.json\` / \`crunch.json\`.
+Generated by \`scripts/fidgets/build-clips.mjs\` — do not edit by hand. Pools, clip times, gates and counts are in \`wax.json\` / \`crunch.json\` / \`squish.json\`.
+All clips were picked automatically from the waveforms and **have not been listened to**. None is a recording of the actual toy except possibly the wax-simulator ones.
 
-## Wax (W01 청사과, W02 초콜릿) — CC BY 4.0, attribution required
+## Wax (W01 청사과, W02 초콜릿)
 
-WAK-PPU-BALL sound effects by **apple77771**, licensed under CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/).
-Source: https://github.com/apple77771/wakppuball-simulator, pinned commit 6882bebcc312b3be3b871b0729e22ceacf5a2f01. The upstream
-notice is preserved in \`../wax/LICENSE.md\`; the original, unmodified MP3 files stay in \`../wax/\`.
+**apple77771 (CC BY 4.0, attribution required)** — WAK-PPU-BALL sound effects by apple77771, licensed under CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/).
+Source: https://github.com/apple77771/wakppuball-simulator, pinned commit 6882bebcc312b3be3b871b0729e22ceacf5a2f01. The upstream notice is preserved in \`../wax/LICENSE.md\`; the original, unmodified MP3 files stay in \`../wax/\`.
+**Changes (CC BY 4.0 §3(a)(1)(B)): the clips in \`wax.wav\` were modified** — cut out of the original recordings at detected strike points, faded in/out, peak-normalised to −1 dBFS and loudness-matched within each pool. No filtering, EQ or pitch change is baked in.
+The upstream licence says the recordings are the maintainer's own; that claim was not independently verified.
+W02 also uses real chocolate-bar snapping/crumbling recordings (Freesound CC0, below). Counts: ${w.counts.extractedClips} clips from ${w.counts.sourceFiles} files.
 
-**Changes made (CC BY 4.0 §3(a)(1)(B)): the clips in \`wax.wav\` were modified** — cut out of the original recordings at detected strike
-points (${w.counts.extractedClips} clips from ${w.counts.sourceFiles} files), faded in/out, peak-normalised to −1 dBFS and loudness-matched within each pool.
-No filtering, EQ or pitch change is baked in. The upstream audio licence says the recordings are the maintainer's own; that claim was not independently verified.
+${head}
+${tbl(w)}
 
-| id | title | author | url | licence | retrieved | material |
-|---|---|---|---|---|---|---|
-${Object.entries(w.sources).map(([id, s]) => row(id, s)).join('\n')}
+## Crunch (C01 비누 크런치, C02 슈가비즈 말랑이) — Freesound CC0 1.0
 
-## Crunch (C01 비누 크런치, C02 슈가비즈 말랑이) — CC0 1.0
+All marked Creative Commons 0 (https://creativecommons.org/publicdomain/zero/1.0/) on their pages on the retrieval date (public HQ preview MP3s). CC0 needs no attribution; we credit the authors anyway.
+**Not recordings of soap crunch slime or sugar beads** — similar materials: C01 dry floral foam / styrofoam, C02 glass beads, sprinkles, pop rocks, rock candy. Counts: ${c.counts.extractedClips} clips from ${c.counts.sourceFiles} files.
 
-Recordings from Freesound, all marked Creative Commons 0 (https://creativecommons.org/publicdomain/zero/1.0/) on their pages on the retrieval date
-(public HQ preview MP3s). CC0 needs no attribution; we credit the authors anyway. The files are in \`../../../scripts/fidgets/source/crunch/\`.
+${head}
+${tbl(c)}
 
-**These are NOT recordings of soap crunch slime or sugar beads.** They are similar materials used as stand-ins:
-C01 uses styrofoam crushing/cracking; C02 uses plastic beads (collisions) and sugar granules (friction). Clips were picked automatically from the
-waveform and **have not been listened to**. Changes: cut at detected strikes (${c.counts.extractedClips} clips from ${c.counts.sourceFiles} files), faded, peak-normalised to −1 dBFS, loudness-matched within each pool.
+## Squish (S01–S03 말랑이, L01–L03 슬랑이) — Freesound CC0 1.0
 
-| id | title | author | url | licence | retrieved | material |
-|---|---|---|---|---|---|---|
-${Object.entries(c.sources).map(([id, s]) => row(id, s)).join('\n')}
+Replaces the earlier shared gel sprite. S01 stress balls / squeeze toy, S02 memory foam / sponge, S03 dough, L01 slime, L02 jelly / goo, L03 shaving foam. Counts: ${q.counts.extractedClips} clips from ${q.counts.sourceFiles} files.
+
+${head}
+${tbl(q)}
 
 ## Counting
 
-\`recordings\` = distinct passages cut from the files above; \`variants\` = derived copies (0). The player adds a ±3–5 % speed/pitch jitter and picks
-clips so that none repeats back-to-back — that jitter is playback variation, not additional recordings.
+\`recordings\` = distinct passages cut from the files above; \`variants\` = derived copies (0). The player adds a ±3–5 % speed/pitch jitter and picks clips so that none repeats back-to-back — that jitter is playback variation, not additional recordings.
+Sources are downloaded (Freesound preview MP3s, sha256-pinned in \`scripts/fidgets/freesound-sources.json\`) into the git-ignored \`bench-out/fidget-src/\` when missing.
 `;
   fs.writeFileSync(path.join(OUT, 'CREDITS.md'), t);
   console.log('\nCREDITS.md written');
