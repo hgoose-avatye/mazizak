@@ -174,6 +174,7 @@ export function createFidget(ctx: ToyContext, spec: FidgetSpec): FidgetToy {
   let frames = 0,
     active = false,
     crunchClock = 0,
+    crackClock = 0,
     pops = 0,
     strokeReady = true,
     dragBudget = 0,
@@ -568,12 +569,22 @@ export function createFidget(ctx: ToyContext, spec: FidgetSpec): FidgetToy {
     }
     if (fracture && shell && shellBase) {
       const before = fracture.crackEvents,
+        crazeBefore = fracture.crazeEvents,
         broken = fracture.step(dt, held);
-      if (fracture.crackEvents > before || broken.length) {
-        // Small hairline changes are silent; one grouped material event per audible cue.
-        if (broken.length || fracture.crackEvents - before > 2)
-          sound.play("crack", Math.min(1, 0.4 + broken.length * 0.1));
+      crackClock -= dt;
+      if (fracture.crazeEvents > crazeBefore) {
+        // the whole shell crazes: the "first break" sound (long, loud)
+        sound.play("crack", 0.85);
+        crackClock = 0.45;
         ctx.haptic(12);
+      } else if (broken.length && crackClock <= 0) {
+        // shards falling away: one grouped long cue every ~0.4 s, not one per patch
+        sound.play("crack", Math.min(1, 0.45 + broken.length * 0.08));
+        crackClock = 0.4;
+        ctx.haptic(8);
+      } else if (fracture.crackEvents - before > 2 && crackClock <= 0) {
+        sound.play("crack", 0.45);
+        crackClock = 0.3;
       }
       for (const i of broken) {
         shards[i].velocity.set(0, 0, 0);
@@ -598,7 +609,7 @@ export function createFidget(ctx: ToyContext, spec: FidgetSpec): FidgetToy {
         for (const k of patchVertices[i]) {
           p0.fromArray(shellBase, k * 3);
           p0.sub(c).multiplyScalar(
-            fracture.broken[i] ? 0.72 : 1 - Math.max(0, dam - 0.16) * 0.055,
+            fracture.broken[i] ? 0.72 : 1 - Math.max(0, dam - 0.16) * (fracture.crazing ? 0.17 : 0.055), // a crazed shell shows its polygon network: patches shrink apart
           );
           if (fracture.broken[i])
             p0.applyAxisAngle(tmp.set(1, 0, 0), state.spin);

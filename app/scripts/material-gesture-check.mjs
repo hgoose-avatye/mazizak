@@ -101,16 +101,14 @@ try {
           down.visualStatus === "reconstructed-material",
       );
     if (id[0] === "W") {
-      ok(
-        id + " local fracture only",
-        down.brokenFaces > 0 && down.brokenFaces < down.totalFaces * 0.25,
-      );
+      ok(id + " shell has started to break", down.brokenFaces > 0);
       ok(id + " no exploding shards", down.maxShardDisplacement < 0.23);
       await p.waitForTimeout(2000);
       const held = await report();
+      // observed in the installed 왁뿌볼 app: a held press crazes the whole shell and most patches fall away within a few seconds, a few flakes stay
       ok(
-        id + " static hold does not cascade over shell",
-        held.brokenFaces <= down.brokenFaces + 4,
+        id + " held press crazes the shell and most patches fall (a few flakes remain)",
+        held.brokenFaces >= held.totalFaces * (id === "W02" ? 0.3 : 0.6) && held.brokenFaces <= held.totalFaces * 0.97,
       );
     }
     await p.screenshot({

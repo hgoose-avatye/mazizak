@@ -238,17 +238,65 @@ export class FractureModel {
   readonly broken: Uint8Array;
   crackEvents = 0;
   breakEvents = 0;
+  /** number of times a deep press started the whole-shell craze (the "first break") */
+  crazeEvents = 0;
+  /** seconds of deep pressing so far / seconds since the craze started (-1: not crazed) */
+  private pressT = 0;
+  cascadeT = -1;
+  private cascadeFrom = new Vector3();
+  private breakAt: Float32Array;
+  private survivor: Uint8Array;
   constructor(
     readonly centers: Vector3[],
     readonly chocolate: boolean,
   ) {
     this.damage = new Float32Array(centers.length);
     this.broken = new Uint8Array(centers.length);
+    this.breakAt = new Float32Array(centers.length);
+    this.survivor = new Uint8Array(centers.length);
   }
+  get crazing() {
+    return this.cascadeT >= 0;
+  }
+  /** deterministic per-patch pseudo random in [0,1) */
+  private rnd(i: number, k: number) {
+    const x = Math.sin(i * 12.9898 + k * 78.233) * 43758.5453;
+    return x - Math.floor(x);
+  }
+  /**
+   * Observed in the installed 왁뿌볼 app (청사과): pressing and holding for a moment turns the WHOLE green shell into a polygon
+   * pattern within ≈0.4 s; the polygons then drop away over ≈2 s while the ball squashes, leaving a white clay ball with a few
+   * green flakes. A light touch only dents it. Thin wax (apple) goes faster than chocolate, which breaks in slower, coarser steps.
+   */
   step(dt: number, contacts: Contact[]) {
     const events: number[] = [];
-    // Peak local deformation, not time held, breaks the wax. A stationary hand
-    // cannot keep propagating cracks around the whole shell.
+    const choc = this.chocolate;
+    // deep, sustained press → craze cascade
+    let deepest = 0,
+      anchor: Vector3 | null = null;
+    for (const c of contacts)
+      if (c.held && c.depth.x > deepest) {
+        deepest = c.depth.x;
+        anchor = c.anchor;
+      }
+    if (!this.crazing) {
+      this.pressT = deepest > 0.02 ? this.pressT + dt : Math.max(0, this.pressT - dt * 2);
+      if (this.pressT > (choc ? 0.25 : 0.07) && anchor) {
+        this.cascadeT = 0;
+        this.cascadeFrom.copy(anchor);
+        this.crazeEvents++;
+        this.crackEvents++;
+        for (let i = 0; i < this.centers.length; i++) {
+          const d = Math.min(1, this.centers[i].distanceTo(anchor) / 1.6);
+          // nearer patches go first; flakes (≈10–15 %) never fall by themselves
+          this.breakAt[i] = (choc ? 0.5 : 0.25) + d * (choc ? 1.2 : 0.7) + this.rnd(i, 1) * (choc ? 1.5 : 1.1);
+          this.survivor[i] = this.rnd(i, 2) < (choc ? 0.15 : 0.1) ? 1 : 0;
+        }
+      }
+    } else {
+      // the cascade keeps running while the finger is down and, more slowly, after it lifts
+      this.cascadeT += dt * (deepest > 0.05 ? 1 : 0.35);
+    }
     for (let i = 0; i < this.centers.length; i++) {
       if (this.broken[i]) continue;
       let strain = 0;
@@ -259,20 +307,27 @@ export class FractureModel {
           Math.max(0, c.depth.x) *
             (c.surfacePatch === i
               ? 1
-              : Math.exp(-distance / (this.chocolate ? 0.16 : 0.22))),
+              : Math.exp(-distance / (choc ? 0.16 : 0.22))),
         );
       }
       const strength =
-        (this.chocolate ? 0.24 : 0.18) * (1 + 0.12 * Math.sin(i * 19.7));
-      const target = strain / strength;
+        (choc ? 0.24 : 0.18) * (1 + 0.12 * Math.sin(i * 19.7));
+      let target = strain / strength;
+      if (this.crazing) {
+        // every patch shows its crack network almost at once…
+        target = Math.max(target, Math.min(0.85, (this.cascadeT / (choc ? 0.6 : 0.35)) * 0.85));
+        // …and then falls away at its own time (flakes stay)
+        if (!this.survivor[i] && this.cascadeT >= this.breakAt[i]) target = 1;
+      }
       const before = this.damage[i];
       if (target > before)
         this.damage[i] = Math.min(
           1,
-          before + (target - before) * (1 - Math.exp(-dt * 10)),
+          before + (target - before) * (1 - Math.exp(-dt * (target >= 1 ? 30 : 10))),
         );
-      if (before < 0.22 && this.damage[i] >= 0.22) this.crackEvents++;
-      if (this.damage[i] >= 1) {
+      if (before < 0.22 && this.damage[i] >= 0.22 && !this.crazing) this.crackEvents++;
+      if (this.damage[i] >= 0.999) {
+        this.damage[i] = 1;
         this.broken[i] = 1;
         this.breakEvents++;
         events.push(i);
@@ -285,6 +340,9 @@ export class FractureModel {
     this.broken.fill(0);
     this.crackEvents = 0;
     this.breakEvents = 0;
+    this.crazeEvents = 0;
+    this.pressT = 0;
+    this.cascadeT = -1;
   }
   get brokenCount() {
     return this.broken.reduce((a, b) => a + b, 0);

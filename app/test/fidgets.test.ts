@@ -77,7 +77,8 @@ describe("fidget material mechanics", () => {
       choco = new FractureModel(centers, true),
       m = new FidgetModel(spec("W01"));
     press(m);
-    for (let i = 0; i < 30; i++) {
+    for (let i = 0; i < 6; i++) {
+      // (a few frames only: the deeper default press of the wax toys saturates both within ~0.1 s)
       m.step(1 / 120);
       apple.step(1 / 120, m.held);
       choco.step(1 / 120, m.held);
@@ -161,5 +162,45 @@ describe("rapid repeated clicking (a mouse always reuses pointer id 1)", () => {
         m.step(0.05);
       }
     }
+  });
+});
+
+describe("shell craze cascade (observed in the installed 왁뿌볼 app)", () => {
+  const sphere = (n: number) => Array.from({ length: n }, (_, i) => { const y = 1 - (2 * (i + 0.5)) / n, r = Math.sqrt(1 - y * y), a = i * 2.399963; return new Vector3(Math.cos(a) * r, y, Math.sin(a) * r).multiplyScalar(0.9); });
+  const run = (chocolate: boolean, seconds: number, holdFor: number) => {
+    const centers = sphere(80), f = new FractureModel(centers, chocolate), m = new FidgetModel(spec(chocolate ? "W02" : "W01"));
+    press(m);
+    let t = 0;
+    const log: number[] = [];
+    while (t < seconds) {
+      if (t >= holdFor) m.release(1);
+      m.step(1 / 120);
+      f.step(1 / 120, m.held);
+      t += 1 / 120;
+      if (Math.abs(t * 4 - Math.round(t * 4)) < 1e-6) log.push(f.brokenCount);
+    }
+    return { f, log };
+  };
+  it("a held deep press crazes the whole shell once, and most patches fall within ~3 s; a few flakes stay", () => {
+    const { f, log } = run(false, 3, 10);
+    expect(f.crazeEvents).toBe(1);
+    expect(f.crazing).toBe(true);
+    expect(f.brokenCount).toBeGreaterThan(80 * 0.6);
+    expect(f.brokenCount).toBeLessThan(80 * 0.97);
+    expect(log.every((v, i) => i === 0 || v >= log[i - 1])).toBe(true); // monotone: pieces only fall
+  });
+  it("chocolate breaks in slower, coarser steps than thin apple wax", () => {
+    const apple = run(false, 1.5, 10).f, choco = run(true, 1.5, 10).f;
+    expect(choco.brokenCount).toBeLessThan(apple.brokenCount);
+  });
+  it("a very short tap does not craze the shell, and reset restores everything", () => {
+    const { f } = run(false, 2, 0.02);
+    expect(f.crazeEvents).toBe(0);
+    expect(f.brokenCount).toBeLessThan(80 * 0.2);
+    const g = run(false, 3, 10).f;
+    g.reset();
+    expect(g.brokenCount).toBe(0);
+    expect(g.crazing).toBe(false);
+    expect(g.crazeEvents).toBe(0);
   });
 });
