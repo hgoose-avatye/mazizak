@@ -53,9 +53,12 @@ export class FidgetModel {
     if (
       [...this.contacts.values()].filter((c) => c.held).length >=
         (this.foam ? 2 : 4) ||
-      this.contacts.has(id)
+      // the same pointer id can only be pressed again once it was released: a mouse always reuses id 1, so a fresh click
+      // must replace the previous (released, still settling) contact instead of being ignored
+      this.contacts.get(id)?.held
     )
       return false;
+    if (this.contacts.has(id)) this.contacts.delete(id);
     if (this.contacts.size >= 10) {
       const old = [...this.contacts.values()].find((c) => !c.held);
       if (old) this.contacts.delete(old.id);

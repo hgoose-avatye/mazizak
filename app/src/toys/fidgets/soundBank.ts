@@ -134,13 +134,33 @@ export interface GateDecision {
   reason?: string;
   /** dB to subtract because other voices are still sounding */
   attenuationDb: number;
+  /** voices to fade out before the new one starts (only when `interrupt` was requested) */
+  evict?: ActiveVoice[];
 }
+/** minimum gap between two contact sounds of the same kind (a finger cannot tap faster than this) */
+export const MIN_INTERRUPT_MS = 35;
 /** Per-toy voice policy: minimum intervals, at most MAX_SHORT_VOICES short voices, one sustained voice at a time. */
 export class VoiceGate {
   voices: ActiveVoice[] = [];
   private lastAt: Partial<Record<FidgetEvent, number>> = {};
-  decide(event: FidgetEvent, now: number): GateDecision {
+  /**
+   * `interrupt` = a new finger contact: it must always be answered, so instead of being refused it replaces the running sustained sound
+   * and, if too many short voices are still ringing, the oldest one (rapid repeated clicking keeps sounding).
+   */
+  decide(event: FidgetEvent, now: number, interrupt = false): GateDecision {
     this.voices = this.voices.filter((v) => v.end > now);
+    if (interrupt) {
+      const last = this.lastAt[event];
+      if (last !== undefined && now - last < MIN_INTERRUPT_MS) return { ok: false, reason: "interval", attenuationDb: 0 };
+      const evict: ActiveVoice[] = [];
+      if (SUSTAINED.has(event)) evict.push(...this.voices.filter((v) => SUSTAINED.has(v.event)));
+      else {
+        const shorts = this.voices.filter((v) => !SUSTAINED.has(v.event));
+        if (shorts.length >= MAX_SHORT_VOICES) evict.push(...shorts.slice(0, shorts.length - MAX_SHORT_VOICES + 1));
+      }
+      this.voices = this.voices.filter((v) => !evict.includes(v));
+      return { ok: true, attenuationDb: OVERLAP_DB * Math.min(3, this.voices.length), evict };
+    }
     const last = this.lastAt[event];
     if (last !== undefined && now - last < MIN_INTERVAL_MS[event]) return { ok: false, reason: "interval", attenuationDb: 0 };
     if (SUSTAINED.has(event)) {

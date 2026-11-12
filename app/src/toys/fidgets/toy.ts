@@ -435,6 +435,18 @@ export function createFidget(ctx: ToyContext, spec: FidgetSpec): FidgetToy {
       dragBudget = 0;
       ctx.haptic(7);
       idleGesture = 0;
+      // answer every finger contact at once (not only after the compression has built up over a few frames),
+      // so rapid repeated clicking keeps sounding: it replaces the sustained sound of the previous click
+      const first =
+        spec.family === "viscous" && anchors.size > 1
+          ? "stretch"
+          : sound.hasOwn("tap")
+            ? "tap"
+            : spec.family === "wax" || spec.family === "particles"
+              ? null
+              : "hold";
+      // (wax and particle toys keep `strokeReady` so their core kneading / crushing still starts on contact)
+      if (first && sound.play(first, 0.55, 0, true) && spec.family !== "wax" && spec.family !== "particles") strokeReady = false;
     } else if (e.kind === "move") {
       const a = anchors.get(e.id);
       if (!a) return;

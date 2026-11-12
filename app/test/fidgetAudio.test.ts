@@ -186,6 +186,25 @@ describe("VoiceGate", () => {
   });
 });
 
+describe("VoiceGate interrupt (a new finger contact is always answered)", () => {
+  it("replaces the running sustained sound and evicts the oldest short voice instead of refusing", () => {
+    const g = new VoiceGate();
+    g.commit("hold", 0, 600, () => undefined);
+    expect(g.decide("hold", 50).ok).toBe(false); // normal playback: busy
+    const d = g.decide("hold", 50, true);
+    expect(d.ok).toBe(true);
+    expect(d.evict?.length).toBe(1);
+    const g2 = new VoiceGate();
+    for (let i = 0; i < MAX_SHORT_VOICES; i++) g2.commit("tap", i * 40, 500, () => undefined);
+    expect(g2.decide("tap", 150).ok).toBe(false);
+    const e = g2.decide("tap", 150, true);
+    expect(e.ok).toBe(true);
+    expect(e.evict?.length).toBe(1);
+    g2.commit("tap", 150, 500);
+    expect(g2.decide("tap", 160, true).ok).toBe(false); // not faster than a finger can tap
+  });
+});
+
 describe("shipped wax / crunch sprites", () => {
   for (const kind of ["wax", "crunch", "squish"] as const) {
     describe(kind, () => {
@@ -369,6 +388,18 @@ describe("FidgetAudio event routing", () => {
     expect(plays[0].name).toMatch(/^fg:W02:init:m:/);
     expect(plays[1].name).toMatch(/^fg:W02:crack:m:/);
     expect(plays[2].name).toMatch(/^fg:W02:crack:a:/);
+  });
+
+  it("rapid clicking: 20 contacts in 1.2 s all produce a sound, each replacing the previous sustained sound", async () => {
+    for (const id of ["L03", "S01", "C01"]) {
+      const { a, plays, stops, at } = await make(id);
+      const first = a.hasOwn("tap") ? "tap" : "hold";
+      let t = 0, ok = 0;
+      for (let i = 0; i < 20; i++) { t += 60; at(t); if (a.play(first, 0.55, 0, true)) ok++; }
+      expect(ok, id).toBe(20);
+      expect(plays.length).toBe(20);
+      expect(stops.length, `${id} replaced voices`).toBeGreaterThan(0);
+    }
   });
 
   it("switching toys: leave() fades out running voices and a left toy is silent; re-entering plays again", async () => {

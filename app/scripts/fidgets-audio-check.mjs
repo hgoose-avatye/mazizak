@@ -33,8 +33,15 @@ const out = await p.evaluate(async () => {
     for (const v of x) { const m = Math.abs(v); peak = Math.max(peak, m); if (m >= 0.999) clipped++; e += v * v; }
     return { played, peakDb: +(20 * Math.log10(Math.max(peak, 1e-9))).toFixed(1), clipped, rmsDb: +(10 * Math.log10(e / x.length + 1e-12)).toFixed(1) };
   };
+  const rolesOf = async (spec) => {
+    const off = new OfflineAudioContext(1, SR, SR);
+    const a = new FidgetAudio(new AudioEngine(32, off), spec, () => 0);
+    for (let i = 0; i < 400 && a.state === "loading"; i++) await new Promise((r) => setTimeout(r, 10));
+    return a.supportedRoles.filter((r) => EVENTS.includes(r));
+  };
   for (const spec of FIDGETS) {
-    const own = EVENTS.filter((e) => FIDGET_SOUND[spec.id][e]);
+    const own = await rolesOf(spec);
+    if (!own.length) { res[spec.id] = { events: [], silent: true }; continue; } // every pool was rejected: silent on purpose
     // single loudest event
     const single = await render(spec, [[100, own.includes("crack") ? "crack" : own.includes("crunch") ? "crunch" : own[0], 1]]);
     // 10 gestures per second, cycling through the toy's own events, strength 1
@@ -47,6 +54,7 @@ const out = await p.evaluate(async () => {
 });
 console.log(JSON.stringify(out, null, 1));
 for (const [id, r] of Object.entries(out)) {
+  if (r.silent) { console.log(id, "has no sound (all pools rejected)"); continue; }
   assert.ok(r.stress.clipped === 0, `${id}: clipped samples ${r.stress.clipped}`);
   assert.ok(r.stress.peakDb <= -0.5, `${id}: stress peak ${r.stress.peakDb} dBFS`);
   assert.ok(r.stress.peakDb - r.single.peakDb <= 8, `${id}: level rise under stress ${r.stress.peakDb - r.single.peakDb} dB`);

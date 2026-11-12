@@ -28,6 +28,10 @@ export default defineConfig(({ command, isPreview }) => {
       "import.meta.env.VITE_LOCAL_FIDGETS": JSON.stringify(
         fidgetDir ? "1" : "0",
       ),
+      // "1" only on the dev server started with MANZIZAK_ORIGINAL_APP_DIR (owner-chosen stand-in sounds from the installed reference app)
+      "import.meta.env.VITE_ORIGINAL_SOUNDS": JSON.stringify(
+        originalDir && process.env.MANZIZAK_ORIGINAL_SOUNDS !== "0" ? "1" : "0",
+      ),
       // "0": keep the local reference meshes but play only the licensed sound pools
       "import.meta.env.VITE_LOCAL_FIDGET_AUDIO": JSON.stringify(
         process.env.MANZIZAK_LOCAL_FIDGET_AUDIO === "0" ? "0" : "1",

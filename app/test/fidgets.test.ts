@@ -145,3 +145,21 @@ describe("fidget material mechanics", () => {
     expect(m.contacts.size).toBe(0);
   });
 });
+
+describe("rapid repeated clicking (a mouse always reuses pointer id 1)", () => {
+  it("a released pointer id can be pressed again immediately; a still-held one cannot", () => {
+    for (const id of ["S01", "S02", "L01", "W01", "C01"]) {
+      const m = new FidgetModel(spec(id));
+      expect(m.press(1, new Vector3(0, 0.2, 0.8), new Vector3(0, 0, 1)), id).toBe(true);
+      expect(m.press(1, new Vector3(0, 0.2, 0.8), new Vector3(0, 0, 1)), `${id} held id`).toBe(false);
+      m.release(1);
+      for (let i = 0; i < 12; i++) {
+        // released but still settling → a new click with the same id must be accepted
+        expect(m.press(1, new Vector3(0.01 * i, 0.2, 0.8), new Vector3(0, 0, 1)), `${id} click ${i}`).toBe(true);
+        m.step(0.04);
+        m.release(1);
+        m.step(0.05);
+      }
+    }
+  });
+});

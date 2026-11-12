@@ -6,6 +6,7 @@ import {
 } from "./references";
 import type { FidgetSpec } from "./catalog";
 import { loadSprite, type LoadedSprite } from "./fidgetSprites";
+import { ORIGINAL_SOUNDS, loadOriginalEvents } from "./originalMap";
 /** dev only: installed-app reference sounds override the licensed pools. Off in production builds, and off when MANZIZAK_LOCAL_FIDGET_AUDIO=0 (meshes stay local, sounds are the shippable ones). */
 const LOCAL_AUDIO = LOCAL_FIDGETS && import.meta.env.VITE_LOCAL_FIDGET_AUDIO !== "0";
 import {
@@ -202,6 +203,18 @@ export async function resolveToy(ctx: BaseAudioContext, spec: FidgetSpec): Promi
     }
     events[event] = e;
   }
+  // dev only: the owner's chosen stand-in sounds from the installed reference app replace this toy's pools entirely
+  if (ORIGINAL_SOUNDS) {
+    const orig = await loadOriginalEvents(ctx, spec.id);
+    if (orig) {
+      for (const e of EVENTS) delete events[e];
+      for (const e of EVENTS) {
+        const list = orig[e];
+        if (list?.length) events[e] = { ref: null, main: list.map((c) => ({ buffer: c.buffer, label: c.label, info: "installed reference app (dev only, not shippable)" })), baseDb: CLASS_LEVEL_DB[e], rate: [0.98, 1.02], origin: "ORIGINAL-APP (dev only)" };
+      }
+      return { events, source: `ORIGINAL-APP stand-in sounds (dev only, not shippable): ${[...new Set(EVENTS.map((e) => events[e]?.main[0]?.label.split("/").slice(0, 2).join("/")).filter(Boolean))].join(", ")}` };
+    }
+  }
   const kinds = new Set(EVENTS.map((e) => events[e]?.origin).filter(Boolean) as string[]);
   const source = LOCAL_AUDIO
     ? hasVideoReference
@@ -301,7 +314,7 @@ export class FidgetAudio {
     this.gate.clear();
   }
   /** `delaySec` only places the sound later in an offline render (tests); the app always plays immediately */
-  play(event: FidgetEvent, strength = 0.5, delaySec = 0) {
+  play(event: FidgetEvent, strength = 0.5, delaySec = 0, interrupt = false) {
     if (!this.enabled || this.state !== "recorded/derived") return false;
     let ev: FidgetEvent = event;
     // the first crack after a reset is the "init" sound when the toy has one
@@ -313,8 +326,9 @@ export class FidgetAudio {
     }
     const set = this.sets[ev]!,
       now = this.now(),
-      d = this.gate.decide(ev, now);
+      d = this.gate.decide(ev, now, interrupt);
     if (!d.ok) return false;
+    for (const v of d.evict ?? []) v.stop?.(0.03);
     const useAlt = !!set.alt && strength >= (set.altMin ?? 1);
     const names = useAlt ? set.alt! : set.main;
     const name = names[this.picker.pick(`${ev}:${useAlt ? "a" : "m"}`, names.length)];

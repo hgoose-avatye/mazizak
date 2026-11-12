@@ -67,7 +67,7 @@ try {
     ok(
       id + " only crunch events",
       down.report.soundPlays.length > 0 &&
-        down.report.soundPlays.every((x) => /:(crunch|hold):/.test(x.name)),
+        down.report.soundPlays.every((x) => /:(crunch|hold|tap):/.test(x.name)),
     );
     ok(
       id + " no generic friction loop",
