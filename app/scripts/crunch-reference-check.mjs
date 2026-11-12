@@ -96,8 +96,11 @@ try {
       report: window.__MANZIZAK__.report(),
       active: window.__crunch.active,
     }));
-    ok(id + " stops sound on release", released.active === 0);
-    await p.waitForTimeout(2200);
+    // short sounds already playing may finish (a lifting finger must not chop them); nothing keeps sounding afterwards
+    ok(id + " sound ends after release", released.active <= 3);
+    await p.waitForTimeout(1800);
+    ok(id + " no sound left ringing", (await p.evaluate(() => window.__crunch.active)) === 0);
+    await p.waitForTimeout(400);
     const rested = await p.evaluate(() => window.__MANZIZAK__.report());
     ok(id + " skin recovers", rested.compression < 0.02);
     if (id === "C02")
