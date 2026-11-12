@@ -19,15 +19,16 @@ const ms = (v) => Math.round((v * SR) / 1000);
 const PRESETS = [
   // dense typing (몽돌: an 8 s Short typed fast): a clean strike stands ≥18 dB over the surrounding typing and decays ≥20 dB
   { id: 'mongdol-pl87w', file: 'mongdol', video: 'https://www.youtube.com/shorts/BgO3pE7VnI8', window: [0, 9], count: 14, isolation: 0.1, gate: { maxLeadDb: -18, decayDb: -20, maxSecondDb: -10 } },
-  // 찌개: the owner heard the neighbouring typing under the first set (lead −18 dB) — strict gates over a longer stretch instead
-  { id: 'jjigae-topre', file: 'jjigae', video: 'https://www.youtube.com/watch?v=TTfTCiwA38c', window: [30, 1190], count: 16, gate: { maxLeadDb: -30, decayDb: -30, maxSecondDb: -15, minDecayMs: 8 } },
+  // 찌개: the owner heard the neighbouring typing under the first set (lead −18 dB) — strict gates over a longer stretch instead;
+  // then a steady hiss (the recording's floor is only ~37 dB under a strike): clips end above the hiss, a gentle expander, strikes ≥38 dB over the hiss
+  { id: 'jjigae-topre', file: 'jjigae', video: 'https://www.youtube.com/watch?v=TTfTCiwA38c', window: [30, 1735], count: 16, gate: { maxLeadDb: -30, decayDb: -30, maxSecondDb: -15, minDecayMs: 8, denoise: true, minSnrDb: 38, maxTailDb: -24 } },
   // ceramic keycaps on a POM plate: a sharp clack that decays within ~10 ms is the real sound, not a glitch
   { id: 'dojagi-space65', file: 'dojagi', video: 'https://www.youtube.com/watch?v=Ry1DJ2xzg6Q&t=10s', window: [10, 130], count: 16, gate: { minDecayMs: 6, minLenMs: 40 } },
 ];
 const only = process.argv.find((a) => a.startsWith('--only='))?.slice(7);
 
 function decode(file, [a, b]) {
-  const r = spawnSync(FFMPEG, ['-v', 'error', '-ss', String(a), '-t', String(b - a), '-i', file, '-f', 'f32le', '-ac', '1', '-ar', String(SR), '-'], { maxBuffer: 1 << 28 });
+  const r = spawnSync(FFMPEG, ['-v', 'error', '-ss', String(a), '-t', String(b - a), '-i', file, '-f', 'f32le', '-ac', '1', '-ar', String(SR), '-'], { maxBuffer: 1 << 30 });
   if (r.status !== 0) throw new Error(`ffmpeg failed for ${file}: ${r.stderr}`);
   const buf = r.stdout;
   return new Float32Array(buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.length));
@@ -55,7 +56,11 @@ for (const P of PRESETS) {
     a = Math.max(0, a - ms(0.5));
     const cap = Math.min(x.length, a + ms(220), a + ms(s.next * 1000 - 8));
     // end: last 2 ms RMS frame above peak −40 dB
-    const seg = x.subarray(a, cap), pk = peakOf(seg), thr = pk * 0.01, h = ms(2);
+    // the recording's own hiss around this strike: 5th percentile of 10 ms RMS frames within ±1.5 s
+    const nf = (() => { const w = ms(10), v = []; for (let i = Math.max(0, a - ms(1500)); i + w <= Math.min(x.length, a + ms(1500)); i += w) { let e = 0; for (let j = i; j < i + w; j++) e += x[j] * x[j]; v.push(Math.sqrt(e / w)); } v.sort((p, q) => p - q); return v[Math.floor(v.length * 0.05)] ?? 1e-6; })();
+    const seg = x.subarray(a, cap), pk = peakOf(seg), h = ms(2);
+    // end the clip when it falls to −40 dB or (denoise) to 6 dB above the hiss, so it does not carry a hiss tail
+    const thr = Math.max(pk * 0.01, GATE.denoise ? nf * 2 : 0);
     let end = seg.length;
     for (let i = seg.length - h; i >= 0; i -= h) { let e = 0; for (let j = i; j < i + h; j++) e += seg[j] * seg[j]; if (Math.sqrt(e / h) > thr) { end = Math.min(seg.length, i + h + ms(4)); break; } }
     const raw = seg.subarray(0, Math.max(ms(40), end));
@@ -66,11 +71,12 @@ for (const P of PRESETS) {
     const d30 = fr.findIndex((v, i) => i > fpi && v < fpk * Math.pow(10, GATE.decayDb / 20)); // decay to GATE.decayDb
     let second = -99; for (let i = fpi + 8; i < fr.length; i++) if (fr[i] > fr[i - 1] * 2.5) second = Math.max(second, db(fr[i] / fpk));
     const lead = db(rms(x.subarray(Math.max(0, a - ms(40)), Math.max(1, a - ms(2)))) / Math.max(fpk, 1e-9)); // background just before the strike
-    return { s, a, raw, endDb: db(Math.min(...fr.slice(fpi)) / Math.max(fpk, 1e-9)), peakDb: db(pk), clippedSource: pk > 0.97, lenMs: (raw.length / SR) * 1000, decayMs: d30 > 0 ? (d30 - fpi) * 2 : null, second, lead, truncated: cap >= x.length - ms(5) };
+    const tailDb = db(rms(raw.subarray(Math.max(0, raw.length - ms(10)))) / Math.max(fpk, 1e-9));
+    return { s, a, raw, tailDb, noiseFloor: nf, snrDb: db(pk / Math.max(nf, 1e-9)), endDb: db(Math.min(...fr.slice(fpi)) / Math.max(fpk, 1e-9)), peakDb: db(pk), clippedSource: pk > 0.97, lenMs: (raw.length / SR) * 1000, decayMs: d30 > 0 ? (d30 - fpi) * 2 : null, second, lead, truncated: cap >= x.length - ms(5) };
   };
   const why = (c) =>
     c.clippedSource ? 'CLIPPED' : c.truncated ? 'TRUNCATED' : c.lenMs < GATE.minLenMs ? 'SHORT' : c.decayMs === null ? 'NO-DECAY' : c.decayMs < GATE.minDecayMs ? 'SPIKE' :
-    c.second > GATE.maxSecondDb ? '2ND-HIT' : c.lead > GATE.maxLeadDb ? 'NOISY-LEAD' : -3 - c.peakDb > GATE.maxBoostDb ? 'BOOST' : null;
+    c.second > GATE.maxSecondDb ? '2ND-HIT' : GATE.minSnrDb && c.snrDb < GATE.minSnrDb ? 'HISS' : GATE.maxTailDb && c.tailDb > GATE.maxTailDb ? 'STILL-SOUNDING' : c.lead > GATE.maxLeadDb ? 'NOISY-LEAD' : -3 - c.peakDb > GATE.maxBoostDb ? 'BOOST' : null;
   const all = cand.map(cut), rej = {};
   if (process.env.KB_DEBUG) { const q = (k) => { const v = all.map(k).filter((n) => n !== null).sort((p, q) => p - q); return [0.1, 0.25, 0.5, 0.75, 0.9].map((f) => Math.round(v[Math.floor(f * (v.length - 1))] ?? NaN)); }; console.log(P.id, 'lead', q((c) => c.lead), 'decay', q((c) => c.decayMs), 'second', q((c) => c.second), 'len', q((c) => c.lenMs), 'peak', q((c) => c.peakDb), 'endLevel', q((c) => c.endDb)); }
   const passed = all.filter((c) => { const r = why(c); if (r) rej[r] = (rej[r] ?? 0) + 1; return !r; });
@@ -78,16 +84,27 @@ for (const P of PRESETS) {
   const medPk = [...passed].map((c) => c.peakDb).sort((p, q) => p - q)[passed.length >> 1] ?? 0;
   passed.sort((p, q) => Math.abs(p.peakDb - medPk) - Math.abs(q.peakDb - medPk));
   const picked = [];
-  for (const c of passed) { if (picked.length >= P.count) break; if (!picked.some((o) => Math.abs(o.s.t - c.s.t) < 0.5)) picked.push(c); }
+  // long ASMR videos often loop one recording: never take the same keystroke twice (waveform correlation > 0.9)
+  const same = (p, q) => { const n = Math.min(p.raw.length, q.raw.length); let pq = 0, pp = 0, qq = 0; for (let i = 0; i < n; i++) { pq += p.raw[i] * q.raw[i]; pp += p.raw[i] ** 2; qq += q.raw[i] ** 2; } return pq / Math.sqrt(pp * qq + 1e-20) > 0.9; };
+  let dups = 0;
+  for (const c of passed) { if (picked.length >= P.count) break; if (picked.some((o) => Math.abs(o.s.t - c.s.t) < 0.5)) continue; if (picked.some((o) => same(o, c))) { dups++; continue; } picked.push(c); }
+  if (dups) rej['DUPLICATE'] = dups;
   picked.sort((p, q) => p.s.t - q.s.t);
   console.log(`${P.id}: ${cand.length} isolated strikes, ${passed.length} pass the gates (rejected ${JSON.stringify(rej)}), ${picked.length} used`);
   const clips = picked.map((c) => {
     const y = Float32Array.from(c.raw);
+    if (GATE.denoise) {
+      // gentle downward expander: 2 ms frames within 12 dB of the hiss are turned down 2:1 (smoothed), the strike itself is untouched
+      const h2 = ms(2), knee = c.noiseFloor * 4, g = [];
+      for (let i = 0; i < y.length; i += h2) { let e = 0, n = 0; for (let j = i; j < Math.min(y.length, i + h2); j++, n++) e += y[j] * y[j]; const l = Math.sqrt(e / Math.max(1, n)); g.push(l >= knee ? 1 : Math.max(0.05, l / knee)); }
+      for (let k = 1; k < g.length; k++) g[k] = Math.max(g[k], g[k - 1] * 0.7); // release ~6 ms: no pumping
+      for (let i = 0; i < y.length; i++) { const f = i / h2, k = Math.min(g.length - 1, Math.floor(f)), k2 = Math.min(g.length - 1, k + 1), t = f - k; y[i] *= g[k] * (1 - t) + g[k2] * t; }
+    }
     const fo = Math.min(y.length >> 1, ms(8)), fi = ms(0.5);
     for (let i = 0; i < y.length; i++) { let w = 1; if (i < fi) w *= i / fi; if (i >= y.length - fo) w *= 0.5 + 0.5 * Math.cos((Math.PI * (i - (y.length - fo))) / fo); y[i] *= w; }
     const k = Math.pow(10, -3 / 20) / Math.max(peakOf(y), 1e-9);
     for (let i = 0; i < y.length; i++) y[i] *= k;
-    return { y, tSrc: P.window[0] + c.a / SR, peakDb: c.peakDb, boostDb: db(k), qc: { lenMs: Math.round(c.lenMs), decayMs: c.decayMs, secondDb: Math.round(c.second * 10) / 10, leadDb: Math.round(c.lead * 10) / 10 } };
+    return { y, tSrc: P.window[0] + c.a / SR, peakDb: c.peakDb, boostDb: db(k), qc: { snrDb: Math.round(c.snrDb * 10) / 10, lenMs: Math.round(c.lenMs), decayMs: c.decayMs, secondDb: Math.round(c.second * 10) / 10, leadDb: Math.round(c.lead * 10) / 10 } };
   });
   if (clips.length < 4) { console.log(`${P.id}: only ${clips.length} clean keystrokes found — skipped`); continue; }
   const GAP = ms(10);
