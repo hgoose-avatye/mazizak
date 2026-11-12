@@ -13,6 +13,7 @@ import { loadKeyboardSamples } from './audio/keyboardSamples';
 import { loadSquishySamples } from './audio/squishySamples';
 import { LOCAL_FIDGETS } from './toys/fidgets/references';
 import { FIDGETS, findFidget } from './toys/fidgets/catalog';
+import { ORIGINAL_SOUNDS, ORIGINAL_FOLDER } from './toys/fidgets/originalMap';
 import { createFidget } from './toys/fidgets/toy';
 import { preloadFidgetAudio } from './toys/fidgets/audio';
 import { KEYBOARD_COLORS } from './toys/keyboard/colors';
@@ -142,6 +143,17 @@ function buildVariants(id: string): void {
         const b = document.createElement('button'); b.className = 'chip'; b.textContent = label;
         b.onclick = () => toys[id]?.action?.(action); variants.append(b);
       }
+    }
+    // dev only: compare the reference-app stand-in sounds with the public ones on the same gestures
+    if (ORIGINAL_SOUNDS && ORIGINAL_FOLDER[id]) {
+      const pair: HTMLButtonElement[] = [];
+      for (const [v, label] of [['original', '원본 소리'], ['public', '공개 소리']] as const) {
+        const b = document.createElement('button'); b.className = 'chip'; b.textContent = label;
+        b.setAttribute('role', 'radio'); b.setAttribute('aria-checked', String(v === 'original'));
+        b.onclick = () => { toys[id]?.action?.('sound:' + v); pair.forEach((x) => x.setAttribute('aria-checked', String(x === b))); };
+        pair.push(b); variants.append(b);
+      }
+      getToy(id)?.action?.('sound:original'); // the chips start on 원본 소리: keep the toy in step after a revisit
     }
     const select = document.createElement('select'); select.className = 'toy-jump'; select.setAttribute('aria-label', '다른 장난감');
     for (const f of FIDGETS) { const o = new Option(f.name, f.id); o.selected = f.id === id; select.add(o); }

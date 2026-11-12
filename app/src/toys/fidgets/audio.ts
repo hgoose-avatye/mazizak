@@ -141,6 +141,8 @@ export interface ResolvedToy {
   events: Partial<Record<FidgetEvent, ResolvedEvent>>;
   mix?: Partial<Record<MixEvent, ResolvedEvent>>;
   source: string;
+  /** dev only: the owner's stand-in sounds from the installed reference app, kept next to the public sounds so both can be compared */
+  original?: { events: Partial<Record<FidgetEvent, ResolvedEvent>>; mix: Partial<Record<MixEvent, ResolvedEvent>>; source: string };
 }
 /** Resolve every event of a toy to its decoded clips (single source of truth for the player and the listening lab). */
 export async function resolveToy(ctx: BaseAudioContext, spec: FidgetSpec): Promise<ResolvedToy> {
@@ -206,14 +208,16 @@ export async function resolveToy(ctx: BaseAudioContext, spec: FidgetSpec): Promi
     }
     events[event] = e;
   }
-  // dev only: the owner's chosen stand-in sounds from the installed reference app replace this toy's pools entirely
+  // dev only: the owner's chosen stand-in sounds from the installed reference app (played instead of this toy's pools by default,
+  // switchable to the public sounds for comparison)
+  let original: ResolvedToy["original"];
   if (ORIGINAL_SOUNDS) {
     const orig = await loadOriginalEvents(ctx, spec.id);
     if (orig) {
-      for (const e of EVENTS) delete events[e];
+      const oe: Partial<Record<FidgetEvent, ResolvedEvent>> = {};
       for (const e of EVENTS) {
         const list = orig[e];
-        if (list?.length) events[e] = { ref: null, main: list.map((c) => ({ buffer: c.buffer, label: c.label, info: "installed reference app (dev only, not shippable)" })), baseDb: CLASS_LEVEL_DB[e], rate: [0.98, 1.02], origin: "ORIGINAL-APP (dev only)" };
+        if (list?.length) oe[e] = { ref: null, main: list.map((c) => ({ buffer: c.buffer, label: c.label, info: "installed reference app (dev only, not shippable)" })), baseDb: CLASS_LEVEL_DB[e], rate: [0.98, 1.02], origin: "ORIGINAL-APP (dev only)" };
       }
       const mixOrig = await loadOriginalMix(ctx, spec.id);
       const mix: ResolvedToy["mix"] = {};
@@ -221,7 +225,7 @@ export async function resolveToy(ctx: BaseAudioContext, spec: FidgetSpec): Promi
         const list = mixOrig?.[e];
         if (list?.length) mix[e] = { ref: null, main: list.map((c) => ({ buffer: c.buffer, label: c.label, info: "installed reference app (dev only, not shippable)" })), baseDb: CLASS_LEVEL_DB[e], rate: [0.98, 1.02], origin: "ORIGINAL-APP (dev only)" };
       }
-      return { events, mix, source: `ORIGINAL-APP stand-in sounds (dev only, not shippable): ${[...new Set(EVENTS.map((e) => events[e]?.main[0]?.label.split("/").slice(0, 2).join("/")).filter(Boolean))].join(", ")}` };
+      original = { events: oe, mix, source: `ORIGINAL-APP stand-in sounds (dev only, not shippable): ${[...new Set(EVENTS.map((e) => oe[e]?.main[0]?.label.split("/").slice(0, 2).join("/")).filter(Boolean))].join(", ")}` };
     }
   }
   const kinds = new Set(EVENTS.map((e) => events[e]?.origin).filter(Boolean) as string[]);
@@ -230,7 +234,7 @@ export async function resolveToy(ctx: BaseAudioContext, spec: FidgetSpec): Promi
       ? "local reference (incl. user video 7WDcH26JU5Q 20–29s soundtrack cues, rights unverified); local only"
       : `local reference overrides + licensed pools: ${[...kinds].join(", ")}`
     : `licensed pools: ${[...kinds].join(", ")}`;
-  return { events, source };
+  return { events, source, ...(original ? { original } : {}) };
 }
 
 interface PlayableSet {
@@ -252,6 +256,9 @@ export class FidgetAudio {
   private enabled = false;
   private sets: Partial<Record<FidgetEvent, PlayableSet>> = {};
   private mixSets: Partial<Record<MixEvent, PlayableSet>> = {};
+  /** "public" = the shippable pools; "original" = dev-only reference-app stand-ins (the default on the dev server when present) */
+  variant: "public" | "original" = "public";
+  private banks: Partial<Record<"public" | "original", { sets: Partial<Record<FidgetEvent, PlayableSet>>; mix: Partial<Record<MixEvent, PlayableSet>>; source: string; roles: string[] }>> = {};
   /** wax balls: every piece broken and being kneaded into the core */
   mixed = false;
   private gate = new VoiceGate();
@@ -278,42 +285,68 @@ export class FidgetAudio {
     });
     return names;
   }
+  private bank(events: ResolvedToy["events"], mix: ResolvedToy["mix"], tag: string, source: string) {
+    const sets: Partial<Record<FidgetEvent, PlayableSet>> = {},
+      mixSets: Partial<Record<MixEvent, PlayableSet>> = {},
+      roles: string[] = [];
+    for (const [event, e] of Object.entries(mix ?? {}) as [MixEvent, ResolvedEvent][]) {
+      const set: PlayableSet = { ref: null, main: [], durations: {}, baseDb: e.baseDb, rate: e.rate, origin: e.origin };
+      for (const [name, d] of this.register(event, tag + "mix", e.main.map((c) => c.buffer))) {
+        set.main.push(name);
+        set.durations[name] = d;
+      }
+      mixSets[event] = set;
+    }
+    for (const event of EVENTS) {
+      const e = events[event];
+      if (!e) continue;
+      const set: PlayableSet = { ref: e.ref, main: [], durations: {}, baseDb: e.baseDb, rate: e.rate, origin: e.origin };
+      for (const [name, d] of this.register(event, tag || "m", e.main.map((c) => c.buffer))) {
+        set.main.push(name);
+        set.durations[name] = d;
+      }
+      if (e.alt) {
+        set.alt = [];
+        set.altMin = e.altMin;
+        for (const [name, d] of this.register(event, tag + "a", e.alt.map((c) => c.buffer))) {
+          set.alt.push(name);
+          set.durations[name] = d;
+        }
+      }
+      sets[event] = set;
+      roles.push(event);
+    }
+    return { sets, mix: mixSets, source, roles };
+  }
   private async prepare() {
     try {
       const r = await resolveToy(this.audio.ctx, this.spec);
-      this.source = r.source;
-      for (const [event, e] of Object.entries(r.mix ?? {}) as [MixEvent, ResolvedEvent][]) {
-        const set: PlayableSet = { ref: null, main: [], durations: {}, baseDb: e.baseDb, rate: e.rate, origin: e.origin };
-        for (const [name, d] of this.register(event, "mix", e.main.map((c) => c.buffer))) {
-          set.main.push(name);
-          set.durations[name] = d;
-        }
-        this.mixSets[event] = set;
-      }
-      for (const event of EVENTS) {
-        const e = r.events[event];
-        if (!e) continue;
-        const set: PlayableSet = { ref: e.ref, main: [], durations: {}, baseDb: e.baseDb, rate: e.rate, origin: e.origin };
-        for (const [name, d] of this.register(event, "m", e.main.map((c) => c.buffer))) {
-          set.main.push(name);
-          set.durations[name] = d;
-        }
-        if (e.alt) {
-          set.alt = [];
-          set.altMin = e.altMin;
-          for (const [name, d] of this.register(event, "a", e.alt.map((c) => c.buffer))) {
-            set.alt.push(name);
-            set.durations[name] = d;
-          }
-        }
-        this.sets[event] = set;
-        this.supportedRoles.push(event);
-      }
+      // engine names: the sounds that play by default keep the plain tags (m / a / mix); the dev-only public bank next to an original one gets "pub"
+      if (r.original) {
+        this.banks.original = this.bank(r.original.events, r.original.mix, "", r.original.source);
+        this.banks.public = this.bank(r.events, r.mix, "pub", r.source);
+      } else this.banks.public = this.bank(r.events, r.mix, "", r.source);
+      this.useVariant(r.original ? "original" : "public");
       this.state = "recorded/derived";
     } catch (e) {
       this.state = "failed";
       console.warn(`Fidget audio ${this.spec.id}`, e);
     }
+  }
+  /** dev only: which sound bank answers the gestures ("original" exists only on the dev server with the reference app) */
+  get variants() {
+    return (["original", "public"] as const).filter((v) => this.banks[v]);
+  }
+  useVariant(v: "public" | "original") {
+    const b = this.banks[v];
+    if (!b) return false;
+    this.gate.clear(0.03);
+    this.variant = v;
+    this.sets = b.sets;
+    this.mixSets = b.mix;
+    this.source = b.source;
+    this.supportedRoles = [...b.roles];
+    return true;
   }
   /** is there a sound (own pool or fallback) for this event? */
   has(event: FidgetEvent) {

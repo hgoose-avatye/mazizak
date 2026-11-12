@@ -92,7 +92,8 @@ try {
     if (id === "S03")
       ok(
         "mochi has no generic release or rub role",
-        JSON.stringify(down.audioRoles) === '["hold"]',
+        // touch (tap) + kneading (hold) only — S03 gained its touch sound on 2026-11-12
+        down.audioRoles.includes("hold") && down.audioRoles.every((r) => r === "tap" || r === "hold"),
       );
     if (id === "L01")
       ok(

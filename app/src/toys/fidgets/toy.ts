@@ -795,7 +795,8 @@ if (uMix > 0.0) {
       bubbles[i].position.lerp(tmp, 1 - Math.exp(-dt / 0.12));
     }
     for (const event of model.events.splice(0))
-      if (event === "fold") sound.play("fold", 0.5);
+      // a fold is a discrete gesture: it replaces the stretch sound still ringing (the gate would otherwise refuse it as "sustained-busy")
+      if (event === "fold") sound.play("fold", 0.5, 0, true);
     return active && (moving || held.length > 0);
   };
   return {
@@ -809,6 +810,8 @@ if (uMix > 0.0) {
     action(name) {
       if (name === "fold") model.foldNow();
       if (name === "gather") model.gather();
+      // dev comparison: the same gestures with the reference-app stand-ins or with the public sounds
+      if (name === "sound:original" || name === "sound:public") sound.useVariant(name === "sound:original" ? "original" : "public");
       ctx.requestFrame();
     },
     enter() {
@@ -890,6 +893,8 @@ if (uMix > 0.0) {
         audio: sound.state,
         audioSource: sound.source,
         audioRoles: sound.supportedRoles,
+        soundVariant: sound.variant,
+        soundVariants: sound.variants,
         vertices: geometry.getAttribute("position").count,
         visualStatus: visualSource,
         localReferenceAudio: LOCAL_FIDGETS,

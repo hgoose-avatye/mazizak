@@ -230,8 +230,10 @@ gpool('tpr.hold', 'hold', 'stress balls / squeeze toy', 'sustained squeezing', T
 const FOAM = ['390315', '390314', '594753'];
 gpool('foam.tap', 'tap', 'memory foam / sponge', 'short presses', FOAM, 'S02 tap', { kind: 'singles', n: 5, len: [80, 260] });
 gpool('foam.hold', 'hold', 'memory foam / sponge', 'long slow presses', FOAM, 'S02 hold', { kind: 'windows', n: 5, lenMs: 800, minStrikes: 2 });
-const MOCHI = ['241813', '612769'];
-gpool('mochi.tap', 'tap', 'soft dough', 'short dough presses', MOCHI, 'S03 tap', { kind: 'singles', n: 5, len: [60, 240] });
+// (the first dough sources 241813 / 612769 were rejected by the listener on 2026-11-12; these replace them)
+const MOCHI = ['172489', '323769', '403915', '837964'];
+// a soft press is a short squish, not a click: ~0.34 s windows (dense dough recordings cut single hits at 60 ms)
+gpool('mochi.tap', 'tap', 'soft dough', 'short dough presses (~0.34 s)', MOCHI, 'S03 tap', { kind: 'windows', n: 5, lenMs: 340, minStrikes: 1 });
 gpool('mochi.hold', 'hold', 'soft dough', 'kneading / rolling windows', MOCHI, 'S03 hold', { kind: 'windows', n: 5, lenMs: 640, minStrikes: 3 });
 const SLIME = ['794270', '680447', '655814'];
 gpool('slime.hold', 'hold', 'slime', 'squishing windows', SLIME, 'L01 hold', { kind: 'windows', n: 6, lenMs: 600, minStrikes: 3 });
@@ -240,6 +242,11 @@ gpool('slime.fold', 'fold', 'slime', 'slime slaps / folds', ['794272', '824934']
 const GEL = ['559768', '655814', '824934'];
 gpool('gel.hold', 'hold', 'jelly / gooey gel', 'wet gel squishing windows', GEL, 'L02 hold', { kind: 'windows', n: 6, lenMs: 600, minStrikes: 3 });
 gpool('gel.fold', 'fold', 'jelly / gooey gel', 'short wet gel squelches', GEL, 'L02 fold', { kind: 'singles', n: 6, len: [80, 280] });
+// L02 mango slime: modelled on the reference app's rainbow-sharbet clips (bright continuous fine crackle, ~4.4 kHz,
+// short 0.5–0.86 s / long 1.1–1.4 s) — crunchy-slime and fizzing-foam recordings with the same brightness and continuity
+const MANGO = ['759401', '759402', '707236'];
+gpool('mango.tap', 'tap', 'crunchy slime / fizzing foam', 'short crackly slime presses (~0.7 s)', MANGO, 'L02 tap', { kind: 'windows', n: 6, lenMs: 700, minStrikes: 2 });
+gpool('mango.hold', 'hold', 'crunchy slime / fizzing foam', 'crackly slime kneading passages (~1.2 s)', MANGO, 'L02 hold', { kind: 'windows', n: 6, lenMs: 1200, minStrikes: 3 });
 const CREAM = ['578460', '578463', '197761', '849247'];
 gpool('cream.hold', 'hold', 'shaving foam / cream', 'foam squashing windows', CREAM, 'L03 hold', { kind: 'windows', n: 5, lenMs: 600, minStrikes: 2 });
 gpool('cream.fold', 'fold', 'shaving foam / cream', 'foam folding windows', CREAM, 'L03 fold', { kind: 'windows', n: 5, lenMs: 480, minStrikes: 2 });
@@ -316,7 +323,7 @@ function build(file, allNames, srcList) {
 const usedFs = Object.values(ANALYSED).map((a) => a.src);
 build('wax', ['apple.init', 'apple.crack', 'apple.burst', 'apple.knead', 'choco.init', 'choco.crack', 'choco.burst', 'choco.knead'], [...WAX_SOURCES, ...usedFs]);
 build('crunch', ['soap.crunch', 'soap.hold', 'beads.crunch', 'beads.hold'], usedFs);
-build('squish', ['tpr.tap', 'tpr.hold', 'foam.tap', 'foam.hold', 'mochi.tap', 'mochi.hold', 'slime.hold', 'slime.stretch', 'slime.fold', 'gel.hold', 'gel.fold', 'cream.hold', 'cream.fold'], usedFs);
+build('squish', ['tpr.tap', 'tpr.hold', 'foam.tap', 'foam.hold', 'mochi.tap', 'mochi.hold', 'slime.hold', 'slime.stretch', 'slime.fold', 'gel.hold', 'gel.fold', 'mango.tap', 'mango.hold', 'cream.hold', 'cream.fold'], usedFs);
 
 // ───────── credits (generated, so they cannot drift from the sprite metadata) ─────────
 {

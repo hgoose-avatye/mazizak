@@ -44,7 +44,7 @@ All marked Creative Commons 0 (https://creativecommons.org/publicdomain/zero/1.0
 
 ## Squish (S01–S03 말랑이, L01–L03 슬랑이) — Freesound CC0 1.0
 
-Replaces the earlier shared gel sprite. S01 stress balls / squeeze toy, S02 memory foam / sponge, S03 dough, L01 slime, L02 jelly / goo, L03 shaving foam. Counts: 35 clips from 7 files.
+Replaces the earlier shared gel sprite. S01 stress balls / squeeze toy, S02 memory foam / sponge, S03 dough, L01 slime, L02 jelly / goo, L03 shaving foam. Counts: 57 clips from 11 files.
 
 | id | title | author | url | licence | retrieved | used for | material |
 |---|---|---|---|---|---|---|---|
@@ -52,8 +52,12 @@ Replaces the earlier shared gel sprite. S01 stress balls / squeeze toy, S02 memo
 | freesound:197761 | shaving cream.wav | Yuval | https://freesound.org/people/Yuval/sounds/197761/ | CC0 1.0 | 2026-11-12 | L03 hold | similar material only (not a recording of the toy) |
 | freesound:390314 | 082816 ASMR.mp3 | pflanigan | https://freesound.org/people/pflanigan/sounds/390314/ | CC0 1.0 | 2026-11-12 | S02 tap | similar material only (not a recording of the toy) |
 | freesound:390315 | 082816 the foam remembers.mp3 | pflanigan | https://freesound.org/people/pflanigan/sounds/390315/ | CC0 1.0 | 2026-11-12 | S02 tap | similar material only (not a recording of the toy) |
+| freesound:403915 | Squishing Sound.WAV | Radio-Brain | https://freesound.org/people/Radio-Brain/sounds/403915/ | CC0 1.0 | 2026-11-12 | S03 tap | similar material only (not a recording of the toy) |
 | freesound:594753 | Pressing down on sponge | emilyneiswonger | https://freesound.org/people/emilyneiswonger/sounds/594753/ | CC0 1.0 | 2026-11-12 | S02 tap | similar material only (not a recording of the toy) |
+| freesound:759401 | Crunchy slimy noise | Valerie-Vivegnis | https://freesound.org/people/Valerie-Vivegnis/sounds/759401/ | CC0 1.0 | 2026-11-12 | L02 tap | similar material only (not a recording of the toy) |
+| freesound:759402 | Crunchy slimy sounds | Valerie-Vivegnis | https://freesound.org/people/Valerie-Vivegnis/sounds/759402/ | CC0 1.0 | 2026-11-12 | L02 tap | similar material only (not a recording of the toy) |
 | freesound:794270 | Slime stretching and squeezing | greenlinker | https://freesound.org/people/greenlinker/sounds/794270/ | CC0 1.0 | 2026-11-12 | L01 hold | similar material only (not a recording of the toy) |
+| freesound:837964 | Wet Sourdough Starter Kneading | marlonnnnnn | https://freesound.org/people/marlonnnnnn/sounds/837964/ | CC0 1.0 | 2026-11-12 | S03 tap | similar material only (not a recording of the toy) |
 | freesound:849247 | Shaving cream oozing out of the tin | _javier_rodas | https://freesound.org/people/_javier_rodas/sounds/849247/ | CC0 1.0 | 2026-11-12 | L03 hold | similar material only (not a recording of the toy) |
 
 ## Counting

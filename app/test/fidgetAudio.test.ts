@@ -364,8 +364,8 @@ describe("FidgetAudio event routing", () => {
   });
 
   it("each squish toy has only the pools that survived the listener verdict and the gates", async () => {
-    // S03 and L02 hold/fold have no sound: every candidate was rejected by the listener verdict or the quality gates
-    const expected: Record<string, string[]> = { S01: ["tap", "hold"], S02: ["hold"], S03: [], L01: ["hold", "stretch"], L02: ["stretch"], L03: ["hold", "fold"] };
+    // S03 (new CC0 dough recordings) and L02 (CC0 crunchy slime) answer touch and kneading in the public build; their fold falls back to hold
+    const expected: Record<string, string[]> = { S01: ["tap", "hold"], S02: ["hold"], S03: ["tap", "hold"], L01: ["hold", "stretch"], L02: ["tap", "hold", "stretch"], L03: ["hold", "fold"] };
     for (const [id, roles] of Object.entries(expected)) {
       const t = await make(id);
       expect(t.a.state, id).toBe("recorded/derived");
@@ -375,8 +375,13 @@ describe("FidgetAudio event routing", () => {
     expect(l03.a.has("stretch")).toBe(true); // → hold
     expect(l03.a.hasOwn("stretch")).toBe(false);
     const s03 = await make("S03");
-    expect(s03.a.has("hold")).toBe(false);
-    s03.at(0); expect(s03.a.play("hold", 1)).toBe(false); // silent, not a wrong sound
+    s03.at(0); expect(s03.a.play("tap", 1)).toBe(true);
+    s03.at(2000); expect(s03.a.play("hold", 1)).toBe(true);
+    const l02 = await make("L02");
+    l02.at(0); expect(l02.a.play("tap", 1)).toBe(true);
+    l02.at(2000); expect(l02.a.play("hold", 1)).toBe(true);
+    expect(l02.a.has("fold")).toBe(true); // → hold
+    expect(l02.a.hasOwn("fold")).toBe(false);
   });
 
   it("W02: first crack is the init sound, then crack, strong breaking the burst pool", async () => {

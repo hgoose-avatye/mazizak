@@ -842,6 +842,139 @@
    "license": "CC0 1.0",
    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
    "retrieved": "2026-11-12"
+  },
+  "freesound:759401": {
+   "title": "Crunchy slimy noise",
+   "author": "Valerie-Vivegnis",
+   "page": "https://freesound.org/people/Valerie-Vivegnis/sounds/759401/",
+   "preview": "https://cdn.freesound.org/previews/759/759401_15375955-hq.mp3",
+   "sha256": "e57605b0adb40518d28c1150416adffe7f3b97d8924d412725d9fe84328eb07e",
+   "tags": [
+    "crunch",
+    "crunchy",
+    "disgusting",
+    "gross",
+    "mud",
+    "slimy",
+    "worms"
+   ],
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "retrieved": "2026-11-12"
+  },
+  "freesound:759402": {
+   "title": "Crunchy slimy sounds",
+   "author": "Valerie-Vivegnis",
+   "page": "https://freesound.org/people/Valerie-Vivegnis/sounds/759402/",
+   "preview": "https://cdn.freesound.org/previews/759/759402_15375955-hq.mp3",
+   "sha256": "48e7e505a36d72f67d5d43f5ce0180b9d3bdab7a363edfe9294a59e47588b8ce",
+   "tags": [
+    "crunch",
+    "crunchy",
+    "disgusting",
+    "gross",
+    "mud",
+    "slimy",
+    "worms"
+   ],
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "retrieved": "2026-11-12"
+  },
+  "freesound:707236": {
+   "title": "stereo noise from detergent foam sparkling.flac",
+   "author": "arseniiv",
+   "page": "https://freesound.org/people/arseniiv/sounds/707236/",
+   "preview": "https://cdn.freesound.org/previews/707/707236_1951924-hq.mp3",
+   "sha256": "162366ae364f2318b4b3cf626cf1a8d79b921128072b4c925f98a62a3ba07e57",
+   "tags": [
+    "bubbles-bursting",
+    "crackling",
+    "fizzy",
+    "foaming",
+    "lo-fi",
+    "noise",
+    "stereo"
+   ],
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "retrieved": "2026-11-12"
+  },
+  "freesound:172489": {
+   "title": "Punching Dough.flac",
+   "author": "qubodup",
+   "page": "https://freesound.org/people/qubodup/sounds/172489/",
+   "preview": "https://cdn.freesound.org/previews/172/172489_71257-hq.mp3",
+   "sha256": "dfdba341d52ff357937461fd3b1bbd4a94f53eafb8759d1b316e31c8b6aec776",
+   "tags": [
+    "attack",
+    "combat",
+    "fight",
+    "fighter",
+    "fighting",
+    "hand-to-hand",
+    "meat",
+    "mele",
+    "punch"
+   ],
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "retrieved": "2026-11-12"
+  },
+  "freesound:323769": {
+   "title": "Kneading Bread.wav",
+   "author": "PrincessGrace",
+   "page": "https://freesound.org/people/PrincessGrace/sounds/323769/",
+   "preview": "https://cdn.freesound.org/previews/323/323769_5485367-hq.mp3",
+   "sha256": "7720ae6adf941604b88277479f5557c28e923d7e090163f69ddd8fc37efe21c0",
+   "tags": [
+    "Foley",
+    "bread",
+    "bread-kneading",
+    "kneading"
+   ],
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "retrieved": "2026-11-12"
+  },
+  "freesound:403915": {
+   "title": "Squishing Sound.WAV",
+   "author": "Radio-Brain",
+   "page": "https://freesound.org/people/Radio-Brain/sounds/403915/",
+   "preview": "https://cdn.freesound.org/previews/403/403915_7678439-hq.mp3",
+   "sha256": "a85ce50e85ec1e1a973845955b19620267998bfd57a12b7b0a7628a028ded738",
+   "tags": [
+    "gross",
+    "mush",
+    "squelch",
+    "squish"
+   ],
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "retrieved": "2026-11-12"
+  },
+  "freesound:837964": {
+   "title": "Wet Sourdough Starter Kneading",
+   "author": "marlonnnnnn",
+   "page": "https://freesound.org/people/marlonnnnnn/sounds/837964/",
+   "preview": "https://cdn.freesound.org/previews/837/837964_195590-hq.mp3",
+   "sha256": "b9c8af66250276e7b0fbd7d40a2fdefd91ee0e0955ae8decfbd6203a9db6ff0a",
+   "tags": [
+    "flesh",
+    "goop",
+    "goopy",
+    "gore",
+    "gross",
+    "slime",
+    "sloppy",
+    "slosh",
+    "squish",
+    "water",
+    "wet"
+   ],
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "retrieved": "2026-11-12"
   }
  }
 }
