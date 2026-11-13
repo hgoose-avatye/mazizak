@@ -10,6 +10,7 @@ the repository (large); it lives in $MANZIZAK_PICKS_SOURCES (default ~/Music/MAN
 Processing per clip (objective; only the owner listened, to the unprocessed candidates):
   cut at the listed start/length · rainbow beads only: spectral hiss reduction (noise profile = quietest 10 % of the source video)
   · lead-in trimmed to 3 ms before the first frame within 20 dB of the peak · 0.5 ms fade-in, 15 ms fade-out
+  (120 ms raised-cosine for a clip still ringing at its end)
   · peak-normalised to −1 dBFS · `gain` (≤ 1) matches loudness within a pool.
 Usage: python3 scripts/fidgets/build-picks.py   (needs numpy)
 """
@@ -97,8 +98,16 @@ def shape(y):
     a = max(0, int(np.argmax(env > env.max() * 0.1)) - int(0.003 * SR))
     y = y[a:].copy()
     fi, fo = int(0.0005 * SR), int(0.015 * SR)
+    # a clip cut while it still rings (the 45 ms before the end within 30 dB of the peak) gets a 120 ms raised-cosine
+    # fade-out instead of the short one, so it decays instead of stopping dead; the others keep the 15 ms fade
+    tail = y[-int(0.045 * SR):]
+    if 20 * np.log10(np.sqrt((tail ** 2).mean()) / np.abs(y).max() + 1e-12) > -30:
+        fo = int(0.12 * SR)
+        y[-fo:] *= 0.5 + 0.5 * np.cos(np.linspace(0, np.pi, fo))
+        fo = 0
     y[:fi] *= np.linspace(0, 1, fi)
-    y[-fo:] *= np.linspace(1, 0, fo)
+    if fo:
+        y[-fo:] *= np.linspace(1, 0, fo)
     return y / np.abs(y).max() * 10 ** (-1 / 20), a / SR
 
 

@@ -110,7 +110,7 @@
      "src": "youtube:kKYelJAi3xE",
      "srcStart": 347.3364,
      "srcEnd": 347.92,
-     "centroidHz": 4523,
+     "centroidHz": 4641,
      "boostDb": 0
     }
    ]
@@ -188,7 +188,7 @@
      "src": "youtube:DT-BjNH0iAo",
      "srcStart": 14.3789,
      "srcEnd": 14.973,
-     "centroidHz": 5846,
+     "centroidHz": 5857,
      "boostDb": 0
     },
     {
@@ -222,7 +222,7 @@
      "src": "youtube:DT-BjNH0iAo",
      "srcStart": 14.3789,
      "srcEnd": 14.973,
-     "centroidHz": 5846,
+     "centroidHz": 5857,
      "boostDb": 0
     },
     {
@@ -476,7 +476,7 @@
      "src": "youtube:wK-jHC_7P6I",
      "srcStart": 37.04,
      "srcEnd": 37.49,
-     "centroidHz": 7896,
+     "centroidHz": 7715,
      "boostDb": 0
     },
     {
@@ -524,7 +524,7 @@
      "src": "youtube:wK-jHC_7P6I",
      "srcStart": 75.14,
      "srcEnd": 75.59,
-     "centroidHz": 6755,
+     "centroidHz": 6628,
      "boostDb": 0
     },
     {
@@ -536,7 +536,7 @@
      "src": "youtube:wK-jHC_7P6I",
      "srcStart": 84.3155,
      "srcEnd": 84.75,
-     "centroidHz": 6574,
+     "centroidHz": 6191,
      "boostDb": 0
     }
    ]
@@ -554,11 +554,11 @@
      "length": 44100,
      "offset": 17.386757,
      "duration": 1.0,
-     "gain": 0.9003,
+     "gain": 0.8726,
      "src": "youtube:wK-jHC_7P6I",
      "srcStart": 17.56,
      "srcEnd": 18.56,
-     "centroidHz": 6919,
+     "centroidHz": 6931,
      "boostDb": 0
     },
     {
@@ -566,7 +566,7 @@
      "length": 44080,
      "offset": 18.416757,
      "duration": 0.999546,
-     "gain": 0.6979,
+     "gain": 0.6629,
      "src": "youtube:wK-jHC_7P6I",
      "srcStart": 30.8205,
      "srcEnd": 31.82,
@@ -578,11 +578,11 @@
      "length": 44100,
      "offset": 19.446304,
      "duration": 1.0,
-     "gain": 0.7947,
+     "gain": 0.775,
      "src": "youtube:wK-jHC_7P6I",
      "srcStart": 37.04,
      "srcEnd": 38.04,
-     "centroidHz": 7140,
+     "centroidHz": 7070,
      "boostDb": 0
     },
     {
@@ -590,7 +590,7 @@
      "length": 44100,
      "offset": 20.476304,
      "duration": 1.0,
-     "gain": 1.0,
+     "gain": 0.9499,
      "src": "youtube:wK-jHC_7P6I",
      "srcStart": 47.64,
      "srcEnd": 48.64,
@@ -602,11 +602,11 @@
      "length": 44100,
      "offset": 21.506304,
      "duration": 1.0,
-     "gain": 0.9816,
+     "gain": 1.0,
      "src": "youtube:wK-jHC_7P6I",
      "srcStart": 58.28,
      "srcEnd": 59.28,
-     "centroidHz": 6273,
+     "centroidHz": 6261,
      "boostDb": 0
     },
     {
@@ -614,7 +614,7 @@
      "length": 43906,
      "offset": 22.536304,
      "duration": 0.995601,
-     "gain": 0.7554,
+     "gain": 0.7175,
      "src": "youtube:wK-jHC_7P6I",
      "srcStart": 69.8044,
      "srcEnd": 70.8,
@@ -626,7 +626,7 @@
      "length": 44100,
      "offset": 23.561905,
      "duration": 1.0,
-     "gain": 0.5935,
+     "gain": 0.5638,
      "src": "youtube:wK-jHC_7P6I",
      "srcStart": 75.14,
      "srcEnd": 76.14,
@@ -638,7 +638,7 @@
      "length": 43417,
      "offset": 24.591905,
      "duration": 0.984512,
-     "gain": 0.8021,
+     "gain": 0.7619,
      "src": "youtube:wK-jHC_7P6I",
      "srcStart": 84.3155,
      "srcEnd": 85.3,
@@ -660,11 +660,11 @@
      "length": 15434,
      "offset": 25.606417,
      "duration": 0.349977,
-     "gain": 0.4419,
+     "gain": 0.5195,
      "src": "freesound:414538",
      "srcStart": 0.011,
      "srcEnd": 0.361,
-     "centroidHz": 4176,
+     "centroidHz": 4380,
      "boostDb": 0
     },
     {
@@ -672,11 +672,11 @@
      "length": 15434,
      "offset": 25.986395,
      "duration": 0.349977,
-     "gain": 0.5796,
+     "gain": 0.5386,
      "src": "freesound:414538",
      "srcStart": 0.367,
      "srcEnd": 0.717,
-     "centroidHz": 4367,
+     "centroidHz": 3954,
      "boostDb": 0
     },
     {
@@ -688,7 +688,7 @@
      "src": "freesound:414538",
      "srcStart": 0.717,
      "srcEnd": 1.067,
-     "centroidHz": 3953,
+     "centroidHz": 3886,
      "boostDb": 0
     },
     {
@@ -696,11 +696,11 @@
      "length": 15434,
      "offset": 26.746349,
      "duration": 0.349977,
-     "gain": 0.5786,
+     "gain": 0.6235,
      "src": "freesound:414538",
      "srcStart": 1.11,
      "srcEnd": 1.46,
-     "centroidHz": 3797,
+     "centroidHz": 3832,
      "boostDb": 0
     },
     {
@@ -712,7 +712,7 @@
      "src": "freesound:414538",
      "srcStart": 1.499,
      "srcEnd": 1.849,
-     "centroidHz": 4178,
+     "centroidHz": 4289,
      "boostDb": 0
     },
     {
@@ -742,11 +742,11 @@
      "length": 30869,
      "offset": 27.886281,
      "duration": 0.699977,
-     "gain": 0.5801,
+     "gain": 0.5608,
      "src": "freesound:414538",
      "srcStart": 0.011,
      "srcEnd": 0.711,
-     "centroidHz": 4325,
+     "centroidHz": 4002,
      "boostDb": 0
     },
     {
@@ -758,7 +758,7 @@
      "src": "freesound:414538",
      "srcStart": 0.367,
      "srcEnd": 1.067,
-     "centroidHz": 4219,
+     "centroidHz": 4204,
      "boostDb": 0
     },
     {
@@ -766,11 +766,11 @@
      "length": 30869,
      "offset": 29.346236,
      "duration": 0.699977,
-     "gain": 0.5892,
+     "gain": 0.592,
      "src": "freesound:414538",
      "srcStart": 0.717,
      "srcEnd": 1.417,
-     "centroidHz": 3891,
+     "centroidHz": 3941,
      "boostDb": 0
     },
     {
@@ -782,7 +782,7 @@
      "src": "freesound:414538",
      "srcStart": 1.11,
      "srcEnd": 1.81,
-     "centroidHz": 4013,
+     "centroidHz": 4024,
      "boostDb": 0
     },
     {

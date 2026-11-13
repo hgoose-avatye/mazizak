@@ -19,6 +19,7 @@ import {
   OWNER_PICKED,
   WAX_STAGES,
   SPRITE_TRIM_DB,
+  SUSTAINED,
   VoiceGate,
   between,
   strengthDb,
@@ -281,6 +282,10 @@ export class FidgetAudio {
   private banks: Partial<Record<"public" | "original", { sets: Partial<Record<FidgetEvent, PlayableSet>>; mix: Partial<Record<MixEvent, PlayableSet>>; stages: Partial<Record<WaxStage, PlayableSet>>; source: string; roles: string[] }>> = {};
   /** wax balls: every piece broken and being kneaded into the core */
   mixed = false;
+  /** wax balls: how far the pieces are kneaded in (0..1, the toy's `mix`) — the mixed sounds take over gradually */
+  mixAmount = 0;
+  /** wax balls: share of the shell already broken (0..1) — kneading the exposed core gets louder as more of it is exposed */
+  breakProgress = 1;
   private gate = new VoiceGate();
   private picker = new ClipPicker(() => this.rng());
   private firstCrackDone = false;
@@ -399,6 +404,8 @@ export class FidgetAudio {
     this.secondDone = false;
     this.nearDoneDone = false;
     this.mixed = false;
+    this.mixAmount = 0;
+    this.breakProgress = 1;
     this.picker.reset();
     this.gate.clear();
   }
@@ -410,22 +417,37 @@ export class FidgetAudio {
     if (ev === "crack" && !this.firstCrackDone && this.sets.init) ev = "init";
     // the crack right after the first break has its own sound when the toy has one (once per reset)
     const second = ev === "crack" && this.firstCrackDone && !this.secondDone ? this.stageSets.second : undefined;
-    // mixed wax ball: its own "completed" sounds when there are any (dev reference); otherwise the knead sounds,
-    // muffled and a little slower — wax crumbs buried in soft clay
-    const mixSet = this.mixed && (ev === "tap" || ev === "hold") ? this.mixSets[ev] : undefined;
+    // mixed wax ball: its own "mixed" sounds when there are any; otherwise the knead sounds, muffled and a little slower —
+    // wax crumbs buried in soft clay. With own mixed sounds the change is gradual: the share of mixed sounds follows how far
+    // the pieces are kneaded in (fully mixed at 70 %), and the knead sounds that still play are muffled step by step.
+    const kneadEv = ev === "tap" || ev === "hold";
+    const mixEv = ev as MixEvent;
+    const mixShare = this.mixed && kneadEv && this.mixSets[mixEv] ? Math.min(1, Math.max(0, this.mixAmount / 0.7)) : 0;
+    const mixSet = mixShare > 0 && (mixShare >= 1 || this.rng() < mixShare) ? this.mixSets[mixEv] : undefined;
+    const blending = mixShare > 0 && mixShare < 1;
     if (!mixSet && !this.sets[ev]) {
       const fb = FALLBACK[ev];
       if (!fb || !this.sets[fb]) return false;
       ev = fb;
     }
-    const muffle = this.mixed && !mixSet && (ev === "hold" || ev === "tap");
+    const muffle = this.mixed && !mixSet && !blending && (ev === "hold" || ev === "tap");
     if (muffle) extra = { rate: (extra.rate ?? 1) * 0.93, lowpassHz: Math.min(extra.lowpassHz ?? 1600, 1600) };
+    // blending: the knead sound gets darker as it is buried (6 kHz → 1.8 kHz); each side is a little quieter while the other one
+    // dominates (≤ 3 dB), so neither jumps in at full level
+    let blendDb = 0;
+    if (blending && !mixSet) {
+      extra = { ...extra, lowpassHz: Math.min(extra.lowpassHz ?? 20000, 6000 - 4200 * mixShare) };
+      blendDb = 3 * Math.log10(Math.max(0.05, 1 - mixShare));
+    } else if (blending && mixSet) blendDb = 3 * Math.log10(Math.max(0.05, mixShare));
+    // kneading the core while the shell is still mostly whole: quieter (≤ −6 dB), full level once it is all broken
+    const exposeDb = this.spec.family === "wax" && !mixSet && kneadEv ? -6 * (1 - Math.min(1, Math.max(0, this.breakProgress))) : 0;
     const set = second ?? mixSet ?? this.sets[ev]!,
       now = this.now(),
       // the one-off break stages (first break, the click after it) must always sound: they replace older short voices
       d = this.gate.decide(ev, now, interrupt || ev === "init" || !!second);
     if (!d.ok) return false;
-    for (const v of d.evict ?? []) v.stop?.(0.03);
+    // a kneading sound cut by a new touch fades over 90 ms on the wax balls (30 ms elsewhere): a 30 ms cut of a soft, long knead was audible
+    for (const v of d.evict ?? []) v.stop?.(this.spec.family === "wax" && SUSTAINED.has(v.event) ? 0.09 : 0.03);
     const useAlt = !!set.alt && strength >= (set.altMin ?? 1);
     const names = useAlt ? set.alt! : set.main;
     const name = names[this.picker.pick(`${ev}:${second ? "second" : mixSet ? "mix" : useAlt ? "a" : "m"}`, names.length)];
@@ -436,7 +458,7 @@ export class FidgetAudio {
         rate,
         detuneCents: 0,
         gainJitterDb: 0.4,
-        gainDb: set.baseDb + strengthDb(strength) + d.attenuationDb + (muffle ? -2 : 0),
+        gainDb: set.baseDb + strengthDb(strength) + d.attenuationDb + (muffle ? -2 : 0) + blendDb + exposeDb,
         ...(extra.lowpassHz ? { lowpassHz: extra.lowpassHz } : {}),
         ...(delaySec > 0 ? { delaySec } : {}),
       },

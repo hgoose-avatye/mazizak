@@ -624,6 +624,8 @@ if (uMix > 0.0) {
       }
       mixU.value = mix;
       sound.mixed = allBroken && mix > 0;
+      sound.mixAmount = mix;
+      sound.breakProgress = fracture.brokenCount / centers.length;
       if (held.length && mix > 0 && mix < 1) moving = true;
     }
     if (

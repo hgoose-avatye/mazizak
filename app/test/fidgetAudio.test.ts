@@ -340,6 +340,7 @@ describe("FidgetAudio event routing", () => {
     expect(plays[2].name).toMatch(/^fg:W01:init:nearDone:/);
     at(900); expect(a.playNearDone()).toBe(false); // once per reset
     a.mixed = true;
+    a.mixAmount = 1;
     at(1000); expect(a.play("hold", 0.5)).toBe(true);
     at(2000); expect(a.play("tap", 0.5)).toBe(true);
     expect(plays[3].name).toMatch(/^fg:W01:hold:mix:/);
@@ -392,6 +393,25 @@ describe("FidgetAudio event routing", () => {
     l02.at(2000); expect(l02.a.play("hold", 1)).toBe(true);
     expect(l02.a.has("fold")).toBe(true); // → hold
     expect(l02.a.hasOwn("fold")).toBe(false);
+  });
+
+  it("W01: the mixed sounds take over gradually with the kneading progress; buried knead sounds get darker", async () => {
+    const { a, plays, at } = await make("W01");
+    a.mixed = true;
+    const share = async (amount: number) => {
+      a.mixAmount = amount;
+      const from = plays.length;
+      let t = amount * 1e6;
+      for (let i = 0; i < 60; i++) { t += 400; at(t); a.play("hold", 0.5); }
+      const ps = plays.slice(from);
+      return { mix: ps.filter((p) => /:hold:mix:/.test(p.name)).length / ps.length, knead: ps.filter((p) => /:hold:m:/.test(p.name)) };
+    };
+    const early = await share(0.1), mid = await share(0.35), done = await share(0.8);
+    expect(early.mix).toBeLessThan(0.35);
+    expect(mid.mix).toBeGreaterThan(0.3);
+    expect(mid.mix).toBeLessThan(0.75);
+    expect(done.mix).toBe(1);
+    for (const p of mid.knead) expect(p.opts.lowpassHz).toBeLessThan(6000);
   });
 
   it("W02 (owner picks): first break, then the picked second click once, then breaking cracks; crumbs on shard friction", async () => {
