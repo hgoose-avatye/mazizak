@@ -25,7 +25,7 @@ const probe = () => p.evaluate(() => ({ ...window.__probe, starts: window.__prob
 const before = await probe();
 // C3: switch to clack, count shader compiles/links/texture uploads across the next frames
 const t0 = await p.evaluate(() => performance.now());
-await p.getByRole('radio', { name: /까랑까랑/ }).click();
+await p.getByRole('radio', { name: /얼음/ }).click();
 await p.waitForTimeout(300);
 const afterSwitch = await probe();
 // C2: press physical keys right after the switch (inside the delayed-load window)
@@ -39,7 +39,7 @@ const afterLoaded = await probe();
 // switch back to pebble, then clack again (should be cheap after first time / after fix)
 await p.getByRole('radio', { name: /조약돌/ }).click(); await p.waitForTimeout(300);
 const s1 = await probe();
-await p.getByRole('radio', { name: /까랑까랑/ }).click(); await p.waitForTimeout(300);
+await p.getByRole('radio', { name: /얼음/ }).click(); await p.waitForTimeout(300);
 const s2 = await probe();
 const d = (a, b) => ({ link: b.link - a.link, compile: b.compile - a.compile, tex: b.tex - a.tex });
 console.log(JSON.stringify({

@@ -42,7 +42,7 @@ function setSide(v: 'A' | 'B') {
   side = v;
   $('#vA').setAttribute('aria-pressed', String(v === 'A'));
   $('#vB').setAttribute('aria-pressed', String(v === 'B'));
-  status.textContent = v === 'A' ? 'A: 이전 Peach V3' : 'B: 히스 정리본';
+  status.textContent = v === 'A' ? 'A: 이전 복숭아(Peach V3)' : 'B: 히스 정리본';
 }
 $('#vA').onclick = () => setSide('A');
 $('#vB').onclick = () => setSide('B');

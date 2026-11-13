@@ -99,7 +99,7 @@ export type KeyPresetId = 'pebble' | 'clack' | 'hush';
 
 export const KEY_PRESETS: Record<KeyPresetId, { label: string; note: string }> = {
   pebble: { label: '조약돌', note: '묵직한 저음 (임시 합성음)' },
-  clack: { label: '까랑까랑', note: '선명한 고음 (임시 합성음)' },
+  clack: { label: '얼음', note: '선명한 고음 (임시 합성음)' },
   hush: { label: '서각서각', note: '조용한 마찰음 (임시 합성음, 비교용)' },
 };
 

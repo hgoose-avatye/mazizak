@@ -203,7 +203,7 @@ try {
     "keyboard 11 presets (8 + 몽돌·찌개·도자기) and reserved assets preserved",
     (await p.getByRole("radio").count()) === 11,
   );
-  await p.getByRole("radio", { name: "Topre", exact: true }).click();
+  await p.getByRole("radio", { name: "마시멜로", exact: true }).click();
   await p.evaluate(() => document.activeElement?.blur());
   await p.keyboard.press("KeyQ");
   ok("no page errors", errors.length === 0);

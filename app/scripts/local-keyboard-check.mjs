@@ -73,10 +73,10 @@ try {
     const clear = () => p.evaluate(() => (window.__starts = []));
     const starts = () => p.evaluate(() => window.__starts);
     const locals = [
-      ["Turquoise Tealios", "turquoise-tealios"],
-      ["IBM Buckling Spring", "ibm-buckling-spring"],
-      ["BOX Jade", "box-jade"],
-      ["Peach V3", "silent-peach-v3"],
+      ["민트", "turquoise-tealios"],
+      ["타자기", "ibm-buckling-spring"],
+      ["옥구슬", "box-jade"],
+      ["복숭아", "silent-peach-v3"],
     ];
     for (const [label, id] of locals) {
       await p.getByRole("radio", { name: label, exact: true }).click();
@@ -183,9 +183,9 @@ try {
     // Existing four still have original down/up counts.
     for (const [label, count] of [
       ["조약돌", 6],
-      ["까랑까랑", 6],
-      ["크리미", 3],
-      ["Topre", 6],
+      ["얼음", 6],
+      ["크림", 3],
+      ["마시멜로", 6],
     ]) {
       await p.getByRole("radio", { name: label, exact: true }).click();
       await clear();
@@ -196,7 +196,7 @@ try {
       );
     }
     await p
-      .getByRole("radio", { name: "Turquoise Tealios", exact: true })
+      .getByRole("radio", { name: "민트", exact: true })
       .click();
     await p.waitForFunction(
       () =>
@@ -208,7 +208,7 @@ try {
     await p.evaluate(() => document.activeElement?.blur());
     await p.keyboard.down("KeyQ");
     await p
-      .getByRole("radio", { name: "IBM Buckling Spring", exact: true })
+      .getByRole("radio", { name: "타자기", exact: true })
       .click();
     await p.keyboard.up("KeyQ");
     await key("KeyA");
@@ -236,7 +236,7 @@ try {
   await failed.goto(LOCAL_URL + "#/keyboard");
   await failed.waitForTimeout(1200);
   await failed
-    .getByRole("radio", { name: "Turquoise Tealios", exact: true })
+    .getByRole("radio", { name: "민트", exact: true })
     .click();
   await failed.waitForFunction(
     () =>

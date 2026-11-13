@@ -32,9 +32,9 @@ async function session(label, { failCreamy = false, mobile = true } = {}) {
 {
   const s = await session('normal');
   const names = await s.p.getByRole('radio').allTextContents();
-  ok('chips_listed', ['조약돌', '까랑까랑', '크리미'].every((n) => names.some((t) => t.includes(n))), JSON.stringify(names));
-  await s.chip(/크리미/).click(); await s.p.waitForTimeout(1500);
-  ok('chip_checked', (await s.chip(/크리미/).getAttribute('aria-checked')) === 'true');
+  ok('chips_listed', ['조약돌', '얼음', '크림'].every((n) => names.some((t) => t.includes(n))), JSON.stringify(names));
+  await s.chip(/크림/).click(); await s.p.waitForTimeout(1500);
+  ok('chip_checked', (await s.chip(/크림/).getAttribute('aria-checked')) === 'true');
   const a = (await s.starts()).length;
   for (const k of ['KeyQ', 'KeyW', 'KeyE', 'KeyA', 'KeyS', 'KeyD', 'KeyZ', 'KeyX', 'KeyC', 'Space']) await s.key(k);
   const L = (await s.starts()).slice(a);
@@ -46,7 +46,7 @@ async function session(label, { failCreamy = false, mobile = true } = {}) {
   for (const [x, y] of [[105, 300], [195, 300], [287, 300]]) { await s.p.mouse.move(x, y); await s.p.mouse.down(); await s.p.waitForTimeout(50); await s.p.mouse.up(); await s.p.waitForTimeout(50); }
   ok('creamy_pointer_taps', (await s.starts()).length - b2 === 3, `${(await s.starts()).length - b2}`);
   // regression: pebble + clack still play down AND up
-  for (const [re, n] of [[/조약돌/, 'pebble'], [/까랑까랑/, 'clack']]) {
+  for (const [re, n] of [[/조약돌/, 'pebble'], [/얼음/, 'clack']]) {
     await s.chip(re).click(); await s.p.waitForTimeout(1500);
     const c0 = (await s.starts()).length;
     for (const k of ['KeyQ', 'KeyW', 'KeyE', 'Space']) await s.key(k);
@@ -55,12 +55,12 @@ async function session(label, { failCreamy = false, mobile = true } = {}) {
   }
   // 2) fast preset switching while typing: never silent, never errors
   const f0 = (await s.starts()).length; let downs = 0;
-  const order = [/크리미/, /조약돌/, /까랑까랑/, /크리미/, /까랑까랑/, /조약돌/, /크리미/, /조약돌/, /크리미/, /까랑까랑/];
+  const order = [/크림/, /조약돌/, /얼음/, /크림/, /얼음/, /조약돌/, /크림/, /조약돌/, /크림/, /얼음/];
   for (const re of order) { await s.chip(re).click(); await s.key('KeyA'); downs++; }
   const sw = (await s.starts()).length - f0;
   ok('rapid_switch_every_press_audible', sw >= downs, `starts=${sw} presses=${downs}`);
   // 3) continuous typing burst on creamy
-  await s.chip(/크리미/).click(); await s.p.waitForTimeout(300);
+  await s.chip(/크림/).click(); await s.p.waitForTimeout(300);
   const g0 = (await s.starts()).length;
   const ks = ['KeyQ', 'KeyW', 'KeyE', 'KeyA', 'KeyS', 'KeyD', 'KeyZ', 'KeyX', 'KeyC', 'Space'];
   await s.p.evaluate(() => document.activeElement?.blur?.());
@@ -68,7 +68,7 @@ async function session(label, { failCreamy = false, mobile = true } = {}) {
   ok('creamy_burst_60_keys', (await s.starts()).length - g0 === 60, `starts=${(await s.starts()).length - g0}`);
   // 4) reload keeps selection
   await s.p.reload(); await s.p.waitForTimeout(2500);
-  ok('selection_persisted', (await s.chip(/크리미/).getAttribute('aria-checked')) === 'true');
+  ok('selection_persisted', (await s.chip(/크림/).getAttribute('aria-checked')) === 'true');
   ok('no_page_errors(normal)', s.errs.length === 0, JSON.stringify(s.errs));
   await s.ctx.close();
 }
@@ -76,7 +76,7 @@ async function session(label, { failCreamy = false, mobile = true } = {}) {
 // 5) load failure → synthesized fallback (key down AND up), warning logged, no crash
 {
   const s = await session('fail', { failCreamy: true });
-  await s.chip(/크리미/).click(); await s.p.waitForTimeout(1500);
+  await s.chip(/크림/).click(); await s.p.waitForTimeout(1500);
   const a = (await s.starts()).length;
   for (const k of ['KeyQ', 'KeyW', 'Space']) await s.key(k);
   const m = (await s.starts()).length - a;
@@ -91,7 +91,7 @@ async function session(label, { failCreamy = false, mobile = true } = {}) {
   const s = await session('slow', {});
   await s.p.route('**/sfx/keyboard/creamy-thocky*', async (r) => { await new Promise((q) => setTimeout(q, 3000)); r.continue(); });
   await s.p.reload(); await s.p.waitForTimeout(2500); await s.p.mouse.click(195, 120);
-  await s.chip(/크리미/).click();
+  await s.chip(/크림/).click();
   const a = (await s.starts()).length;
   for (const k of ['KeyQ', 'KeyW', 'KeyE']) await s.key(k);
   const during = (await s.starts()).length - a;
@@ -107,7 +107,7 @@ async function session(label, { failCreamy = false, mobile = true } = {}) {
 // 7) desktop viewport smoke
 {
   const s = await session('desktop', { mobile: false });
-  await s.chip(/크리미/).click(); await s.p.waitForTimeout(1500);
+  await s.chip(/크림/).click(); await s.p.waitForTimeout(1500);
   const a = (await s.starts()).length; await s.key('KeyQ');
   ok('desktop_smoke', (await s.starts()).length - a === 1 && s.errs.length === 0, JSON.stringify(s.errs));
   await s.ctx.close();

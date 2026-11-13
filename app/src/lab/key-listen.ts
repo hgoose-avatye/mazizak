@@ -11,8 +11,8 @@ import type { KeyboardSounds } from '../audio/sfx';
  */
 const PRESETS: { id: KeyPresetId; label: string }[] = [
   { id: 'pebble', label: '조약돌' },
-  { id: 'clack', label: '까랑까랑' },
-  { id: 'creamy-thocky', label: '크리미' },
+  { id: 'clack', label: '얼음' },
+  { id: 'creamy-thocky', label: '크림' },
 ];
 const CLIP_NAMES = ['OtherKeys', '2', 'BackSpace', 'Shift', 'Space']; // = order of entries.down in creamy-thocky.json
 const SRC_DIR = './scripts/kbsamples/source/creamy-thocky/';

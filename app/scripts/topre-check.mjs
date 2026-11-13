@@ -47,8 +47,8 @@ async function session({ mobile = false, fail = false, slow = false } = {}) {
 try {
   for (const mobile of [false, true]) {
     const s = await session({ mobile });
-    check(`six chips / mobile=${mobile}`, JSON.stringify(await s.page.getByRole('radio').allTextContents()) === JSON.stringify(['조약돌', '까랑까랑', '크리미', 'Topre', 'Turquoise Tealios', 'IBM Buckling Spring']));
-    await s.choose('Topre'); await s.clear();
+    check(`six chips / mobile=${mobile}`, JSON.stringify(await s.page.getByRole('radio').allTextContents()) === JSON.stringify(['조약돌', '얼음', '크림', '마시멜로', '민트', '타자기']));
+    await s.choose('마시멜로'); await s.clear();
     for (const code of pattern) await s.key(code);
     let l = await s.logs();
     const expected = roles.flatMap((role, i) => [`kb:topre:${role}`, `kb:topre:${i < 5 ? 'up' : role.replace('Down', 'Up')}`]);
@@ -60,18 +60,18 @@ try {
     for (const code of ['Digit1', 'Digit2', 'KeyQ', 'KeyW', 'Enter', 'Backspace']) await s.page.keyboard.up(code);
     check(`independent chord / mobile=${mobile}`, (await s.logs()).starts.length === 12);
     // Hold Topre Enter while switching to creamy; release must remain Topre Enter.
-    await s.clear(); await s.page.keyboard.down('Enter'); await s.choose('크리미'); await s.page.keyboard.up('Enter');
+    await s.clear(); await s.page.keyboard.down('Enter'); await s.choose('크림'); await s.page.keyboard.up('Enter');
     l = await s.logs();
     check(`held release retains preset and role / mobile=${mobile}`, l.plays.at(-1)?.name === 'kb:topre:enterUp');
-    for (const [label, count] of [['조약돌', 8], ['까랑까랑', 8], ['크리미', 4]]) {
+    for (const [label, count] of [['조약돌', 8], ['얼음', 8], ['크림', 4]]) {
       await s.choose(label); await s.clear();
       for (const code of ['KeyQ', 'KeyA', 'KeyZ', 'Space']) await s.key(code);
       check(`${label} regression / mobile=${mobile}`, (await s.logs()).starts.length === count);
     }
     await s.clear();
-    for (let i = 0; i < 16; i++) { await s.choose(['Topre', '조약돌', '까랑까랑', '크리미'][i % 4]); await s.key('KeyA'); }
+    for (let i = 0; i < 16; i++) { await s.choose(['마시멜로', '조약돌', '얼음', '크림'][i % 4]); await s.key('KeyA'); }
     check(`rapid switching / mobile=${mobile}`, (await s.logs()).starts.length === 28);
-    await s.choose('Topre'); await s.clear();
+    await s.choose('마시멜로'); await s.clear();
     for (let i = 0; i < 80; i++) await s.key(pattern[i % pattern.length]);
     check(`80-keystroke burst / mobile=${mobile}`, (await s.logs()).starts.length === 160);
     // Pointer rows Q/A/Z and Space use the same routing.
@@ -87,13 +87,13 @@ try {
       check(`pointer taps ${rects.w}x${rects.h}`, (await s.logs()).starts.length === 6);
     }
     await s.page.reload(); await s.page.waitForTimeout(1800);
-    check(`Topre selection persists / mobile=${mobile}`, await s.chip('Topre').getAttribute('aria-checked') === 'true');
+    check(`마시멜로 selection persists / mobile=${mobile}`, await s.chip('마시멜로').getAttribute('aria-checked') === 'true');
     check(`no page errors / mobile=${mobile}`, s.errors.length === 0);
     await s.context.close();
   }
   for (const opts of [{ fail: true }, { slow: true }]) {
     const s = await session(opts);
-    await s.choose('Topre'); await s.clear();
+    await s.choose('마시멜로'); await s.clear();
     for (const code of ['KeyQ', 'Enter', 'Backspace']) await s.key(code);
     const loading = await s.logs();
     check(`load ${opts.fail ? 'failure fallback' : 'window keeps ready preset'}`, opts.fail ? loading.starts.length === 6 : loading.starts.length >= 3);

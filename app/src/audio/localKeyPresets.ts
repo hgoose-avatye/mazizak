@@ -20,7 +20,7 @@ export const LOCAL_KEY_PRESETS = {
   },
   "box-jade": {
     id: "K08",
-    label: "BOX Jade",
+    label: "옥구슬",
     sensoryExpression: "유리구슬·방울",
     onomatopoeia: "찰칵·챙",
     tags: ["clicky", "sharp", "click-bar"],
@@ -28,7 +28,7 @@ export const LOCAL_KEY_PRESETS = {
   },
   "silent-peach-v3": {
     id: "K09",
-    label: "Peach V3",
+    label: "복숭아",
     sensoryExpression: "솜사탕·모래사장",
     onomatopoeia: "푹·톡",
     tags: ["silent", "soft", "muted"],
@@ -37,7 +37,7 @@ export const LOCAL_KEY_PRESETS = {
   // Recordings taken from YouTube typing videos chosen by the owner. LOCAL DEVELOPMENT ONLY: never shipped (rights unverified).
   "mongdol-pl87w": {
     id: "K11",
-    label: "몽돌 (SPM PL87W)",
+    label: "몽돌",
     sensoryExpression: "바둑알 달그락",
     onomatopoeia: "달그락·톡톡",
     tags: ["pebble", "poppy", "smooth"],
@@ -46,7 +46,7 @@ export const LOCAL_KEY_PRESETS = {
   },
   "jjigae-topre": {
     id: "K12",
-    label: "찌개 (RealForce R2 Topre)",
+    label: "찌개",
     sensoryExpression: "보글보글 찌개",
     onomatopoeia: "보글·퐁퐁",
     tags: ["topre", "lubed", "deep"],
@@ -55,7 +55,7 @@ export const LOCAL_KEY_PRESETS = {
   },
   "dojagi-space65": {
     id: "K13",
-    label: "도자기 (SPACE65)",
+    label: "도자기",
     sensoryExpression: "도자기 두드리는 소리",
     onomatopoeia: "또각·탁",
     tags: ["ceramic", "clean", "clacky"],
