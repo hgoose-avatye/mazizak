@@ -48,7 +48,7 @@ export interface LoadedSprite {
 }
 
 const cache = new WeakMap<BaseAudioContext, Map<string, Promise<LoadedSprite>>>();
-export function loadSprite(ctx: BaseAudioContext, name: "wax" | "crunch" | "squish", base = "./sfx/fidgets/"): Promise<LoadedSprite> {
+export function loadSprite(ctx: BaseAudioContext, name: "wax" | "crunch" | "squish" | "picks", base = "./sfx/fidgets/"): Promise<LoadedSprite> {
   let per = cache.get(ctx);
   if (!per) cache.set(ctx, (per = new Map()));
   const hit = per.get(name);

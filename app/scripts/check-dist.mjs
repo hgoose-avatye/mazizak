@@ -21,14 +21,14 @@ for (const f of files) {
   if ((/(^|\/)thumbs\/[A-Z]\d+\.png$/.test(rel) || /(^|\/)audio\//.test(rel)) && !rel.startsWith('sfx/')) problems.push(`reference asset shipped: ${rel}`);
 }
 // 3) every shipped fidget sprite pool has a source with an allowed licence and a usage note
-for (const k of ['wax', 'crunch', 'squish']) {
+for (const k of ['wax', 'crunch', 'squish', 'picks']) {
   const j = JSON.parse(fs.readFileSync(path.join(dist, `sfx/fidgets/${k}.json`), 'utf8'));
   for (const [n, p] of Object.entries(j.pools)) for (const e of p.entries) {
     const s = j.sources[e.src];
     if (!s) problems.push(`${k}/${n}: clip source ${e.src} unknown`);
-    else if (!['CC0 1.0', 'CC BY 4.0'].includes(s.license) || !s.usage) problems.push(`${k}/${n}: ${e.src} licence/usage missing`);
+    else if (!['CC0 1.0', 'CC BY 4.0', 'CC BY 3.0'].includes(s.license) || !s.usage) problems.push(`${k}/${n}: ${e.src} licence/usage missing`);
   }
 }
-if (!fs.existsSync(path.join(dist, 'sfx/fidgets/CREDITS.md'))) problems.push('sfx/fidgets/CREDITS.md missing');
+for (const f of ['CREDITS.md', 'PICKS-CREDITS.md']) if (!fs.existsSync(path.join(dist, 'sfx/fidgets', f))) problems.push(`sfx/fidgets/${f} missing`);
 if (problems.length) { console.error('dist check FAILED:\n - ' + problems.join('\n - ')); process.exit(1); }
 console.log(`dist check OK: ${files.length} files, no local-reference strings or models, fidget sprites licensed`);

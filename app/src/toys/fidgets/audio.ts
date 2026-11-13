@@ -15,6 +15,8 @@ import {
   EVENTS,
   FALLBACK,
   FIDGET_SOUND,
+  MIX_SOUND,
+  OWNER_PICKED,
   SPRITE_TRIM_DB,
   VoiceGate,
   between,
@@ -46,7 +48,7 @@ function cut(
 /** warm the sprite cache a little after start-up (a toy loads what it needs itself; this only shortens the wait) */
 export const preloadFidgetAudio = async (audio: AudioEngine) => {
   await new Promise((r) => setTimeout(r, 2500));
-  for (const n of ["squish", "wax", "crunch"] as const) await loadSprite(audio.ctx, n);
+  for (const n of ["squish", "wax", "crunch", "picks"] as const) await loadSprite(audio.ctx, n);
 };
 /** Segment at quiet envelope gaps, rather than looping a short impact recording. */
 function gestureCues(ctx: BaseAudioContext, buffer: AudioBuffer) {
@@ -148,9 +150,10 @@ export interface ResolvedToy {
 export async function resolveToy(ctx: BaseAudioContext, spec: FidgetSpec): Promise<ResolvedToy> {
   const map = FIDGET_SOUND[spec.id];
   if (!map) throw Error(`no sound map for ${spec.id}`);
-  const needs = (s: PoolRef["source"]) => EVENTS.some((e) => map[e]?.source === s);
-  const sprites: Partial<Record<"wax" | "crunch" | "squish", LoadedSprite>> = {};
-  for (const k of ["wax", "crunch", "squish"] as const) if (needs(k)) sprites[k] = await loadSprite(ctx, k);
+  const mixMap = MIX_SOUND[spec.id] ?? {};
+  const needs = (s: PoolRef["source"]) => EVENTS.some((e) => map[e]?.source === s) || Object.values(mixMap).some((r) => r?.source === s);
+  const sprites: Partial<Record<PoolRef["source"], LoadedSprite>> = {};
+  for (const k of ["wax", "crunch", "squish", "picks"] as const) if (needs(k)) sprites[k] = await loadSprite(ctx, k);
   const local = LOCAL_AUDIO ? await referenceSounds(ctx, spec.id) : {};
   const hasVideoReference = LOCAL_AUDIO && spec.id === "L01" && !!(await referenceManifest()).toys.L01?.referenceVideo;
   // dev-only local reference override (old role names → events); never present in production builds
@@ -166,15 +169,15 @@ export async function resolveToy(ctx: BaseAudioContext, spec: FidgetSpec): Promi
           : { hold: local.compress ?? local.press, ...(spec.family === "viscous" ? { stretch: local.stretch, fold: local.fold } : {}) };
   const shapeDb = SHAPE_TARGET_DB[spec.shape] ?? -27;
   const events: ResolvedToy["events"] = {};
-  for (const event of EVENTS) {
-    const ref = map[event];
-    const poolsOf = (r: PoolRef, name: string): ResolvedClip[] => {
+  const poolsOf = (r: PoolRef, name: string): ResolvedClip[] => {
       const sprite = sprites[r.source]!;
       const p = sprite.pools[name];
       if (!p) return []; // pool dropped by the clip audit: the event simply has no sound
       const entries = sprite.json.pools[name].entries;
       return p.map((buffer, i) => ({ buffer, label: `${entries[i].src} @${entries[i].srcStart.toFixed(2)}s`, src: entries[i].src, srcStart: entries[i].srcStart, info: `${(entries[i].duration * 1000).toFixed(0)} ms · ${(entries[i] as unknown as { centroidHz: number }).centroidHz} Hz · boost +${(entries[i] as unknown as { boostDb: number }).boostDb} dB` }));
-    };
+  };
+  for (const event of EVENTS) {
+    const ref = map[event];
     const override = LOCAL_AUDIO ? localFor[event] : undefined;
     if (!ref && !override?.length) continue;
     let origin = ref ? `${ref.source}/${ref.pool}[${ref.kind}]` : "";
@@ -234,7 +237,13 @@ export async function resolveToy(ctx: BaseAudioContext, spec: FidgetSpec): Promi
       ? "local reference (incl. user video 7WDcH26JU5Q 20–29s soundtrack cues, rights unverified); local only"
       : `local reference overrides + licensed pools: ${[...kinds].join(", ")}`
     : `licensed pools: ${[...kinds].join(", ")}`;
-  return { events, source, ...(original ? { original } : {}) };
+  // wax balls once mixed: the owner-picked "mixed" sounds replace tap/hold (otherwise the player muffles the knead sounds)
+  const mix: ResolvedToy["mix"] = {};
+  for (const [e, r] of Object.entries(mixMap) as [MixEvent, PoolRef][]) {
+    const main = poolsOf(r, r.pool);
+    if (main.length) mix[e] = { ref: r, main, baseDb: SPRITE_TRIM_DB[e] + (r.trimDb ?? 0), rate: r.rate, origin: `${r.source}/${r.pool}[${r.kind}]` };
+  }
+  return { events, ...(Object.keys(mix).length ? { mix } : {}), source, ...(original ? { original } : {}) };
 }
 
 interface PlayableSet {
@@ -326,7 +335,8 @@ export class FidgetAudio {
         this.banks.original = this.bank(r.original.events, r.original.mix, "", r.original.source);
         this.banks.public = this.bank(r.events, r.mix, "pub", r.source);
       } else this.banks.public = this.bank(r.events, r.mix, "", r.source);
-      this.useVariant(r.original ? "original" : "public");
+      // owner-picked public sounds win over the dev-only reference-app ones (which stay switchable for comparison)
+      this.useVariant(r.original && !OWNER_PICKED.has(this.spec.id) ? "original" : "public");
       this.state = "recorded/derived";
     } catch (e) {
       this.state = "failed";

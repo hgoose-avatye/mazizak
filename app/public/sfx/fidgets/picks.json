@@ -1,0 +1,773 @@
+{
+ "version": 1,
+ "file": "picks.wav",
+ "sampleRate": 44100,
+ "channels": 1,
+ "bitDepth": 16,
+ "totalSamples": 1356327,
+ "built": "2026-11-13",
+ "note": "Clips picked by ear by the owner from candidate cuts (2026-11-13). Peak-normalised to −1 dBFS; `gain` (≤1) matches loudness within a pool; relative loudness between event classes is set by the player.",
+ "counts": {
+  "sourceFiles": 9,
+  "extractedClips": 47,
+  "derivedVariants": 0
+ },
+ "dropped": [],
+ "sources": {
+  "youtube:kKYelJAi3xE": {
+   "title": "ASMR | 말랑이 17개 털었어요 +슬랑이, 왁뿌볼, 크랑이",
+   "author": "까퓰러ASMR Gapular",
+   "url": "https://www.youtube.com/watch?v=kKYelJAi3xE",
+   "license": "CC BY 3.0",
+   "licenseUrl": "https://creativecommons.org/licenses/by/3.0/",
+   "retrieved": "2026-11-13",
+   "usage": "owner-picked fidget clips (see pool notes); cut, faded, normalised",
+   "materialMatch": "real wax ball (왁뿌볼) being broken by hand",
+   "originalFile": "https://www.youtube.com/watch?v=kKYelJAi3xE"
+  },
+  "youtube:OVPG4qZMl0U": {
+   "title": "ULTIMATE Wax Cracking ASMR! Best Crunchy Sounds",
+   "author": "Mochich! by Jolislime",
+   "url": "https://www.youtube.com/watch?v=OVPG4qZMl0U",
+   "license": "CC BY 3.0",
+   "licenseUrl": "https://creativecommons.org/licenses/by/3.0/",
+   "retrieved": "2026-11-13",
+   "usage": "owner-picked fidget clips (see pool notes); cut, faded, normalised",
+   "materialMatch": "real wax-coated squishy, cracked wax skin",
+   "originalFile": "https://www.youtube.com/watch?v=OVPG4qZMl0U"
+  },
+  "youtube:DT-BjNH0iAo": {
+   "title": "Wax Cracking ASMR — What should I crack next?",
+   "author": "Mochich! by Jolislime",
+   "url": "https://www.youtube.com/watch?v=DT-BjNH0iAo",
+   "license": "CC BY 3.0",
+   "licenseUrl": "https://creativecommons.org/licenses/by/3.0/",
+   "retrieved": "2026-11-13",
+   "usage": "owner-picked fidget clips (see pool notes); cut, faded, normalised",
+   "materialMatch": "real wax-coated squishy, cracked wax skin",
+   "originalFile": "https://www.youtube.com/watch?v=DT-BjNH0iAo"
+  },
+  "youtube:416I3CavrD0": {
+   "title": "레전드 두쫀쿠 역대급 16종 버터 왁뿌! 두쫀쿠&딸기모찌 반갈죽부터 모래 왁스 부수기 ASMR",
+   "author": "오마이비키",
+   "url": "https://www.youtube.com/watch?v=416I3CavrD0",
+   "license": "CC BY 3.0",
+   "licenseUrl": "https://creativecommons.org/licenses/by/3.0/",
+   "retrieved": "2026-11-13",
+   "usage": "owner-picked fidget clips (see pool notes); cut, faded, normalised",
+   "materialMatch": "real wax ball (두쫀쿠 왁뿌) being broken",
+   "originalFile": "https://www.youtube.com/watch?v=416I3CavrD0"
+  },
+  "youtube:zosnnXmc_q8": {
+   "title": "[ASMR] 역대급 16종 버터 왁뿌 부수기!",
+   "author": "오마이비키",
+   "url": "https://www.youtube.com/watch?v=zosnnXmc_q8",
+   "license": "CC BY 3.0",
+   "licenseUrl": "https://creativecommons.org/licenses/by/3.0/",
+   "retrieved": "2026-11-13",
+   "usage": "owner-picked fidget clips (see pool notes); cut, faded, normalised",
+   "materialMatch": "real wax balls being broken",
+   "originalFile": "https://www.youtube.com/watch?v=zosnnXmc_q8"
+  },
+  "youtube:bExGHkTQmo4": {
+   "title": "Chocolate ASMR | Breaking, Cutting & Melting Chocolate",
+   "author": "ramit girdhar",
+   "url": "https://www.youtube.com/watch?v=bExGHkTQmo4",
+   "license": "CC BY 3.0",
+   "licenseUrl": "https://creativecommons.org/licenses/by/3.0/",
+   "retrieved": "2026-11-13",
+   "usage": "owner-picked fidget clips (see pool notes); cut, faded, normalised",
+   "materialMatch": "real chocolate — crumbs pressed (similar to chocolate wax crumbs)",
+   "originalFile": "https://www.youtube.com/watch?v=bExGHkTQmo4"
+  },
+  "youtube:-LJJrKD68bs": {
+   "title": "너덜너덜해진 슬랑이 ASMR",
+   "author": "공짝지근",
+   "url": "https://www.youtube.com/watch?v=-LJJrKD68bs",
+   "license": "CC BY 3.0",
+   "licenseUrl": "https://creativecommons.org/licenses/by/3.0/",
+   "retrieved": "2026-11-13",
+   "usage": "owner-picked fidget clips (see pool notes); cut, faded, normalised",
+   "materialMatch": "worn crunchy slime squish — stands in for fully mixed wax",
+   "originalFile": "https://www.youtube.com/watch?v=-LJJrKD68bs"
+  },
+  "youtube:wK-jHC_7P6I": {
+   "title": "복숭아 크런치슬라임 무편집영상 공유",
+   "author": "뿌직 PPUJIG",
+   "url": "https://www.youtube.com/watch?v=wK-jHC_7P6I",
+   "license": "CC BY 3.0",
+   "licenseUrl": "https://creativecommons.org/licenses/by/3.0/",
+   "retrieved": "2026-11-13",
+   "usage": "owner-picked fidget clips (see pool notes); cut, faded, normalised, hiss-reduced",
+   "materialMatch": "crunchy (bead) slime — stands in for the rainbow bead squishy",
+   "originalFile": "https://www.youtube.com/watch?v=wK-jHC_7P6I"
+  },
+  "freesound:414538": {
+   "title": "Crunch Sound 1",
+   "author": "emilyws",
+   "url": "https://freesound.org/people/emilyws/sounds/414538/",
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "retrieved": "2026-11-13",
+   "usage": "owner-picked fidget clips (see pool notes); cut, faded, normalised",
+   "materialMatch": "generic dry crunch — stands in for soap crunch",
+   "originalFile": "https://freesound.org/people/emilyws/sounds/414538/"
+  }
+ },
+ "pools": {
+  "apple.break": {
+   "event": "crack",
+   "loudnessClass": "impact",
+   "material": "owner pick",
+   "note": "W01 first break (owner pick: 처음 부술 때)",
+   "recordings": 3,
+   "variants": 0,
+   "entries": [
+    {
+     "start": 0,
+     "length": 25631,
+     "offset": 0.0,
+     "duration": 0.581202,
+     "gain": 0.9442,
+     "src": "youtube:kKYelJAi3xE",
+     "srcStart": 92.0288,
+     "srcEnd": 92.61,
+     "centroidHz": 4574,
+     "boostDb": 0
+    },
+    {
+     "start": 26954,
+     "length": 25607,
+     "offset": 0.611202,
+     "duration": 0.580658,
+     "gain": 1.0,
+     "src": "youtube:kKYelJAi3xE",
+     "srcStart": 174.8793,
+     "srcEnd": 175.46,
+     "centroidHz": 5627,
+     "boostDb": 0
+    },
+    {
+     "start": 53884,
+     "length": 26341,
+     "offset": 1.221859,
+     "duration": 0.597302,
+     "gain": 0.9091,
+     "src": "youtube:kKYelJAi3xE",
+     "srcStart": 180.5527,
+     "srcEnd": 181.15,
+     "centroidHz": 5449,
+     "boostDb": 0
+    }
+   ]
+  },
+  "apple.after": {
+   "event": "hold",
+   "loudnessClass": "impact",
+   "material": "owner pick",
+   "note": "W01 broken wax being pressed (owner pick: 처음 다 부수고 나서)",
+   "recordings": 8,
+   "variants": 0,
+   "entries": [
+    {
+     "start": 81548,
+     "length": 25517,
+     "offset": 1.849161,
+     "duration": 0.578617,
+     "gain": 1.0,
+     "src": "youtube:OVPG4qZMl0U",
+     "srcStart": 21.8814,
+     "srcEnd": 22.46,
+     "centroidHz": 6871,
+     "boostDb": 0
+    },
+    {
+     "start": 108388,
+     "length": 26398,
+     "offset": 2.457778,
+     "duration": 0.598594,
+     "gain": 0.6526,
+     "src": "youtube:OVPG4qZMl0U",
+     "srcStart": 27.5664,
+     "srcEnd": 28.165,
+     "centroidHz": 6349,
+     "boostDb": 0
+    },
+    {
+     "start": 136109,
+     "length": 26460,
+     "offset": 3.086372,
+     "duration": 0.6,
+     "gain": 0.9,
+     "src": "youtube:OVPG4qZMl0U",
+     "srcStart": 33.748,
+     "srcEnd": 34.348,
+     "centroidHz": 5507,
+     "boostDb": 0
+    },
+    {
+     "start": 163892,
+     "length": 26298,
+     "offset": 3.716372,
+     "duration": 0.596327,
+     "gain": 0.6527,
+     "src": "youtube:OVPG4qZMl0U",
+     "srcStart": 38.6277,
+     "srcEnd": 39.224,
+     "centroidHz": 6213,
+     "boostDb": 0
+    },
+    {
+     "start": 191513,
+     "length": 26455,
+     "offset": 4.342698,
+     "duration": 0.599887,
+     "gain": 0.7184,
+     "src": "youtube:OVPG4qZMl0U",
+     "srcStart": 42.7021,
+     "srcEnd": 43.302,
+     "centroidHz": 6893,
+     "boostDb": 0
+    },
+    {
+     "start": 219291,
+     "length": 26020,
+     "offset": 4.972585,
+     "duration": 0.590023,
+     "gain": 0.5287,
+     "src": "youtube:DT-BjNH0iAo",
+     "srcStart": 7.301,
+     "srcEnd": 7.891,
+     "centroidHz": 5879,
+     "boostDb": 0
+    },
+    {
+     "start": 246634,
+     "length": 26198,
+     "offset": 5.592608,
+     "duration": 0.594059,
+     "gain": 0.7136,
+     "src": "youtube:DT-BjNH0iAo",
+     "srcStart": 14.3789,
+     "srcEnd": 14.973,
+     "centroidHz": 5846,
+     "boostDb": 0
+    },
+    {
+     "start": 274155,
+     "length": 26394,
+     "offset": 6.216667,
+     "duration": 0.598503,
+     "gain": 0.5139,
+     "src": "youtube:DT-BjNH0iAo",
+     "srcStart": 23.0175,
+     "srcEnd": 23.616,
+     "centroidHz": 6355,
+     "boostDb": 0
+    }
+   ]
+  },
+  "choco.break": {
+   "event": "crack",
+   "loudnessClass": "impact",
+   "material": "owner pick",
+   "note": "W02 first break (owner pick: 처음 부술 때)",
+   "recordings": 4,
+   "variants": 0,
+   "entries": [
+    {
+     "start": 301872,
+     "length": 25524,
+     "offset": 6.84517,
+     "duration": 0.578776,
+     "gain": 0.6894,
+     "src": "youtube:416I3CavrD0",
+     "srcStart": 12.1612,
+     "srcEnd": 12.74,
+     "centroidHz": 7311,
+     "boostDb": 0
+    },
+    {
+     "start": 328719,
+     "length": 25473,
+     "offset": 7.453946,
+     "duration": 0.577619,
+     "gain": 1.0,
+     "src": "youtube:zosnnXmc_q8",
+     "srcStart": 1745.5824,
+     "srcEnd": 1746.16,
+     "centroidHz": 6693,
+     "boostDb": 0
+    },
+    {
+     "start": 355515,
+     "length": 26460,
+     "offset": 8.061565,
+     "duration": 0.6,
+     "gain": 0.8855,
+     "src": "youtube:zosnnXmc_q8",
+     "srcStart": 1821.09,
+     "srcEnd": 1821.69,
+     "centroidHz": 7711,
+     "boostDb": 0
+    },
+    {
+     "start": 383298,
+     "length": 26460,
+     "offset": 8.691565,
+     "duration": 0.6,
+     "gain": 0.6663,
+     "src": "youtube:zosnnXmc_q8",
+     "srcStart": 1951.17,
+     "srcEnd": 1951.77,
+     "centroidHz": 6684,
+     "boostDb": 0
+    }
+   ]
+  },
+  "choco.crumbs": {
+   "event": "crunch",
+   "loudnessClass": "impact",
+   "material": "owner pick",
+   "note": "W02 crumbs left after the first break, pressed (owner pick)",
+   "recordings": 1,
+   "variants": 0,
+   "entries": [
+    {
+     "start": 411081,
+     "length": 25706,
+     "offset": 9.321565,
+     "duration": 0.582902,
+     "gain": 1.0,
+     "src": "youtube:bExGHkTQmo4",
+     "srcStart": 47.1371,
+     "srcEnd": 47.72,
+     "centroidHz": 4052,
+     "boostDb": 0
+    }
+   ]
+  },
+  "wax.mixed": {
+   "event": "hold",
+   "loudnessClass": "impact",
+   "material": "owner pick",
+   "note": "W01/W02 every piece broken and kneaded in (owner pick: 다 부서지고 다 섞였을 때)",
+   "recordings": 3,
+   "variants": 0,
+   "entries": [
+    {
+     "start": 438110,
+     "length": 30085,
+     "offset": 9.934467,
+     "duration": 0.6822,
+     "gain": 0.8969,
+     "src": "youtube:-LJJrKD68bs",
+     "srcStart": 108.7378,
+     "srcEnd": 109.42,
+     "centroidHz": 3820,
+     "boostDb": 0
+    },
+    {
+     "start": 469518,
+     "length": 29866,
+     "offset": 10.646667,
+     "duration": 0.677234,
+     "gain": 0.8641,
+     "src": "youtube:-LJJrKD68bs",
+     "srcStart": 139.9027,
+     "srcEnd": 140.5799,
+     "centroidHz": 4410,
+     "boostDb": 0
+    },
+    {
+     "start": 500707,
+     "length": 30138,
+     "offset": 11.3539,
+     "duration": 0.683401,
+     "gain": 1.0,
+     "src": "youtube:-LJJrKD68bs",
+     "srcStart": 150.3866,
+     "srcEnd": 151.07,
+     "centroidHz": 4063,
+     "boostDb": 0
+    }
+   ]
+  },
+  "beads.crunch": {
+   "event": "crunch",
+   "loudnessClass": "impact",
+   "material": "owner pick",
+   "note": "C02 rainbow beads crushed (owner pick, hiss reduced; short cut)",
+   "recordings": 8,
+   "variants": 0,
+   "entries": [
+    {
+     "start": 532168,
+     "length": 19845,
+     "offset": 12.067302,
+     "duration": 0.45,
+     "gain": 0.8088,
+     "src": "youtube:wK-jHC_7P6I",
+     "srcStart": 17.56,
+     "srcEnd": 18.01,
+     "centroidHz": 6981,
+     "boostDb": 0
+    },
+    {
+     "start": 553336,
+     "length": 19825,
+     "offset": 12.547302,
+     "duration": 0.449546,
+     "gain": 0.5719,
+     "src": "youtube:wK-jHC_7P6I",
+     "srcStart": 30.8205,
+     "srcEnd": 31.27,
+     "centroidHz": 6303,
+     "boostDb": 0
+    },
+    {
+     "start": 574484,
+     "length": 19845,
+     "offset": 13.026848,
+     "duration": 0.45,
+     "gain": 1.0,
+     "src": "youtube:wK-jHC_7P6I",
+     "srcStart": 37.04,
+     "srcEnd": 37.49,
+     "centroidHz": 7896,
+     "boostDb": 0
+    },
+    {
+     "start": 595652,
+     "length": 19845,
+     "offset": 13.506848,
+     "duration": 0.45,
+     "gain": 0.7178,
+     "src": "youtube:wK-jHC_7P6I",
+     "srcStart": 47.64,
+     "srcEnd": 48.09,
+     "centroidHz": 6194,
+     "boostDb": 0
+    },
+    {
+     "start": 616820,
+     "length": 19845,
+     "offset": 13.986848,
+     "duration": 0.45,
+     "gain": 0.7515,
+     "src": "youtube:wK-jHC_7P6I",
+     "srcStart": 58.28,
+     "srcEnd": 58.73,
+     "centroidHz": 5059,
+     "boostDb": 0
+    },
+    {
+     "start": 637988,
+     "length": 19651,
+     "offset": 14.466848,
+     "duration": 0.445601,
+     "gain": 0.4792,
+     "src": "youtube:wK-jHC_7P6I",
+     "srcStart": 69.8044,
+     "srcEnd": 70.25,
+     "centroidHz": 5607,
+     "boostDb": 0
+    },
+    {
+     "start": 658962,
+     "length": 19845,
+     "offset": 14.942449,
+     "duration": 0.45,
+     "gain": 0.6514,
+     "src": "youtube:wK-jHC_7P6I",
+     "srcStart": 75.14,
+     "srcEnd": 75.59,
+     "centroidHz": 6755,
+     "boostDb": 0
+    },
+    {
+     "start": 680130,
+     "length": 19162,
+     "offset": 15.422449,
+     "duration": 0.434512,
+     "gain": 0.6942,
+     "src": "youtube:wK-jHC_7P6I",
+     "srcStart": 84.3155,
+     "srcEnd": 84.75,
+     "centroidHz": 6574,
+     "boostDb": 0
+    }
+   ]
+  },
+  "beads.hold": {
+   "event": "hold",
+   "loudnessClass": "continuous",
+   "material": "owner pick",
+   "note": "C02 rainbow beads squeezed (owner pick, hiss reduced; full cut)",
+   "recordings": 8,
+   "variants": 0,
+   "entries": [
+    {
+     "start": 700615,
+     "length": 44100,
+     "offset": 15.886961,
+     "duration": 1.0,
+     "gain": 0.9003,
+     "src": "youtube:wK-jHC_7P6I",
+     "srcStart": 17.56,
+     "srcEnd": 18.56,
+     "centroidHz": 6919,
+     "boostDb": 0
+    },
+    {
+     "start": 746038,
+     "length": 44080,
+     "offset": 16.916961,
+     "duration": 0.999546,
+     "gain": 0.6979,
+     "src": "youtube:wK-jHC_7P6I",
+     "srcStart": 30.8205,
+     "srcEnd": 31.82,
+     "centroidHz": 6268,
+     "boostDb": 0
+    },
+    {
+     "start": 791441,
+     "length": 44100,
+     "offset": 17.946508,
+     "duration": 1.0,
+     "gain": 0.7947,
+     "src": "youtube:wK-jHC_7P6I",
+     "srcStart": 37.04,
+     "srcEnd": 38.04,
+     "centroidHz": 7140,
+     "boostDb": 0
+    },
+    {
+     "start": 836864,
+     "length": 44100,
+     "offset": 18.976508,
+     "duration": 1.0,
+     "gain": 1.0,
+     "src": "youtube:wK-jHC_7P6I",
+     "srcStart": 47.64,
+     "srcEnd": 48.64,
+     "centroidHz": 6330,
+     "boostDb": 0
+    },
+    {
+     "start": 882287,
+     "length": 44100,
+     "offset": 20.006508,
+     "duration": 1.0,
+     "gain": 0.9816,
+     "src": "youtube:wK-jHC_7P6I",
+     "srcStart": 58.28,
+     "srcEnd": 59.28,
+     "centroidHz": 6273,
+     "boostDb": 0
+    },
+    {
+     "start": 927710,
+     "length": 43906,
+     "offset": 21.036508,
+     "duration": 0.995601,
+     "gain": 0.7554,
+     "src": "youtube:wK-jHC_7P6I",
+     "srcStart": 69.8044,
+     "srcEnd": 70.8,
+     "centroidHz": 6027,
+     "boostDb": 0
+    },
+    {
+     "start": 972939,
+     "length": 44100,
+     "offset": 22.062109,
+     "duration": 1.0,
+     "gain": 0.5935,
+     "src": "youtube:wK-jHC_7P6I",
+     "srcStart": 75.14,
+     "srcEnd": 76.14,
+     "centroidHz": 7038,
+     "boostDb": 0
+    },
+    {
+     "start": 1018362,
+     "length": 43417,
+     "offset": 23.092109,
+     "duration": 0.984512,
+     "gain": 0.8021,
+     "src": "youtube:wK-jHC_7P6I",
+     "srcStart": 84.3155,
+     "srcEnd": 85.3,
+     "centroidHz": 6534,
+     "boostDb": 0
+    }
+   ]
+  },
+  "soap.crunch": {
+   "event": "crunch",
+   "loudnessClass": "impact",
+   "material": "owner pick",
+   "note": "C01 soap crunch (owner pick, provisional; short cut)",
+   "recordings": 6,
+   "variants": 0,
+   "entries": [
+    {
+     "start": 1063102,
+     "length": 15434,
+     "offset": 24.106621,
+     "duration": 0.349977,
+     "gain": 0.4419,
+     "src": "freesound:414538",
+     "srcStart": 0.011,
+     "srcEnd": 0.361,
+     "centroidHz": 4176,
+     "boostDb": 0
+    },
+    {
+     "start": 1079859,
+     "length": 15434,
+     "offset": 24.486599,
+     "duration": 0.349977,
+     "gain": 0.5796,
+     "src": "freesound:414538",
+     "srcStart": 0.367,
+     "srcEnd": 0.717,
+     "centroidHz": 4367,
+     "boostDb": 0
+    },
+    {
+     "start": 1096616,
+     "length": 15434,
+     "offset": 24.866576,
+     "duration": 0.349977,
+     "gain": 0.5148,
+     "src": "freesound:414538",
+     "srcStart": 0.717,
+     "srcEnd": 1.067,
+     "centroidHz": 3953,
+     "boostDb": 0
+    },
+    {
+     "start": 1113373,
+     "length": 15434,
+     "offset": 25.246553,
+     "duration": 0.349977,
+     "gain": 0.5786,
+     "src": "freesound:414538",
+     "srcStart": 1.11,
+     "srcEnd": 1.46,
+     "centroidHz": 3797,
+     "boostDb": 0
+    },
+    {
+     "start": 1130130,
+     "length": 15434,
+     "offset": 25.626531,
+     "duration": 0.349977,
+     "gain": 1.0,
+     "src": "freesound:414538",
+     "srcStart": 1.499,
+     "srcEnd": 1.849,
+     "centroidHz": 4178,
+     "boostDb": 0
+    },
+    {
+     "start": 1146887,
+     "length": 15434,
+     "offset": 26.006508,
+     "duration": 0.349977,
+     "gain": 0.7296,
+     "src": "freesound:414538",
+     "srcStart": 1.956,
+     "srcEnd": 2.306,
+     "centroidHz": 3667,
+     "boostDb": 0
+    }
+   ]
+  },
+  "soap.hold": {
+   "event": "hold",
+   "loudnessClass": "impact",
+   "material": "owner pick",
+   "note": "C01 soap squeezed (owner pick, provisional; full cut)",
+   "recordings": 6,
+   "variants": 0,
+   "entries": [
+    {
+     "start": 1163644,
+     "length": 30869,
+     "offset": 26.386485,
+     "duration": 0.699977,
+     "gain": 0.5801,
+     "src": "freesound:414538",
+     "srcStart": 0.011,
+     "srcEnd": 0.711,
+     "centroidHz": 4325,
+     "boostDb": 0
+    },
+    {
+     "start": 1195836,
+     "length": 30869,
+     "offset": 27.116463,
+     "duration": 0.699977,
+     "gain": 0.5796,
+     "src": "freesound:414538",
+     "srcStart": 0.367,
+     "srcEnd": 1.067,
+     "centroidHz": 4219,
+     "boostDb": 0
+    },
+    {
+     "start": 1228028,
+     "length": 30869,
+     "offset": 27.84644,
+     "duration": 0.699977,
+     "gain": 0.5892,
+     "src": "freesound:414538",
+     "srcStart": 0.717,
+     "srcEnd": 1.417,
+     "centroidHz": 3891,
+     "boostDb": 0
+    },
+    {
+     "start": 1260220,
+     "length": 30869,
+     "offset": 28.576417,
+     "duration": 0.699977,
+     "gain": 0.9865,
+     "src": "freesound:414538",
+     "srcStart": 1.11,
+     "srcEnd": 1.81,
+     "centroidHz": 4013,
+     "boostDb": 0
+    },
+    {
+     "start": 1292412,
+     "length": 30869,
+     "offset": 29.306395,
+     "duration": 0.699977,
+     "gain": 1.0,
+     "src": "freesound:414538",
+     "srcStart": 1.499,
+     "srcEnd": 2.199,
+     "centroidHz": 4136,
+     "boostDb": 0
+    },
+    {
+     "start": 1324604,
+     "length": 30400,
+     "offset": 30.036372,
+     "duration": 0.689342,
+     "gain": 0.7296,
+     "src": "freesound:414538",
+     "srcStart": 1.956,
+     "srcEnd": 2.6453,
+     "centroidHz": 3738,
+     "boostDb": 0
+    }
+   ]
+  }
+ }
+}
