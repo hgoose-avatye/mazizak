@@ -2,6 +2,8 @@ import { defineConfig } from "vite";
 import { fileURLToPath } from "node:url";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
+import { existsSync } from "node:fs";
+import { homedir } from "node:os";
 
 const r = (p: string) => fileURLToPath(new URL(p, import.meta.url));
 
@@ -25,10 +27,16 @@ export default defineConfig(({ command, isPreview }) => {
     command === "serve" && !isPreview
       ? process.env.MANZIZAK_LOCAL_AUDIO_DIR
       : undefined;
+  // permanent home of the owner's YouTube keyboard presets (몽돌 / 찌개 / 도자기), outside the repository (dev server only)
+  const ytPresetDir = (() => {
+    if (command !== "serve" || isPreview || process.env.VITEST) return undefined; // unit tests see the plain (disabled) state
+    const d = path.join(process.env.MANZIZAK_DEV_KEYBOARD_DIR ?? path.join(homedir(), "Music/MANZIZAK/dev-keyboard-audio"), "presets");
+    return existsSync(d) ? d : undefined;
+  })();
   return {
     define: {
       "import.meta.env.VITE_LOCAL_KEY_PRESETS": JSON.stringify(
-        localDir ? "1" : "0",
+        localDir || ytPresetDir ? "1" : "0",
       ),
       "import.meta.env.VITE_LOCAL_FIDGETS": JSON.stringify(
         fidgetDir ? "1" : "0",
@@ -160,7 +168,7 @@ export default defineConfig(({ command, isPreview }) => {
             },
           ]
         : []),
-      ...(localDir
+      ...(localDir || ytPresetDir
         ? [
             {
               name: "manzizak-local-keyboard-audio",
@@ -172,8 +180,12 @@ export default defineConfig(({ command, isPreview }) => {
                     );
                   if (!match) return next();
                   try {
+                    // the three YouTube presets come from the permanent folder when it exists, the rest from MANZIZAK_LOCAL_AUDIO_DIR
+                    const yt = /^(mongdol-pl87w|jjigae-topre|dojagi-space65)$/.test(match[1]);
+                    const dir = yt && ytPresetDir ? ytPresetDir : localDir;
+                    if (!dir) throw new Error("no folder");
                     const data = await readFile(
-                      path.join(localDir, `${match[1]}.${match[2]}`),
+                      path.join(dir, `${match[1]}.${match[2]}`),
                     );
                     res.setHeader(
                       "Content-Type",

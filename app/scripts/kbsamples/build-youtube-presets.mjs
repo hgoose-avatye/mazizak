@@ -2,17 +2,20 @@
 // The recordings' rights are unverified: output goes to the git-ignored local preset folder, is served only by the loopback dev server
 // (MANZIZAK_LOCAL_AUDIO_DIR) and is never part of a build (check-dist).
 //
-//   Input  : $MANZIZAK_YT_AUDIO_DIR (default /private/tmp/manzizak-yt-audio) containing  mongdol.<ext>  jjigae.<ext>  dojagi.<ext>   (any ffmpeg-readable audio)
-//   Output : $MANZIZAK_LOCAL_AUDIO_DIR (default /private/tmp/manzizak-local-presets)/<id>.{wav,json}
+//   Input  : $MANZIZAK_YT_AUDIO_DIR (default ~/Music/MANZIZAK/dev-keyboard-audio/source) containing  mongdol.<ext>  jjigae.<ext>  dojagi.<ext>   (any ffmpeg-readable audio)
+//   Output : $MANZIZAK_LOCAL_AUDIO_DIR (default ~/Music/MANZIZAK/dev-keyboard-audio/presets)/<id>.{wav,json}
 //   Usage  : FFMPEG=/path/to/ffmpeg node scripts/kbsamples/build-youtube-presets.mjs [--only=mongdol-pl87w]
 // Keystrokes are detected from the waveform (strong, isolated transients) — nobody has listened to the result.
 import fs from 'node:fs';
 import path from 'node:path';
+import os from 'node:os';
 import { spawnSync } from 'node:child_process';
 import { SR, db, env, onsets } from '../kbsamples/lib.mjs';
 
-const IN = process.env.MANZIZAK_YT_AUDIO_DIR ?? '/private/tmp/manzizak-yt-audio';
-const OUT = process.env.MANZIZAK_LOCAL_AUDIO_DIR ?? '/private/tmp/manzizak-local-presets';
+// default: the permanent folder outside the repository (survives /private/tmp being cleared); env vars still override
+const HOME_DIR = process.env.MANZIZAK_DEV_KEYBOARD_DIR ?? path.join(os.homedir(), 'Music/MANZIZAK/dev-keyboard-audio');
+const IN = process.env.MANZIZAK_YT_AUDIO_DIR ?? path.join(HOME_DIR, 'source');
+const OUT = process.env.MANZIZAK_LOCAL_AUDIO_DIR ?? path.join(HOME_DIR, 'presets');
 const FFMPEG = process.env.FFMPEG || 'ffmpeg';
 const ms = (v) => Math.round((v * SR) / 1000);
 /** window = [start, end] seconds of the downloaded file to use (a 1–2 h video: only a typing passage is needed) */
