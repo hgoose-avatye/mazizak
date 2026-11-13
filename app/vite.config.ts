@@ -180,9 +180,10 @@ export default defineConfig(({ command, isPreview }) => {
                     );
                   if (!match) return next();
                   try {
-                    // the three YouTube presets come from the permanent folder when it exists, the rest from MANZIZAK_LOCAL_AUDIO_DIR
-                    const yt = /^(mongdol-pl87w|jjigae-topre|dojagi-space65)$/.test(match[1]);
-                    const dir = yt && ytPresetDir ? ytPresetDir : localDir;
+                    // 몽돌 / 찌개 / 도자기 and Peach V3 (cleaned B) come from the permanent folder when it exists; Peach V3's previous
+                    // sprite (A, ".orig") only from its compare/ folder (A/B page; never the keyboard's default); the rest from MANZIZAK_LOCAL_AUDIO_DIR
+                    const kept = /^(mongdol-pl87w|jjigae-topre|dojagi-space65|silent-peach-v3)$/.test(match[1]);
+                    const dir = match[1] === "silent-peach-v3.orig" && ytPresetDir ? path.join(ytPresetDir, "..", "compare") : kept && ytPresetDir ? ytPresetDir : localDir;
                     if (!dir) throw new Error("no folder");
                     const data = await readFile(
                       path.join(dir, `${match[1]}.${match[2]}`),

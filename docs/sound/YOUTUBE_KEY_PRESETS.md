@@ -31,6 +31,9 @@ yt-dlp --js-runtimes node -f bestaudio -o "mongdol.%(ext)s" https://www.youtube.
 | source/mongdol.webm · jjigae.wav · dojagi.webm | — | 245c824fb04f3631 · 72494cde0f2c8aed · 72638596cd355a5b |
 | source/jjigae-parts/p1 · p2 · p3 | — | 6c3f646eaa2b43de · cc4cac2835753ecd · bf2b810003f036e7 |
 
+### Peach V3 (Outemu Silent Peach V3) — 정리본 B 최종 채택 (2026-11-13)
+같은 영구 폴더에 함께 보존한다. 원본 `source/peach-v3/thockhub/K09/0~13.ogg`(14개, 연구 다운로드 매니페스트와 14/14 일치), 기본 재생 **B** `presets/silent-peach-v3.{wav,json}`(12클립), 비교·복원용 **A** `compare/silent-peach-v3.orig.{wav,json}`(이전 스프라이트, `keyboard-ab.html` 만 읽음). B는 `scripts/kbsamples/clean-peach-v3.mjs` 로 원본에서 바이트 단위로 같게 다시 만들어진다. SHA-256 앞 16자: B wav `69b41584c92c65a6` · json `31882bc1e19fad46`, A wav `b95424cab6a75b24` · json `3a6cd1c48a57da0c`. 전체 목록은 폴더의 `MANIFEST.sha256`(30개).
+
 ## 음원 넣는 법 (직접 다운로드한 파일 사용)
 1. 위 영상의 오디오를 직접 내려받아 `~/Music/MANZIZAK/dev-keyboard-audio/source/` 에 `mongdol.<확장자>`, `jjigae.<확장자>`, `dojagi.<확장자>` 로 저장한다(ffmpeg가 읽는 형식이면 된다).
 2. `cd app && FFMPEG=/path/to/ffmpeg node scripts/kbsamples/build-youtube-presets.mjs`

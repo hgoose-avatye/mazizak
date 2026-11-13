@@ -9,17 +9,21 @@
 //   expand  = after the peak only, 2 ms frames within 10 dB of the hiss are turned down (≤ 2:1, smoothed); attack untouched
 //   level   = strike loudness (max 20 ms RMS) equalised within the pool, at the old preset's median loudness; peak ≤ 0.85
 //
-// Input : $MANZIZAK_REFERENCE_AUDIO_DIR/thockhub/K09/{0..13}.ogg (default /private/tmp/manzizak-six-research/reference-only)
-// Output: $MANZIZAK_LOCAL_AUDIO_DIR/silent-peach-v3.{wav,json} (default /private/tmp/manzizak-local-presets); the previous
-//         sprite is kept once as silent-peach-v3.orig.{wav,json} for A/B listening (keyboard-ab.html)
+// Input : $MANZIZAK_REFERENCE_AUDIO_DIR/thockhub/K09/{0..13}.ogg (default ~/Music/MANZIZAK/dev-keyboard-audio/source/peach-v3)
+// Output: $MANZIZAK_LOCAL_AUDIO_DIR/silent-peach-v3.{wav,json} (default ~/Music/MANZIZAK/dev-keyboard-audio/presets); the previous
+//         sprite is kept once as silent-peach-v3.orig.{wav,json} in compare/ (or the same env folder) for A/B listening (keyboard-ab.html)
 // Usage : FFMPEG=/path/to/ffmpeg node scripts/kbsamples/clean-peach-v3.mjs
 import fs from 'node:fs';
 import path from 'node:path';
+import os from 'node:os';
 import { spawnSync } from 'node:child_process';
 
 const SR = 48000;
-const REFS = process.env.MANZIZAK_REFERENCE_AUDIO_DIR ?? '/private/tmp/manzizak-six-research/reference-only';
-const OUT = process.env.MANZIZAK_LOCAL_AUDIO_DIR ?? '/private/tmp/manzizak-local-presets';
+// default: the permanent folder outside the repository (B is final, 2026-11-13); env vars still override
+const HOME_DIR = process.env.MANZIZAK_DEV_KEYBOARD_DIR ?? path.join(os.homedir(), 'Music/MANZIZAK/dev-keyboard-audio');
+const REFS = process.env.MANZIZAK_REFERENCE_AUDIO_DIR ?? path.join(HOME_DIR, 'source/peach-v3');
+const OUT = process.env.MANZIZAK_LOCAL_AUDIO_DIR ?? path.join(HOME_DIR, 'presets');
+const COMPARE = process.env.MANZIZAK_LOCAL_AUDIO_DIR ?? path.join(HOME_DIR, 'compare'); // where A (the previous sprite) is kept
 const FFMPEG = process.env.FFMPEG || 'ffmpeg';
 const MIN_SNR_DB = 25;
 const OLD_GAIN = 10; // build-local-presets.py: ×10, peak capped at 0.85
@@ -78,7 +82,7 @@ for (const c of clips) {
 
 // keep the previous sprite once, for A/B
 for (const ext of ['wav', 'json']) {
-  const cur = path.join(OUT, `silent-peach-v3.${ext}`), orig = path.join(OUT, `silent-peach-v3.orig.${ext}`);
+  const cur = path.join(OUT, `silent-peach-v3.${ext}`), orig = path.join(COMPARE, `silent-peach-v3.orig.${ext}`);
   if (!fs.existsSync(orig) && fs.existsSync(cur)) fs.copyFileSync(cur, orig);
 }
 const GAP = 480;
