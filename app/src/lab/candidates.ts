@@ -36,7 +36,7 @@ const btn = (label: string, url: string, cls = '') => { const b = document.creat
     const sec = document.createElement('section'); sec.innerHTML = `<h2>${LABEL[toy]}</h2>`;
     const o = ORIGINAL[toy], files = (orig[o.folder] ?? []).filter((f) => !o.match || o.match.test(f)).slice(0, 6);
     if (files.length) { const row = document.createElement('div'); row.className = 'row'; files.forEach((f, i) => row.append(btn(`원본 ${i + 1}`, `/__original-wak/${o.folder}/${f}`, 'orig'))); sec.append(row); }
-    for (const c of index.filter((c) => c.toy === toy)) {
+    for (const c of index.filter((c) => c.toy === toy).sort((a, b) => Number(b.id.startsWith('yt-')) - Number(a.id.startsWith('yt-')))) {
       const d = document.createElement('div'); d.className = 'cand';
       d.innerHTML = `<b></b><small></small>`; d.querySelector('b')!.textContent = `${c.title} (${c.id})`;
       d.querySelector('small')!.innerHTML = `${c.author} · ${c.license} · <a target="_blank" rel="noopener" href="${c.page}">페이지</a>`;
