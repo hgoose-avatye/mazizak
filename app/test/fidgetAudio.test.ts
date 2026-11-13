@@ -59,9 +59,9 @@ interface SpriteMap {
   sources: Record<string, { license: string; licenseUrl: string; author: string; usage: string; originalFile: string; materialMatch: string }>;
   pools: Record<string, { event: string; loudnessClass: string; recordings: number; variants: number; entries: Entry[] }>;
 }
-const sprites = { wax: json("fidgets/wax.json") as SpriteMap, crunch: json("fidgets/crunch.json") as SpriteMap, squish: json("fidgets/squish.json") as SpriteMap };
-const wavs = { wax: readWav(read("fidgets/wax.wav")), crunch: readWav(read("fidgets/crunch.wav")), squish: readWav(read("fidgets/squish.wav")) };
-const clipOf = (kind: "wax" | "crunch" | "squish", e: Entry) => wavs[kind].data.slice(e.start, e.start + e.length).map((v) => v * e.gain);
+const sprites = { wax: json("fidgets/wax.json") as SpriteMap, crunch: json("fidgets/crunch.json") as SpriteMap, squish: json("fidgets/squish.json") as SpriteMap, picks: json("fidgets/picks.json") as SpriteMap };
+const wavs = { wax: readWav(read("fidgets/wax.wav")), crunch: readWav(read("fidgets/crunch.wav")), squish: readWav(read("fidgets/squish.wav")), picks: readWav(read("fidgets/picks.wav")) };
+const clipOf = (kind: "wax" | "crunch" | "squish" | "picks", e: Entry) => wavs[kind].data.slice(e.start, e.start + e.length).map((v) => v * e.gain);
 
 describe("event → pool mapping", () => {
   it("every catalog toy has every event declared (a pool or an explicit null)", () => {
@@ -108,7 +108,8 @@ describe("event → pool mapping", () => {
         if (!r) continue;
         const sp = sprites[r.source];
         if (sp.dropped.some((d) => d.pool === r.pool)) continue; // dropped pool: no sound of its own
-        expect(sp.pools[r.pool].entries.length, `${id}.${e}`).toBeGreaterThanOrEqual(e === "init" ? 2 : 3);
+        // owner picks were chosen by ear clip by clip: a single picked clip is a deliberate choice
+        expect(sp.pools[r.pool].entries.length, `${id}.${e}`).toBeGreaterThanOrEqual(r.ownerPick ? 1 : e === "init" ? 2 : 3);
       }
   });
 
@@ -208,7 +209,7 @@ describe("VoiceGate interrupt (a new finger contact is always answered)", () => 
 });
 
 describe("shipped wax / crunch sprites", () => {
-  for (const kind of ["wax", "crunch", "squish"] as const) {
+  for (const kind of ["wax", "crunch", "squish", "picks"] as const) {
     describe(kind, () => {
       const map = sprites[kind], wav = wavs[kind];
       it("is 16-bit mono PCM and matches its map", () => {
@@ -247,11 +248,14 @@ describe("shipped wax / crunch sprites", () => {
         for (const s of Object.values(map.sources)) {
           if (s.author === "project owner") expect(s.license).toBe("Own recording (project owner)"); // own recordings: no third-party licence is claimed
           else {
-            expect(["CC0 1.0", "CC BY 4.0"]).toContain(s.license);
+            // YouTube's "Creative Commons Attribution license (reuse allowed)" is CC BY 3.0 (owner picks)
+            expect(kind === "picks" ? ["CC0 1.0", "CC BY 3.0"] : ["CC0 1.0", "CC BY 4.0"]).toContain(s.license);
             expect(s.licenseUrl).toMatch(/^https:\/\/creativecommons\.org\//);
           }
           expect(s.usage.length).toBeGreaterThan(5);
-          expect(fs.existsSync(new URL(`../${s.originalFile}`, import.meta.url)), s.originalFile).toBe(true);
+          // owner picks: the source audio is too large for the repository; the source page is recorded instead
+          if (kind === "picks") expect(s.originalFile).toMatch(/^https:\/\/(www\.youtube\.com|freesound\.org)\//);
+          else expect(fs.existsSync(new URL(`../${s.originalFile}`, import.meta.url)), s.originalFile).toBe(true);
         }
         const total = Object.values(map.pools).reduce((n, p) => n + p.recordings, 0);
         expect(map.counts.extractedClips).toBe(total);
@@ -334,18 +338,25 @@ async function make(id: string) {
 describe("FidgetAudio event routing", () => {
   afterEach(() => vi.unstubAllGlobals());
 
-  it("W01: first crack is the init sound, later cracks use the crack pool, strong breaking uses the burst pool", async () => {
+  it("W01 (owner picks): first break, then breaking cracks; nearly broken once; mixed wax plays the picked mixed clips", async () => {
     const { a, plays, at } = await make("W01");
     expect(a.state).toBe("recorded/derived");
     expect(a.supportedRoles.sort()).toEqual(["crack", "hold", "init"].sort());
     at(0); expect(a.play("crack", 0.5)).toBe(true);
-    at(300); expect(a.play("crack", 0.5)).toBe(true);
-    at(600); expect(a.play("crack", 0.9)).toBe(true);
+    at(300); expect(a.play("crack", 0.9)).toBe(true);
     expect(plays[0].name).toMatch(/^fg:W01:init:m:/);
-    expect(plays[1].name).toMatch(/^fg:W01:crack:m:/);
-    expect(plays[2].name).toMatch(/^fg:W01:crack:a:/);
-    a.reset(); at(1000); a.play("crack", 0.5);
-    expect(plays[3].name).toMatch(/^fg:W01:init:m:/); // after reset the first crack is "init" again
+    expect(plays[1].name).toMatch(/^fg:W01:crack:m:/); // W01 has no "second" stage
+    at(600); expect(a.playNearDone()).toBe(true);
+    expect(plays[2].name).toMatch(/^fg:W01:init:nearDone:/);
+    at(900); expect(a.playNearDone()).toBe(false); // once per reset
+    a.mixed = true;
+    a.mixAmount = 1;
+    at(1000); expect(a.play("hold", 0.5)).toBe(true);
+    at(2000); expect(a.play("tap", 0.5)).toBe(true);
+    expect(plays[3].name).toMatch(/^fg:W01:hold:mix:/);
+    expect(plays[4].name).toMatch(/^fg:W01:tap:mix:/);
+    expect(plays[3].opts.lowpassHz).toBeUndefined(); // own mixed sounds, not the muffled knead
+    a.reset(); at(3000); expect(a.playNearDone()).toBe(true);
   });
 
   it("W01: kneading is `hold`; `tap` falls back to hold; releases and stretch are silent (no pool, no fallback)", async () => {
@@ -394,15 +405,38 @@ describe("FidgetAudio event routing", () => {
     expect(l02.a.hasOwn("fold")).toBe(false);
   });
 
-  it("W02: first crack is the init sound, then crack, strong breaking the burst pool", async () => {
+  it("W01: the mixed sounds take over gradually with the kneading progress; buried knead sounds get darker", async () => {
+    const { a, plays, at } = await make("W01");
+    a.mixed = true;
+    const share = async (amount: number) => {
+      a.mixAmount = amount;
+      const from = plays.length;
+      let t = amount * 1e6;
+      for (let i = 0; i < 60; i++) { t += 400; at(t); a.play("hold", 0.5); }
+      const ps = plays.slice(from);
+      return { mix: ps.filter((p) => /:hold:mix:/.test(p.name)).length / ps.length, knead: ps.filter((p) => /:hold:m:/.test(p.name)) };
+    };
+    const early = await share(0.1), mid = await share(0.35), done = await share(0.8);
+    expect(early.mix).toBeLessThan(0.35);
+    expect(mid.mix).toBeGreaterThan(0.3);
+    expect(mid.mix).toBeLessThan(0.75);
+    expect(done.mix).toBe(1);
+    for (const p of mid.knead) expect(p.opts.lowpassHz).toBeLessThan(6000);
+  });
+
+  it("W02 (owner picks): first break, then the picked second click once, then breaking cracks; crumbs on shard friction", async () => {
     const { a, plays, at } = await make("W02");
     expect(a.hasOwn("init")).toBe(true);
     at(0); expect(a.play("crack", 0.5)).toBe(true);
     at(400); expect(a.play("crack", 0.5)).toBe(true);
     at(800); expect(a.play("crack", 0.9)).toBe(true);
+    at(1200); expect(a.play("crunch", 0.6)).toBe(true);
     expect(plays[0].name).toMatch(/^fg:W02:init:m:/);
-    expect(plays[1].name).toMatch(/^fg:W02:crack:m:/);
-    expect(plays[2].name).toMatch(/^fg:W02:crack:a:/);
+    expect(plays[1].name).toMatch(/^fg:W02:crack:second:/);
+    expect(plays[2].name).toMatch(/^fg:W02:crack:m:/);
+    expect(plays[3].name).toMatch(/^fg:W02:crunch:m:/);
+    a.reset(); at(2000); a.play("crack", 0.5); at(2400); a.play("crack", 0.5);
+    expect(plays[5].name).toMatch(/^fg:W02:crack:second:/); // again after a reset
   });
 
   it("rapid clicking: 20 contacts in 1.2 s all produce a sound, each replacing the previous sustained sound", async () => {

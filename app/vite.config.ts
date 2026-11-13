@@ -35,6 +35,11 @@ export default defineConfig(({ command, isPreview }) => {
     command === "serve" && !isPreview
       ? process.env.MANZIZAK_LOCAL_AUDIO_DIR || undefined
       : undefined;
+  // dev-only listening page for licensed stand-in sound candidates (candidates.html); the audio lives outside the repository
+  const candDir =
+    command === "serve" && !isPreview
+      ? devDir(process.env.MANZIZAK_CANDIDATES_DIR, path.join(MANZIZAK_HOME, "dev-reference/candidates"))
+      : undefined;
   // permanent home of the owner's YouTube keyboard presets (몽돌 / 찌개 / 도자기), outside the repository (dev server only)
   const ytPresetDir = (() => {
     if (command !== "serve" || isPreview || process.env.VITEST) return undefined; // unit tests see the plain (disabled) state
@@ -136,6 +141,27 @@ export default defineConfig(({ command, isPreview }) => {
                   } catch {
                     res.statusCode = 404;
                     res.end("unavailable");
+                  }
+                });
+              },
+            },
+          ]
+        : []),
+      ...(candDir
+        ? [
+            {
+              name: "manzizak-sfx-candidates",
+              configureServer(server: import("vite").ViteDevServer) {
+                server.middlewares.use(async (req, res, next) => {
+                  const m = /^\/__candidates\/(index\.json|[a-z]+\/[A-Za-z0-9]+-\d+\.wav)$/.exec((req.url ?? "").split("?")[0]);
+                  if (!m) return next();
+                  try {
+                    res.setHeader("Content-Type", m[1].endsWith(".json") ? "application/json" : "audio/wav");
+                    res.setHeader("Cache-Control", "no-store");
+                    res.end(await readFile(path.join(candDir, m[1])));
+                  } catch {
+                    res.statusCode = 404;
+                    res.end("candidate unavailable");
                   }
                 });
               },

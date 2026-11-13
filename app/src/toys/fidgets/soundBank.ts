@@ -20,7 +20,7 @@ export type FidgetEvent = (typeof EVENTS)[number];
 export type PoolKind = "recording" | "derived" | "proxy";
 
 export interface PoolRef {
-  source: "wax" | "crunch" | "squish";
+  source: "wax" | "crunch" | "squish" | "picks";
   /** sprite pool name in public/sfx/fidgets/<source>.json, e.g. "apple.crack" */
   pool: string;
   /** a second pool that replaces `pool` when the event strength reaches `minStrength` (dense, continuous breaking) */
@@ -31,6 +31,8 @@ export interface PoolRef {
   /** extra trim in dB on top of the event class level */
   trimDb?: number;
   note: string;
+  /** picked by ear by the owner: allowed to rest on fewer clips than the automatic pools */
+  ownerPick?: boolean;
 }
 export type ToySound = Record<FidgetEvent, PoolRef | null>;
 
@@ -39,7 +41,21 @@ const jitter = (d: number): [number, number] => [1 - d, 1 + d];
 
 const sqz = (pool: string, kind: PoolKind, note: string, o: Partial<PoolRef> = {}): PoolRef => ({ source: "squish", pool, kind, rate: jitter(0.03), note, ...o });
 const wax = (pool: string, note: string, o: Partial<PoolRef> = {}): PoolRef => ({ source: "wax", pool, kind: "recording", rate: jitter(0.03), note, ...o });
+
 const crunch = (pool: string, note: string, o: Partial<PoolRef> = {}): PoolRef => ({ source: "crunch", pool, kind: "proxy", rate: jitter(0.04), note, ...o });
+
+/** owner-picked clips (public/sfx/fidgets/picks.json, scripts/fidgets/build-picks.py; YouTube CC BY 3.0 + Freesound CC0) */
+const pick = (pool: string, kind: PoolKind, note: string, o: Partial<PoolRef> = {}): PoolRef => ({ source: "picks", pool, kind, rate: jitter(0.03), note, ownerPick: true, ...o });
+
+/**
+ * Wax-ball stage balance (dB on top of the event class trim). Measured 2026-11-13 as the played short-term loudness
+ * (max 100 ms RMS of each pool's median clip + class trim + typical strength): choco first break ≈ −23, breaking cracks ≈ −37/−38,
+ * apple first break ≈ −30, broken-wax presses ≈ −42, mixed ≈ −44. Only the outliers are moved: the first break stays the loudest
+ * hit and the mixed kneading the softest, but the 13 dB drop from the chocolate's first break to its breaking cracks is halved.
+ * Second pick round (more clips per pool, hiss-reduced): a pool is matched to its quietest clip, so the trims were re-derived to
+ * keep the same played levels (≈ choco first break −27, apple −28, cracks −33/−32, nearly broken −32, crumbs −37, presses −40, mixed −42).
+ */
+const BAL: Record<string, number> = { "apple.init": 8, "choco.init": 11, "choco.second": 11, "apple.crack": 6, "choco.crack": 7, "wax.nearDone": 4, "apple.after": 3, "choco.crumbs": 3, "wax.mixed": 2 };
 
 const waxToy = (k: "apple" | "choco"): ToySound => ({
   init: wax(`${k}.init`, "strongest isolated first-break hits"),
@@ -62,22 +78,48 @@ export const FIDGET_SOUND: Record<string, ToySound> = {
   // L02: modelled on the reference app's rainbow-sharbet clips (bright, continuous fine crackle; short ≈0.7 s, long ≈1.2 s)
   L02: { init: NONE, tap: sqz("mango.tap", "proxy", "crunchy-slime presses (stands in for the crackly mango slime)"), hold: sqz("mango.hold", "proxy", "crunchy-slime kneading passages (stands in for the crackly mango slime)"), release: NONE, stretch: sqz("slime.stretch", "recording", "slime stretching passages", { trimDb: -1 }), fold: sqz("slime.fold", "recording", "slime slaps / folds"), crack: NONE, crunch: NONE },
   L03: { init: NONE, tap: NONE, hold: sqz("cream.hold", "proxy", "shaving-foam squashing (stands in for whipped cream)"), release: NONE, stretch: NONE, fold: sqz("cream.fold", "proxy", "shaving-foam folding (stands in for whipped cream)"), crack: NONE, crunch: NONE },
-  W01: waxToy("apple"),
-  W02: waxToy("choco"),
+  // W01/W02/C01/C02: the owner picked these by ear (2026-11-13) — see public/sfx/fidgets/PICKS-CREDITS.md
+  W01: {
+    init: pick("apple.init", "recording", "a real wax ball's first break", { trimDb: BAL["apple.init"] }),
+    tap: NONE,
+    hold: pick("apple.after", "recording", "broken wax skin being pressed (real wax squishy)", { trimDb: BAL["apple.after"] }),
+    release: NONE, stretch: NONE, fold: NONE,
+    crack: pick("apple.crack", "recording", "wax skin cracking while the shell breaks (real wax squishy)", { trimDb: BAL["apple.crack"] }),
+    crunch: NONE,
+  },
+  W02: {
+    ...waxToy("choco"),
+    init: pick("choco.init", "recording", "a real wax ball's first break", { trimDb: BAL["choco.init"] }),
+    crack: pick("choco.crack", "recording", "wax skin cracking while the shell breaks (real wax squishy)", { trimDb: BAL["choco.crack"] }),
+    crunch: pick("choco.crumbs", "proxy", "chocolate crumbs pressed (real chocolate stands in for chocolate wax crumbs)", { trimDb: BAL["choco.crumbs"] }),
+  },
   C01: {
     init: NONE, tap: NONE,
-    // the project owner's own recordings of the actual toy (scripts/fidgets/own/, provenance in own/sources.json)
+    // the project owner's own recordings of the actual toy (scripts/fidgets/own/, provenance in own/sources.json) — replace the provisional picks
     hold: crunch("soap.hold", "continuous squeezing windows from the owner's recording of the soap crunch squishy (take 27)", { kind: "recording", trimDb: 2 }), // +2 dB: these windows have a higher crest factor (≈2.5 dB lower RMS) than the stand-in they replace
     release: NONE, stretch: NONE, fold: NONE, crack: NONE,
     crunch: crunch("soap.crunch", "short crushing hits from the owner's recording of the soap crunch squishy (take 28)", { kind: "recording" }),
   },
   C02: {
     init: NONE, tap: NONE,
-    hold: crunch("beads.hold", "sugar-granule friction windows as sustained bead compression (similar material only)"),
+    hold: pick("beads.hold", "proxy", "crunchy bead slime squeezed, hiss reduced (stands in for the bead squishy)"),
     release: NONE, stretch: NONE, fold: NONE, crack: NONE,
-    crunch: crunch("beads.crunch", "short plastic-bead collisions (similar material only)", { rate: jitter(0.05) }),
+    crunch: pick("beads.crunch", "proxy", "crunchy bead slime, short cut, hiss reduced", { rate: jitter(0.04) }),
   },
 };
+
+/** wax balls once every piece is broken and kneaded into the core ("mixed"): these replace tap/hold */
+export const MIX_SOUND: Record<string, Partial<Record<"tap" | "hold", PoolRef>>> = {
+  W01: { tap: pick("wax.mixed", "proxy", "worn crunchy slime pressed (stands in for wax mixed into the core)", { trimDb: BAL["wax.mixed"] }), hold: pick("wax.mixed", "proxy", "worn crunchy slime squished (stands in for wax mixed into the core)", { trimDb: BAL["wax.mixed"] }) },
+  W02: { tap: pick("wax.mixed", "proxy", "worn crunchy slime pressed (stands in for wax mixed into the core)", { trimDb: BAL["wax.mixed"] }), hold: pick("wax.mixed", "proxy", "worn crunchy slime squished (stands in for wax mixed into the core)", { trimDb: BAL["wax.mixed"] }) },
+};
+/** wax balls: one-off stages of the break — `second` = the crack right after the first break, `nearDone` = nearly every piece broken */
+export const WAX_STAGES: Record<string, Partial<Record<"second" | "nearDone", PoolRef>>> = {
+  W01: { nearDone: pick("wax.nearDone", "recording", "a real wax ball nearly broken", { trimDb: BAL["wax.nearDone"] }) },
+  W02: { second: pick("choco.second", "recording", "the click right after the first break", { trimDb: BAL["choco.second"] }), nearDone: pick("wax.nearDone", "recording", "a real wax ball nearly broken", { trimDb: BAL["wax.nearDone"] }) },
+};
+/** toys whose public sounds the owner picked by ear: on the dev server they play these by default (the reference-app sounds stay switchable) */
+export const OWNER_PICKED: ReadonlySet<string> = new Set(["W01", "W02", "C01", "C02"]);
 
 /** What was taken out in the quality pass and why (objective facts; nobody has listened). */
 export const EXCLUDED: { what: string; why: string }[] = [
