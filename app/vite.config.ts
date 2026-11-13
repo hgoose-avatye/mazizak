@@ -10,6 +10,7 @@ const r = (p: string) => fileURLToPath(new URL(p, import.meta.url));
 // An env var still overrides; MANZIZAK_*="" turns one off. A path that does not exist is ignored.
 const MANZIZAK_HOME = path.join(homedir(), "Music/MANZIZAK");
 const devDir = (env: string | undefined, fallback: string) => {
+  if (process.env.VITEST) return env || undefined; // unit tests see the plain state unless a test sets the variable itself
   const d = env ?? fallback;
   return d && existsSync(d) ? d : undefined;
 };
