@@ -102,7 +102,7 @@ export const FIDGETS: readonly FidgetSpec[] = [
   },
   {
     id: "W01",
-    name: "청사과 왁뿌볼",
+    name: "청사과",
     category: "왁뿌볼",
     family: "wax",
     shape: "apple",
@@ -122,7 +122,7 @@ export const FIDGETS: readonly FidgetSpec[] = [
   },
   {
     id: "W02",
-    name: "초콜릿 왁뿌볼",
+    name: "초콜릿",
     category: "왁뿌볼",
     family: "wax",
     shape: "chocolate",
