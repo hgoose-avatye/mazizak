@@ -8,8 +8,8 @@ the repository (large); it lives in $MANZIZAK_PICKS_SOURCES (default ~/Music/MAN
 (yt-dlp bestaudio → mono 44.1 kHz WAV) and freesound/414538.wav (HQ preview → mono 44.1 kHz WAV).
 
 Processing per clip (objective; only the owner listened, to the unprocessed candidates):
-  cut at the listed start/length · rainbow beads only: spectral hiss reduction (noise profile = quietest 10 % of the source video)
-  · lead-in trimmed to 3 ms before the first frame within 20 dB of the peak · 0.5 ms fade-in, 15 ms fade-out
+  cut at the listed start/length · rainbow beads and wax-ball sources: spectral hiss reduction (noise profile = quietest 10 % of the source video)
+  · lead-in trimmed to 1 ms before the first frame within 12 dB of the peak · 0.5 ms fade-in, 15 ms fade-out
   (120 ms raised-cosine for a clip still ringing at its end)
   · peak-normalised to −1 dBFS · `gain` (≤ 1) matches loudness within a pool.
 Usage: python3 scripts/fidgets/build-picks.py   (needs numpy)
@@ -37,21 +37,22 @@ FREESOUND = {"freesound:414538": "https://freesound.org/people/emilyws/sounds/41
 # pool → (event, loudness class, note, [(source, start s, length s)]) — starts located in the sources by cross-correlation
 PICKS = {
     # wax balls, owner picks 2026-11-13 (second round): first break → (choco) second click → breaking → nearly all broken → mixed
-    "apple.init": ("init", "impact", "W01 first break (owner pick: 처음 깰 때)", [("youtube:kKYelJAi3xE", 347.320, .6)]),
-    "choco.init": ("init", "impact", "W02 first break (owner pick: 처음 깰 때)", [("youtube:kKYelJAi3xE", 92.010, .6)]),
-    "choco.second": ("crack", "impact", "W02 the click right after the first break (owner pick: 깨고 나서 두 번째 클릭)", [("youtube:kKYelJAi3xE", 174.860, .6)]),
-    "apple.crack": ("crack", "impact", "W01 while breaking (owner pick: 깨지고 있을 때; #1 apple only, #2/#3 shared with W02)", [("youtube:DT-BjNH0iAo", 7.291, .6), ("youtube:DT-BjNH0iAo", 14.373, .6), ("youtube:DT-BjNH0iAo", 23.016, .6)]),
-    "choco.crack": ("crack", "impact", "W02 while breaking (owner pick: 깨지고 있을 때, shared with W01)", [("youtube:DT-BjNH0iAo", 14.373, .6), ("youtube:DT-BjNH0iAo", 23.016, .6)]),
-    "wax.nearDone": ("crack", "impact", "W01/W02 nearly every piece broken (owner pick: 거의 다 깨졌을 때)", [("youtube:kKYelJAi3xE", 356.590, .6)]),
-    "apple.after": ("hold", "impact", "W01 broken wax being pressed (owner pick, first round: 다 부수고 나서)", [("youtube:OVPG4qZMl0U", t, .6) for t in (21.860, 27.565, 33.748, 38.624, 42.702)]),
-    "choco.crumbs": ("crunch", "impact", "W02 crumbs left after the first break, pressed (owner pick)", [("youtube:bExGHkTQmo4", 47.120, .6)]),
-    "wax.mixed": ("hold", "impact", "W01/W02 every piece broken and kneaded in (owner pick: 다 깨고 다 섞였을 때, #3–#8)", [("youtube:-LJJrKD68bs", t, .7) for t in (108.720, 139.880, 150.370, 173.770, 196.770, 350.930)]),
+    "apple.init": ("init", "impact", "W01 first break (owner picks: 처음 깰 때 #4 + second round 3–10)", [("youtube:kKYelJAi3xE", t, .6) for t in (347.320, 354.51, 362.01, 368.74, 369.47, 370.86, 372.42, 373.72, 375.09)]),
+    "choco.init": ("init", "impact", "W02 first break (owner picks: #1 + second round 1–10)", [("youtube:kKYelJAi3xE", t, .6) for t in (92.010, 74.63, 98.0, 99.5, 101.77, 102.81, 104.88, 105.98, 114.68, 121.82, 123.31)]),
+    "choco.second": ("crack", "impact", "W02 the click right after the first break (owner picks: #2 + second round 1–7, 9, 10)", [("youtube:kKYelJAi3xE", t, .6) for t in (174.860, 160.18, 161.0, 164.87, 165.6, 167.58, 170.09, 173.7, 179.49, 187.0)]),
+    "apple.crack": ("crack", "impact", "W01 while breaking (owner picks: #1 apple only; #2/#3 and second round 1, 2, 4, 5, 6, 8, 9, 10 shared with W02)", [("youtube:DT-BjNH0iAo", t, .6) for t in (7.291, 14.373, 23.016, 0.32, 1.12, 6.43, 8.44, 12.08, 19.59, 20.35, 24.5)]),
+    "choco.crack": ("crack", "impact", "W02 while breaking (owner picks, shared with W01)", [("youtube:DT-BjNH0iAo", t, .6) for t in (14.373, 23.016, 0.32, 1.12, 6.43, 8.44, 12.08, 19.59, 20.35, 24.5)]),
+    "wax.nearDone": ("crack", "impact", "W01/W02 nearly every piece broken (owner picks: #5 + second round 3–10 of the same passage)", [("youtube:kKYelJAi3xE", t, .6) for t in (356.590, 354.51, 362.01, 368.74, 369.47, 370.86, 372.42, 373.72, 375.09)]),
+    "apple.after": ("hold", "impact", "W01 broken wax being pressed (owner picks: first round 1–5 + second round 1–8)", [("youtube:OVPG4qZMl0U", t, .6) for t in (21.860, 27.565, 33.748, 38.624, 42.702, 11.76, 19.38, 20.48, 22.95, 25.4, 26.63, 34.6, 36.82)]),
+    "choco.crumbs": ("crunch", "impact", "W02 crumbs left after the first break, pressed (owner picks: #5 + second round 7, 10)", [("youtube:bExGHkTQmo4", t, .6) for t in (47.120, 27.41, 45.43)]),
+    "wax.mixed": ("hold", "impact", "W01/W02 every piece broken and kneaded in (owner picks: #3–#8 + second round 1, 2, 3, 5, 9)", [("youtube:-LJJrKD68bs", t, .7) for t in (108.720, 139.880, 150.370, 173.770, 196.770, 350.930, 16.67, 32.81, 62.01, 76.43, 193.9)]),
     "beads.crunch": ("crunch", "impact", "C02 rainbow beads crushed (owner pick, hiss reduced; short cut)", [("youtube:wK-jHC_7P6I", t, .45) for t in (17.56, 30.82, 37.04, 47.64, 58.28, 69.80, 75.14, 84.30)]),
     "beads.hold": ("hold", "continuous", "C02 rainbow beads squeezed (owner pick, hiss reduced; full cut)", [("youtube:wK-jHC_7P6I", t, 1.0) for t in (17.56, 30.82, 37.04, 47.64, 58.28, 69.80, 75.14, 84.30)]),
     "soap.crunch": ("crunch", "impact", "C01 soap crunch (owner pick, provisional; short cut)", [("freesound:414538", t, .35) for t in (0.011, 0.367, 0.717, 1.110, 1.499, 1.956)]),
     "soap.hold": ("hold", "impact", "C01 soap squeezed (owner pick, provisional; full cut)", [("freesound:414538", t, .7) for t in (0.011, 0.367, 0.717, 1.110, 1.499, 1.956)]),
 }
-DENOISE = {"youtube:wK-jHC_7P6I"}
+# hiss reduction: the rainbow beads (2026-11-13) and, at the owner's request, every wax-ball source (second pick round)
+DENOISE = {"youtube:wK-jHC_7P6I", "youtube:kKYelJAi3xE", "youtube:DT-BjNH0iAo", "youtube:OVPG4qZMl0U", "youtube:bExGHkTQmo4", "youtube:-LJJrKD68bs"}
 
 
 def load(rel):
@@ -95,7 +96,7 @@ def denoise(y, noise):
 
 def shape(y):
     env = np.sqrt(np.convolve(y ** 2, np.ones(88) / 88, "same"))
-    a = max(0, int(np.argmax(env > env.max() * 0.1)) - int(0.003 * SR))
+    a = max(0, int(np.argmax(env > env.max() * 0.25)) - int(0.001 * SR))
     y = y[a:].copy()
     fi, fo = int(0.0005 * SR), int(0.015 * SR)
     # a clip cut while it still rings (the 45 ms before the end within 30 dB of the peak) gets a 120 ms raised-cosine
@@ -175,7 +176,7 @@ def main():
     lines = ["# Owner-picked fidget sound credits (picks.wav)", "",
              "Generated by `scripts/fidgets/build-picks.py` — do not edit by hand. Pools and clip times are in `picks.json`.",
              "The owner picked these clips by ear (2026-11-13). **All clips were modified**: cut out of the source audio, faded in/out,",
-             "peak-normalised and loudness-matched; the rainbow-bead clips were also hiss-reduced.", "",
+             "peak-normalised and loudness-matched; the rainbow-bead and wax-ball clips were also hiss-reduced.", "",
              "YouTube videos: published by their uploaders under YouTube's “Creative Commons Attribution license (reuse allowed)” —",
              f"CC BY 3.0 ({YT_LICENSE_URL}). Freesound: CC0 1.0 (no attribution needed; credited anyway).", "",
              "| source | title | author | licence | used for |", "|---|---|---|---|---|"]

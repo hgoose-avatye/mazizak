@@ -50,8 +50,10 @@ const pick = (pool: string, kind: PoolKind, note: string, o: Partial<PoolRef> = 
  * (max 100 ms RMS of each pool's median clip + class trim + typical strength): choco first break ≈ −23, breaking cracks ≈ −37/−38,
  * apple first break ≈ −30, broken-wax presses ≈ −42, mixed ≈ −44. Only the outliers are moved: the first break stays the loudest
  * hit and the mixed kneading the softest, but the 13 dB drop from the chocolate's first break to its breaking cracks is halved.
+ * Second pick round (more clips per pool, hiss-reduced): a pool is matched to its quietest clip, so the trims were re-derived to
+ * keep the same played levels (≈ choco first break −27, apple −28, cracks −33/−32, nearly broken −32, crumbs −37, presses −40, mixed −42).
  */
-const BAL: Record<string, number> = { "choco.init": -4, "choco.second": -4, "apple.init": 2, "apple.crack": 5, "choco.crack": 5, "apple.after": 2, "wax.mixed": 2 };
+const BAL: Record<string, number> = { "apple.init": 8, "choco.init": 11, "choco.second": 11, "apple.crack": 6, "choco.crack": 7, "wax.nearDone": 4, "apple.after": 3, "choco.crumbs": 3, "wax.mixed": 2 };
 
 const waxToy = (k: "apple" | "choco"): ToySound => ({
   init: wax(`${k}.init`, "strongest isolated first-break hits"),
@@ -87,7 +89,7 @@ export const FIDGET_SOUND: Record<string, ToySound> = {
     ...waxToy("choco"),
     init: pick("choco.init", "recording", "a real wax ball's first break", { trimDb: BAL["choco.init"] }),
     crack: pick("choco.crack", "recording", "wax skin cracking while the shell breaks (real wax squishy)", { trimDb: BAL["choco.crack"] }),
-    crunch: pick("choco.crumbs", "proxy", "chocolate crumbs pressed (real chocolate stands in for chocolate wax crumbs)"),
+    crunch: pick("choco.crumbs", "proxy", "chocolate crumbs pressed (real chocolate stands in for chocolate wax crumbs)", { trimDb: BAL["choco.crumbs"] }),
   },
   C01: {
     init: NONE, tap: NONE,
@@ -110,8 +112,8 @@ export const MIX_SOUND: Record<string, Partial<Record<"tap" | "hold", PoolRef>>>
 };
 /** wax balls: one-off stages of the break — `second` = the crack right after the first break, `nearDone` = nearly every piece broken */
 export const WAX_STAGES: Record<string, Partial<Record<"second" | "nearDone", PoolRef>>> = {
-  W01: { nearDone: pick("wax.nearDone", "recording", "a real wax ball nearly broken") },
-  W02: { second: pick("choco.second", "recording", "the click right after the first break", { trimDb: BAL["choco.second"] }), nearDone: pick("wax.nearDone", "recording", "a real wax ball nearly broken") },
+  W01: { nearDone: pick("wax.nearDone", "recording", "a real wax ball nearly broken", { trimDb: BAL["wax.nearDone"] }) },
+  W02: { second: pick("choco.second", "recording", "the click right after the first break", { trimDb: BAL["choco.second"] }), nearDone: pick("wax.nearDone", "recording", "a real wax ball nearly broken", { trimDb: BAL["wax.nearDone"] }) },
 };
 /** toys whose public sounds the owner picked by ear: on the dev server they play these by default (the reference-app sounds stay switchable) */
 export const OWNER_PICKED: ReadonlySet<string> = new Set(["W01", "W02", "C01", "C02"]);
