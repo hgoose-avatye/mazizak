@@ -153,7 +153,7 @@ export default defineConfig(({ command, isPreview }) => {
               name: "manzizak-sfx-candidates",
               configureServer(server: import("vite").ViteDevServer) {
                 server.middlewares.use(async (req, res, next) => {
-                  const m = /^\/__candidates\/(index\.json|[a-z]+\/\d+-\d+\.wav)$/.exec((req.url ?? "").split("?")[0]);
+                  const m = /^\/__candidates\/(index\.json|[a-z]+\/[A-Za-z0-9]+-\d+\.wav)$/.exec((req.url ?? "").split("?")[0]);
                   if (!m) return next();
                   try {
                     res.setHeader("Content-Type", m[1].endsWith(".json") ? "application/json" : "audio/wav");
