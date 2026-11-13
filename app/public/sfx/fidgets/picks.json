@@ -4,12 +4,12 @@
  "sampleRate": 44100,
  "channels": 1,
  "bitDepth": 16,
- "totalSamples": 3188911,
+ "totalSamples": 2901642,
  "built": "2026-11-13",
  "note": "Clips picked by ear by the owner from candidate cuts (2026-11-13). Peak-normalised to −1 dBFS; `gain` (≤1) matches loudness within a pool; relative loudness between event classes is set by the player.",
  "counts": {
-  "sourceFiles": 7,
-  "extractedClips": 115,
+  "sourceFiles": 6,
+  "extractedClips": 103,
   "derivedVariants": 0
  },
  "dropped": [],
@@ -79,17 +79,6 @@
    "usage": "owner-picked fidget clips (see pool notes); cut, faded, normalised, hiss-reduced",
    "materialMatch": "crunchy (bead) slime — stands in for the rainbow bead squishy",
    "originalFile": "https://www.youtube.com/watch?v=wK-jHC_7P6I"
-  },
-  "freesound:414538": {
-   "title": "Crunch Sound 1",
-   "author": "emilyws",
-   "url": "https://freesound.org/people/emilyws/sounds/414538/",
-   "license": "CC0 1.0",
-   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
-   "retrieved": "2026-11-13",
-   "usage": "owner-picked fidget clips (see pool notes); cut, faded, normalised",
-   "materialMatch": "generic dry crunch — stands in for soap crunch",
-   "originalFile": "https://freesound.org/people/emilyws/sounds/414538/"
   }
  },
  "pools": {
@@ -1435,170 +1424,6 @@
      "srcStart": 84.3228,
      "srcEnd": 85.3,
      "centroidHz": 6542,
-     "boostDb": 0
-    }
-   ]
-  },
-  "soap.crunch": {
-   "event": "crunch",
-   "loudnessClass": "impact",
-   "material": "owner pick",
-   "note": "C01 soap crunch (owner pick, provisional; short cut)",
-   "recordings": 6,
-   "variants": 0,
-   "entries": [
-    {
-     "start": 2901642,
-     "length": 15382,
-     "offset": 65.796871,
-     "duration": 0.348798,
-     "gain": 0.5257,
-     "src": "freesound:414538",
-     "srcStart": 0.0122,
-     "srcEnd": 0.361,
-     "centroidHz": 4369,
-     "boostDb": 0
-    },
-    {
-     "start": 2918347,
-     "length": 14841,
-     "offset": 66.175669,
-     "duration": 0.336531,
-     "gain": 0.5386,
-     "src": "freesound:414538",
-     "srcStart": 0.3804,
-     "srcEnd": 0.7169,
-     "centroidHz": 3956,
-     "boostDb": 0
-    },
-    {
-     "start": 2934511,
-     "length": 15434,
-     "offset": 66.5422,
-     "duration": 0.349977,
-     "gain": 0.5147,
-     "src": "freesound:414538",
-     "srcStart": 0.717,
-     "srcEnd": 1.067,
-     "centroidHz": 3886,
-     "boostDb": 0
-    },
-    {
-     "start": 2951268,
-     "length": 14890,
-     "offset": 66.922177,
-     "duration": 0.337642,
-     "gain": 0.6329,
-     "src": "freesound:414538",
-     "srcStart": 1.1223,
-     "srcEnd": 1.4599,
-     "centroidHz": 3825,
-     "boostDb": 0
-    },
-    {
-     "start": 2967481,
-     "length": 14870,
-     "offset": 67.289819,
-     "duration": 0.337188,
-     "gain": 1.0,
-     "src": "freesound:414538",
-     "srcStart": 1.5118,
-     "srcEnd": 1.849,
-     "centroidHz": 4301,
-     "boostDb": 0
-    },
-    {
-     "start": 2983674,
-     "length": 14870,
-     "offset": 67.657007,
-     "duration": 0.337188,
-     "gain": 0.737,
-     "src": "freesound:414538",
-     "srcStart": 1.9688,
-     "srcEnd": 2.306,
-     "centroidHz": 3640,
-     "boostDb": 0
-    }
-   ]
-  },
-  "soap.hold": {
-   "event": "hold",
-   "loudnessClass": "impact",
-   "material": "owner pick",
-   "note": "C01 soap squeezed (owner pick, provisional; full cut)",
-   "recordings": 6,
-   "variants": 0,
-   "entries": [
-    {
-     "start": 2999867,
-     "length": 29514,
-     "offset": 68.024195,
-     "duration": 0.669252,
-     "gain": 0.5613,
-     "src": "freesound:414538",
-     "srcStart": 0.0417,
-     "srcEnd": 0.711,
-     "centroidHz": 4007,
-     "boostDb": 0
-    },
-    {
-     "start": 3030704,
-     "length": 30276,
-     "offset": 68.723447,
-     "duration": 0.686531,
-     "gain": 0.5798,
-     "src": "freesound:414538",
-     "srcStart": 0.3804,
-     "srcEnd": 1.0669,
-     "centroidHz": 4202,
-     "boostDb": 0
-    },
-    {
-     "start": 3062303,
-     "length": 30869,
-     "offset": 69.439977,
-     "duration": 0.699977,
-     "gain": 0.5918,
-     "src": "freesound:414538",
-     "srcStart": 0.717,
-     "srcEnd": 1.417,
-     "centroidHz": 3941,
-     "boostDb": 0
-    },
-    {
-     "start": 3094495,
-     "length": 30306,
-     "offset": 70.169955,
-     "duration": 0.687211,
-     "gain": 0.9387,
-     "src": "freesound:414538",
-     "srcStart": 1.1228,
-     "srcEnd": 1.81,
-     "centroidHz": 4025,
-     "boostDb": 0
-    },
-    {
-     "start": 3126124,
-     "length": 30305,
-     "offset": 70.887166,
-     "duration": 0.687188,
-     "gain": 1.0,
-     "src": "freesound:414538",
-     "srcStart": 1.5118,
-     "srcEnd": 2.199,
-     "centroidHz": 4150,
-     "boostDb": 0
-    },
-    {
-     "start": 3157752,
-     "length": 29836,
-     "offset": 71.604354,
-     "duration": 0.676553,
-     "gain": 0.737,
-     "src": "freesound:414538",
-     "srcStart": 1.9688,
-     "srcEnd": 2.6454,
-     "centroidHz": 3723,
      "boostDb": 0
     }
    ]

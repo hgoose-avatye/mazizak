@@ -2,10 +2,12 @@
 """Owner-picked fidget clips → public/sfx/fidgets/picks.{wav,json} + PICKS-CREDITS.md.
 
 The owner listened to candidate clips (dev page candidates.html, 2026-11-13) and picked these by ear for the wax balls,
-the soap crunch and the rainbow beads. Sources are YouTube videos the uploaders published under YouTube's
-"Creative Commons Attribution license (reuse allowed)" (= CC BY 3.0) and one Freesound CC0 file. The source audio is NOT in
+and the rainbow beads. Sources are YouTube videos the uploaders published under YouTube's
+"Creative Commons Attribution license (reuse allowed)" (= CC BY 3.0). The source audio is NOT in
 the repository (large); it lives in $MANZIZAK_PICKS_SOURCES (default ~/Music/MANZIZAK/dev-reference): youtube-cc/<folder>/<id>.wav
-(yt-dlp bestaudio → mono 44.1 kHz WAV) and freesound/414538.wav (HQ preview → mono 44.1 kHz WAV).
+(yt-dlp bestaudio → mono 44.1 kHz WAV).
+C01 soap crunch is not here: its provisional pick (Freesound 414538) was removed on 2026-11-13; C01 plays the owner's own
+recordings from crunch.wav (scripts/fidgets/build-clips.mjs, scripts/fidgets/own/).
 
 Processing per clip (objective; only the owner listened, to the unprocessed candidates):
   cut at the listed start/length · rainbow beads and wax-ball sources: spectral hiss reduction (noise profile = quietest 10 % of the source video)
@@ -30,9 +32,8 @@ SOURCES = {
     "youtube:bExGHkTQmo4": ("Chocolate ASMR | Breaking, Cutting & Melting Chocolate", "ramit girdhar", "youtube-cc/choco/bExGHkTQmo4.wav", "real chocolate — crumbs pressed (similar to chocolate wax crumbs)"),
     "youtube:-LJJrKD68bs": ("너덜너덜해진 슬랑이 ASMR", "공짝지근", "youtube-cc/soap/-LJJrKD68bs.wav", "worn crunchy slime squish — stands in for fully mixed wax"),
     "youtube:wK-jHC_7P6I": ("복숭아 크런치슬라임 무편집영상 공유", "뿌직 PPUJIG", "youtube-cc/beads/wK-jHC_7P6I.wav", "crunchy (bead) slime — stands in for the rainbow bead squishy"),
-    "freesound:414538": ("Crunch Sound 1", "emilyws", "freesound/414538.wav", "generic dry crunch — stands in for soap crunch"),
 }
-FREESOUND = {"freesound:414538": "https://freesound.org/people/emilyws/sounds/414538/"}
+FREESOUND: dict = {}
 
 # pool → (event, loudness class, note, [(source, start s, length s)]) — starts located in the sources by cross-correlation
 PICKS = {
@@ -48,8 +49,6 @@ PICKS = {
     "wax.mixed": ("hold", "impact", "W01/W02 every piece broken and kneaded in (owner picks: #3–#8 + second round 1, 2, 3, 5, 9)", [("youtube:-LJJrKD68bs", t, .7) for t in (108.720, 139.880, 150.370, 173.770, 196.770, 350.930, 16.67, 32.81, 62.01, 76.43, 193.9)]),
     "beads.crunch": ("crunch", "impact", "C02 rainbow beads crushed (owner pick, hiss reduced; short cut)", [("youtube:wK-jHC_7P6I", t, .45) for t in (17.56, 30.82, 37.04, 47.64, 58.28, 69.80, 75.14, 84.30)]),
     "beads.hold": ("hold", "continuous", "C02 rainbow beads squeezed (owner pick, hiss reduced; full cut)", [("youtube:wK-jHC_7P6I", t, 1.0) for t in (17.56, 30.82, 37.04, 47.64, 58.28, 69.80, 75.14, 84.30)]),
-    "soap.crunch": ("crunch", "impact", "C01 soap crunch (owner pick, provisional; short cut)", [("freesound:414538", t, .35) for t in (0.011, 0.367, 0.717, 1.110, 1.499, 1.956)]),
-    "soap.hold": ("hold", "impact", "C01 soap squeezed (owner pick, provisional; full cut)", [("freesound:414538", t, .7) for t in (0.011, 0.367, 0.717, 1.110, 1.499, 1.956)]),
 }
 # hiss reduction: the rainbow beads (2026-11-13) and, at the owner's request, every wax-ball source (second pick round)
 DENOISE = {"youtube:wK-jHC_7P6I", "youtube:kKYelJAi3xE", "youtube:DT-BjNH0iAo", "youtube:OVPG4qZMl0U", "youtube:bExGHkTQmo4", "youtube:-LJJrKD68bs"}
@@ -178,7 +177,9 @@ def main():
              "The owner picked these clips by ear (2026-11-13). **All clips were modified**: cut out of the source audio, faded in/out,",
              "peak-normalised and loudness-matched; the rainbow-bead and wax-ball clips were also hiss-reduced.", "",
              "YouTube videos: published by their uploaders under YouTube's “Creative Commons Attribution license (reuse allowed)” —",
-             f"CC BY 3.0 ({YT_LICENSE_URL}). Freesound: CC0 1.0 (no attribution needed; credited anyway).", "",
+             f"CC BY 3.0 ({YT_LICENSE_URL})." + (" Freesound: CC0 1.0 (no attribution needed; credited anyway)." if FREESOUND else ""), "",
+             "C01 비누 크런치 is not in this bundle: its provisional pick (Freesound 414538 “Crunch Sound 1” by emilyws, CC0) was removed",
+             "on 2026-11-13 and is no longer shipped. C01 plays the project owner's own recordings of the actual toy — see `CREDITS.md` (`own:` rows).", "",
              "| source | title | author | licence | used for |", "|---|---|---|---|---|"]
     used = {}
     for name, (_, _, note, made) in pools.items():

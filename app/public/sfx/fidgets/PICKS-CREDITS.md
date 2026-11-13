@@ -5,7 +5,10 @@ The owner picked these clips by ear (2026-11-13). **All clips were modified**: c
 peak-normalised and loudness-matched; the rainbow-bead and wax-ball clips were also hiss-reduced.
 
 YouTube videos: published by their uploaders under YouTube's “Creative Commons Attribution license (reuse allowed)” —
-CC BY 3.0 (https://creativecommons.org/licenses/by/3.0/). Freesound: CC0 1.0 (no attribution needed; credited anyway).
+CC BY 3.0 (https://creativecommons.org/licenses/by/3.0/).
+
+C01 비누 크런치 is not in this bundle: its provisional pick (Freesound 414538 “Crunch Sound 1” by emilyws, CC0) was removed
+on 2026-11-13 and is no longer shipped. C01 plays the project owner's own recordings of the actual toy — see `CREDITS.md` (`own:` rows).
 
 | source | title | author | licence | used for |
 |---|---|---|---|---|
@@ -15,4 +18,3 @@ CC BY 3.0 (https://creativecommons.org/licenses/by/3.0/). Freesound: CC0 1.0 (no
 | https://www.youtube.com/watch?v=bExGHkTQmo4 | Chocolate ASMR / Breaking, Cutting & Melting Chocolate | ramit girdhar | CC BY 3.0 | choco.crumbs |
 | https://www.youtube.com/watch?v=-LJJrKD68bs | 너덜너덜해진 슬랑이 ASMR | 공짝지근 | CC BY 3.0 | wax.mixed |
 | https://www.youtube.com/watch?v=wK-jHC_7P6I | 복숭아 크런치슬라임 무편집영상 공유 | 뿌직 PPUJIG | CC BY 3.0 | beads.crunch, beads.hold |
-| https://freesound.org/people/emilyws/sounds/414538/ | Crunch Sound 1 | emilyws | CC0 1.0 | soap.crunch, soap.hold |
