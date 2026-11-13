@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="ko">
+<head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /><title>Peach V3 A/B · MANZIZAK</title>
+<style>
+body{font:16px/1.6 system-ui,sans-serif;background:#f3f0eb;color:#342f29;margin:0;padding:24px}main{max-width:820px;margin:auto}
+fieldset{border:0;padding:0;display:flex;flex-wrap:wrap;gap:12px;margin:18px 0}
+button{font:inherit;padding:12px 16px;border:1px solid #b9afa0;border-radius:12px;background:white;color:inherit;touch-action:none}
+button[aria-pressed=true]{background:#e5d2b3;font-weight:600}button:disabled{opacity:.5}
+#pads{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:12px 0}#pads button{padding:26px 0}
+#status{min-height:1.6em}table{border-collapse:collapse;font-size:13px;width:100%;margin-top:10px}td,th{border-bottom:1px solid #d8cfc2;padding:4px 6px;text-align:right}th:first-child,td:first-child{text-align:left}
+small{display:block;margin-top:20px;color:#6b6155}a{color:#59482f}
+</style></head>
+<body><main><a href="./#/keyboard">← 키보드로 돌아가기</a><h1>Peach V3 A/B (개발용)</h1>
+<p><b>A</b> = 이전 Peach V3 (237 ms 통째 · ×10 증폭), <b>B</b> = 히스 정리본(앱이 지금 쓰는 소리). 같은 패드·키로 번갈아 들어 보세요.</p>
+<fieldset><button id="vA" aria-pressed="true">A 이전</button><button id="vB" aria-pressed="false">B 정리본</button>
+<button id="alt" disabled>같은 패턴 A→B 번갈아</button><button id="rapid" disabled>빠른 연타 (현재 쪽)</button></fieldset>
+<p id="status" role="status">음원 불러오는 중…</p>
+<div id="pads"></div>
+<p>패드를 누르거나 실제 키보드(A S D F J K L ;)로 쳐 보세요. 패드마다 무작위 클립이 아니라 고정된 클립을 냅니다(A·B 모두 같은 원본 번호끼리 짝).</p>
+<div id="table"></div>
+<small>같은 앱 오디오 엔진(+6 dB 보정, 앱과 동일)으로 재생합니다. 사람 청취 검증 전입니다. 원본: ThockHub K09 (권리 미확인, 로컬 전용).</small>
+</main><script type="module" src="/src/lab/keyboard-ab.ts"></script></body></html>
