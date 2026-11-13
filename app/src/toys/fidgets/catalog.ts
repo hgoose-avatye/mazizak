@@ -42,7 +42,7 @@ export interface FidgetSpec {
 export const FIDGETS: readonly FidgetSpec[] = [
   {
     id: "S01",
-    name: "TPR 젤리볼",
+    name: "슬랑이",
     category: "말랑이",
     family: "elastic",
     shape: "ball",
@@ -62,7 +62,7 @@ export const FIDGETS: readonly FidgetSpec[] = [
   },
   {
     id: "S02",
-    name: "슬로우 라이징 폼",
+    name: "모닝빵",
     category: "말랑이",
     family: "elastic",
     shape: "foam",
@@ -82,7 +82,7 @@ export const FIDGETS: readonly FidgetSpec[] = [
   },
   {
     id: "S03",
-    name: "모찌 말랑이",
+    name: "찹쌀떡",
     category: "말랑이",
     family: "elastic",
     shape: "mochi",
@@ -142,7 +142,7 @@ export const FIDGETS: readonly FidgetSpec[] = [
   },
   {
     id: "L01",
-    name: "치즈 슬랑이",
+    name: "치즈",
     category: "슬랑이",
     family: "viscous",
     shape: "cheese",
@@ -162,7 +162,7 @@ export const FIDGETS: readonly FidgetSpec[] = [
   },
   {
     id: "L02",
-    name: "망고 슬랑이",
+    name: "망고",
     category: "슬랑이",
     family: "viscous",
     shape: "mango",
@@ -182,7 +182,7 @@ export const FIDGETS: readonly FidgetSpec[] = [
   },
   {
     id: "L03",
-    name: "휘핑크림 슬랑이",
+    name: "휘핑크림",
     category: "슬랑이",
     family: "viscous",
     shape: "cream",
@@ -202,7 +202,7 @@ export const FIDGETS: readonly FidgetSpec[] = [
   },
   {
     id: "C01",
-    name: "비누 크런치",
+    name: "비누",
     category: "크런치 말랑이",
     family: "particles",
     shape: "soap",
@@ -222,7 +222,7 @@ export const FIDGETS: readonly FidgetSpec[] = [
   },
   {
     id: "C02",
-    name: "슈가비즈 말랑이",
+    name: "레인보우",
     category: "크런치 말랑이",
     family: "particles",
     shape: "beads",
