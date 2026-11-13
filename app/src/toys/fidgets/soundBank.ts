@@ -68,16 +68,17 @@ export const FIDGET_SOUND: Record<string, ToySound> = {
   L03: { init: NONE, tap: NONE, hold: sqz("cream.hold", "proxy", "shaving-foam squashing (stands in for whipped cream)"), release: NONE, stretch: NONE, fold: sqz("cream.fold", "proxy", "shaving-foam folding (stands in for whipped cream)"), crack: NONE, crunch: NONE },
   // W01/W02/C01/C02: the owner picked these by ear (2026-11-13) — see public/sfx/fidgets/PICKS-CREDITS.md
   W01: {
-    init: NONE, tap: NONE,
+    init: pick("apple.init", "recording", "a real wax ball's first break"),
+    tap: NONE,
     hold: pick("apple.after", "recording", "broken wax skin being pressed (real wax squishy)"),
     release: NONE, stretch: NONE, fold: NONE,
-    crack: pick("apple.break", "recording", "a real wax ball being broken by hand"),
+    crack: pick("apple.crack", "recording", "wax skin cracking while the shell breaks (real wax squishy)"),
     crunch: NONE,
   },
   W02: {
     ...waxToy("choco"),
-    init: NONE,
-    crack: pick("choco.break", "recording", "real wax balls (두쫀쿠 왁뿌) being broken"),
+    init: pick("choco.init", "recording", "a real wax ball's first break"),
+    crack: pick("choco.crack", "recording", "wax skin cracking while the shell breaks (real wax squishy)"),
     crunch: pick("choco.crumbs", "proxy", "chocolate crumbs pressed (real chocolate stands in for chocolate wax crumbs)"),
   },
   C01: {
@@ -98,6 +99,11 @@ export const FIDGET_SOUND: Record<string, ToySound> = {
 export const MIX_SOUND: Record<string, Partial<Record<"tap" | "hold", PoolRef>>> = {
   W01: { tap: pick("wax.mixed", "proxy", "worn crunchy slime pressed (stands in for wax mixed into the core)"), hold: pick("wax.mixed", "proxy", "worn crunchy slime squished (stands in for wax mixed into the core)") },
   W02: { tap: pick("wax.mixed", "proxy", "worn crunchy slime pressed (stands in for wax mixed into the core)"), hold: pick("wax.mixed", "proxy", "worn crunchy slime squished (stands in for wax mixed into the core)") },
+};
+/** wax balls: one-off stages of the break — `second` = the crack right after the first break, `nearDone` = nearly every piece broken */
+export const WAX_STAGES: Record<string, Partial<Record<"second" | "nearDone", PoolRef>>> = {
+  W01: { nearDone: pick("wax.nearDone", "recording", "a real wax ball nearly broken") },
+  W02: { second: pick("choco.second", "recording", "the click right after the first break"), nearDone: pick("wax.nearDone", "recording", "a real wax ball nearly broken") },
 };
 /** toys whose public sounds the owner picked by ear: on the dev server they play these by default (the reference-app sounds stay switchable) */
 export const OWNER_PICKED: ReadonlySet<string> = new Set(["W01", "W02", "C01", "C02"]);

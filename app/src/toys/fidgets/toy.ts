@@ -131,6 +131,8 @@ if (uMix > 0.0) {
   // W02: solid → fracturing → kneaded state machine with runtime Voronoi shards (chocolate.ts)
   const choco = spec.shape === "chocolate" ? new ChocolateBar(scene, blob.position, spec) : null;
   let frictionClock = 0;
+  /** wax balls: the "nearly every piece broken" sound has played (once per reset) */
+  let nearDoneFired = false;
   let softbox: THREE.Mesh | null = null;
   const softboxRest = new THREE.Vector3(-0.09, 0.45, 0.89)
     .normalize()
@@ -530,6 +532,7 @@ if (uMix > 0.0) {
     fracture?.reset();
     choco?.reset();
     mix = mixU.value = 0;
+    nearDoneFired = false;
     if (shell && shellNormals) {
       (shell.geometry.getAttribute("normal").array as Float32Array).set(
         shellNormals,
@@ -640,6 +643,12 @@ if (uMix > 0.0) {
         crazeBefore = fracture.crazeEvents,
         broken = fracture.step(dt, held);
       crackClock -= dt;
+      // nearly every piece broken: the owner-picked "거의 다 깨졌을 때" sound replaces this frame's crack sound (once per reset)
+      const nearNow = !nearDoneFired && broken.length > 0 && fracture.brokenCount >= Math.ceil(centers.length * 0.75);
+      const crackSound = (strength: number, extra: { rate?: number } = {}) => {
+        if (nearNow && !nearDoneFired && sound.playNearDone()) return (nearDoneFired = true);
+        return sound.play("crack", strength, 0, false, extra);
+      };
       if (choco) {
         // line fracture: a snapped piece takes its row-mate across the seam; both are cut into Voronoi shards at the press point
         const snapped = [...broken];
@@ -655,21 +664,21 @@ if (uMix > 0.0) {
           for (const i of snapped) area += choco.snap(i, press, dir);
           area /= snapped.length;
           // shatter layer: one sharp cue per snap; smaller shards → higher pitch
-          sound.play("crack", Math.min(1, 0.6 + snapped.length * 0.15), 0, false, { rate: THREE.MathUtils.clamp(1.12 - area * 1.2, 0.92, 1.12) });
+          crackSound(Math.min(1, 0.6 + snapped.length * 0.15), { rate: THREE.MathUtils.clamp(1.12 - area * 1.2, 0.92, 1.12) });
           ctx.haptic(14);
         }
       } else if (fracture.crazeEvents > crazeBefore) {
         // the whole shell crazes: the "first break" sound (long, loud)
-        sound.play("crack", 0.85);
+        crackSound(0.85);
         crackClock = 0.45;
         ctx.haptic(12);
       } else if (broken.length && crackClock <= 0) {
         // shards falling away: one grouped long cue every ~0.4 s, not one per patch
-        sound.play("crack", Math.min(1, 0.45 + broken.length * 0.08));
+        crackSound(Math.min(1, 0.45 + broken.length * 0.08));
         crackClock = 0.4;
         ctx.haptic(8);
       } else if (fracture.crackEvents - before > 2 && crackClock <= 0) {
-        sound.play("crack", 0.45);
+        crackSound(0.45);
         crackClock = 0.3;
       }
       for (const i of broken) {

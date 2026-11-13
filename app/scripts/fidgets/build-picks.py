@@ -26,8 +26,6 @@ SOURCES = {
     "youtube:kKYelJAi3xE": ("ASMR | 말랑이 17개 털었어요 +슬랑이, 왁뿌볼, 크랑이", "까퓰러ASMR Gapular", "youtube-cc/apple/kKYelJAi3xE.wav", "real wax ball (왁뿌볼) being broken by hand"),
     "youtube:OVPG4qZMl0U": ("ULTIMATE Wax Cracking ASMR! Best Crunchy Sounds", "Mochich! by Jolislime", "youtube-cc/apple/OVPG4qZMl0U.wav", "real wax-coated squishy, cracked wax skin"),
     "youtube:DT-BjNH0iAo": ("Wax Cracking ASMR — What should I crack next?", "Mochich! by Jolislime", "youtube-cc/apple/DT-BjNH0iAo.wav", "real wax-coated squishy, cracked wax skin"),
-    "youtube:416I3CavrD0": ("레전드 두쫀쿠 역대급 16종 버터 왁뿌! 두쫀쿠&딸기모찌 반갈죽부터 모래 왁스 부수기 ASMR", "오마이비키", "youtube-cc/choco/416I3CavrD0.wav", "real wax ball (두쫀쿠 왁뿌) being broken"),
-    "youtube:zosnnXmc_q8": ("[ASMR] 역대급 16종 버터 왁뿌 부수기!", "오마이비키", "youtube-cc/choco/zosnnXmc_q8.wav", "real wax balls being broken"),
     "youtube:bExGHkTQmo4": ("Chocolate ASMR | Breaking, Cutting & Melting Chocolate", "ramit girdhar", "youtube-cc/choco/bExGHkTQmo4.wav", "real chocolate — crumbs pressed (similar to chocolate wax crumbs)"),
     "youtube:-LJJrKD68bs": ("너덜너덜해진 슬랑이 ASMR", "공짝지근", "youtube-cc/soap/-LJJrKD68bs.wav", "worn crunchy slime squish — stands in for fully mixed wax"),
     "youtube:wK-jHC_7P6I": ("복숭아 크런치슬라임 무편집영상 공유", "뿌직 PPUJIG", "youtube-cc/beads/wK-jHC_7P6I.wav", "crunchy (bead) slime — stands in for the rainbow bead squishy"),
@@ -37,11 +35,16 @@ FREESOUND = {"freesound:414538": "https://freesound.org/people/emilyws/sounds/41
 
 # pool → (event, loudness class, note, [(source, start s, length s)]) — starts located in the sources by cross-correlation
 PICKS = {
-    "apple.break": ("crack", "impact", "W01 first break (owner pick: 처음 부술 때)", [("youtube:kKYelJAi3xE", 92.010, .6), ("youtube:kKYelJAi3xE", 174.860, .6), ("youtube:kKYelJAi3xE", 180.550, .6)]),
-    "apple.after": ("hold", "impact", "W01 broken wax being pressed (owner pick: 처음 다 부수고 나서)", [("youtube:OVPG4qZMl0U", 21.860, .6), ("youtube:OVPG4qZMl0U", 27.565, .6), ("youtube:OVPG4qZMl0U", 33.748, .6), ("youtube:OVPG4qZMl0U", 38.624, .6), ("youtube:OVPG4qZMl0U", 42.702, .6), ("youtube:DT-BjNH0iAo", 7.291, .6), ("youtube:DT-BjNH0iAo", 14.373, .6), ("youtube:DT-BjNH0iAo", 23.016, .6)]),
-    "choco.break": ("crack", "impact", "W02 first break (owner pick: 처음 부술 때)", [("youtube:416I3CavrD0", 12.140, .6), ("youtube:zosnnXmc_q8", 1745.560, .6), ("youtube:zosnnXmc_q8", 1821.090, .6), ("youtube:zosnnXmc_q8", 1951.170, .6)]),
+    # wax balls, owner picks 2026-11-13 (second round): first break → (choco) second click → breaking → nearly all broken → mixed
+    "apple.init": ("init", "impact", "W01 first break (owner pick: 처음 깰 때)", [("youtube:kKYelJAi3xE", 347.320, .6)]),
+    "choco.init": ("init", "impact", "W02 first break (owner pick: 처음 깰 때)", [("youtube:kKYelJAi3xE", 92.010, .6)]),
+    "choco.second": ("crack", "impact", "W02 the click right after the first break (owner pick: 깨고 나서 두 번째 클릭)", [("youtube:kKYelJAi3xE", 174.860, .6)]),
+    "apple.crack": ("crack", "impact", "W01 while breaking (owner pick: 깨지고 있을 때; #1 apple only, #2/#3 shared with W02)", [("youtube:DT-BjNH0iAo", 7.291, .6), ("youtube:DT-BjNH0iAo", 14.373, .6), ("youtube:DT-BjNH0iAo", 23.016, .6)]),
+    "choco.crack": ("crack", "impact", "W02 while breaking (owner pick: 깨지고 있을 때, shared with W01)", [("youtube:DT-BjNH0iAo", 14.373, .6), ("youtube:DT-BjNH0iAo", 23.016, .6)]),
+    "wax.nearDone": ("crack", "impact", "W01/W02 nearly every piece broken (owner pick: 거의 다 깨졌을 때)", [("youtube:kKYelJAi3xE", 356.590, .6)]),
+    "apple.after": ("hold", "impact", "W01 broken wax being pressed (owner pick, first round: 다 부수고 나서)", [("youtube:OVPG4qZMl0U", t, .6) for t in (21.860, 27.565, 33.748, 38.624, 42.702)]),
     "choco.crumbs": ("crunch", "impact", "W02 crumbs left after the first break, pressed (owner pick)", [("youtube:bExGHkTQmo4", 47.120, .6)]),
-    "wax.mixed": ("hold", "impact", "W01/W02 every piece broken and kneaded in (owner pick: 다 부서지고 다 섞였을 때)", [("youtube:-LJJrKD68bs", 108.720, .7), ("youtube:-LJJrKD68bs", 139.880, .7), ("youtube:-LJJrKD68bs", 150.370, .7)]),
+    "wax.mixed": ("hold", "impact", "W01/W02 every piece broken and kneaded in (owner pick: 다 깨고 다 섞였을 때, #3–#8)", [("youtube:-LJJrKD68bs", t, .7) for t in (108.720, 139.880, 150.370, 173.770, 196.770, 350.930)]),
     "beads.crunch": ("crunch", "impact", "C02 rainbow beads crushed (owner pick, hiss reduced; short cut)", [("youtube:wK-jHC_7P6I", t, .45) for t in (17.56, 30.82, 37.04, 47.64, 58.28, 69.80, 75.14, 84.30)]),
     "beads.hold": ("hold", "continuous", "C02 rainbow beads squeezed (owner pick, hiss reduced; full cut)", [("youtube:wK-jHC_7P6I", t, 1.0) for t in (17.56, 30.82, 37.04, 47.64, 58.28, 69.80, 75.14, 84.30)]),
     "soap.crunch": ("crunch", "impact", "C01 soap crunch (owner pick, provisional; short cut)", [("freesound:414538", t, .35) for t in (0.011, 0.367, 0.717, 1.110, 1.499, 1.956)]),

@@ -328,20 +328,24 @@ async function make(id: string) {
 describe("FidgetAudio event routing", () => {
   afterEach(() => vi.unstubAllGlobals());
 
-  it("W01 (owner picks): every crack plays the picked first-break clips; mixed wax plays the picked mixed clips", async () => {
+  it("W01 (owner picks): first break, then breaking cracks; nearly broken once; mixed wax plays the picked mixed clips", async () => {
     const { a, plays, at } = await make("W01");
     expect(a.state).toBe("recorded/derived");
-    expect(a.supportedRoles.sort()).toEqual(["crack", "hold"].sort());
+    expect(a.supportedRoles.sort()).toEqual(["crack", "hold", "init"].sort());
     at(0); expect(a.play("crack", 0.5)).toBe(true);
     at(300); expect(a.play("crack", 0.9)).toBe(true);
-    expect(plays[0].name).toMatch(/^fg:W01:crack:m:/);
-    expect(plays[1].name).toMatch(/^fg:W01:crack:m:/);
+    expect(plays[0].name).toMatch(/^fg:W01:init:m:/);
+    expect(plays[1].name).toMatch(/^fg:W01:crack:m:/); // W01 has no "second" stage
+    at(600); expect(a.playNearDone()).toBe(true);
+    expect(plays[2].name).toMatch(/^fg:W01:init:nearDone:/);
+    at(900); expect(a.playNearDone()).toBe(false); // once per reset
     a.mixed = true;
     at(1000); expect(a.play("hold", 0.5)).toBe(true);
     at(2000); expect(a.play("tap", 0.5)).toBe(true);
-    expect(plays[2].name).toMatch(/^fg:W01:hold:mix:/);
-    expect(plays[3].name).toMatch(/^fg:W01:tap:mix:/);
-    expect(plays[2].opts.lowpassHz).toBeUndefined(); // own mixed sounds, not the muffled knead
+    expect(plays[3].name).toMatch(/^fg:W01:hold:mix:/);
+    expect(plays[4].name).toMatch(/^fg:W01:tap:mix:/);
+    expect(plays[3].opts.lowpassHz).toBeUndefined(); // own mixed sounds, not the muffled knead
+    a.reset(); at(3000); expect(a.playNearDone()).toBe(true);
   });
 
   it("W01: kneading is `hold`; `tap` falls back to hold; releases and stretch are silent (no pool, no fallback)", async () => {
@@ -390,15 +394,19 @@ describe("FidgetAudio event routing", () => {
     expect(l02.a.hasOwn("fold")).toBe(false);
   });
 
-  it("W02 (owner picks): cracks play the picked first-break clips; shard friction plays the picked crumbs clip", async () => {
+  it("W02 (owner picks): first break, then the picked second click once, then breaking cracks; crumbs on shard friction", async () => {
     const { a, plays, at } = await make("W02");
-    expect(a.hasOwn("init")).toBe(false);
+    expect(a.hasOwn("init")).toBe(true);
     at(0); expect(a.play("crack", 0.5)).toBe(true);
-    at(400); expect(a.play("crack", 0.9)).toBe(true);
-    at(800); expect(a.play("crunch", 0.6)).toBe(true);
-    expect(plays[0].name).toMatch(/^fg:W02:crack:m:/);
-    expect(plays[1].name).toMatch(/^fg:W02:crack:m:/);
-    expect(plays[2].name).toMatch(/^fg:W02:crunch:m:/);
+    at(400); expect(a.play("crack", 0.5)).toBe(true);
+    at(800); expect(a.play("crack", 0.9)).toBe(true);
+    at(1200); expect(a.play("crunch", 0.6)).toBe(true);
+    expect(plays[0].name).toMatch(/^fg:W02:init:m:/);
+    expect(plays[1].name).toMatch(/^fg:W02:crack:second:/);
+    expect(plays[2].name).toMatch(/^fg:W02:crack:m:/);
+    expect(plays[3].name).toMatch(/^fg:W02:crunch:m:/);
+    a.reset(); at(2000); a.play("crack", 0.5); at(2400); a.play("crack", 0.5);
+    expect(plays[5].name).toMatch(/^fg:W02:crack:second:/); // again after a reset
   });
 
   it("rapid clicking: 20 contacts in 1.2 s all produce a sound, each replacing the previous sustained sound", async () => {

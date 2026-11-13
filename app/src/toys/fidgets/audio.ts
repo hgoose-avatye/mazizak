@@ -17,6 +17,7 @@ import {
   FIDGET_SOUND,
   MIX_SOUND,
   OWNER_PICKED,
+  WAX_STAGES,
   SPRITE_TRIM_DB,
   VoiceGate,
   between,
@@ -139,9 +140,12 @@ export interface ResolvedEvent {
 }
 /** wax balls after every piece is broken and kneaded into the core: the sounds that replace tap/hold ("mixed" phase) */
 export type MixEvent = "tap" | "hold";
+/** wax balls: one-off stages of the break (see WAX_STAGES) */
+export type WaxStage = "second" | "nearDone";
 export interface ResolvedToy {
   events: Partial<Record<FidgetEvent, ResolvedEvent>>;
   mix?: Partial<Record<MixEvent, ResolvedEvent>>;
+  stages?: Partial<Record<WaxStage, ResolvedEvent>>;
   source: string;
   /** dev only: the owner's stand-in sounds from the installed reference app, kept next to the public sounds so both can be compared */
   original?: { events: Partial<Record<FidgetEvent, ResolvedEvent>>; mix: Partial<Record<MixEvent, ResolvedEvent>>; source: string };
@@ -151,7 +155,8 @@ export async function resolveToy(ctx: BaseAudioContext, spec: FidgetSpec): Promi
   const map = FIDGET_SOUND[spec.id];
   if (!map) throw Error(`no sound map for ${spec.id}`);
   const mixMap = MIX_SOUND[spec.id] ?? {};
-  const needs = (s: PoolRef["source"]) => EVENTS.some((e) => map[e]?.source === s) || Object.values(mixMap).some((r) => r?.source === s);
+  const stageMap = WAX_STAGES[spec.id] ?? {};
+  const needs = (s: PoolRef["source"]) => EVENTS.some((e) => map[e]?.source === s) || [...Object.values(mixMap), ...Object.values(stageMap)].some((r) => r?.source === s);
   const sprites: Partial<Record<PoolRef["source"], LoadedSprite>> = {};
   for (const k of ["wax", "crunch", "squish", "picks"] as const) if (needs(k)) sprites[k] = await loadSprite(ctx, k);
   const local = LOCAL_AUDIO ? await referenceSounds(ctx, spec.id) : {};
@@ -243,7 +248,12 @@ export async function resolveToy(ctx: BaseAudioContext, spec: FidgetSpec): Promi
     const main = poolsOf(r, r.pool);
     if (main.length) mix[e] = { ref: r, main, baseDb: SPRITE_TRIM_DB[e] + (r.trimDb ?? 0), rate: r.rate, origin: `${r.source}/${r.pool}[${r.kind}]` };
   }
-  return { events, ...(Object.keys(mix).length ? { mix } : {}), source, ...(original ? { original } : {}) };
+  const stages: ResolvedToy["stages"] = {};
+  for (const [st, r] of Object.entries(stageMap) as [WaxStage, PoolRef][]) {
+    const main = poolsOf(r, r.pool);
+    if (main.length) stages[st] = { ref: r, main, baseDb: SPRITE_TRIM_DB[st === "second" ? "crack" : "init"] + (r.trimDb ?? 0), rate: r.rate, origin: `${r.source}/${r.pool}[${r.kind}]` };
+  }
+  return { events, ...(Object.keys(mix).length ? { mix } : {}), ...(Object.keys(stages).length ? { stages } : {}), source, ...(original ? { original } : {}) };
 }
 
 interface PlayableSet {
@@ -265,14 +275,17 @@ export class FidgetAudio {
   private enabled = false;
   private sets: Partial<Record<FidgetEvent, PlayableSet>> = {};
   private mixSets: Partial<Record<MixEvent, PlayableSet>> = {};
+  private stageSets: Partial<Record<WaxStage, PlayableSet>> = {};
   /** "public" = the shippable pools; "original" = dev-only reference-app stand-ins (the default on the dev server when present) */
   variant: "public" | "original" = "public";
-  private banks: Partial<Record<"public" | "original", { sets: Partial<Record<FidgetEvent, PlayableSet>>; mix: Partial<Record<MixEvent, PlayableSet>>; source: string; roles: string[] }>> = {};
+  private banks: Partial<Record<"public" | "original", { sets: Partial<Record<FidgetEvent, PlayableSet>>; mix: Partial<Record<MixEvent, PlayableSet>>; stages: Partial<Record<WaxStage, PlayableSet>>; source: string; roles: string[] }>> = {};
   /** wax balls: every piece broken and being kneaded into the core */
   mixed = false;
   private gate = new VoiceGate();
   private picker = new ClipPicker(() => this.rng());
   private firstCrackDone = false;
+  private secondDone = false;
+  private nearDoneDone = false;
   private seed = 1;
   /** small deterministic LCG: same event sequence → same clip/rate sequence (testable) */
   private rng = () => {
@@ -294,10 +307,19 @@ export class FidgetAudio {
     });
     return names;
   }
-  private bank(events: ResolvedToy["events"], mix: ResolvedToy["mix"], tag: string, source: string) {
+  private bank(events: ResolvedToy["events"], mix: ResolvedToy["mix"], tag: string, source: string, stages: ResolvedToy["stages"] = {}) {
     const sets: Partial<Record<FidgetEvent, PlayableSet>> = {},
       mixSets: Partial<Record<MixEvent, PlayableSet>> = {},
+      stageSets: Partial<Record<WaxStage, PlayableSet>> = {},
       roles: string[] = [];
+    for (const [st, e] of Object.entries(stages ?? {}) as [WaxStage, ResolvedEvent][]) {
+      const set: PlayableSet = { ref: e.ref, main: [], durations: {}, baseDb: e.baseDb, rate: e.rate, origin: e.origin };
+      for (const [name, d] of this.register(st === "second" ? "crack" : "init", tag + st, e.main.map((c) => c.buffer))) {
+        set.main.push(name);
+        set.durations[name] = d;
+      }
+      stageSets[st] = set;
+    }
     for (const [event, e] of Object.entries(mix ?? {}) as [MixEvent, ResolvedEvent][]) {
       const set: PlayableSet = { ref: null, main: [], durations: {}, baseDb: e.baseDb, rate: e.rate, origin: e.origin };
       for (const [name, d] of this.register(event, tag + "mix", e.main.map((c) => c.buffer))) {
@@ -325,7 +347,7 @@ export class FidgetAudio {
       sets[event] = set;
       roles.push(event);
     }
-    return { sets, mix: mixSets, source, roles };
+    return { sets, mix: mixSets, stages: stageSets, source, roles };
   }
   private async prepare() {
     try {
@@ -333,8 +355,8 @@ export class FidgetAudio {
       // engine names: the sounds that play by default keep the plain tags (m / a / mix); the dev-only public bank next to an original one gets "pub"
       if (r.original) {
         this.banks.original = this.bank(r.original.events, r.original.mix, "", r.original.source);
-        this.banks.public = this.bank(r.events, r.mix, "pub", r.source);
-      } else this.banks.public = this.bank(r.events, r.mix, "", r.source);
+        this.banks.public = this.bank(r.events, r.mix, "pub", r.source, r.stages);
+      } else this.banks.public = this.bank(r.events, r.mix, "", r.source, r.stages);
       // owner-picked public sounds win over the dev-only reference-app ones (which stay switchable for comparison)
       this.useVariant(r.original && !OWNER_PICKED.has(this.spec.id) ? "original" : "public");
       this.state = "recorded/derived";
@@ -354,6 +376,7 @@ export class FidgetAudio {
     this.variant = v;
     this.sets = b.sets;
     this.mixSets = b.mix;
+    this.stageSets = b.stages;
     this.source = b.source;
     this.supportedRoles = [...b.roles];
     return true;
@@ -373,6 +396,8 @@ export class FidgetAudio {
   /** restore per-object state (first crack) — call on toy reset */
   reset() {
     this.firstCrackDone = false;
+    this.secondDone = false;
+    this.nearDoneDone = false;
     this.mixed = false;
     this.picker.reset();
     this.gate.clear();
@@ -383,6 +408,8 @@ export class FidgetAudio {
     let ev: FidgetEvent = event;
     // the first crack after a reset is the "init" sound when the toy has one
     if (ev === "crack" && !this.firstCrackDone && this.sets.init) ev = "init";
+    // the crack right after the first break has its own sound when the toy has one (once per reset)
+    const second = ev === "crack" && this.firstCrackDone && !this.secondDone ? this.stageSets.second : undefined;
     // mixed wax ball: its own "completed" sounds when there are any (dev reference); otherwise the knead sounds,
     // muffled and a little slower — wax crumbs buried in soft clay
     const mixSet = this.mixed && (ev === "tap" || ev === "hold") ? this.mixSets[ev] : undefined;
@@ -393,14 +420,15 @@ export class FidgetAudio {
     }
     const muffle = this.mixed && !mixSet && (ev === "hold" || ev === "tap");
     if (muffle) extra = { rate: (extra.rate ?? 1) * 0.93, lowpassHz: Math.min(extra.lowpassHz ?? 1600, 1600) };
-    const set = mixSet ?? this.sets[ev]!,
+    const set = second ?? mixSet ?? this.sets[ev]!,
       now = this.now(),
-      d = this.gate.decide(ev, now, interrupt);
+      // the one-off break stages (first break, the click after it) must always sound: they replace older short voices
+      d = this.gate.decide(ev, now, interrupt || ev === "init" || !!second);
     if (!d.ok) return false;
     for (const v of d.evict ?? []) v.stop?.(0.03);
     const useAlt = !!set.alt && strength >= (set.altMin ?? 1);
     const names = useAlt ? set.alt! : set.main;
-    const name = names[this.picker.pick(`${ev}:${mixSet ? "mix" : useAlt ? "a" : "m"}`, names.length)];
+    const name = names[this.picker.pick(`${ev}:${second ? "second" : mixSet ? "mix" : useAlt ? "a" : "m"}`, names.length)];
     const rate = between(this.rng, set.rate) * (extra.rate ?? 1);
     const log = this.audio.play(
       name,
@@ -416,7 +444,24 @@ export class FidgetAudio {
     );
     if (!log) return false;
     this.gate.commit(ev, now, (set.durations[name] / rate) * 1000 + 25, log.stop);
+    if (second) this.secondDone = true;
     if (ev === "init" || event === "crack") this.firstCrackDone = true;
+    return true;
+  }
+  /** wax balls: "nearly every piece broken" — plays its own sound once per reset (returns false when the toy has none) */
+  playNearDone(strength = 0.85) {
+    const set = this.stageSets.nearDone;
+    if (!this.enabled || this.state !== "recorded/derived" || !set || this.nearDoneDone) return false;
+    const now = this.now();
+    const d = this.gate.decide("crack", now, true);
+    if (!d.ok) return false;
+    for (const v of d.evict ?? []) v.stop?.(0.03);
+    const name = set.main[this.picker.pick("nearDone", set.main.length)];
+    const rate = between(this.rng, set.rate);
+    const log = this.audio.play(name, { rate, detuneCents: 0, gainJitterDb: 0.4, gainDb: set.baseDb + strengthDb(strength) + d.attenuationDb }, "fidget:crack");
+    if (!log) return false;
+    this.gate.commit("crack", now, (set.durations[name] / rate) * 1000 + 25, log.stop);
+    this.nearDoneDone = this.firstCrackDone = this.secondDone = true;
     return true;
   }
   releaseGesture() {

@@ -4,12 +4,12 @@
  "sampleRate": 44100,
  "channels": 1,
  "bitDepth": 16,
- "totalSamples": 1356327,
+ "totalSamples": 1422468,
  "built": "2026-11-13",
  "note": "Clips picked by ear by the owner from candidate cuts (2026-11-13). Peak-normalised to −1 dBFS; `gain` (≤1) matches loudness within a pool; relative loudness between event classes is set by the player.",
  "counts": {
-  "sourceFiles": 9,
-  "extractedClips": 47,
+  "sourceFiles": 7,
+  "extractedClips": 49,
   "derivedVariants": 0
  },
  "dropped": [],
@@ -46,28 +46,6 @@
    "usage": "owner-picked fidget clips (see pool notes); cut, faded, normalised",
    "materialMatch": "real wax-coated squishy, cracked wax skin",
    "originalFile": "https://www.youtube.com/watch?v=DT-BjNH0iAo"
-  },
-  "youtube:416I3CavrD0": {
-   "title": "레전드 두쫀쿠 역대급 16종 버터 왁뿌! 두쫀쿠&딸기모찌 반갈죽부터 모래 왁스 부수기 ASMR",
-   "author": "오마이비키",
-   "url": "https://www.youtube.com/watch?v=416I3CavrD0",
-   "license": "CC BY 3.0",
-   "licenseUrl": "https://creativecommons.org/licenses/by/3.0/",
-   "retrieved": "2026-11-13",
-   "usage": "owner-picked fidget clips (see pool notes); cut, faded, normalised",
-   "materialMatch": "real wax ball (두쫀쿠 왁뿌) being broken",
-   "originalFile": "https://www.youtube.com/watch?v=416I3CavrD0"
-  },
-  "youtube:zosnnXmc_q8": {
-   "title": "[ASMR] 역대급 16종 버터 왁뿌 부수기!",
-   "author": "오마이비키",
-   "url": "https://www.youtube.com/watch?v=zosnnXmc_q8",
-   "license": "CC BY 3.0",
-   "licenseUrl": "https://creativecommons.org/licenses/by/3.0/",
-   "retrieved": "2026-11-13",
-   "usage": "owner-picked fidget clips (see pool notes); cut, faded, normalised",
-   "materialMatch": "real wax balls being broken",
-   "originalFile": "https://www.youtube.com/watch?v=zosnnXmc_q8"
   },
   "youtube:bExGHkTQmo4": {
    "title": "Chocolate ASMR | Breaking, Cutting & Melting Chocolate",
@@ -115,30 +93,62 @@
   }
  },
  "pools": {
-  "apple.break": {
-   "event": "crack",
+  "apple.init": {
+   "event": "init",
    "loudnessClass": "impact",
    "material": "owner pick",
-   "note": "W01 first break (owner pick: 처음 부술 때)",
-   "recordings": 3,
+   "note": "W01 first break (owner pick: 처음 깰 때)",
+   "recordings": 1,
    "variants": 0,
    "entries": [
     {
      "start": 0,
-     "length": 25631,
+     "length": 25735,
      "offset": 0.0,
+     "duration": 0.58356,
+     "gain": 1.0,
+     "src": "youtube:kKYelJAi3xE",
+     "srcStart": 347.3364,
+     "srcEnd": 347.92,
+     "centroidHz": 4523,
+     "boostDb": 0
+    }
+   ]
+  },
+  "choco.init": {
+   "event": "init",
+   "loudnessClass": "impact",
+   "material": "owner pick",
+   "note": "W02 first break (owner pick: 처음 깰 때)",
+   "recordings": 1,
+   "variants": 0,
+   "entries": [
+    {
+     "start": 27058,
+     "length": 25631,
+     "offset": 0.61356,
      "duration": 0.581202,
-     "gain": 0.9442,
+     "gain": 1.0,
      "src": "youtube:kKYelJAi3xE",
      "srcStart": 92.0288,
      "srcEnd": 92.61,
      "centroidHz": 4574,
      "boostDb": 0
-    },
+    }
+   ]
+  },
+  "choco.second": {
+   "event": "crack",
+   "loudnessClass": "impact",
+   "material": "owner pick",
+   "note": "W02 the click right after the first break (owner pick: 깨고 나서 두 번째 클릭)",
+   "recordings": 1,
+   "variants": 0,
+   "entries": [
     {
-     "start": 26954,
+     "start": 54012,
      "length": 25607,
-     "offset": 0.611202,
+     "offset": 1.224762,
      "duration": 0.580658,
      "gain": 1.0,
      "src": "youtube:kKYelJAi3xE",
@@ -146,17 +156,107 @@
      "srcEnd": 175.46,
      "centroidHz": 5627,
      "boostDb": 0
+    }
+   ]
+  },
+  "apple.crack": {
+   "event": "crack",
+   "loudnessClass": "impact",
+   "material": "owner pick",
+   "note": "W01 while breaking (owner pick: 깨지고 있을 때; #1 apple only, #2/#3 shared with W02)",
+   "recordings": 3,
+   "variants": 0,
+   "entries": [
+    {
+     "start": 80942,
+     "length": 26020,
+     "offset": 1.83542,
+     "duration": 0.590023,
+     "gain": 0.7408,
+     "src": "youtube:DT-BjNH0iAo",
+     "srcStart": 7.301,
+     "srcEnd": 7.891,
+     "centroidHz": 5879,
+     "boostDb": 0
     },
     {
-     "start": 53884,
-     "length": 26341,
-     "offset": 1.221859,
-     "duration": 0.597302,
-     "gain": 0.9091,
+     "start": 108285,
+     "length": 26198,
+     "offset": 2.455442,
+     "duration": 0.594059,
+     "gain": 1.0,
+     "src": "youtube:DT-BjNH0iAo",
+     "srcStart": 14.3789,
+     "srcEnd": 14.973,
+     "centroidHz": 5846,
+     "boostDb": 0
+    },
+    {
+     "start": 135806,
+     "length": 26394,
+     "offset": 3.079501,
+     "duration": 0.598503,
+     "gain": 0.7202,
+     "src": "youtube:DT-BjNH0iAo",
+     "srcStart": 23.0175,
+     "srcEnd": 23.616,
+     "centroidHz": 6355,
+     "boostDb": 0
+    }
+   ]
+  },
+  "choco.crack": {
+   "event": "crack",
+   "loudnessClass": "impact",
+   "material": "owner pick",
+   "note": "W02 while breaking (owner pick: 깨지고 있을 때, shared with W01)",
+   "recordings": 2,
+   "variants": 0,
+   "entries": [
+    {
+     "start": 163523,
+     "length": 26198,
+     "offset": 3.708005,
+     "duration": 0.594059,
+     "gain": 1.0,
+     "src": "youtube:DT-BjNH0iAo",
+     "srcStart": 14.3789,
+     "srcEnd": 14.973,
+     "centroidHz": 5846,
+     "boostDb": 0
+    },
+    {
+     "start": 191044,
+     "length": 26394,
+     "offset": 4.332063,
+     "duration": 0.598503,
+     "gain": 0.7202,
+     "src": "youtube:DT-BjNH0iAo",
+     "srcStart": 23.0175,
+     "srcEnd": 23.616,
+     "centroidHz": 6355,
+     "boostDb": 0
+    }
+   ]
+  },
+  "wax.nearDone": {
+   "event": "crack",
+   "loudnessClass": "impact",
+   "material": "owner pick",
+   "note": "W01/W02 nearly every piece broken (owner pick: 거의 다 깨졌을 때)",
+   "recordings": 1,
+   "variants": 0,
+   "entries": [
+    {
+     "start": 218761,
+     "length": 25575,
+     "offset": 4.960567,
+     "duration": 0.579932,
+     "gain": 1.0,
      "src": "youtube:kKYelJAi3xE",
-     "srcStart": 180.5527,
-     "srcEnd": 181.15,
-     "centroidHz": 5449,
+     "srcStart": 356.6101,
+     "srcEnd": 357.19,
+     "centroidHz": 4926,
      "boostDb": 0
     }
    ]
@@ -165,14 +265,14 @@
    "event": "hold",
    "loudnessClass": "impact",
    "material": "owner pick",
-   "note": "W01 broken wax being pressed (owner pick: 처음 다 부수고 나서)",
-   "recordings": 8,
+   "note": "W01 broken wax being pressed (owner pick, first round: 다 부수고 나서)",
+   "recordings": 5,
    "variants": 0,
    "entries": [
     {
-     "start": 81548,
+     "start": 245659,
      "length": 25517,
-     "offset": 1.849161,
+     "offset": 5.570499,
      "duration": 0.578617,
      "gain": 1.0,
      "src": "youtube:OVPG4qZMl0U",
@@ -182,9 +282,9 @@
      "boostDb": 0
     },
     {
-     "start": 108388,
+     "start": 272499,
      "length": 26398,
-     "offset": 2.457778,
+     "offset": 6.179116,
      "duration": 0.598594,
      "gain": 0.6526,
      "src": "youtube:OVPG4qZMl0U",
@@ -194,9 +294,9 @@
      "boostDb": 0
     },
     {
-     "start": 136109,
+     "start": 300220,
      "length": 26460,
-     "offset": 3.086372,
+     "offset": 6.80771,
      "duration": 0.6,
      "gain": 0.9,
      "src": "youtube:OVPG4qZMl0U",
@@ -206,9 +306,9 @@
      "boostDb": 0
     },
     {
-     "start": 163892,
+     "start": 328003,
      "length": 26298,
-     "offset": 3.716372,
+     "offset": 7.43771,
      "duration": 0.596327,
      "gain": 0.6527,
      "src": "youtube:OVPG4qZMl0U",
@@ -218,109 +318,15 @@
      "boostDb": 0
     },
     {
-     "start": 191513,
+     "start": 355624,
      "length": 26455,
-     "offset": 4.342698,
+     "offset": 8.064036,
      "duration": 0.599887,
      "gain": 0.7184,
      "src": "youtube:OVPG4qZMl0U",
      "srcStart": 42.7021,
      "srcEnd": 43.302,
      "centroidHz": 6893,
-     "boostDb": 0
-    },
-    {
-     "start": 219291,
-     "length": 26020,
-     "offset": 4.972585,
-     "duration": 0.590023,
-     "gain": 0.5287,
-     "src": "youtube:DT-BjNH0iAo",
-     "srcStart": 7.301,
-     "srcEnd": 7.891,
-     "centroidHz": 5879,
-     "boostDb": 0
-    },
-    {
-     "start": 246634,
-     "length": 26198,
-     "offset": 5.592608,
-     "duration": 0.594059,
-     "gain": 0.7136,
-     "src": "youtube:DT-BjNH0iAo",
-     "srcStart": 14.3789,
-     "srcEnd": 14.973,
-     "centroidHz": 5846,
-     "boostDb": 0
-    },
-    {
-     "start": 274155,
-     "length": 26394,
-     "offset": 6.216667,
-     "duration": 0.598503,
-     "gain": 0.5139,
-     "src": "youtube:DT-BjNH0iAo",
-     "srcStart": 23.0175,
-     "srcEnd": 23.616,
-     "centroidHz": 6355,
-     "boostDb": 0
-    }
-   ]
-  },
-  "choco.break": {
-   "event": "crack",
-   "loudnessClass": "impact",
-   "material": "owner pick",
-   "note": "W02 first break (owner pick: 처음 부술 때)",
-   "recordings": 4,
-   "variants": 0,
-   "entries": [
-    {
-     "start": 301872,
-     "length": 25524,
-     "offset": 6.84517,
-     "duration": 0.578776,
-     "gain": 0.6894,
-     "src": "youtube:416I3CavrD0",
-     "srcStart": 12.1612,
-     "srcEnd": 12.74,
-     "centroidHz": 7311,
-     "boostDb": 0
-    },
-    {
-     "start": 328719,
-     "length": 25473,
-     "offset": 7.453946,
-     "duration": 0.577619,
-     "gain": 1.0,
-     "src": "youtube:zosnnXmc_q8",
-     "srcStart": 1745.5824,
-     "srcEnd": 1746.16,
-     "centroidHz": 6693,
-     "boostDb": 0
-    },
-    {
-     "start": 355515,
-     "length": 26460,
-     "offset": 8.061565,
-     "duration": 0.6,
-     "gain": 0.8855,
-     "src": "youtube:zosnnXmc_q8",
-     "srcStart": 1821.09,
-     "srcEnd": 1821.69,
-     "centroidHz": 7711,
-     "boostDb": 0
-    },
-    {
-     "start": 383298,
-     "length": 26460,
-     "offset": 8.691565,
-     "duration": 0.6,
-     "gain": 0.6663,
-     "src": "youtube:zosnnXmc_q8",
-     "srcStart": 1951.17,
-     "srcEnd": 1951.77,
-     "centroidHz": 6684,
      "boostDb": 0
     }
    ]
@@ -334,9 +340,9 @@
    "variants": 0,
    "entries": [
     {
-     "start": 411081,
+     "start": 383402,
      "length": 25706,
-     "offset": 9.321565,
+     "offset": 8.693923,
      "duration": 0.582902,
      "gain": 1.0,
      "src": "youtube:bExGHkTQmo4",
@@ -351,16 +357,16 @@
    "event": "hold",
    "loudnessClass": "impact",
    "material": "owner pick",
-   "note": "W01/W02 every piece broken and kneaded in (owner pick: 다 부서지고 다 섞였을 때)",
-   "recordings": 3,
+   "note": "W01/W02 every piece broken and kneaded in (owner pick: 다 깨고 다 섞였을 때, #3–#8)",
+   "recordings": 6,
    "variants": 0,
    "entries": [
     {
-     "start": 438110,
+     "start": 410431,
      "length": 30085,
-     "offset": 9.934467,
+     "offset": 9.306825,
      "duration": 0.6822,
-     "gain": 0.8969,
+     "gain": 0.6377,
      "src": "youtube:-LJJrKD68bs",
      "srcStart": 108.7378,
      "srcEnd": 109.42,
@@ -368,11 +374,11 @@
      "boostDb": 0
     },
     {
-     "start": 469518,
+     "start": 441839,
      "length": 29866,
-     "offset": 10.646667,
+     "offset": 10.019025,
      "duration": 0.677234,
-     "gain": 0.8641,
+     "gain": 0.6144,
      "src": "youtube:-LJJrKD68bs",
      "srcStart": 139.9027,
      "srcEnd": 140.5799,
@@ -380,15 +386,51 @@
      "boostDb": 0
     },
     {
-     "start": 500707,
+     "start": 473028,
      "length": 30138,
-     "offset": 11.3539,
+     "offset": 10.726259,
      "duration": 0.683401,
-     "gain": 1.0,
+     "gain": 0.711,
      "src": "youtube:-LJJrKD68bs",
      "srcStart": 150.3866,
      "srcEnd": 151.07,
      "centroidHz": 4063,
+     "boostDb": 0
+    },
+    {
+     "start": 504489,
+     "length": 29947,
+     "offset": 11.43966,
+     "duration": 0.67907,
+     "gain": 0.7466,
+     "src": "youtube:-LJJrKD68bs",
+     "srcStart": 173.7909,
+     "srcEnd": 174.47,
+     "centroidHz": 6572,
+     "boostDb": 0
+    },
+    {
+     "start": 535759,
+     "length": 29997,
+     "offset": 12.14873,
+     "duration": 0.680204,
+     "gain": 0.9535,
+     "src": "youtube:-LJJrKD68bs",
+     "srcStart": 196.7898,
+     "srcEnd": 197.47,
+     "centroidHz": 3918,
+     "boostDb": 0
+    },
+    {
+     "start": 567079,
+     "length": 29907,
+     "offset": 12.858934,
+     "duration": 0.678163,
+     "gain": 1.0,
+     "src": "youtube:-LJJrKD68bs",
+     "srcStart": 350.9518,
+     "srcEnd": 351.63,
+     "centroidHz": 5695,
      "boostDb": 0
     }
    ]
@@ -402,9 +444,9 @@
    "variants": 0,
    "entries": [
     {
-     "start": 532168,
+     "start": 598309,
      "length": 19845,
-     "offset": 12.067302,
+     "offset": 13.567098,
      "duration": 0.45,
      "gain": 0.8088,
      "src": "youtube:wK-jHC_7P6I",
@@ -414,9 +456,9 @@
      "boostDb": 0
     },
     {
-     "start": 553336,
+     "start": 619477,
      "length": 19825,
-     "offset": 12.547302,
+     "offset": 14.047098,
      "duration": 0.449546,
      "gain": 0.5719,
      "src": "youtube:wK-jHC_7P6I",
@@ -426,9 +468,9 @@
      "boostDb": 0
     },
     {
-     "start": 574484,
+     "start": 640625,
      "length": 19845,
-     "offset": 13.026848,
+     "offset": 14.526644,
      "duration": 0.45,
      "gain": 1.0,
      "src": "youtube:wK-jHC_7P6I",
@@ -438,9 +480,9 @@
      "boostDb": 0
     },
     {
-     "start": 595652,
+     "start": 661793,
      "length": 19845,
-     "offset": 13.506848,
+     "offset": 15.006644,
      "duration": 0.45,
      "gain": 0.7178,
      "src": "youtube:wK-jHC_7P6I",
@@ -450,9 +492,9 @@
      "boostDb": 0
     },
     {
-     "start": 616820,
+     "start": 682961,
      "length": 19845,
-     "offset": 13.986848,
+     "offset": 15.486644,
      "duration": 0.45,
      "gain": 0.7515,
      "src": "youtube:wK-jHC_7P6I",
@@ -462,9 +504,9 @@
      "boostDb": 0
     },
     {
-     "start": 637988,
+     "start": 704129,
      "length": 19651,
-     "offset": 14.466848,
+     "offset": 15.966644,
      "duration": 0.445601,
      "gain": 0.4792,
      "src": "youtube:wK-jHC_7P6I",
@@ -474,9 +516,9 @@
      "boostDb": 0
     },
     {
-     "start": 658962,
+     "start": 725103,
      "length": 19845,
-     "offset": 14.942449,
+     "offset": 16.442245,
      "duration": 0.45,
      "gain": 0.6514,
      "src": "youtube:wK-jHC_7P6I",
@@ -486,9 +528,9 @@
      "boostDb": 0
     },
     {
-     "start": 680130,
+     "start": 746271,
      "length": 19162,
-     "offset": 15.422449,
+     "offset": 16.922245,
      "duration": 0.434512,
      "gain": 0.6942,
      "src": "youtube:wK-jHC_7P6I",
@@ -508,9 +550,9 @@
    "variants": 0,
    "entries": [
     {
-     "start": 700615,
+     "start": 766756,
      "length": 44100,
-     "offset": 15.886961,
+     "offset": 17.386757,
      "duration": 1.0,
      "gain": 0.9003,
      "src": "youtube:wK-jHC_7P6I",
@@ -520,9 +562,9 @@
      "boostDb": 0
     },
     {
-     "start": 746038,
+     "start": 812179,
      "length": 44080,
-     "offset": 16.916961,
+     "offset": 18.416757,
      "duration": 0.999546,
      "gain": 0.6979,
      "src": "youtube:wK-jHC_7P6I",
@@ -532,9 +574,9 @@
      "boostDb": 0
     },
     {
-     "start": 791441,
+     "start": 857582,
      "length": 44100,
-     "offset": 17.946508,
+     "offset": 19.446304,
      "duration": 1.0,
      "gain": 0.7947,
      "src": "youtube:wK-jHC_7P6I",
@@ -544,9 +586,9 @@
      "boostDb": 0
     },
     {
-     "start": 836864,
+     "start": 903005,
      "length": 44100,
-     "offset": 18.976508,
+     "offset": 20.476304,
      "duration": 1.0,
      "gain": 1.0,
      "src": "youtube:wK-jHC_7P6I",
@@ -556,9 +598,9 @@
      "boostDb": 0
     },
     {
-     "start": 882287,
+     "start": 948428,
      "length": 44100,
-     "offset": 20.006508,
+     "offset": 21.506304,
      "duration": 1.0,
      "gain": 0.9816,
      "src": "youtube:wK-jHC_7P6I",
@@ -568,9 +610,9 @@
      "boostDb": 0
     },
     {
-     "start": 927710,
+     "start": 993851,
      "length": 43906,
-     "offset": 21.036508,
+     "offset": 22.536304,
      "duration": 0.995601,
      "gain": 0.7554,
      "src": "youtube:wK-jHC_7P6I",
@@ -580,9 +622,9 @@
      "boostDb": 0
     },
     {
-     "start": 972939,
+     "start": 1039080,
      "length": 44100,
-     "offset": 22.062109,
+     "offset": 23.561905,
      "duration": 1.0,
      "gain": 0.5935,
      "src": "youtube:wK-jHC_7P6I",
@@ -592,9 +634,9 @@
      "boostDb": 0
     },
     {
-     "start": 1018362,
+     "start": 1084503,
      "length": 43417,
-     "offset": 23.092109,
+     "offset": 24.591905,
      "duration": 0.984512,
      "gain": 0.8021,
      "src": "youtube:wK-jHC_7P6I",
@@ -614,9 +656,9 @@
    "variants": 0,
    "entries": [
     {
-     "start": 1063102,
+     "start": 1129243,
      "length": 15434,
-     "offset": 24.106621,
+     "offset": 25.606417,
      "duration": 0.349977,
      "gain": 0.4419,
      "src": "freesound:414538",
@@ -626,9 +668,9 @@
      "boostDb": 0
     },
     {
-     "start": 1079859,
+     "start": 1146000,
      "length": 15434,
-     "offset": 24.486599,
+     "offset": 25.986395,
      "duration": 0.349977,
      "gain": 0.5796,
      "src": "freesound:414538",
@@ -638,9 +680,9 @@
      "boostDb": 0
     },
     {
-     "start": 1096616,
+     "start": 1162757,
      "length": 15434,
-     "offset": 24.866576,
+     "offset": 26.366372,
      "duration": 0.349977,
      "gain": 0.5148,
      "src": "freesound:414538",
@@ -650,9 +692,9 @@
      "boostDb": 0
     },
     {
-     "start": 1113373,
+     "start": 1179514,
      "length": 15434,
-     "offset": 25.246553,
+     "offset": 26.746349,
      "duration": 0.349977,
      "gain": 0.5786,
      "src": "freesound:414538",
@@ -662,9 +704,9 @@
      "boostDb": 0
     },
     {
-     "start": 1130130,
+     "start": 1196271,
      "length": 15434,
-     "offset": 25.626531,
+     "offset": 27.126327,
      "duration": 0.349977,
      "gain": 1.0,
      "src": "freesound:414538",
@@ -674,9 +716,9 @@
      "boostDb": 0
     },
     {
-     "start": 1146887,
+     "start": 1213028,
      "length": 15434,
-     "offset": 26.006508,
+     "offset": 27.506304,
      "duration": 0.349977,
      "gain": 0.7296,
      "src": "freesound:414538",
@@ -696,9 +738,9 @@
    "variants": 0,
    "entries": [
     {
-     "start": 1163644,
+     "start": 1229785,
      "length": 30869,
-     "offset": 26.386485,
+     "offset": 27.886281,
      "duration": 0.699977,
      "gain": 0.5801,
      "src": "freesound:414538",
@@ -708,9 +750,9 @@
      "boostDb": 0
     },
     {
-     "start": 1195836,
+     "start": 1261977,
      "length": 30869,
-     "offset": 27.116463,
+     "offset": 28.616259,
      "duration": 0.699977,
      "gain": 0.5796,
      "src": "freesound:414538",
@@ -720,9 +762,9 @@
      "boostDb": 0
     },
     {
-     "start": 1228028,
+     "start": 1294169,
      "length": 30869,
-     "offset": 27.84644,
+     "offset": 29.346236,
      "duration": 0.699977,
      "gain": 0.5892,
      "src": "freesound:414538",
@@ -732,9 +774,9 @@
      "boostDb": 0
     },
     {
-     "start": 1260220,
+     "start": 1326361,
      "length": 30869,
-     "offset": 28.576417,
+     "offset": 30.076213,
      "duration": 0.699977,
      "gain": 0.9865,
      "src": "freesound:414538",
@@ -744,9 +786,9 @@
      "boostDb": 0
     },
     {
-     "start": 1292412,
+     "start": 1358553,
      "length": 30869,
-     "offset": 29.306395,
+     "offset": 30.80619,
      "duration": 0.699977,
      "gain": 1.0,
      "src": "freesound:414538",
@@ -756,9 +798,9 @@
      "boostDb": 0
     },
     {
-     "start": 1324604,
+     "start": 1390745,
      "length": 30400,
-     "offset": 30.036372,
+     "offset": 31.536168,
      "duration": 0.689342,
      "gain": 0.7296,
      "src": "freesound:414538",
