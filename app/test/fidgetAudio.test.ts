@@ -114,7 +114,9 @@ describe("event → pool mapping", () => {
 
   it("derived / proxy sources are labelled, never claimed as recordings of the toy", () => {
     for (const toy of Object.values(FIDGET_SOUND)) for (const e of EVENTS) expect(toy[e]?.kind, "no reversed / derived audio is used for any fidget event").not.toBe("derived");
-    for (const id of ["C01", "C02"]) for (const e of ["hold", "crunch"] as const) expect(FIDGET_SOUND[id][e]!.kind).toBe("proxy");
+    // C01 plays the owner's recordings of the actual toy; C02 still uses stand-in materials
+    for (const e of ["hold", "crunch"] as const) expect(FIDGET_SOUND.C01[e]!.kind).toBe("recording");
+    for (const e of ["hold", "crunch"] as const) expect(FIDGET_SOUND.C02[e]!.kind).toBe("proxy");
     for (const id of ["S03", "L02", "L03"]) expect(FIDGET_SOUND[id].hold!.kind).toBe("proxy");
     expect(EXCLUDED.length).toBeGreaterThan(3);
   });
@@ -243,8 +245,11 @@ describe("shipped wax / crunch sprites", () => {
       it("records source, license, usage and the original file for every clip; counts raw vs derived separately", () => {
         for (const p of Object.values(map.pools)) for (const e of p.entries) expect(map.sources[e.src], e.src).toBeTruthy();
         for (const s of Object.values(map.sources)) {
-          expect(["CC0 1.0", "CC BY 4.0"]).toContain(s.license);
-          expect(s.licenseUrl).toMatch(/^https:\/\/creativecommons\.org\//);
+          if (s.author === "project owner") expect(s.license).toBe("Own recording (project owner)"); // own recordings: no third-party licence is claimed
+          else {
+            expect(["CC0 1.0", "CC BY 4.0"]).toContain(s.license);
+            expect(s.licenseUrl).toMatch(/^https:\/\/creativecommons\.org\//);
+          }
           expect(s.usage.length).toBeGreaterThan(5);
           expect(fs.existsSync(new URL(`../${s.originalFile}`, import.meta.url)), s.originalFile).toBe(true);
         }
@@ -264,12 +269,17 @@ describe("shipped wax / crunch sprites", () => {
         expect(new Set(keys).size).toBe(keys.length);
       }
   });
+  it("C01 (soap) plays only the owner's recordings: take 28 for crunch, take 27 for hold", () => {
+    const src = (n: string) => new Set(sprites.crunch.pools[n].entries.map((e) => e.src));
+    expect([...src("soap.crunch")]).toEqual(["own:soap.crunch/rec28.wav"]);
+    expect([...src("soap.hold")]).toEqual(["own:soap.hold/rec27.wav"]);
+  });
   it("C01 (soap) and C02 (beads) use different source files and measurably different crunch spectra", () => {
     const src = (n: string) => new Set(sprites.crunch.pools[n].entries.map((e) => e.src));
     for (const a of ["soap.crunch", "soap.hold"]) for (const b of ["beads.crunch", "beads.hold"]) for (const s of src(a)) expect(src(b).has(s), `${a} vs ${b}`).toBe(false);
     const c = (n: string) => sprites.crunch.pools[n].entries.reduce((s, e) => s + e.centroidHz, 0) / sprites.crunch.pools[n].entries.length;
     // the two toys differ in material AND spectrum (soap-like dry foam vs. small hard granules)
-    expect(Math.abs(c("soap.hold") - c("beads.hold")) / Math.min(c("soap.hold"), c("beads.hold")) + Math.abs(c("soap.crunch") - c("beads.crunch")) / Math.min(c("soap.crunch"), c("beads.crunch"))).toBeGreaterThan(0.25); // measured ≈0.30: C01 and C02 differ only moderately in spectrum — a known weakness until own recordings exist
+    expect(Math.abs(c("soap.hold") - c("beads.hold")) / Math.min(c("soap.hold"), c("beads.hold")) + Math.abs(c("soap.crunch") - c("beads.crunch")) / Math.min(c("soap.crunch"), c("beads.crunch"))).toBeGreaterThan(0.25); // C01 own recordings (≈2.5 kHz) vs C02 beads (≈6–7 kHz) differ clearly
     expect(sprites.crunch.pools["soap.crunch"].entries.length).toBeGreaterThanOrEqual(8);
     expect(sprites.crunch.pools["soap.hold"].entries.length).toBeGreaterThanOrEqual(5);
   });

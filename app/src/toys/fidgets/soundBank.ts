@@ -66,9 +66,10 @@ export const FIDGET_SOUND: Record<string, ToySound> = {
   W02: waxToy("choco"),
   C01: {
     init: NONE, tap: NONE,
-    hold: crunch("soap.hold", "styrofoam crinkle windows as sustained soap-chip compression (similar material only)"),
+    // the project owner's own recordings of the actual toy (scripts/fidgets/own/, provenance in own/sources.json)
+    hold: crunch("soap.hold", "continuous squeezing windows from the owner's recording of the soap crunch squishy (take 27)", { kind: "recording", trimDb: 2 }), // +2 dB: these windows have a higher crest factor (≈2.5 dB lower RMS) than the stand-in they replace
     release: NONE, stretch: NONE, fold: NONE, crack: NONE,
-    crunch: crunch("soap.crunch", "short styrofoam crushing hits as soap-chip crushing (similar material only)"),
+    crunch: crunch("soap.crunch", "short crushing hits from the owner's recording of the soap crunch squishy (take 28)", { kind: "recording" }),
   },
   C02: {
     init: NONE, tap: NONE,
@@ -83,6 +84,7 @@ export const EXCLUDED: { what: string; why: string }[] = [
   { what: "the shared CC0 gel sprite (squishy.wav) for every fidget", why: "S01–S03 and L01–L03 sounded alike and the clips were boosted up to +21 dB from 128 kbps sources; replaced by per-toy recordings in squish.wav" },
   { what: "rubber-glove stretch loop as slime stretch", why: "latex, not slime; replaced by slime stretching recordings" },
   { what: "styrofoam-only C01, plastic/sugar-only C02", why: "replaced by dry floral foam + styrofoam (C01) and glass beads, sprinkles, pop rocks, rock candy (C02)" },
+  { what: "C01 stand-ins: dry floral foam + styrofoam (Freesound 560167, 868249, 774262)", why: "replaced on 2026-11-13 by the project owner's own recordings of the soap crunch squishy (scripts/fidgets/own/soap.crunch, soap.hold)" },
   { what: "13 Freesound sources the listener marked 제외 on every judged clip (2026-11-12): stress ball 344643, squeeze toy 622335, dough 241813/612769, slime 794272/680447, goo 655814/824934, jello 559768, styrofoam 389657/195797, beads 541076/343795", why: "listener verdict (lab-compare); S03 now uses other CC0 dough / squish recordings (403915, 837964) and L02 CC0 crunchy-slime recordings (759401, 759402) — not yet listened to (own recordings: scripts/fidgets/own/<pool>/ replace them)" },
   { what: "pools failing the waveform gates (foam.tap, gel.fold, choco... as listed in the sprite JSON `dropped`)", why: "fewer than the minimum number of independent clips passed" },
   { what: "candidate clips failing the waveform gates", why: "amplification > 18 dB, clipped source passage, mostly silence, abrupt window end, spectral or length outlier within the pool (see `audit` in the sprite JSON)" },

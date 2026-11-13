@@ -26,7 +26,7 @@ for (const k of ['wax', 'crunch', 'squish']) {
   for (const [n, p] of Object.entries(j.pools)) for (const e of p.entries) {
     const s = j.sources[e.src];
     if (!s) problems.push(`${k}/${n}: clip source ${e.src} unknown`);
-    else if (!['CC0 1.0', 'CC BY 4.0'].includes(s.license) || !s.usage) problems.push(`${k}/${n}: ${e.src} licence/usage missing`);
+    else if (!(['CC0 1.0', 'CC BY 4.0'].includes(s.license) || (e.src.startsWith('own:') && s.license === 'Own recording (project owner)')) || !s.usage) problems.push(`${k}/${n}: ${e.src} licence/usage missing`);
   }
 }
 if (!fs.existsSync(path.join(dist, 'sfx/fidgets/CREDITS.md'))) problems.push('sfx/fidgets/CREDITS.md missing');

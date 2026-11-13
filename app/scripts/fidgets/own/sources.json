@@ -1,0 +1,5 @@
+{
+ "_doc": "Provenance of the project owner's own recordings in scripts/fidgets/own/<pool>/ — only what the owner stated. WAVs were converted from the owner's .m4a files (48 kHz mono AAC) with macOS afconvert to 48 kHz mono 16-bit PCM; no other processing.",
+ "soap.crunch/rec28.wav": { "title": "새로운 녹음 28.m4a (C01 비누 크런치 — short crushing)", "added": "2026-11-13", "material": "recording of the actual toy (C01 soap crunch squishy), per the project owner" },
+ "soap.hold/rec27.wav": { "title": "새로운 녹음 27.m4a (C01 비누 크런치 — continuous squeezing)", "added": "2026-11-13", "material": "recording of the actual toy (C01 soap crunch squishy), per the project owner" }
+}
