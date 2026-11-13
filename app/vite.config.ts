@@ -6,26 +6,33 @@ import { existsSync } from "node:fs";
 import { homedir } from "node:os";
 
 const r = (p: string) => fileURLToPath(new URL(p, import.meta.url));
+// Dev-server defaults: the owner's permanent local folders and installed reference apps (nothing here is committed or built).
+// An env var still overrides; MANZIZAK_*="" turns one off. A path that does not exist is ignored.
+const MANZIZAK_HOME = path.join(homedir(), "Music/MANZIZAK");
+const devDir = (env: string | undefined, fallback: string) => {
+  const d = env ?? fallback;
+  return d && existsSync(d) ? d : undefined;
+};
 
 export default defineConfig(({ command, isPreview }) => {
   const fidgetDir =
     command === "serve" && !isPreview
-      ? process.env.MANZIZAK_LOCAL_FIDGET_DIR
+      ? devDir(process.env.MANZIZAK_LOCAL_FIDGET_DIR, path.join(MANZIZAK_HOME, "dev-reference/fidgets"))
       : undefined;
   // read-only, loopback-only window onto the sounds of an installed reference app, for listening comparisons in lab-compare.html.
   // Nothing is copied into the repository or the build (scripts/check-dist.mjs forbids the route name in dist/).
   const originalDir =
     command === "serve" && !isPreview
-      ? process.env.MANZIZAK_ORIGINAL_APP_DIR
+      ? devDir(process.env.MANZIZAK_ORIGINAL_APP_DIR, "/Applications/Runner.app/Wrapper/Runner.app/Frameworks/App.framework/flutter_assets/assets/sounds")
       : undefined;
   // same idea for the installed 뿌왁 app (squish_<name>_mallang_N.wav at the bundle root)
   const wakppuDir =
     command === "serve" && !isPreview
-      ? process.env.MANZIZAK_ORIGINAL_WAKPPU_DIR
+      ? devDir(process.env.MANZIZAK_ORIGINAL_WAKPPU_DIR, "/Applications/Wakppu.app/Wrapper/Wakppu.app")
       : undefined;
   const localDir =
     command === "serve" && !isPreview
-      ? process.env.MANZIZAK_LOCAL_AUDIO_DIR
+      ? process.env.MANZIZAK_LOCAL_AUDIO_DIR || undefined
       : undefined;
   // permanent home of the owner's YouTube keyboard presets (몽돌 / 찌개 / 도자기), outside the repository (dev server only)
   const ytPresetDir = (() => {
@@ -45,9 +52,9 @@ export default defineConfig(({ command, isPreview }) => {
       "import.meta.env.VITE_ORIGINAL_SOUNDS": JSON.stringify(
         (originalDir || wakppuDir) && process.env.MANZIZAK_ORIGINAL_SOUNDS !== "0" ? "1" : "0",
       ),
-      // "0": keep the local reference meshes but play only the licensed sound pools
+      // "1" (opt-in): also play the reference app's own audio; default keeps the local reference meshes with only the licensed pools + the owner-chosen original sounds
       "import.meta.env.VITE_LOCAL_FIDGET_AUDIO": JSON.stringify(
-        process.env.MANZIZAK_LOCAL_FIDGET_AUDIO === "0" ? "0" : "1",
+        process.env.MANZIZAK_LOCAL_FIDGET_AUDIO === "1" ? "1" : "0",
       ),
     },
     plugins: [
@@ -182,8 +189,8 @@ export default defineConfig(({ command, isPreview }) => {
                   try {
                     // 몽돌 / 찌개 / 도자기 and Peach V3 (cleaned B) come from the permanent folder when it exists; Peach V3's previous
                     // sprite (A, ".orig") only from its compare/ folder (A/B page; never the keyboard's default); the rest from MANZIZAK_LOCAL_AUDIO_DIR
-                    const kept = /^(mongdol-pl87w|jjigae-topre|dojagi-space65|silent-peach-v3)$/.test(match[1]);
-                    const dir = match[1] === "silent-peach-v3.orig" && ytPresetDir ? path.join(ytPresetDir, "..", "compare") : kept && ytPresetDir ? ytPresetDir : localDir;
+                    const file = `${match[1]}.${match[2]}`;
+                    const dir = match[1] === "silent-peach-v3.orig" && ytPresetDir ? path.join(ytPresetDir, "..", "compare") : ytPresetDir && existsSync(path.join(ytPresetDir, file)) ? ytPresetDir : localDir;
                     if (!dir) throw new Error("no folder");
                     const data = await readFile(
                       path.join(dir, `${match[1]}.${match[2]}`),
