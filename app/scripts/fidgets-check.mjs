@@ -154,9 +154,8 @@ try {
         touchPoints: [],
       });
       await cdp.detach();
-      await p.getByRole("button", { name: "접기", exact: true }).click();
-      await p.waitForTimeout(200);
-      ok(id + " fold button", (await report()).folds > 0);
+      // the 접기 / 뭉치기 buttons were removed (2026-11-13); the two-finger gesture above still folds
+      ok(id + " no fold / gather buttons", (await p.getByRole("button", { name: /^(접기|뭉치기)$/ }).count()) === 0);
     }
     await p.getByRole("button", { name: "처음 상태로" }).click();
     await p.waitForTimeout(150);

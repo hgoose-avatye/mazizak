@@ -137,13 +137,6 @@ const variants = $('#variants');
 function buildVariants(id: string): void {
   variants.innerHTML = '';
   if (findFidget(id)) {
-    const spec = findFidget(id)!;
-    if (spec.family === 'viscous') {
-      for (const [action, label] of [['fold', '접기'], ['gather', '뭉치기']]) {
-        const b = document.createElement('button'); b.className = 'chip'; b.textContent = label;
-        b.onclick = () => toys[id]?.action?.(action); variants.append(b);
-      }
-    }
     // dev only: compare the reference-app stand-in sounds with the public ones on the same gestures
     if (ORIGINAL_SOUNDS && ORIGINAL_FOLDER[id]) {
       const pair: HTMLButtonElement[] = [];

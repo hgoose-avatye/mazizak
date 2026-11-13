@@ -808,8 +808,6 @@ if (uMix > 0.0) {
     frame,
     reset,
     action(name) {
-      if (name === "fold") model.foldNow();
-      if (name === "gather") model.gather();
       // dev comparison: the same gestures with the reference-app stand-ins or with the public sounds
       if (name === "sound:original" || name === "sound:public") sound.useVariant(name === "sound:original" ? "original" : "public");
       ctx.requestFrame();
