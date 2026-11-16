@@ -1,6 +1,7 @@
-// LOCAL DEVELOPMENT ONLY. Builds the three owner-chosen YouTube keyboard presets (몽돌 / 찌개 / 도자기) from audio files that YOU downloaded.
-// The recordings' rights are unverified: output goes to the git-ignored local preset folder, is served only by the loopback dev server
-// (MANZIZAK_LOCAL_AUDIO_DIR) and is never part of a build (check-dist).
+// Builds the three owner-chosen YouTube keyboard presets (몽돌 / 찌개 / 도자기) from audio files that YOU downloaded.
+// The project owner obtained permission to use these recordings in the public build (2026-11-16). This script still writes into the local
+// preset folder (MANZIZAK_LOCAL_AUDIO_DIR, with a local-only marker in the JSON); scripts/kbsamples/ship-cleared-presets.mjs promotes the
+// result to public/sfx/keyboard/ and replaces the marker by the permission record (check-dist refuses a sprite that still carries the marker).
 //
 //   Input  : $MANZIZAK_YT_AUDIO_DIR (default ~/Music/MANZIZAK/dev-keyboard-audio/source) containing  mongdol.<ext>  jjigae.<ext>  dojagi.<ext>   (any ffmpeg-readable audio)
 //   Output : $MANZIZAK_LOCAL_AUDIO_DIR (default ~/Music/MANZIZAK/dev-keyboard-audio/presets)/<id>.{wav,json}

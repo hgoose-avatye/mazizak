@@ -1,4 +1,5 @@
-// LOCAL DEVELOPMENT ONLY. Peach V3 (Outemu Silent Peach V3, ThockHub K09 clips): remove the hiss the old build carried.
+// Peach V3 (Outemu Silent Peach V3, ThockHub K09 clips): remove the hiss the old build carried. (The owner obtained permission to use these
+// recordings in the public build, 2026-11-16; this script writes to the local preset folder and scripts/kbsamples/ship-cleared-presets.mjs promotes it.)
 // The old build (build-local-presets.py) used every 237 ms file whole and amplified it ×10 (+20 dB): up to 48 ms of hiss before
 // the click and 100–200 ms of hiss after the (quiet, silent-switch) strike had faded.
 //

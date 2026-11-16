@@ -1,4 +1,5 @@
-# Local development only. See docs/research/keyboard-six-2026-11-11/local-playable/REPORT.md.
+# Writes the local preset folder (with a local-only marker in the JSON). Box Jade (옥구슬) is shipped from there: the owner obtained permission to use
+# the recordings in the public build (2026-11-16) and scripts/kbsamples/ship-cleared-presets.mjs promotes it. See docs/research/keyboard-six-2026-11-11/local-playable/REPORT.md.
 from pathlib import Path
 import subprocess,wave,struct,math,json,hashlib,os,shutil
 ff=os.environ.get('FFMPEG') or shutil.which('ffmpeg')

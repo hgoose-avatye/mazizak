@@ -184,13 +184,13 @@ No filtering, EQ, pitch change or noise reduction.
 - Cheese and Magnetic Jade were replaced by these two presets. Their private video files are retained
   outside the repository, are not served by the app, and are not included in the build.
 
-## Third-party recordings cleared by the project owner (2026-11-16): 몽돌 · 찌개 · 도자기 · 복숭아 · 옥구슬
+## Third-party recordings used with permission (2026-11-16): 몽돌 · 찌개 · 도자기 · 복숭아 · 옥구슬
 
-These five presets are cut from recordings made by other people. **The project owner stated on 2026-11-16 that these sounds are cleared for the
-public build.** That is the owner's statement: the build tooling cannot verify it, and the sources themselves carry no open licence
-(YouTube standard licence for the three videos; "Personal use only" on the Mechvibes pack page; no redistribution terms on ThockHub). If a rights
-holder objects, remove the preset (`CLEARED_KEY_PRESETS` in `src/audio/localKeyPresets.ts`, then `public/sfx/keyboard/<id>.*`).
-Each shipped sprite JSON carries the same record (`clearance`) and the credit (`credit`).
+These five presets are cut from recordings made by other people. **The project owner obtained permission to use them in the public build**
+(the owner's statement of 2026-11-16). The text of the permissions is not stored in this repository, and no credit condition beyond the source
+credits below has been reported to it. If a permission requires a specific credit, add it to this section and to the settings sheet
+(`index.html`). To withdraw a preset: remove its id from `CLEARED_KEY_PRESETS` (`src/audio/localKeyPresets.ts`) and delete
+`public/sfx/keyboard/<id>.*` and `public/thumbs/menu/kb-<id>.jpg`. Each shipped sprite JSON carries the same record (`clearance`) and the credit (`credit`).
 
 | Preset | Recording | By | Source |
 |---|---|---|---|

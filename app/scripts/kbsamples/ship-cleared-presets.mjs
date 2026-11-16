@@ -1,9 +1,9 @@
 // Promote the cleared key presets (옥구슬 복숭아 몽돌 찌개 도자기) from the local dev folder to the public build:
 //   ~/Music/MANZIZAK/dev-keyboard-audio/presets/<id>.{wav,json}  →  public/sfx/keyboard/<id>.{wav,json}
 //
-// The recordings come from third parties (YouTube typing videos, ThockHub, a Mechvibes pack). The project owner stated on 2026-11-16 that the
-// sounds in use are cleared for the public build; nothing here (or anywhere in the build tooling) can verify that, so the statement is written
-// into every shipped JSON (`clearance`) and into public/sfx/keyboard/CREDITS.md. The generators (build-youtube-presets.mjs, clean-peach-v3.mjs,
+// The recordings come from third parties (YouTube typing videos, ThockHub, a Mechvibes pack). The project owner obtained permission to use them
+// in the public build (owner's statement, 2026-11-16). The permission texts are not kept in the repository, so the record says exactly that
+// (`clearance` in every shipped JSON, and public/sfx/keyboard/CREDITS.md). The generators (build-youtube-presets.mjs, clean-peach-v3.mjs,
 // build-local-presets.py) keep writing their output with the local-only markers; this script is the one place that turns them into shippable files.
 //
 // Usage: node scripts/kbsamples/ship-cleared-presets.mjs        (re-runnable; the WAV bytes are copied unchanged and checked against MANIFEST.sha256)
@@ -38,10 +38,10 @@ for (const [id, credit] of Object.entries(CLEARED)) {
   delete map.usage;
   delete map.rights;
   map.clearance = {
-    status: 'cleared for the public build',
+    status: 'permission to use in the public build obtained',
     statedBy: 'project owner',
     statedOn: '2026-11-16',
-    note: 'A statement by the owner. The recording rights could not be verified independently (third-party recordings; see CREDITS.md).',
+    note: "The owner's statement; the permission terms are not stored in the repository. A required credit, if any, belongs in CREDITS.md (sfx/keyboard).",
   };
   map.credit = credit;
   map.wavSha256 = sha(wav);

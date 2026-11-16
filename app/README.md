@@ -19,7 +19,7 @@ node scripts/make-thumbs.mjs   # 메뉴 썸네일 다시 만들기 (장난감 �
 
 - `#/` 홈: 장난감 선택 카드(실제 3D 렌더 썸네일 — `public/thumbs/menu/<ID>.jpg`, `kb-<프리셋>.jpg`; 이미지가 없으면 CSS로 그린 모양이 대신 보임)
 - `#/squishy` 말랑이(슬로우 라이징 폼): 누르면 즉시 들어가고, 놓으면 자국이 잠시 남았다가 1.4~3초에 걸쳐 천천히 복원(반동 없음) · 끌기 · 두 손가락 늘리기 · 색상 4종 · 초기화
-- `#/keyboard` 키보드: 9키+스페이스, 동시 입력, 누른 위치에 따른 미세 기울기, 프리셋 조약돌/까랑까랑, 물리 키보드(QWE/ASD/ZXC/Space)
+- `#/keyboard` 키캡: 9키+스페이스, 동시 입력, 누른 위치에 따른 미세 기울기, 프리셋 11종(조약돌·얼음·크림·마시멜로·민트·타자기 + 몽돌·찌개·도자기·복숭아·옥구슬), 물리 키보드(QWE/ASD/ZXC/Space). 소리 출처·허락 기록: `public/sfx/keyboard/CREDITS.md`
 - 설정 시트: 소리·볼륨·진동(Android)·화질(자동/고화질/절약)·움직임 줄이기·성능 정보
 - `audio-test.html`: 모바일 오디오 활성화(pointerdown/pointerup/touchstart) 실기기 검증 도구
 

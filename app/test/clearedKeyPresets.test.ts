@@ -2,8 +2,8 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { loadKeyboardSamples } from "../src/audio/keyboardSamples";
 import { CLEARED_KEY_PRESETS, isKeyPresetEnabled } from "../src/audio/localKeyPresets";
 
-// 옥구슬 · 복숭아 · 몽돌 · 찌개 · 도자기: third-party recordings the project owner cleared for the public build (2026-11-16).
-// These tests guard the shipped files and the record of the clearance; they cannot (and do not) verify the rights themselves.
+// 옥구슬 · 복숭아 · 몽돌 · 찌개 · 도자기: third-party recordings the project owner obtained permission to use in the public build (2026-11-16).
+// These tests guard the shipped files and the record of that permission; they cannot (and do not) verify the permission itself.
 // node:fs via a dynamic specifier so `tsc` needs no @types/node (same pattern as the other sample tests)
 const fsName = "node:fs";
 const { readFileSync } = (await import(/* @vite-ignore */ fsName)) as { readFileSync(p: URL): Uint8Array };
@@ -44,7 +44,7 @@ describe.each([...CLEARED_KEY_PRESETS])("cleared preset %s", (id) => {
       }
   });
 
-  it("carries the owner's clearance record instead of the local-only marker, and no local path", () => {
+  it("carries the owner's permission record instead of the local-only marker, and no local path", () => {
     const text = JSON.stringify(map);
     expect(map.clearance).toMatchObject({ statedBy: "project owner", statedOn: "2026-11-16" });
     expect(map.usage).toBeUndefined();
@@ -56,7 +56,7 @@ describe.each([...CLEARED_KEY_PRESETS])("cleared preset %s", (id) => {
   it("is named in CREDITS.md with its source", () => {
     const t = new TextDecoder().decode(file("CREDITS.md"));
     for (const name of CREDIT_NAMES[id]) expect(t, name).toContain(name);
-    expect(t).toContain("cleared for the\npublic build");
+    expect(t).toContain("obtained permission to use them in the public build");
   });
 
   it("is enabled in every build and loads from the shipped folder, never from the dev route", async () => {

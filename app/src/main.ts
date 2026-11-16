@@ -281,7 +281,7 @@ audio.onStateChange = (s) => {
 const homeCards = document.querySelector<HTMLElement>('#content-cards')!;
 /**
  * Real render of the toy (scripts/make-thumbs.mjs → public/thumbs/menu/<name>.jpg). The CSS-drawn shape / key tiles stay underneath as the
- * fallback while it loads or when no file exists (e.g. the dev-only key presets), so a card never shows a broken image.
+ * fallback while it loads or when no file exists (e.g. a preset that has no thumbnail yet), so a card never shows a broken image.
  */
 const thumbSrc = (name: string) => `./thumbs/menu/${name}.jpg`;
 const thumbImage = (src: string) => {
