@@ -279,6 +279,17 @@ audio.onStateChange = (s) => {
 };
 
 const homeCards = document.querySelector<HTMLElement>('#content-cards')!;
+/**
+ * Real render of the toy (scripts/make-thumbs.mjs → public/thumbs/menu/<name>.jpg). The CSS-drawn shape / key tiles stay underneath as the
+ * fallback while it loads or when no file exists (e.g. the dev-only key presets), so a card never shows a broken image.
+ */
+const thumbSrc = (name: string) => `./thumbs/menu/${name}.jpg`;
+const thumbImage = (name: string) => {
+  const img = document.createElement('img');
+  img.className = 'shot'; img.alt = ''; img.width = img.height = 116; img.decoding = 'async'; img.src = thumbSrc(name);
+  img.onerror = () => img.remove();
+  return img;
+};
 function showCategory(category: string) {
   document.querySelectorAll<HTMLButtonElement>('[data-category]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.category === category)));
   homeCards.replaceChildren();
@@ -288,6 +299,7 @@ function showCategory(category: string) {
       const link = document.createElement('a'); link.className = 'card'; link.href = '#/keyboard/' + p;
       const thumb = document.createElement('div'); thumb.className = 'thumb preview-keyboard';
       for (const color of KEYBOARD_COLORS[p].keys.slice(0, 9)) { const key = document.createElement('i'); key.style.background = '#' + color.toString(16).padStart(6, '0'); thumb.append(key); }
+      thumb.append(thumbImage('kb-' + p));
       const body = document.createElement('div'); body.className = 'card-body'; const title = document.createElement('b'); title.textContent = KEY_PRESET_INFO[p].label;
       const desc = document.createElement('span'); desc.textContent = KEY_PRESET_INFO[p].desc; body.append(title, desc); link.append(thumb, body); homeCards.append(link);
     }
@@ -295,7 +307,7 @@ function showCategory(category: string) {
     for (const f of FIDGETS.filter(f => f.category === category)) {
       const link = document.createElement('a'); link.className = 'card'; link.href = '#/' + f.id; link.dataset.toy = f.id;
       const thumb = document.createElement('div'); thumb.className = 'thumb preview-fidget ' + f.shape; thumb.style.setProperty('--toy-color', '#' + f.color.toString(16).padStart(6, '0'));
-      const shape = document.createElement('i'); thumb.append(shape);
+      const shape = document.createElement('i'); thumb.append(shape, thumbImage(f.id));
       if (LOCAL_FIDGETS && f.shape !== 'cheese') { const image = document.createElement('img'); image.src = '/__local-fidgets/thumbs/' + f.id + '.png'; image.alt = ''; image.onload = () => shape.hidden = true; image.onerror = () => image.remove(); thumb.append(image); }
       const body = document.createElement('div'); body.className = 'card-body'; const title = document.createElement('b'); title.textContent = f.name;
       const desc = document.createElement('span'); desc.textContent = f.hint; const label = document.createElement('i'); label.textContent = f.category; body.append(title, desc, label); link.append(thumb, body); homeCards.append(link);
@@ -304,6 +316,15 @@ function showCategory(category: string) {
 }
 document.querySelectorAll<HTMLButtonElement>('[data-category]').forEach(b => b.onclick = () => showCategory(b.dataset.category!));
 showCategory('말랑이');
+// fetch every category's thumbnails once the browser is idle (≈140 KB), so switching categories shows the images at once
+{
+  const warm = () => {
+    for (const f of FIDGETS) new Image().src = thumbSrc(f.id);
+    for (const p of Object.keys(KEY_PRESET_INFO) as KeyPresetId[]) if (isKeyPresetEnabled(p)) new Image().src = thumbSrc('kb-' + p);
+  };
+  const ric = (window as Window & { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number }).requestIdleCallback;
+  if (ric) ric(warm, { timeout: 3000 }); else setTimeout(warm, 1500);
+}
 if (import.meta.env.DEV) (window as unknown as { __MANZIZAK__: unknown }).__MANZIZAK__ = {
   report: () => rt.toy?.report?.(), audio: () => audio.playLogs.slice(-100), frames: () => rt.framesRendered,
 };

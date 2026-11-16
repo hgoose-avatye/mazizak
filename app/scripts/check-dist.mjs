@@ -30,5 +30,12 @@ for (const k of ['wax', 'crunch', 'squish', 'picks']) {
   }
 }
 for (const f of ['CREDITS.md', 'PICKS-CREDITS.md']) if (!fs.existsSync(path.join(dist, 'sfx/fidgets', f))) problems.push(`sfx/fidgets/${f} missing`);
+// 4) menu thumbnails are our own renders (small JPEGs in thumbs/menu/), never the reference app's PNG thumbnails
+const menuThumbs = files.filter((f) => /(^|\/)thumbs\/menu\//.test(path.relative(dist, f)));
+if (!menuThumbs.length) problems.push('no menu thumbnails in dist/thumbs/menu');
+for (const f of menuThumbs) {
+  if (!/\.jpg$/.test(f)) problems.push(`menu thumbnail is not a jpg: ${path.relative(dist, f)}`);
+  else if (fs.statSync(f).size > 60000) problems.push(`menu thumbnail over 60 KB: ${path.relative(dist, f)}`);
+}
 if (problems.length) { console.error('dist check FAILED:\n - ' + problems.join('\n - ')); process.exit(1); }
 console.log(`dist check OK: ${files.length} files, no local-reference strings or models, fidget sprites licensed`);
