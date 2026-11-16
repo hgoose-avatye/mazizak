@@ -383,7 +383,9 @@ function syncDock(scroll: boolean): void {
   if (!sel) toyList.querySelector<HTMLButtonElement>('.toy-item')?.setAttribute('tabindex', '0');
   $('#dock-current').textContent = TOY_TITLES[currentId] === '키보드' ? KEY_PRESET_INFO[settings.get().keyPreset].label : TOY_TITLES[currentId] ?? '';
   $('#now-name').textContent = $('#dock-current').textContent;
-  $('#now-category').textContent = currentId === 'keyboard' ? '키보드' : findFidget(currentId)?.category ?? '말랑이';
+  // 말랑이 show their name only; the keyboard keeps its '키보드' label above the keycap name
+  $('#now-category').textContent = currentId === 'keyboard' ? '키보드' : '';
+  $('#now-category').classList.toggle('blank', currentId !== 'keyboard');
   if ($('#collection-count').textContent !== `${toyList.children.length}가지`) $('#collection-count').textContent = `${toyList.children.length}가지`;
   if (scroll && sel && settings.get().dockOpen) {
     const s = sel as HTMLButtonElement;

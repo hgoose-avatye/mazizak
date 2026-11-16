@@ -20,6 +20,11 @@ button { font-weight: 650; }
 .brand .wordmark { font-size: 23px; line-height: 1; }
 .brand .latin { font-size: 7px; font-weight: 650; line-height: 1; letter-spacing: 2.4px; padding-left: 1px; }
 .head-actions { gap: 5px; }
+/* the brand is not drawn in the header (name kept for screen readers): the actions stay on the right,
+   on the row of the toy's name (.now-playing top + 14 px label + 6 px gap, h2 line box 26 px × 1.15) */
+.head-actions { margin-left: auto; pointer-events: auto; }
+.app-head { top: calc(var(--safe-t) + var(--head-h) + 42px); height: 30px; pointer-events: none; }
+.sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
 .icon-btn.ghost {
   width: 44px; height: 44px;
   color: var(--ink);
@@ -43,7 +48,9 @@ button { font-weight: 650; }
   z-index: 4;
   pointer-events: none;
 }
-.now-category { display: block; color: #697d6d; font-size: 11px; font-weight: 700; letter-spacing: .2px; }
+.now-category { display: block; height: 14px; line-height: 14px; color: #697d6d; font-size: 11px; font-weight: 700; letter-spacing: .2px; }
+/* 말랑이 hide the label but keep its row, so the name (and the header icons aligned to it) sit at the same height for every toy */
+.now-category.blank { visibility: hidden; }
 .now-category::before { content: ''; display: inline-block; width: 5px; height: 5px; margin: 0 6px 2px 0; border-radius: 50%; background: #719775; }
 .now-playing h2 { margin: 6px 0 0; font-family: var(--font-brand); font-size: 26px; line-height: 1.15; font-weight: 850; letter-spacing: -.85px; }
 .splash-mark { gap: 12px; }
@@ -151,6 +158,7 @@ html.dock-folded .dock-body { display: none; }
   .brand .latin { font-size: 7.5px; }
   .head-actions { gap: 8px; }
   .now-playing { left: 40px; top: calc(var(--safe-t) + var(--head-h) + 33px); }
+  .app-head { top: calc(var(--safe-t) + var(--head-h) + 53px); height: 39px; }
   .now-playing h2 { font-size: 34px; letter-spacing: -1.2px; }
   .now-category { font-size: 11px; }
   .dock { height: calc(191px + var(--safe-b)); border-radius: 28px 28px 0 0; }
@@ -170,6 +178,7 @@ html.dock-folded .dock-body { display: none; }
   .brand .latin { font-size: 6px; }
   .icon-btn.ghost { width: 36px; height: 36px; }
   .now-playing { display: none; }
+  .app-head { top: var(--safe-t); height: var(--head-h); } /* no name on screen here: icons back at the top */
   .dock { height: calc(104px + var(--safe-b)); border-radius: 18px 18px 0 0; }
   .dock-toggle { height: 24px; }
   .dock-body { height: 79px; padding: 0 0 5px; gap: 8px; }

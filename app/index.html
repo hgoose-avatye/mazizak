@@ -21,7 +21,7 @@
     <div id="stage"></div>
 
     <header id="app-head" class="app-head">
-      <h1 class="brand"><svg class="brand-symbol" viewBox="0 0 36 36" width="32" height="32" aria-hidden="true"><rect x="3" y="13" width="8" height="20" rx="4" fill="currentColor"/><rect x="14" y="3" width="8" height="30" rx="4" fill="currentColor"/><rect x="25" y="9" width="8" height="24" rx="4" fill="currentColor"/><circle cx="7" cy="6" r="3" fill="#d88f72"/></svg><span class="brand-type"><span class="wordmark">만지작</span><span class="latin">MANZIZAK</span></span></h1>
+      <h1 class="sr-only">만지작</h1>
       <div class="head-actions">
         <button class="icon-btn ghost" data-action="reset" aria-label="처음 상태로">
           <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M4.5 12a7.5 7.5 0 1 0 2.2-5.3M4.5 4.5v3.8h3.8" /></svg>
@@ -34,7 +34,7 @@
     </header>
 
     <div class="now-playing" id="now-playing" aria-live="polite" aria-atomic="true">
-      <span class="now-category" id="now-category">말랑이</span>
+      <span class="now-category blank" id="now-category"></span>
       <h2 id="now-name">슬랑이</h2>
     </div>
 
@@ -78,18 +78,6 @@
         </div>
         <label class="row"><span>움직임 줄이기</span><input type="checkbox" role="switch" data-setting="reduceMotion" /></label>
         <label class="row"><span>성능 정보 표시</span><input type="checkbox" role="switch" data-setting="showStats" /></label>
-        <details class="credits"><summary>출처와 라이선스<span aria-hidden="true">＋</span></summary><p class="sheet-note">
-          무음 모드에서는 소리가 나지 않습니다. 효과음은 Freesound의 CC0(퍼블릭 도메인) 실제 녹음을 가공해 사용합니다 — <a href="./sfx/keyboard/CREDITS.md">키보드 출처</a> · <a href="./sfx/squishy/CREDITS.md">말랑이 출처</a><br />
-          <a href="./keyboard-compare.html">키보드 6종 비교 청취</a><br />
-          Topre · Turquoise Tealios · Buckling Spring: <a href="https://github.com/tplai/kbsim">tplai/kbsim</a>, Copyright (c) Thomas Lai, <a href="./sfx/keyboard/kbsim-LICENSE.md">MIT</a>. MP3→mono WAV 스프라이트 변환. 원 녹음 권리 출처는 별도 확인되지 않음<br />
-          모닝빵·찹쌀떡 3D 모델: 참고 앱의 모델 — 사용 허락을 받음(프로젝트 소유자 확인), 메시·기본 색 텍스처만 남기고 텍스처를 줄여 재포장함 · <a href="./models/CREDITS.md">출처 자세히</a><br />
-          키보드 ‘몽돌’·‘찌개’·‘도자기’: 유튜브 <a href="https://www.youtube.com/shorts/BgO3pE7VnI8">세계 SEGYE</a> · <a href="https://www.youtube.com/watch?v=TTfTCiwA38c">쟈글링-KeyboardHolic</a> · <a href="https://www.youtube.com/watch?v=Ry1DJ2xzg6Q">tadadak ASMR 타다닥</a>, ‘복숭아’: <a href="https://thockhub.com/">ThockHub</a>, ‘옥구슬’: <a href="https://mechvibes.com/sound-packs/kailh-box-jade">Mechvibes</a> — 사용 허락을 받음(프로젝트 소유자 확인), 잘라내기·음량 보정·변환 등 가공함 · <a href="./sfx/keyboard/CREDITS.md">출처 자세히</a><br />
-          키보드 ‘크림’: “My Sound Pack” by Chevy (<a href="https://mechvibes.com/sound-packs/my-sound-pack-5">Mechvibes</a>), <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>, 잘라내기·음량 보정·변환 등 가공함<br />
-          왁뿌볼 음원: <a href="https://github.com/apple77771/wakppuball-simulator">apple77771</a>, <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>, 잘라서 수정함 · 크런치 음원: Freesound CC0(비슷한 재질로 대체) · <a href="./sfx/fidgets/CREDITS.md">피젯 음원·가공 내역</a><br />
-          청사과·초콜릿·비누·레인보우 음원: 유튜브 <a href="https://www.youtube.com/watch?v=kKYelJAi3xE">까퓰러ASMR Gapular</a>, <a href="https://www.youtube.com/watch?v=OVPG4qZMl0U">Mochich! by Jolislime</a>, <a href="https://www.youtube.com/watch?v=416I3CavrD0">오마이비키</a>, <a href="https://www.youtube.com/watch?v=bExGHkTQmo4">ramit girdhar</a>, <a href="https://www.youtube.com/watch?v=-LJJrKD68bs">공짝지근</a>, <a href="https://www.youtube.com/watch?v=wK-jHC_7P6I">뿌직 PPUJIG</a> (<a href="https://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>), Freesound emilyws (CC0) — 잘라내기·잡음 제거·음량 보정함 · <a href="./sfx/fidgets/PICKS-CREDITS.md">상세 출처</a><br />
-          글꼴: <a href="https://github.com/sun-typeface/SUITE">SUITE</a> · <a href="https://github.com/sun-typeface/SUIT">SUIT</a> © SUNN, SIL OFL 1.1 (<a href="./fonts/OFL-SUITE.txt">SUITE 라이선스</a> · <a href="./fonts/OFL-SUIT.txt">SUIT 라이선스</a>), 원본 파일 그대로 사용<br />
-          <a href="./audio-test.html">오디오 진단</a> · v0.1 MVP
-        </p></details>
         <button class="primary" data-action="close-sheet">완료</button>
       </section>
     </div>
