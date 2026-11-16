@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { FIDGETS } from "../src/toys/fidgets/catalog";
 import { KEYBOARD_COLORS } from "../src/toys/keyboard/colors";
-import { isLocalKeyPreset } from "../src/audio/localKeyPresets";
+import { isKeyPresetEnabled, isLocalKeyPreset } from "../src/audio/localKeyPresets";
 
 // Menu card thumbnails: renders of the app's own toys (scripts/make-thumbs.mjs → public/thumbs/menu/)
 // node:fs via a dynamic specifier so `tsc` needs no @types/node (same pattern as the other sample tests)
@@ -12,7 +12,8 @@ const fs = (await import(/* @vite-ignore */ fsName)) as {
   existsSync(p: URL): boolean;
 };
 const dir = new URL("../public/thumbs/menu/", import.meta.url);
-const publicPresets = Object.keys(KEYBOARD_COLORS).filter((p) => !isLocalKeyPreset(p));
+// the presets of the public build: the open-licence ones plus the owner-cleared ones (isKeyPresetEnabled is false for retired / dev-only presets)
+const publicPresets = Object.keys(KEYBOARD_COLORS).filter((p) => isKeyPresetEnabled(p));
 const expected = [...FIDGETS.map((f) => f.id), ...publicPresets.map((p) => `kb-${p}`)];
 const jpegSize = (b: Uint8Array) => {
   expect([b[0], b[1]]).toEqual([0xff, 0xd8]); // JPEG start of image
@@ -27,10 +28,10 @@ const jpegSize = (b: Uint8Array) => {
 };
 
 describe("menu thumbnails", () => {
-  it("every toy and every public key preset has one; dev-only key presets must not ship one", () => {
-    expect(publicPresets.length).toBeGreaterThanOrEqual(6);
+  it("every toy and every public key preset has one; presets that are not in the public build must not ship one", () => {
+    expect(publicPresets.length).toBeGreaterThanOrEqual(11);
     for (const name of expected) expect(fs.existsSync(new URL(`${name}.jpg`, dir)), `${name}.jpg`).toBe(true);
-    for (const p of Object.keys(KEYBOARD_COLORS).filter(isLocalKeyPreset)) expect(fs.existsSync(new URL(`kb-${p}.jpg`, dir)), `kb-${p}.jpg (local preset)`).toBe(false);
+    for (const p of Object.keys(KEYBOARD_COLORS).filter((p) => isLocalKeyPreset(p) && !isKeyPresetEnabled(p))) expect(fs.existsSync(new URL(`kb-${p}.jpg`, dir)), `kb-${p}.jpg (not in the public build)`).toBe(false);
   });
   it("are 256×256 JPEGs under 60 KB, and no file is left over from a removed toy", () => {
     const files = fs.readdirSync(dir).filter((f: string) => !f.startsWith("."));

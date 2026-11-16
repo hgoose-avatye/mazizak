@@ -13,6 +13,7 @@
 import type { KeyboardSounds } from "./sfx";
 import type { KeyPresetId } from "./keyPresets";
 import {
+  isClearedKeyPreset,
   isLocalKeyPreset,
   isRetiredKeyPreset,
   LOCAL_KEY_PRESETS_ENABLED,
@@ -34,7 +35,9 @@ export const KEYBOARD_SAMPLE_CREDITS =
   '"Typing on a rainy 75" by Techrul (freesound.org/s/815614) [pebble]; ' +
   '"Keyboard slow typing with Gateron Blue switches + low echo" by forfii (freesound.org/s/755222) [clack]; ' +
   '"My Sound Pack" by Chevy (mechvibes.com/sound-packs/my-sound-pack-5), CC BY 4.0 [creamy-thocky]; ' +
-  "Topre, Turquoise Tealios and Buckling Spring from tplai/kbsim (github.com/tplai/kbsim), Copyright (c) Thomas Lai, MIT; original recording provenance unverified.";
+  "Topre, Turquoise Tealios and Buckling Spring from tplai/kbsim (github.com/tplai/kbsim), Copyright (c) Thomas Lai, MIT; original recording provenance unverified; " +
+  "몽돌 (SPM PL87W 몽돌축 ASMR, 세계 SEGYE), 찌개 (RealForce R2 Lubed Topre EC, 쟈글링-KeyboardHolic), 도자기 (SPACE65 BSUN, tadadak ASMR 타다닥) from YouTube, " +
+  "복숭아 (Outemu Silent Peach V3, ThockHub K09) and 옥구슬 (Kailh Box Jade, Mechvibes pack): third-party recordings used with the project owner's clearance (2026-11-16), cut and level-matched.";
 
 interface SpriteEntry {
   /** seconds into the sprite */
@@ -75,7 +78,8 @@ export function loadKeyboardSamples(
     return Promise.reject(
       new Error("Reserved keyboard slot has no active audio"),
     );
-  if (isLocalKeyPreset(preset)) {
+  if (isLocalKeyPreset(preset) && !isClearedKeyPreset(preset)) {
+    // not cleared for the public build: only the dev server serves it
     if (!LOCAL_KEY_PRESETS_ENABLED)
       return Promise.reject(new Error("Local-only preset is disabled"));
     baseUrl = "/__local-keyboard/";

@@ -37,5 +37,16 @@ for (const f of menuThumbs) {
   if (!/\.jpg$/.test(f)) problems.push(`menu thumbnail is not a jpg: ${path.relative(dist, f)}`);
   else if (fs.statSync(f).size > 60000) problems.push(`menu thumbnail over 60 KB: ${path.relative(dist, f)}`);
 }
+// 5) a keyboard sprite that still carries the local-only marker must not ship; the cleared third-party presets must carry the owner's clearance record
+for (const f of files.filter((f) => /(^|\/)sfx\/keyboard\/[^/]+\.json$/.test(f))) {
+  const t = fs.readFileSync(f, 'utf8'), rel = path.relative(dist, f);
+  if (/LOCAL_DEVELOPMENT_ONLY|NOT_FOR_PUBLIC_DISTRIBUTION/.test(t)) problems.push(`${rel} still carries the local-only marker`);
+  if (/\/(Users|private)\//.test(t)) problems.push(`${rel} contains a local absolute path`);
+}
+for (const id of ['box-jade', 'silent-peach-v3', 'mongdol-pl87w', 'jjigae-topre', 'dojagi-space65']) {
+  const f = path.join(dist, `sfx/keyboard/${id}.json`);
+  if (!fs.existsSync(f)) { problems.push(`cleared preset ${id} missing from dist/sfx/keyboard`); continue; }
+  if (JSON.parse(fs.readFileSync(f, 'utf8')).clearance?.statedBy !== 'project owner') problems.push(`${id}.json has no clearance record`);
+}
 if (problems.length) { console.error('dist check FAILED:\n - ' + problems.join('\n - ')); process.exit(1); }
 console.log(`dist check OK: ${files.length} files, no local-reference strings or models, fidget sprites licensed`);

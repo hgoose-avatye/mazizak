@@ -47,7 +47,7 @@ async function session({ mobile = false, fail = false, slow = false } = {}) {
 try {
   for (const mobile of [false, true]) {
     const s = await session({ mobile });
-    check(`six chips / mobile=${mobile}`, JSON.stringify(await s.page.getByRole('radio').allTextContents()) === JSON.stringify(['조약돌', '얼음', '크림', '마시멜로', '민트', '타자기']));
+    check(`eleven chips / mobile=${mobile}`, JSON.stringify(await s.page.getByRole('radio').allTextContents()) === JSON.stringify(['조약돌', '얼음', '크림', '마시멜로', '민트', '타자기', '옥구슬', '복숭아', '몽돌', '찌개', '도자기'])); // the public build's presets: six open-licence + five owner-cleared (2026-11-16)
     await s.choose('마시멜로'); await s.clear();
     for (const code of pattern) await s.key(code);
     let l = await s.logs();

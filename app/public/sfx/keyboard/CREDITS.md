@@ -183,3 +183,24 @@ No filtering, EQ, pitch change or noise reduction.
   The available permission basis is the repository MIT license, as with the existing Topre preset.
 - Cheese and Magnetic Jade were replaced by these two presets. Their private video files are retained
   outside the repository, are not served by the app, and are not included in the build.
+
+## Third-party recordings cleared by the project owner (2026-11-16): 몽돌 · 찌개 · 도자기 · 복숭아 · 옥구슬
+
+These five presets are cut from recordings made by other people. **The project owner stated on 2026-11-16 that these sounds are cleared for the
+public build.** That is the owner's statement: the build tooling cannot verify it, and the sources themselves carry no open licence
+(YouTube standard licence for the three videos; "Personal use only" on the Mechvibes pack page; no redistribution terms on ThockHub). If a rights
+holder objects, remove the preset (`CLEARED_KEY_PRESETS` in `src/audio/localKeyPresets.ts`, then `public/sfx/keyboard/<id>.*`).
+Each shipped sprite JSON carries the same record (`clearance`) and the credit (`credit`).
+
+| Preset | Recording | By | Source |
+|---|---|---|---|
+| 몽돌 (`mongdol-pl87w`) | SPM PL87W 몽돌축 ASMR (0–9 s) | 세계 SEGYE (YouTube) | https://www.youtube.com/shorts/BgO3pE7VnI8 |
+| 찌개 (`jjigae-topre`) | 【FAST ASMR】 RealForce R2 (30g) Lubed Topre EC | 쟈글링-KeyboardHolic (YouTube) | https://www.youtube.com/watch?v=TTfTCiwA38c |
+| 도자기 (`dojagi-space65`) | ASMR \| 주말에 듣는 차분한 도자기 키보드 소리 1시간 \| SPACE65, BSUN RAW | tadadak ASMR 타다닥 (YouTube) | https://www.youtube.com/watch?v=Ry1DJ2xzg6Q |
+| 복숭아 (`silent-peach-v3`) | Outemu Silent Peach V3 sound test (ThockHub K09, 14 clips, 12 used) | ThockHub / the sound-test author | https://thockhub.com/audio/ct/ultimate-outemu-silent-peach-v3-sound-test-better-than-the-original/ |
+| 옥구슬 (`box-jade`) | Kailh Box Jade sound pack | Mechvibes pack (author as listed on the pack page) | https://mechvibes.com/sound-packs/kailh-box-jade |
+
+Changes made: strikes cut out of the recordings, level-matched, converted to 48 kHz mono 16-bit WAV sprites (key-down only, `upMode: "none"`;
+복숭아 without two clips that had hiss inside the strike). The sprites are produced by `scripts/kbsamples/build-youtube-presets.mjs`,
+`clean-peach-v3.mjs` and `build-local-presets.py` and promoted to this folder by `scripts/kbsamples/ship-cleared-presets.mjs` (WAV bytes unchanged,
+checked against the owner's local MANIFEST.sha256).

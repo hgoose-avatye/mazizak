@@ -1,4 +1,9 @@
-/** Unverified recordings are served from outside the repository by the opt-in Vite dev server only. */
+/**
+ * Recordings taken from third-party packs / videos. Those the project owner has CLEARED for the public build (statement of 2026-11-16, recorded in
+ * every sprite's JSON `clearance` and in public/sfx/keyboard/CREDITS.md) ship like any other preset (scripts/kbsamples/ship-cleared-presets.mjs);
+ * the rest stay out of the build and are served from outside the repository by the opt-in Vite dev server only.
+ * ("local" is the historical name of this group: they are mapped and played like the kbsim presets, see isLocalKeyPreset in toy.ts.)
+ */
 export const LOCAL_KEY_PRESETS_ENABLED =
   import.meta.env.DEV && import.meta.env.VITE_LOCAL_KEY_PRESETS === "1";
 export const LOCAL_KEY_PRESETS = {
@@ -34,7 +39,7 @@ export const LOCAL_KEY_PRESETS = {
     tags: ["silent", "soft", "muted"],
     classification: "Silent Linear",
   },
-  // Recordings taken from YouTube typing videos chosen by the owner. LOCAL DEVELOPMENT ONLY: never shipped (rights unverified).
+  // Recordings taken from YouTube typing videos chosen by the owner (cleared for the public build by the owner, 2026-11-16).
   "mongdol-pl87w": {
     id: "K11",
     label: "몽돌",
@@ -64,6 +69,9 @@ export const LOCAL_KEY_PRESETS = {
   },
 } as const;
 export type LocalKeyPresetId = keyof typeof LOCAL_KEY_PRESETS;
+/** the owner-cleared presets: shipped in public/sfx/keyboard/ and enabled in every build */
+export const CLEARED_KEY_PRESETS: ReadonlySet<string> = new Set(["box-jade", "silent-peach-v3", "mongdol-pl87w", "jjigae-topre", "dojagi-space65"]);
+export const isClearedKeyPreset = (id: string) => CLEARED_KEY_PRESETS.has(id);
 export const isLocalKeyPreset = (id: string): id is LocalKeyPresetId =>
   Object.hasOwn(LOCAL_KEY_PRESETS, id);
 /** Reserved for replacement: assets and visual palettes are intentionally retained. */
@@ -71,4 +79,4 @@ export const RETIRED_KEY_PRESETS = new Set<string>(["oil-king", "boba-u4t"]);
 export const isRetiredKeyPreset = (id: string) => RETIRED_KEY_PRESETS.has(id);
 export const isKeyPresetEnabled = (id: string) =>
   !isRetiredKeyPreset(id) &&
-  (!isLocalKeyPreset(id) || LOCAL_KEY_PRESETS_ENABLED);
+  (!isLocalKeyPreset(id) || isClearedKeyPreset(id) || LOCAL_KEY_PRESETS_ENABLED);

@@ -299,9 +299,7 @@ function showCategory(category: string) {
       const link = document.createElement('a'); link.className = 'card'; link.href = '#/keyboard/' + p;
       const thumb = document.createElement('div'); thumb.className = 'thumb preview-keyboard';
       for (const color of KEYBOARD_COLORS[p].keys.slice(0, 9)) { const key = document.createElement('i'); key.style.background = '#' + color.toString(16).padStart(6, '0'); thumb.append(key); }
-      // dev-only key presets are not in the public build: their thumbnails come from the local dev folder (never shipped)
-      if (!isLocalKeyPreset(p)) thumb.append(thumbImage(thumbSrc('kb-' + p)));
-      else if (LOCAL_FIDGETS) thumb.append(thumbImage('/__local-fidgets/thumbs/kb-' + p + '.jpg'));
+      thumb.append(thumbImage(thumbSrc('kb-' + p)));
       const body = document.createElement('div'); body.className = 'card-body'; const title = document.createElement('b'); title.textContent = KEY_PRESET_INFO[p].label;
       const desc = document.createElement('span'); desc.textContent = KEY_PRESET_INFO[p].desc; body.append(title, desc); link.append(thumb, body); homeCards.append(link);
     }

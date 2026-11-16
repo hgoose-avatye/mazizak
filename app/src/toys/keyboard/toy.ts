@@ -4,7 +4,7 @@ import type { Toy, ToyContext } from '../../core/toy';
 import { buildKeyboardSounds } from '../../audio/sfx';
 import { EXTRA_KEY_ROLES, loadKeyboardSamples, type KeyboardSampleSounds } from '../../audio/keyboardSamples';
 import { SYNTH_BASE, VISUAL_STYLE, type KeyPresetId } from '../../audio/keyPresets';
-import { LOCAL_KEY_PRESETS, isLocalKeyPreset, isKeyPresetEnabled } from '../../audio/localKeyPresets';
+import { LOCAL_KEY_PRESETS, isClearedKeyPreset, isLocalKeyPreset, isKeyPresetEnabled } from '../../audio/localKeyPresets';
 import { topreRole, topreRow, isKbsimMappedPreset } from '../../audio/keyboardRouting';
 import { param } from '../../core/params';
 import { radialShadowTexture, studioEnvironment } from '../../core/studio';
@@ -20,7 +20,7 @@ export const KEY_PRESET_INFO: Record<KeyPresetId, { label: string; desc: string 
   topre: { label: '마시멜로', desc: 'kbs.im Topre · 행별 타건음과 전용 특수키 (MIT)' },
   'turquoise-tealios': { label: '민트', desc: 'K06 · kbsim 실록 · 행별 누름/공통 키업 · 특수키 전용 (MIT)' },
   'ibm-buckling-spring': { label: '타자기', desc: 'K10 · kbsim Buckling Spring 실록 · 행별 누름/공통 키업 · 특수키 전용 (MIT)' },
-  ...Object.fromEntries(Object.entries(LOCAL_KEY_PRESETS).map(([id, p]) => [id, { label: p.label, desc: `${p.sensoryExpression} · ${p.onomatopoeia} · 로컬 검토용` }])) as Record<keyof typeof LOCAL_KEY_PRESETS, { label: string; desc: string }>,
+  ...Object.fromEntries(Object.entries(LOCAL_KEY_PRESETS).map(([id, p]) => [id, { label: p.label, desc: `${p.sensoryExpression} · ${p.onomatopoeia}${isClearedKeyPreset(id) ? '' : ' · 로컬 검토용'}` }])) as Record<keyof typeof LOCAL_KEY_PRESETS, { label: string; desc: string }>,
 };
 
 const PHYS_KEYS = ['KeyQ', 'KeyW', 'KeyE', 'KeyA', 'KeyS', 'KeyD', 'KeyZ', 'KeyX', 'KeyC', 'Space'];

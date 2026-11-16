@@ -1,5 +1,6 @@
 import { afterEach, expect, it, vi } from "vitest";
 import {
+  CLEARED_KEY_PRESETS,
   LOCAL_KEY_PRESETS,
   LOCAL_KEY_PRESETS_ENABLED,
   isKeyPresetEnabled,
@@ -9,21 +10,27 @@ import { loadKeyboardSamples } from "../src/audio/keyboardSamples";
 
 afterEach(() => vi.unstubAllGlobals());
 
-it("keeps all four local-only choices disabled unless explicitly enabled by the dev server", () => {
+it("enables the owner-cleared presets in every build and keeps the other local choices disabled unless the dev server enables them", () => {
   expect(LOCAL_KEY_PRESETS_ENABLED).toBe(false);
+  expect([...CLEARED_KEY_PRESETS].sort()).toEqual(["box-jade", "dojagi-space65", "jjigae-topre", "mongdol-pl87w", "silent-peach-v3"]);
   for (const id of Object.keys(LOCAL_KEY_PRESETS))
-    expect(isKeyPresetEnabled(id)).toBe(false);
+    expect(isKeyPresetEnabled(id), id).toBe(CLEARED_KEY_PRESETS.has(id));
   for (const id of ["pebble", "clack", "creamy-thocky", "topre"])
     expect(isKeyPresetEnabled(id)).toBe(true);
 });
 
-it("cannot fetch local samples through an alternate base URL when local mode is disabled", async () => {
+it("a local preset that is NOT cleared cannot be fetched through any base URL when local mode is disabled", async () => {
   const fetch = vi.fn();
   vi.stubGlobal("fetch", fetch);
-  for (const preset of ["silent-peach-v3"] as const) {
+  // no such preset is left in the table (the retired ones reject earlier); the guard is exercised with a made-up local id
+  const local = LOCAL_KEY_PRESETS as Record<string, unknown>;
+  local["not-cleared-test"] = { id: "KXX", label: "x", sensoryExpression: "x", onomatopoeia: "x", tags: [], classification: "x" };
+  try {
     await expect(
-      loadKeyboardSamples({} as BaseAudioContext, preset, "/sfx/keyboard/"),
+      loadKeyboardSamples({} as BaseAudioContext, "not-cleared-test" as never, "/sfx/keyboard/"),
     ).rejects.toThrow("Local-only preset is disabled");
+  } finally {
+    delete local["not-cleared-test"];
   }
   expect(fetch).not.toHaveBeenCalled();
 });
