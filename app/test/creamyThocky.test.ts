@@ -2,13 +2,14 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { KEYBOARD_SAMPLE_CREDITS, loadKeyboardSamples } from '../src/audio/keyboardSamples';
 import { SYNTH_BASE, VISUAL_STYLE } from '../src/audio/keyPresets';
 import { buildKeyboardSounds } from '../src/audio/sfx';
+import { decodePcm, shippedFetch } from './shippedSfx';
 
 // Checks the SHIPPED creamy-thocky sprite (My Sound Pack, CC BY 4.0) straight from disk. Audio *quality/timbre* is NOT
 // verified here (nobody has listened to it); these tests only guard format, levels, map consistency and loader behaviour.
 
 const fsName = 'node:fs';
 const { readFileSync } = (await import(/* @vite-ignore */ fsName)) as { readFileSync(p: URL): Uint8Array };
-const file = (name: string) => readFileSync(new URL(`../public/sfx/keyboard/${name}`, import.meta.url));
+const file = (name: string) => readFileSync(new URL(`../audio-src/sfx/keyboard/${name}`, import.meta.url));
 const ascii = (b: Uint8Array, a: number, z: number) => String.fromCharCode(...b.subarray(a, z));
 
 interface Entry { start: number; length: number; offset: number; duration: number; gain: number; src: string; srcStart: number; srcEnd: number }
@@ -122,12 +123,9 @@ describe('loadKeyboardSamples("creamy-thocky")', () => {
   const fakeCtx = () => ({
     sampleRate: 48000,
     createBuffer: (c: number, n: number, sr: number) => new FakeBuffer(c, n, sr),
-    decodeAudioData: async (ab: ArrayBuffer) => { const { data } = readWav(new Uint8Array(ab)); const b = new FakeBuffer(1, data.length, 48000); b.getChannelData().set(data); return b; },
+    decodeAudioData: async (ab: ArrayBuffer) => { const { data } = await decodePcm(ab); const b = new FakeBuffer(1, data.length, 48000); b.getChannelData().set(data); return b; },
   }) as unknown as BaseAudioContext;
-  const okFetch = () => vi.fn(async (url: string) => {
-    const buf = file(String(url).split('/').pop()!);
-    return { ok: true, status: 200, json: async () => JSON.parse(new TextDecoder().decode(buf)), arrayBuffer: async () => buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.length) };
-  });
+  const okFetch = shippedFetch;
 
   it('loads 5 key-down buffers; release stays empty (no key-down sound reused as release); spaceDown falls back to down', async () => {
     vi.stubGlobal('fetch', okFetch());

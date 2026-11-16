@@ -15,6 +15,7 @@ import {
   strengthDb,
   type PoolRef,
 } from "../src/toys/fidgets/soundBank";
+import { decodePcm, readPublic } from "./shippedSfx";
 
 // node:fs via a dynamic specifier so `tsc` needs no @types/node (same pattern as the other sample tests)
 const fsName = "node:fs";
@@ -22,7 +23,7 @@ const fs = (await import(/* @vite-ignore */ fsName)) as {
   readFileSync(p: URL): Uint8Array;
   existsSync(p: URL): boolean;
 };
-const pub = (name: string) => new URL(`../public/sfx/${name}`, import.meta.url);
+const pub = (name: string) => new URL(`../audio-src/sfx/${name}`, import.meta.url);
 const read = (name: string) => fs.readFileSync(pub(name));
 const json = (name: string) => JSON.parse(new TextDecoder().decode(read(name)));
 const ascii = (b: Uint8Array, a: number, z: number) => String.fromCharCode(...b.subarray(a, z));
@@ -310,7 +311,7 @@ function makeEngine() {
   const ctx = {
     sampleRate: 48000,
     createBuffer: (c: number, n: number, sr: number) => new FakeBuffer(c, n, sr),
-    decodeAudioData: async (ab: ArrayBuffer) => { const { fmt, data } = readWav(new Uint8Array(ab)); const b = new FakeBuffer(1, data.length, fmt.sr); b.getChannelData().set(data); return b; },
+    decodeAudioData: async (ab: ArrayBuffer) => { const { sr, data } = await decodePcm(ab); const b = new FakeBuffer(1, data.length, sr); b.getChannelData().set(data); return b; },
   };
   const engine = {
     ctx,
@@ -321,8 +322,7 @@ function makeEngine() {
 }
 const stubFetch = () =>
   vi.stubGlobal("fetch", vi.fn(async (url: string) => {
-    const u = String(url).replace(/^\.\/sfx\//, "");
-    const buf = read(u);
+    const buf = readPublic(url); // the shipped per-toy FLAC chunks
     return { ok: true, status: 200, json: async () => JSON.parse(new TextDecoder().decode(buf)), arrayBuffer: async () => buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.length) };
   }));
 async function make(id: string) {
@@ -330,7 +330,8 @@ async function make(id: string) {
   const { engine, plays, stops } = makeEngine();
   let t = 0;
   const a = new FidgetAudio(engine as never, FIDGETS.find((f) => f.id === id)!, () => t);
-  for (let i = 0; i < 200 && a.state === "loading"; i++) await new Promise((r) => setTimeout(r, 5));
+  // up to 10 s: the shipped chunks are real FLAC, decoded by the pure-JS libFLAC in this test (slower than the browser, more so under load)
+  for (let i = 0; i < 2000 && a.state === "loading"; i++) await new Promise((r) => setTimeout(r, 5));
   a.enter();
   return { a, plays, stops, at: (ms: number) => (t = ms) };
 }

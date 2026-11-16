@@ -1,0 +1,196 @@
+{
+ "version": 1,
+ "chunkOf": "squish.wav",
+ "toys": [
+  "L03"
+ ],
+ "sampleRate": 48000,
+ "totalSamples": 296221,
+ "sources": {
+  "freesound:197761": {
+   "title": "shaving cream.wav",
+   "author": "Yuval",
+   "url": "https://freesound.org/people/Yuval/sounds/197761/",
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "retrieved": "2026-11-12",
+   "usage": "L03 hold",
+   "materialMatch": "similar material only (not a recording of the toy)",
+   "originalFile": "bench-out/fidget-src/fs_197761.mp3"
+  },
+  "freesound:849247": {
+   "title": "Shaving cream oozing out of the tin",
+   "author": "_javier_rodas",
+   "url": "https://freesound.org/people/_javier_rodas/sounds/849247/",
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "retrieved": "2026-11-12",
+   "usage": "L03 hold",
+   "materialMatch": "similar material only (not a recording of the toy)",
+   "originalFile": "bench-out/fidget-src/fs_849247.mp3"
+  }
+ },
+ "pools": {
+  "cream.hold": {
+   "event": "hold",
+   "loudnessClass": "continuous",
+   "material": "shaving foam / cream",
+   "note": "foam squashing windows",
+   "recordings": 5,
+   "variants": 0,
+   "entries": [
+    {
+     "start": 3805,
+     "length": 28992,
+     "offset": 0.079271,
+     "duration": 0.604,
+     "gain": 1,
+     "src": "freesound:197761",
+     "srcStart": 5.5433,
+     "srcEnd": 6.1473,
+     "peakDbSource": -17,
+     "centroidHz": 5850,
+     "strikes": 10,
+     "boostDb": 16
+    },
+    {
+     "start": 33277,
+     "length": 31584,
+     "offset": 0.693271,
+     "duration": 0.658,
+     "gain": 0.775,
+     "src": "freesound:197761",
+     "srcStart": 8.6181,
+     "srcEnd": 9.2761,
+     "peakDbSource": -15.3,
+     "centroidHz": 10844,
+     "strikes": 11,
+     "boostDb": 14.3
+    },
+    {
+     "start": 65341,
+     "length": 32064,
+     "offset": 1.361271,
+     "duration": 0.668,
+     "gain": 0.4404,
+     "src": "freesound:197761",
+     "srcStart": 21.223,
+     "srcEnd": 21.891,
+     "peakDbSource": -17.4,
+     "centroidHz": 10971,
+     "strikes": 8,
+     "boostDb": 16.4
+    },
+    {
+     "start": 97885,
+     "length": 31968,
+     "offset": 2.039271,
+     "duration": 0.666,
+     "gain": 0.8104,
+     "src": "freesound:197761",
+     "srcStart": 22.4596,
+     "srcEnd": 23.1256,
+     "peakDbSource": -15.5,
+     "centroidHz": 7900,
+     "strikes": 10,
+     "boostDb": 14.5
+    },
+    {
+     "start": 130333,
+     "length": 32064,
+     "offset": 2.715271,
+     "duration": 0.668,
+     "gain": 0.4921,
+     "src": "freesound:849247",
+     "srcStart": 0.1681,
+     "srcEnd": 0.8361,
+     "peakDbSource": -4.1,
+     "centroidHz": 4789,
+     "strikes": 9,
+     "boostDb": 3.1
+    }
+   ]
+  },
+  "cream.fold": {
+   "event": "fold",
+   "loudnessClass": "continuous",
+   "material": "shaving foam / cream",
+   "note": "foam folding windows",
+   "recordings": 5,
+   "variants": 0,
+   "entries": [
+    {
+     "start": 162877,
+     "length": 25152,
+     "offset": 3.393271,
+     "duration": 0.524,
+     "gain": 0.9294,
+     "src": "freesound:197761",
+     "srcStart": 8.7548,
+     "srcEnd": 9.2788,
+     "peakDbSource": -15.3,
+     "centroidHz": 8501,
+     "strikes": 9,
+     "boostDb": 14.3
+    },
+    {
+     "start": 188509,
+     "length": 26880,
+     "offset": 3.927271,
+     "duration": 0.56,
+     "gain": 0.6218,
+     "src": "freesound:197761",
+     "srcStart": 20.9857,
+     "srcEnd": 21.5457,
+     "peakDbSource": -17.2,
+     "centroidHz": 9924,
+     "strikes": 8,
+     "boostDb": 16.2
+    },
+    {
+     "start": 215869,
+     "length": 25824,
+     "offset": 4.497271,
+     "duration": 0.538,
+     "gain": 0.7956,
+     "src": "freesound:197761",
+     "srcStart": 21.5957,
+     "srcEnd": 22.1337,
+     "peakDbSource": -15.3,
+     "centroidHz": 11862,
+     "strikes": 7,
+     "boostDb": 14.3
+    },
+    {
+     "start": 242173,
+     "length": 26688,
+     "offset": 5.045271,
+     "duration": 0.556,
+     "gain": 1,
+     "src": "freesound:197761",
+     "srcStart": 22.6504,
+     "srcEnd": 23.2064,
+     "peakDbSource": -15.5,
+     "centroidHz": 6915,
+     "strikes": 8,
+     "boostDb": 14.5
+    },
+    {
+     "start": 269341,
+     "length": 26880,
+     "offset": 5.611271,
+     "duration": 0.56,
+     "gain": 0.5881,
+     "src": "freesound:849247",
+     "srcStart": 0.1681,
+     "srcEnd": 0.7281,
+     "peakDbSource": -4.1,
+     "centroidHz": 4789,
+     "strikes": 9,
+     "boostDb": 3.1
+    }
+   ]
+  }
+ },
+ "file": "squish.L03.8802a813c9.flac"
+}

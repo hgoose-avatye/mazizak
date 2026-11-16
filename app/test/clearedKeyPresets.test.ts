@@ -7,7 +7,7 @@ import { CLEARED_KEY_PRESETS, isKeyPresetEnabled } from "../src/audio/localKeyPr
 // node:fs via a dynamic specifier so `tsc` needs no @types/node (same pattern as the other sample tests)
 const fsName = "node:fs";
 const { readFileSync } = (await import(/* @vite-ignore */ fsName)) as { readFileSync(p: URL): Uint8Array };
-const file = (name: string) => readFileSync(new URL(`../public/sfx/keyboard/${name}`, import.meta.url));
+const file = (name: string) => readFileSync(new URL(`../audio-src/sfx/keyboard/${name}`, import.meta.url));
 const json = (id: string) => JSON.parse(new TextDecoder().decode(file(`${id}.json`)));
 afterEach(() => vi.unstubAllGlobals());
 

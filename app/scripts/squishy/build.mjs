@@ -1,4 +1,4 @@
-// Builds public/sfx/squishy/squishy.wav + squishy.json from CC0 Freesound recordings.
+// Builds audio-src/sfx/squishy/squishy.wav + squishy.json from CC0 Freesound recordings.
 // Inputs: bench-out/audio-src/squishy/f32/*.f32 (mono float32 @44.1 kHz, made by decode.mjs from the
 // Freesound HQ preview MP3s). Pipeline per source: DC/rumble high-pass -> gentle STFT spectral noise
 // reduction (max 14 dB) -> slice (onset-trimmed) -> fades -> per-category loudness match with a
@@ -10,7 +10,7 @@ import { fileURLToPath } from 'node:url';
 
 const APP = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const SRC = path.join(APP, 'bench-out/audio-src/squishy/f32');
-const OUT = path.join(APP, 'public/sfx/squishy');
+const OUT = path.join(APP, 'audio-src/sfx/squishy');
 const SR = 44100;
 const OUT_SR = 32000;
 const RETRIEVED = '2026-11-09';

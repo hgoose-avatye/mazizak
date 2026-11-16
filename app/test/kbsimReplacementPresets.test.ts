@@ -6,7 +6,7 @@ import { isKbsimMappedPreset } from '../src/audio/keyboardRouting';
 const fsName = 'node:fs', cryptoName = 'node:crypto';
 const { readFileSync } = await import(/* @vite-ignore */ fsName);
 const { createHash } = await import(/* @vite-ignore */ cryptoName);
-const file = (name: string): Uint8Array => readFileSync(new URL(`../public/sfx/keyboard/${name}`, import.meta.url));
+const file = (name: string): Uint8Array => readFileSync(new URL(`../audio-src/sfx/keyboard/${name}`, import.meta.url));
 afterEach(() => vi.unstubAllGlobals());
 
 for (const [id, upstream] of [['turquoise-tealios', 'turquoise'], ['ibm-buckling-spring', 'buckling']] as const) {

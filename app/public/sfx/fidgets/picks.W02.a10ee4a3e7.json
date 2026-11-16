@@ -1,0 +1,495 @@
+{
+ "version": 1,
+ "chunkOf": "picks.wav",
+ "toys": [
+  "W02"
+ ],
+ "sampleRate": 44100,
+ "totalSamples": 921942,
+ "sources": {
+  "youtube:DT-BjNH0iAo": {
+   "title": "Wax Cracking ASMR — What should I crack next?",
+   "author": "Mochich! by Jolislime",
+   "url": "https://www.youtube.com/watch?v=DT-BjNH0iAo",
+   "license": "CC BY 3.0",
+   "licenseUrl": "https://creativecommons.org/licenses/by/3.0/",
+   "retrieved": "2026-11-13",
+   "usage": "owner-picked fidget clips (see pool notes); cut, faded, normalised, hiss-reduced",
+   "materialMatch": "real wax-coated squishy, cracked wax skin",
+   "originalFile": "https://www.youtube.com/watch?v=DT-BjNH0iAo"
+  },
+  "youtube:bExGHkTQmo4": {
+   "title": "Chocolate ASMR | Breaking, Cutting & Melting Chocolate",
+   "author": "ramit girdhar",
+   "url": "https://www.youtube.com/watch?v=bExGHkTQmo4",
+   "license": "CC BY 3.0",
+   "licenseUrl": "https://creativecommons.org/licenses/by/3.0/",
+   "retrieved": "2026-11-13",
+   "usage": "owner-picked fidget clips (see pool notes); cut, faded, normalised, hiss-reduced",
+   "materialMatch": "real chocolate — crumbs pressed (similar to chocolate wax crumbs)",
+   "originalFile": "https://www.youtube.com/watch?v=bExGHkTQmo4"
+  },
+  "youtube:kKYelJAi3xE": {
+   "title": "ASMR | 말랑이 17개 털었어요 +슬랑이, 왁뿌볼, 크랑이",
+   "author": "까퓰러ASMR Gapular",
+   "url": "https://www.youtube.com/watch?v=kKYelJAi3xE",
+   "license": "CC BY 3.0",
+   "licenseUrl": "https://creativecommons.org/licenses/by/3.0/",
+   "retrieved": "2026-11-13",
+   "usage": "owner-picked fidget clips (see pool notes); cut, faded, normalised, hiss-reduced",
+   "materialMatch": "real wax ball (왁뿌볼) being broken by hand",
+   "originalFile": "https://www.youtube.com/watch?v=kKYelJAi3xE"
+  }
+ },
+ "pools": {
+  "choco.init": {
+   "event": "init",
+   "loudnessClass": "impact",
+   "material": "owner pick",
+   "note": "W02 first break (owner picks: #1 + second round 1–10)",
+   "recordings": 11,
+   "variants": 0,
+   "entries": [
+    {
+     "start": 3183,
+     "length": 25537,
+     "offset": 0.072177,
+     "duration": 0.57907,
+     "gain": 0.1877,
+     "src": "youtube:kKYelJAi3xE",
+     "srcStart": 92.0309,
+     "srcEnd": 92.61,
+     "centroidHz": 4573,
+     "boostDb": 0
+    },
+    {
+     "start": 30043,
+     "length": 25345,
+     "offset": 0.681247,
+     "duration": 0.574717,
+     "gain": 0.5285,
+     "src": "youtube:kKYelJAi3xE",
+     "srcStart": 74.6553,
+     "srcEnd": 75.23,
+     "centroidHz": 4077,
+     "boostDb": 0
+    },
+    {
+     "start": 56711,
+     "length": 25395,
+     "offset": 1.285964,
+     "duration": 0.57585,
+     "gain": 0.5531,
+     "src": "youtube:kKYelJAi3xE",
+     "srcStart": 98.0241,
+     "srcEnd": 98.6,
+     "centroidHz": 3629,
+     "boostDb": 0
+    },
+    {
+     "start": 83429,
+     "length": 25306,
+     "offset": 1.891814,
+     "duration": 0.573832,
+     "gain": 0.726,
+     "src": "youtube:kKYelJAi3xE",
+     "srcStart": 99.5262,
+     "srcEnd": 100.1,
+     "centroidHz": 3706,
+     "boostDb": 0
+    },
+    {
+     "start": 110058,
+     "length": 25250,
+     "offset": 2.495646,
+     "duration": 0.572562,
+     "gain": 0.5475,
+     "src": "youtube:kKYelJAi3xE",
+     "srcStart": 101.7974,
+     "srcEnd": 102.37,
+     "centroidHz": 4289,
+     "boostDb": 0
+    },
+    {
+     "start": 136631,
+     "length": 25466,
+     "offset": 3.098209,
+     "duration": 0.57746,
+     "gain": 1,
+     "src": "youtube:kKYelJAi3xE",
+     "srcStart": 102.8325,
+     "srcEnd": 103.41,
+     "centroidHz": 4505,
+     "boostDb": 0
+    },
+    {
+     "start": 163420,
+     "length": 25237,
+     "offset": 3.705669,
+     "duration": 0.572268,
+     "gain": 0.4473,
+     "src": "youtube:kKYelJAi3xE",
+     "srcStart": 104.9077,
+     "srcEnd": 105.48,
+     "centroidHz": 2850,
+     "boostDb": 0
+    },
+    {
+     "start": 189980,
+     "length": 25605,
+     "offset": 4.307937,
+     "duration": 0.580612,
+     "gain": 0.6837,
+     "src": "youtube:kKYelJAi3xE",
+     "srcStart": 105.9994,
+     "srcEnd": 106.58,
+     "centroidHz": 4598,
+     "boostDb": 0
+    },
+    {
+     "start": 216908,
+     "length": 25429,
+     "offset": 4.918549,
+     "duration": 0.576621,
+     "gain": 0.8551,
+     "src": "youtube:kKYelJAi3xE",
+     "srcStart": 114.7034,
+     "srcEnd": 115.28,
+     "centroidHz": 3985,
+     "boostDb": 0
+    },
+    {
+     "start": 243660,
+     "length": 25470,
+     "offset": 5.52517,
+     "duration": 0.577551,
+     "gain": 0.9401,
+     "src": "youtube:kKYelJAi3xE",
+     "srcStart": 121.8424,
+     "srcEnd": 122.42,
+     "centroidHz": 5524,
+     "boostDb": 0
+    },
+    {
+     "start": 270453,
+     "length": 25611,
+     "offset": 6.132721,
+     "duration": 0.580748,
+     "gain": 0.6809,
+     "src": "youtube:kKYelJAi3xE",
+     "srcStart": 123.3293,
+     "srcEnd": 123.91,
+     "centroidHz": 3279,
+     "boostDb": 0
+    }
+   ]
+  },
+  "choco.second": {
+   "event": "crack",
+   "loudnessClass": "impact",
+   "material": "owner pick",
+   "note": "W02 the click right after the first break (owner picks: #2 + second round 1–7, 9, 10)",
+   "recordings": 10,
+   "variants": 0,
+   "entries": [
+    {
+     "start": 297387,
+     "length": 25451,
+     "offset": 6.743469,
+     "duration": 0.57712,
+     "gain": 0.1859,
+     "src": "youtube:kKYelJAi3xE",
+     "srcStart": 174.8829,
+     "srcEnd": 175.46,
+     "centroidHz": 5628,
+     "boostDb": 0
+    },
+    {
+     "start": 324161,
+     "length": 25323,
+     "offset": 7.35059,
+     "duration": 0.574218,
+     "gain": 0.8532,
+     "src": "youtube:kKYelJAi3xE",
+     "srcStart": 160.2058,
+     "srcEnd": 160.78,
+     "centroidHz": 6822,
+     "boostDb": 0
+    },
+    {
+     "start": 350807,
+     "length": 25244,
+     "offset": 7.954807,
+     "duration": 0.572426,
+     "gain": 0.7992,
+     "src": "youtube:kKYelJAi3xE",
+     "srcStart": 161.0276,
+     "srcEnd": 161.6,
+     "centroidHz": 5887,
+     "boostDb": 0
+    },
+    {
+     "start": 377374,
+     "length": 25261,
+     "offset": 8.557234,
+     "duration": 0.572812,
+     "gain": 0.591,
+     "src": "youtube:kKYelJAi3xE",
+     "srcStart": 164.8972,
+     "srcEnd": 165.47,
+     "centroidHz": 5109,
+     "boostDb": 0
+    },
+    {
+     "start": 403958,
+     "length": 25436,
+     "offset": 9.160045,
+     "duration": 0.57678,
+     "gain": 0.7191,
+     "src": "youtube:kKYelJAi3xE",
+     "srcStart": 165.6232,
+     "srcEnd": 166.2,
+     "centroidHz": 5445,
+     "boostDb": 0
+    },
+    {
+     "start": 430717,
+     "length": 25512,
+     "offset": 9.766825,
+     "duration": 0.578503,
+     "gain": 0.2123,
+     "src": "youtube:kKYelJAi3xE",
+     "srcStart": 167.6015,
+     "srcEnd": 168.18,
+     "centroidHz": 5034,
+     "boostDb": 0
+    },
+    {
+     "start": 457552,
+     "length": 25625,
+     "offset": 10.375329,
+     "duration": 0.581066,
+     "gain": 0.2029,
+     "src": "youtube:kKYelJAi3xE",
+     "srcStart": 170.1089,
+     "srcEnd": 170.69,
+     "centroidHz": 4952,
+     "boostDb": 0
+    },
+    {
+     "start": 484500,
+     "length": 25246,
+     "offset": 10.986395,
+     "duration": 0.572472,
+     "gain": 1,
+     "src": "youtube:kKYelJAi3xE",
+     "srcStart": 173.7275,
+     "srcEnd": 174.3,
+     "centroidHz": 6763,
+     "boostDb": 0
+    },
+    {
+     "start": 511069,
+     "length": 26460,
+     "offset": 11.588866,
+     "duration": 0.6,
+     "gain": 0.18,
+     "src": "youtube:kKYelJAi3xE",
+     "srcStart": 179.49,
+     "srcEnd": 180.09,
+     "centroidHz": 5471,
+     "boostDb": 0
+    },
+    {
+     "start": 538852,
+     "length": 25636,
+     "offset": 12.218866,
+     "duration": 0.581315,
+     "gain": 0.5281,
+     "src": "youtube:kKYelJAi3xE",
+     "srcStart": 187.0187,
+     "srcEnd": 187.6,
+     "centroidHz": 5880,
+     "boostDb": 0
+    }
+   ]
+  },
+  "choco.crack": {
+   "event": "crack",
+   "loudnessClass": "impact",
+   "material": "owner pick",
+   "note": "W02 while breaking (owner picks, shared with W01)",
+   "recordings": 10,
+   "variants": 0,
+   "entries": [
+    {
+     "start": 568620,
+     "length": 25424,
+     "offset": 12.893878,
+     "duration": 0.576508,
+     "gain": 0.8512,
+     "src": "youtube:DT-BjNH0iAo",
+     "srcStart": 14.3965,
+     "srcEnd": 14.973,
+     "centroidHz": 5878,
+     "boostDb": 0
+    },
+    {
+     "start": 595367,
+     "length": 26124,
+     "offset": 13.500385,
+     "duration": 0.592381,
+     "gain": 0.6043,
+     "src": "youtube:DT-BjNH0iAo",
+     "srcStart": 23.0236,
+     "srcEnd": 23.616,
+     "centroidHz": 6378,
+     "boostDb": 0
+    },
+    {
+     "start": 622814,
+     "length": 25417,
+     "offset": 14.122766,
+     "duration": 0.576349,
+     "gain": 0.9652,
+     "src": "youtube:DT-BjNH0iAo",
+     "srcStart": 0.3437,
+     "srcEnd": 0.92,
+     "centroidHz": 5992,
+     "boostDb": 0
+    },
+    {
+     "start": 649554,
+     "length": 25456,
+     "offset": 14.729116,
+     "duration": 0.577234,
+     "gain": 1,
+     "src": "youtube:DT-BjNH0iAo",
+     "srcStart": 1.1428,
+     "srcEnd": 1.72,
+     "centroidHz": 7071,
+     "boostDb": 0
+    },
+    {
+     "start": 676333,
+     "length": 25332,
+     "offset": 15.336349,
+     "duration": 0.574422,
+     "gain": 0.732,
+     "src": "youtube:DT-BjNH0iAo",
+     "srcStart": 6.4556,
+     "srcEnd": 7.03,
+     "centroidHz": 5918,
+     "boostDb": 0
+    },
+    {
+     "start": 702988,
+     "length": 25506,
+     "offset": 15.940771,
+     "duration": 0.578367,
+     "gain": 0.925,
+     "src": "youtube:DT-BjNH0iAo",
+     "srcStart": 8.4616,
+     "srcEnd": 9.04,
+     "centroidHz": 6277,
+     "boostDb": 0
+    },
+    {
+     "start": 729817,
+     "length": 25598,
+     "offset": 16.549138,
+     "duration": 0.580454,
+     "gain": 0.5646,
+     "src": "youtube:DT-BjNH0iAo",
+     "srcStart": 12.0995,
+     "srcEnd": 12.68,
+     "centroidHz": 5672,
+     "boostDb": 0
+    },
+    {
+     "start": 756738,
+     "length": 25267,
+     "offset": 17.159592,
+     "duration": 0.572948,
+     "gain": 0.8988,
+     "src": "youtube:DT-BjNH0iAo",
+     "srcStart": 19.6171,
+     "srcEnd": 20.19,
+     "centroidHz": 5628,
+     "boostDb": 0
+    },
+    {
+     "start": 783328,
+     "length": 25663,
+     "offset": 17.76254,
+     "duration": 0.581927,
+     "gain": 0.6613,
+     "src": "youtube:DT-BjNH0iAo",
+     "srcStart": 20.3681,
+     "srcEnd": 20.95,
+     "centroidHz": 4530,
+     "boostDb": 0
+    },
+    {
+     "start": 810314,
+     "length": 25385,
+     "offset": 18.374467,
+     "duration": 0.575624,
+     "gain": 0.9804,
+     "src": "youtube:DT-BjNH0iAo",
+     "srcStart": 24.5244,
+     "srcEnd": 25.1,
+     "centroidHz": 6202,
+     "boostDb": 0
+    }
+   ]
+  },
+  "choco.crumbs": {
+   "event": "crunch",
+   "loudnessClass": "impact",
+   "material": "owner pick",
+   "note": "W02 crumbs left after the first break, pressed (owner picks: #5 + second round 7, 10)",
+   "recordings": 3,
+   "variants": 0,
+   "entries": [
+    {
+     "start": 840841,
+     "length": 25592,
+     "offset": 19.066689,
+     "duration": 0.580317,
+     "gain": 0.6974,
+     "src": "youtube:bExGHkTQmo4",
+     "srcStart": 47.1397,
+     "srcEnd": 47.72,
+     "centroidHz": 4098,
+     "boostDb": 0
+    },
+    {
+     "start": 867756,
+     "length": 25340,
+     "offset": 19.677007,
+     "duration": 0.574603,
+     "gain": 1,
+     "src": "youtube:bExGHkTQmo4",
+     "srcStart": 27.4354,
+     "srcEnd": 28.01,
+     "centroidHz": 2526,
+     "boostDb": 0
+    },
+    {
+     "start": 894419,
+     "length": 25474,
+     "offset": 20.28161,
+     "duration": 0.577642,
+     "gain": 0.8093,
+     "src": "youtube:bExGHkTQmo4",
+     "srcStart": 45.4524,
+     "srcEnd": 46.03,
+     "centroidHz": 3536,
+     "boostDb": 0
+    }
+   ]
+  }
+ },
+ "file": "picks.W02.d2a03d3c82.flac"
+}

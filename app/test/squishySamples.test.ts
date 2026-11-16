@@ -7,7 +7,7 @@ const { readFileSync, statSync } = (await import(/* @vite-ignore */ fsName)) as 
   readFileSync(p: string): Uint8Array;
   statSync(p: string): { size: number };
 };
-const dir = decodeURIComponent(new URL('../public/sfx/squishy/', import.meta.url).pathname);
+const dir = decodeURIComponent(new URL('../audio-src/sfx/squishy/', import.meta.url).pathname);
 const text = (b: Uint8Array) => new TextDecoder().decode(b);
 const ab = (b: Uint8Array) => b.buffer.slice(b.byteOffset, b.byteOffset + b.byteLength) as ArrayBuffer;
 const map = JSON.parse(text(readFileSync(dir + 'squishy.json'))) as {

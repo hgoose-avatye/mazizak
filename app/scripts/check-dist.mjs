@@ -28,9 +28,11 @@ for (const f of files) {
   if (/\.html?$/.test(rel) && rel !== 'index.html') problems.push(`dev-only page shipped: ${rel}`);
   if (/(^|\/)assets\/(audio|labSound|keyboardCompare|candidates|keyboardAb|lab[A-Z]\w*|keycapLab)-[\w-]+\.js$/.test(rel)) problems.push(`dev-only bundle shipped: ${rel}`);
 }
-// 3) every shipped fidget sprite pool has a source with an allowed licence and a usage note
-for (const k of ['wax', 'crunch', 'squish', 'picks']) {
-  const j = JSON.parse(fs.readFileSync(path.join(dist, `sfx/fidgets/${k}.json`), 'utf8'));
+// 3) every shipped fidget chunk has a source with an allowed licence and a usage note
+const fidgetMaps = files.filter((f) => /(^|\/)sfx\/fidgets\/[^/]+\.json$/.test(path.relative(dist, f)));
+if (!fidgetMaps.length) problems.push('no fidget sound chunks in dist/sfx/fidgets');
+for (const f of fidgetMaps) {
+  const j = JSON.parse(fs.readFileSync(f, 'utf8')), k = path.basename(f);
   for (const [n, p] of Object.entries(j.pools)) for (const e of p.entries) {
     const s = j.sources[e.src];
     if (!s) problems.push(`${k}/${n}: clip source ${e.src} unknown`);
@@ -38,6 +40,15 @@ for (const k of ['wax', 'crunch', 'squish', 'picks']) {
   }
 }
 for (const f of ['CREDITS.md', 'PICKS-CREDITS.md']) if (!fs.existsSync(path.join(dist, 'sfx/fidgets', f))) problems.push(`sfx/fidgets/${f} missing`);
+// 3b) sounds ship as lossless FLAC only (WAV sources stay in audio-src/), under content-hashed names, and every map points at a shipped file
+for (const f of files) {
+  const rel = path.relative(dist, f);
+  if (!rel.startsWith('sfx/')) continue;
+  if (/\.(wav|mp3|f32)$/i.test(rel)) problems.push(`uncompressed / source audio shipped: ${rel}`);
+  if (/\.(flac|json)$/.test(rel) && !/\.[0-9a-f]{10}\.(flac|json)$/.test(rel)) problems.push(`sound file without a content hash: ${rel}`);
+  if (rel.endsWith('.json')) { const file = JSON.parse(fs.readFileSync(f, 'utf8')).file; if (!fs.existsSync(path.join(path.dirname(f), file))) problems.push(`${rel} points at missing ${file}`); }
+  if (rel.endsWith('.flac') && fs.readFileSync(f).subarray(0, 4).toString('ascii') !== 'fLaC') problems.push(`${rel} is not FLAC`);
+}
 // 4) menu thumbnails are our own renders (small JPEGs in thumbs/menu/), never the reference app's PNG thumbnails
 const menuThumbs = files.filter((f) => /(^|\/)thumbs\/menu\//.test(path.relative(dist, f)));
 if (!menuThumbs.length) problems.push('no menu thumbnails in dist/thumbs/menu');
@@ -52,8 +63,8 @@ for (const f of files.filter((f) => /(^|\/)sfx\/keyboard\/[^/]+\.json$/.test(f))
   if (/\/(Users|private)\//.test(t)) problems.push(`${rel} contains a local absolute path`);
 }
 for (const id of ['box-jade', 'silent-peach-v3', 'mongdol-pl87w', 'jjigae-topre', 'dojagi-space65']) {
-  const f = path.join(dist, `sfx/keyboard/${id}.json`);
-  if (!fs.existsSync(f)) { problems.push(`cleared preset ${id} missing from dist/sfx/keyboard`); continue; }
+  const f = files.find((x) => new RegExp(`(^|/)sfx/keyboard/${id}\\.[0-9a-f]{10}\\.json$`).test(path.relative(dist, x)));
+  if (!f) { problems.push(`cleared preset ${id} missing from dist/sfx/keyboard`); continue; }
   if (JSON.parse(fs.readFileSync(f, 'utf8')).clearance?.statedBy !== 'project owner') problems.push(`${id}.json has no clearance record`);
 }
 // 6) the shipped models: valid, small, and the owner's permission record travels with them
@@ -67,4 +78,4 @@ for (const rel of SHIPPED_MODELS) {
 for (const f of ['models/CREDITS.md', 'models/models.json']) if (!fs.existsSync(path.join(dist, f))) problems.push(`${f} missing from dist`);
 try { if (JSON.parse(fs.readFileSync(path.join(dist, 'models/models.json'), 'utf8')).clearance?.statedBy !== 'project owner') problems.push('models/models.json has no permission record'); } catch { problems.push('models/models.json unreadable'); }
 if (problems.length) { console.error('dist check FAILED:\n - ' + problems.join('\n - ')); process.exit(1); }
-console.log(`dist check OK: ${files.length} files, no local-reference strings or models, fidget sprites licensed`);
+console.log(`dist check OK: ${files.length} files, no local-reference strings or models, fidget chunks licensed, sounds FLAC-only with hashed names`);

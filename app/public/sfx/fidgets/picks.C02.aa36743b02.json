@@ -1,0 +1,237 @@
+{
+ "version": 1,
+ "chunkOf": "picks.wav",
+ "toys": [
+  "C02"
+ ],
+ "sampleRate": 44100,
+ "totalSamples": 522006,
+ "sources": {
+  "youtube:wK-jHC_7P6I": {
+   "title": "복숭아 크런치슬라임 무편집영상 공유",
+   "author": "뿌직 PPUJIG",
+   "url": "https://www.youtube.com/watch?v=wK-jHC_7P6I",
+   "license": "CC BY 3.0",
+   "licenseUrl": "https://creativecommons.org/licenses/by/3.0/",
+   "retrieved": "2026-11-13",
+   "usage": "owner-picked fidget clips (see pool notes); cut, faded, normalised, hiss-reduced",
+   "materialMatch": "crunchy (bead) slime — stands in for the rainbow bead squishy",
+   "originalFile": "https://www.youtube.com/watch?v=wK-jHC_7P6I"
+  }
+ },
+ "pools": {
+  "beads.crunch": {
+   "event": "crunch",
+   "loudnessClass": "impact",
+   "material": "owner pick",
+   "note": "C02 rainbow beads crushed (owner pick, hiss reduced; short cut)",
+   "recordings": 8,
+   "variants": 0,
+   "entries": [
+    {
+     "start": 3678,
+     "length": 18736,
+     "offset": 0.083401,
+     "duration": 0.424853,
+     "gain": 0.8012,
+     "src": "youtube:wK-jHC_7P6I",
+     "srcStart": 17.5851,
+     "srcEnd": 18.01,
+     "centroidHz": 7007,
+     "boostDb": 0
+    },
+    {
+     "start": 23737,
+     "length": 19584,
+     "offset": 0.538254,
+     "duration": 0.444082,
+     "gain": 0.5673,
+     "src": "youtube:wK-jHC_7P6I",
+     "srcStart": 30.8259,
+     "srcEnd": 31.27,
+     "centroidHz": 6322,
+     "boostDb": 0
+    },
+    {
+     "start": 44644,
+     "length": 18847,
+     "offset": 1.012336,
+     "duration": 0.42737,
+     "gain": 1,
+     "src": "youtube:wK-jHC_7P6I",
+     "srcStart": 37.0626,
+     "srcEnd": 37.49,
+     "centroidHz": 7740,
+     "boostDb": 0
+    },
+    {
+     "start": 64814,
+     "length": 19012,
+     "offset": 1.469705,
+     "duration": 0.431111,
+     "gain": 0.7127,
+     "src": "youtube:wK-jHC_7P6I",
+     "srcStart": 47.6589,
+     "srcEnd": 48.09,
+     "centroidHz": 6221,
+     "boostDb": 0
+    },
+    {
+     "start": 85149,
+     "length": 18750,
+     "offset": 1.930816,
+     "duration": 0.42517,
+     "gain": 0.7463,
+     "src": "youtube:wK-jHC_7P6I",
+     "srcStart": 58.3048,
+     "srcEnd": 58.73,
+     "centroidHz": 5097,
+     "boostDb": 0
+    },
+    {
+     "start": 105222,
+     "length": 18752,
+     "offset": 2.385986,
+     "duration": 0.425215,
+     "gain": 0.4768,
+     "src": "youtube:wK-jHC_7P6I",
+     "srcStart": 69.8248,
+     "srcEnd": 70.25,
+     "centroidHz": 5613,
+     "boostDb": 0
+    },
+    {
+     "start": 125297,
+     "length": 19039,
+     "offset": 2.841202,
+     "duration": 0.431723,
+     "gain": 0.6473,
+     "src": "youtube:wK-jHC_7P6I",
+     "srcStart": 75.1583,
+     "srcEnd": 75.59,
+     "centroidHz": 6654,
+     "boostDb": 0
+    },
+    {
+     "start": 145659,
+     "length": 18840,
+     "offset": 3.302925,
+     "duration": 0.427211,
+     "gain": 0.6899,
+     "src": "youtube:wK-jHC_7P6I",
+     "srcStart": 84.3228,
+     "srcEnd": 84.75,
+     "centroidHz": 6199,
+     "boostDb": 0
+    }
+   ]
+  },
+  "beads.hold": {
+   "event": "hold",
+   "loudnessClass": "continuous",
+   "material": "owner pick",
+   "note": "C02 rainbow beads squeezed (owner pick, hiss reduced; full cut)",
+   "recordings": 8,
+   "variants": 0,
+   "entries": [
+    {
+     "start": 165822,
+     "length": 42991,
+     "offset": 3.760136,
+     "duration": 0.974853,
+     "gain": 0.8715,
+     "src": "youtube:wK-jHC_7P6I",
+     "srcStart": 17.5851,
+     "srcEnd": 18.56,
+     "centroidHz": 6958,
+     "boostDb": 0
+    },
+    {
+     "start": 210136,
+     "length": 43839,
+     "offset": 4.764989,
+     "duration": 0.994082,
+     "gain": 0.6639,
+     "src": "youtube:wK-jHC_7P6I",
+     "srcStart": 30.8259,
+     "srcEnd": 31.82,
+     "centroidHz": 6271,
+     "boostDb": 0
+    },
+    {
+     "start": 255298,
+     "length": 43102,
+     "offset": 5.78907,
+     "duration": 0.97737,
+     "gain": 0.7709,
+     "src": "youtube:wK-jHC_7P6I",
+     "srcStart": 37.0626,
+     "srcEnd": 38.04,
+     "centroidHz": 7075,
+     "boostDb": 0
+    },
+    {
+     "start": 299723,
+     "length": 43267,
+     "offset": 6.79644,
+     "duration": 0.981111,
+     "gain": 0.9538,
+     "src": "youtube:wK-jHC_7P6I",
+     "srcStart": 47.6589,
+     "srcEnd": 48.64,
+     "centroidHz": 6348,
+     "boostDb": 0
+    },
+    {
+     "start": 344313,
+     "length": 43005,
+     "offset": 7.807551,
+     "duration": 0.97517,
+     "gain": 1,
+     "src": "youtube:wK-jHC_7P6I",
+     "srcStart": 58.3048,
+     "srcEnd": 59.28,
+     "centroidHz": 6297,
+     "boostDb": 0
+    },
+    {
+     "start": 388641,
+     "length": 43007,
+     "offset": 8.812721,
+     "duration": 0.975215,
+     "gain": 0.714,
+     "src": "youtube:wK-jHC_7P6I",
+     "srcStart": 69.8248,
+     "srcEnd": 70.8,
+     "centroidHz": 6038,
+     "boostDb": 0
+    },
+    {
+     "start": 432971,
+     "length": 43294,
+     "offset": 9.817937,
+     "duration": 0.981723,
+     "gain": 0.564,
+     "src": "youtube:wK-jHC_7P6I",
+     "srcStart": 75.1583,
+     "srcEnd": 76.14,
+     "centroidHz": 7057,
+     "boostDb": 0
+    },
+    {
+     "start": 477588,
+     "length": 43095,
+     "offset": 10.82966,
+     "duration": 0.977211,
+     "gain": 0.7635,
+     "src": "youtube:wK-jHC_7P6I",
+     "srcStart": 84.3228,
+     "srcEnd": 85.3,
+     "centroidHz": 6542,
+     "boostDb": 0
+    }
+   ]
+  }
+ },
+ "file": "picks.C02.c697f022a8.flac"
+}

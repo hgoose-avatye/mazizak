@@ -5,13 +5,13 @@ import {
   referenceManifest,
 } from "./references";
 import type { FidgetSpec } from "./catalog";
-import { loadSprite, type LoadedSprite } from "./fidgetSprites";
+import { loadToySprites } from "./fidgetSprites";
+import { SfxDecodeError } from "../../audio/fetchSprite";
 import { ORIGINAL_SOUNDS, loadOriginalEvents, loadOriginalMix } from "./originalMap";
 /** dev only: installed-app reference sounds override the licensed pools. Off in production builds, and off when MANZIZAK_LOCAL_FIDGET_AUDIO=0 (meshes stay local, sounds are the shippable ones). */
 const LOCAL_AUDIO = LOCAL_FIDGETS && import.meta.env.VITE_LOCAL_FIDGET_AUDIO !== "0";
 import {
   CLASS_LEVEL_DB,
-  spritesNeeded,
   ClipPicker,
   EVENTS,
   FALLBACK,
@@ -153,8 +153,7 @@ export async function resolveToy(ctx: BaseAudioContext, spec: FidgetSpec): Promi
   if (!map) throw Error(`no sound map for ${spec.id}`);
   const mixMap = MIX_SOUND[spec.id] ?? {};
   const stageMap = WAX_STAGES[spec.id] ?? {};
-  const sprites: Partial<Record<PoolRef["source"], LoadedSprite>> = {};
-  await Promise.all(spritesNeeded(spec.id).map(async (k) => { sprites[k] = await loadSprite(ctx, k); }));
+  const sprites = await loadToySprites(ctx, spec.id);
   const local = LOCAL_AUDIO ? await referenceSounds(ctx, spec.id) : {};
   const hasVideoReference = LOCAL_AUDIO && spec.id === "L01" && !!(await referenceManifest()).toys.L01?.referenceVideo;
   // dev-only local reference override (old role names → events); never present in production builds
@@ -171,9 +170,9 @@ export async function resolveToy(ctx: BaseAudioContext, spec: FidgetSpec): Promi
   const shapeDb = SHAPE_TARGET_DB[spec.shape] ?? -27;
   const events: ResolvedToy["events"] = {};
   const poolsOf = (r: PoolRef, name: string): ResolvedClip[] => {
-      const sprite = sprites[r.source]!;
-      const p = sprite.pools[name];
-      if (!p) return []; // pool dropped by the clip audit: the event simply has no sound
+      const sprite = sprites[r.source];
+      const p = sprite?.pools[name];
+      if (!sprite || !p) return []; // pool dropped by the clip audit (not shipped): the event simply has no sound
       const entries = sprite.json.pools[name].entries;
       return p.map((buffer, i) => ({ buffer, label: `${entries[i].src} @${entries[i].srcStart.toFixed(2)}s`, src: entries[i].src, srcStart: entries[i].srcStart, info: `${(entries[i].duration * 1000).toFixed(0)} ms · ${(entries[i] as unknown as { centroidHz: number }).centroidHz} Hz · boost +${(entries[i] as unknown as { boostDb: number }).boostDb} dB` }));
   };
@@ -267,6 +266,10 @@ interface PlayableSet {
 const PENDING_MAX_MS = 800;
 export class FidgetAudio {
   state = "loading";
+  /** called whenever `state` changes (the toy forwards it to the app's sound-loading chip) */
+  onChange?: () => void;
+  /** the last failure was a file the browser cannot decode: retrying would fail the same way */
+  decodeFailed = false;
   /** the one gesture made before the sounds finished loading (replayed on ready when still within PENDING_MAX_MS) */
   private pending: { args: Parameters<FidgetAudio["play"]>; at: number } | null = null;
   source = "";
@@ -364,12 +367,16 @@ export class FidgetAudio {
       // owner-picked public sounds win over the dev-only reference-app ones (which stay switchable for comparison)
       this.useVariant(r.original && !OWNER_PICKED.has(this.spec.id) ? "original" : "public");
       this.state = "recorded/derived";
+      this.onChange?.();
       const p = this.pending;
       this.pending = null;
       if (p && this.now() - p.at < PENDING_MAX_MS) this.play(...p.args);
     } catch (e) {
       this.state = "failed";
-      console.warn(`Fidget audio ${this.spec.id}`, e);
+      this.pending = null;
+      this.decodeFailed = e instanceof SfxDecodeError;
+      console.warn(`[sfx] fidget ${this.spec.id}: sounds failed to load${this.decodeFailed ? " (cannot decode; not retried)" : " (retry possible)"}`, e);
+      this.onChange?.();
     }
   }
   /** dev only: which sound bank answers the gestures ("original" exists only on the dev server with the reference app) */
@@ -400,10 +407,14 @@ export class FidgetAudio {
   enter() {
     this.enabled = true;
     // a failed load (network drop) is retried when the toy is opened again
-    if (this.state === "failed") {
-      this.state = "loading";
-      void this.prepare();
-    }
+    this.retry();
+  }
+  /** load again after a network failure (no-op while loading, when ready, or when the file cannot be decoded) */
+  retry() {
+    if (this.state !== "failed" || this.decodeFailed) return;
+    this.state = "loading";
+    this.onChange?.();
+    void this.prepare();
   }
   /** restore per-object state (first crack) — call on toy reset */
   reset() {

@@ -8,4 +8,4 @@ Original recording authorship and rights provenance are unverified: no separate 
 
 Rebuild from app/: `node scripts/kbsamples/build-topre.mjs` (requires playwright-core and system Chrome; CHROME_PATH can override it).
 
-See public/sfx/keyboard/CREDITS.md and topre.json for conversion details and source hashes.
+See audio-src/sfx/keyboard/CREDITS.md and topre.json for conversion details and source hashes.

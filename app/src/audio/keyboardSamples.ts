@@ -1,5 +1,5 @@
 /**
- * Recording-based keyboard sounds (per-preset licenses: public/sfx/keyboard/CREDITS.md).
+ * Recording-based keyboard sounds (per-preset licenses: audio-src/sfx/keyboard/CREDITS.md).
  *
  * Each preset ships as ONE 16-bit mono WAV sprite + a JSON map. We fetch both, decode once,
  * slice every entry into its own AudioBuffer (channel data copied, map gain applied) and cache
@@ -12,6 +12,8 @@
  */
 import type { KeyboardSounds } from "./sfx";
 import type { KeyPresetId } from "./keyPresets";
+import { SFX_KEYBOARD } from "./sfxManifest";
+import { fetchSprite, forgetUnlessDecodeError } from "./fetchSprite";
 import {
   isClearedKeyPreset,
   isLocalKeyPreset,
@@ -92,7 +94,7 @@ export function loadKeyboardSamples(
   if (hit) return hit;
   const p = load(ctx, preset, base);
   perCtx.set(key, p);
-  p.catch(() => perCtx!.delete(key)); // allow a retry after a network error
+  forgetUnlessDecodeError(perCtx, key, p); // a network error can be retried; an undecodable file is not fetched again
   return p;
 }
 
@@ -101,14 +103,20 @@ async function load(
   preset: KeyPresetId,
   base: string,
 ): Promise<KeyboardSampleSounds> {
-  const mapRes = await fetch(`${base}${preset}.json`);
-  if (!mapRes.ok)
-    throw new Error(`keyboard samples: ${preset}.json HTTP ${mapRes.status}`);
-  const map = (await mapRes.json()) as SpriteMap;
-  const wavRes = await fetch(`${base}${map.file}`);
-  if (!wavRes.ok)
-    throw new Error(`keyboard samples: ${map.file} HTTP ${wavRes.status}`);
-  const sprite = await ctx.decodeAudioData(await wavRes.arrayBuffer());
+  // shipped presets: hashed FLAC + map from the manifest, both requested at once; dev-only presets (/__local-keyboard/): map, then its file
+  const shipped = base === "./sfx/keyboard/" ? SFX_KEYBOARD[preset] : undefined;
+  let map: SpriteMap, sprite: AudioBuffer;
+  if (shipped) ({ map, buffer: sprite } = await fetchSprite<SpriteMap>(ctx, `./${shipped.json}`, `./${shipped.audio}`));
+  else {
+    const mapRes = await fetch(`${base}${preset}.json`);
+    if (!mapRes.ok)
+      throw new Error(`keyboard samples: ${preset}.json HTTP ${mapRes.status}`);
+    map = (await mapRes.json()) as SpriteMap;
+    const wavRes = await fetch(`${base}${map.file}`);
+    if (!wavRes.ok)
+      throw new Error(`keyboard samples: ${map.file} HTTP ${wavRes.status}`);
+    sprite = await ctx.decodeAudioData(await wavRes.arrayBuffer());
+  }
   // decodeAudioData resamples to ctx.sampleRate, so address the sprite in seconds.
   const sr = sprite.sampleRate;
   const src = sprite.getChannelData(0);

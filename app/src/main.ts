@@ -16,8 +16,7 @@ import { loadSquishySamples } from './audio/squishySamples';
 const LOCAL_FIDGETS = import.meta.env.VITE_LOCAL_FIDGETS === '1';
 import { FIDGETS, findFidget } from './toys/fidgets/catalog';
 import { ORIGINAL_SOUNDS, ORIGINAL_FOLDER } from './toys/fidgets/originalMap';
-import { loadSprite } from './toys/fidgets/fidgetSprites';
-import { spritesNeeded } from './toys/fidgets/soundBank';
+import { loadChunk, chunksOf } from './toys/fidgets/fidgetSprites';
 import { KEYBOARD_COLORS } from './toys/keyboard/colors';
 
 const $ = <T extends HTMLElement>(sel: string) => document.querySelector(sel) as T;
@@ -52,8 +51,35 @@ const ensureStage = (): Promise<ToyContext> => (stageReady ??= (async () => {
     requestFrame: () => r.requestFrame(),
     size: () => ({ w: r.width, h: r.height }),
     haptic,
+    soundChanged: () => syncSoundStatus(),
   };
 })().catch((e) => { stageReady = null; throw e; })); // a failed load can be retried by opening the toy again
+
+// ---------- sound status chip ----------
+// From the first touch / key press on a toy whose sounds are not ready yet: a small "소리 불러오는 중" chip, so silent presses are not
+// mistaken for a broken toy. It hides itself when the sounds are ready; after a network failure it offers 다시 시도. Input is never blocked.
+const soundStatusEl = $('#sound-status');
+let soundTouched = false;
+function syncSoundStatus(): void {
+  const st = soundTouched && currentId ? (rt?.toy ? rt.toy.soundStatus?.() : { state: 'loading' as const }) : undefined;
+  if (!st || st.state === 'ready') { soundStatusEl.hidden = true; soundStatusEl.replaceChildren(); return; }
+  if (soundStatusEl.dataset.state === st.state && !soundStatusEl.hidden && (st.state === 'loading' || !!soundStatusEl.querySelector('button') === !!st.retry)) return;
+  soundStatusEl.dataset.state = st.state;
+  soundStatusEl.hidden = false;
+  if (st.state === 'loading') soundStatusEl.replaceChildren('소리 불러오는 중…');
+  else {
+    soundStatusEl.replaceChildren(st.retry ? '소리를 불러오지 못했어요' : '이 기기에서 소리를 재생할 수 없어요');
+    if (st.retry) {
+      const b = document.createElement('button');
+      b.type = 'button'; b.textContent = '다시 시도';
+      b.onclick = () => { st.retry!(); syncSoundStatus(); };
+      soundStatusEl.append(b);
+    }
+  }
+}
+const noteToyInput = () => { if (soundTouched || !currentId) return; soundTouched = true; syncSoundStatus(); };
+$('#stage').addEventListener('pointerdown', noteToyInput);
+window.addEventListener('keydown', (e) => { if (!e.repeat && !e.metaKey && !e.ctrlKey && !e.altKey && sheet.hidden) noteToyInput(); });
 
 // Audio unlock: any user gesture anywhere (the first touch on the toy itself, or a tap in the dock).
 // Touch pointerdown may not count as activation on some browsers, so we also try on pointerup/touchend/click.
@@ -148,7 +174,7 @@ function warmAudio(id: string): void {
   if (new URLSearchParams(location.search).get('sfx') === 'synth') return;
   if (id === 'squishy') void loadSquishySamples(audio.ctx).catch(() => {});
   else if (id === 'keyboard') void loadKeyboardSamples(audio.ctx, settings.get().keyPreset).catch(() => {});
-  else for (const k of spritesNeeded(id)) void loadSprite(audio.ctx, k).catch(() => {});
+  else for (const c of chunksOf(id)) void loadChunk(audio.ctx, c).catch(() => {});
 }
 
 const variants = $('#variants');
@@ -219,6 +245,8 @@ async function route(): Promise<void> {
   else if (id === 'keyboard') settings.set('lastCategory', 'keyboard');
   const changed = id !== currentId;
   currentId = id;
+  if (changed) soundTouched = false; // the chip belongs to this visit of this toy
+  syncSoundStatus();
   if (id !== 'squishy') category = id === 'keyboard' ? 'keyboard' : 'fidget';
   syncDock(changed);
   document.title = `${TOY_TITLES[id]} · 만지작`;
@@ -243,6 +271,7 @@ async function route(): Promise<void> {
   rt.canvas.setAttribute('aria-label', `${TOY_TITLES[id]} — ${TOY_HINTS[id]}`);
   rt.canvas.setAttribute('role', 'img');
   rt.setToy(toy);
+  syncSoundStatus();
   // the page around the stage takes the toy's backdrop colour, so the header and dock do not frame the canvas as a box
   const bg = toy.scene.background as { getHexString?: () => string } | null;
   if (bg?.getHexString) {

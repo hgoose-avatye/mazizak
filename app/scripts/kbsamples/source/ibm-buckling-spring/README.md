@@ -7,4 +7,4 @@ The full original MIT notice is preserved in LICENSE.md. Recording-specific auth
 and rights provenance are not separately documented upstream.
 
 Rebuild both presets from app/: `node scripts/kbsamples/build-kbsim-presets.mjs`.
-See public/sfx/keyboard/CREDITS.md for processing and attribution details.
+See audio-src/sfx/keyboard/CREDITS.md for processing and attribution details.

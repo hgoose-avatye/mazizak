@@ -1,0 +1,199 @@
+{
+ "version": 1,
+ "chunkOf": "squish.wav",
+ "toys": [
+  "S01"
+ ],
+ "sampleRate": 48000,
+ "totalSamples": 187966,
+ "sources": {
+  "freesound:168011": {
+   "title": "Stress Ball",
+   "author": "gmarchisio",
+   "url": "https://freesound.org/people/gmarchisio/sounds/168011/",
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "retrieved": "2026-11-12",
+   "usage": "S01 tap",
+   "materialMatch": "similar material only (not a recording of the toy)",
+   "originalFile": "bench-out/fidget-src/fs_168011.mp3"
+  }
+ },
+ "pools": {
+  "tpr.tap": {
+   "event": "tap",
+   "loudnessClass": "impact",
+   "material": "stress balls / squeeze toy",
+   "note": "short squeezes",
+   "recordings": 6,
+   "variants": 0,
+   "entries": [
+    {
+     "start": 0,
+     "length": 11520,
+     "offset": 0,
+     "duration": 0.24,
+     "gain": 0.5354,
+     "src": "freesound:168011",
+     "srcStart": 1.7049,
+     "srcEnd": 1.9449,
+     "peakDbSource": -7.5,
+     "centroidHz": 5048,
+     "strikes": 1,
+     "boostDb": 6.5
+    },
+    {
+     "start": 12000,
+     "length": 11136,
+     "offset": 0.25,
+     "duration": 0.232,
+     "gain": 0.8752,
+     "src": "freesound:168011",
+     "srcStart": 2.268,
+     "srcEnd": 2.5,
+     "peakDbSource": -6.1,
+     "centroidHz": 4000,
+     "strikes": 1,
+     "boostDb": 5.1
+    },
+    {
+     "start": 23616,
+     "length": 11520,
+     "offset": 0.492,
+     "duration": 0.24,
+     "gain": 1,
+     "src": "freesound:168011",
+     "srcStart": 2.9069,
+     "srcEnd": 3.1469,
+     "peakDbSource": -11.9,
+     "centroidHz": 6336,
+     "strikes": 1,
+     "boostDb": 10.9
+    },
+    {
+     "start": 35616,
+     "length": 6781,
+     "offset": 0.742,
+     "duration": 0.141271,
+     "gain": 0.4661,
+     "src": "freesound:168011",
+     "srcStart": 4.6511,
+     "srcEnd": 4.7924,
+     "peakDbSource": -6,
+     "centroidHz": 3105,
+     "strikes": 1,
+     "boostDb": 5
+    },
+    {
+     "start": 42877,
+     "length": 11520,
+     "offset": 0.893271,
+     "duration": 0.24,
+     "gain": 0.3662,
+     "src": "freesound:168011",
+     "srcStart": 4.9493,
+     "srcEnd": 5.1893,
+     "peakDbSource": -5.9,
+     "centroidHz": 4370,
+     "strikes": 1,
+     "boostDb": 4.9
+    },
+    {
+     "start": 54877,
+     "length": 11520,
+     "offset": 1.143271,
+     "duration": 0.24,
+     "gain": 0.415,
+     "src": "freesound:168011",
+     "srcStart": 5.4556,
+     "srcEnd": 5.6956,
+     "peakDbSource": -6,
+     "centroidHz": 4678,
+     "strikes": 1,
+     "boostDb": 5
+    }
+   ]
+  },
+  "tpr.hold": {
+   "event": "hold",
+   "loudnessClass": "continuous",
+   "material": "stress balls / squeeze toy",
+   "note": "sustained squeezing",
+   "recordings": 5,
+   "variants": 0,
+   "entries": [
+    {
+     "start": 66877,
+     "length": 20160,
+     "offset": 1.393271,
+     "duration": 0.42,
+     "gain": 0.841,
+     "src": "freesound:168011",
+     "srcStart": 1.4295,
+     "srcEnd": 1.8495,
+     "peakDbSource": -5.7,
+     "centroidHz": 3982,
+     "strikes": 2,
+     "boostDb": 4.7
+    },
+    {
+     "start": 87517,
+     "length": 27648,
+     "offset": 1.823271,
+     "duration": 0.576,
+     "gain": 1,
+     "src": "freesound:168011",
+     "srcStart": 2.202,
+     "srcEnd": 2.778,
+     "peakDbSource": -6.1,
+     "centroidHz": 5052,
+     "strikes": 2,
+     "boostDb": 5.1
+    },
+    {
+     "start": 115645,
+     "length": 21216,
+     "offset": 2.409271,
+     "duration": 0.442,
+     "gain": 0.6979,
+     "src": "freesound:168011",
+     "srcStart": 2.9069,
+     "srcEnd": 3.3489,
+     "peakDbSource": -6.9,
+     "centroidHz": 6336,
+     "strikes": 3,
+     "boostDb": 5.9
+    },
+    {
+     "start": 137341,
+     "length": 25536,
+     "offset": 2.861271,
+     "duration": 0.532,
+     "gain": 0.6841,
+     "src": "freesound:168011",
+     "srcStart": 3.424,
+     "srcEnd": 3.956,
+     "peakDbSource": -14.9,
+     "centroidHz": 5681,
+     "strikes": 2,
+     "boostDb": 13.9
+    },
+    {
+     "start": 163357,
+     "length": 22560,
+     "offset": 3.403271,
+     "duration": 0.47,
+     "gain": 0.516,
+     "src": "freesound:168011",
+     "srcStart": 4.5811,
+     "srcEnd": 5.0511,
+     "peakDbSource": -5.8,
+     "centroidHz": 5803,
+     "strikes": 4,
+     "boostDb": 4.8
+    }
+   ]
+  }
+ },
+ "file": "squish.S01.1b24d96139.flac"
+}

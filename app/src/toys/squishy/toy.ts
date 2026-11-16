@@ -153,6 +153,7 @@ export function createSquishy(ctx: ToyContext): Toy & { setColor(id: string): vo
     stretchSnd = ctx.audio.createLoop(sfx.stretch);
     soundSource = 'synth';
     flushPendingTouch();
+    ctx.soundChanged();
   };
   if (param('sfx', 'samples') === 'synth') useSynth();
   else
@@ -165,9 +166,10 @@ export function createSquishy(ctx: ToyContext): Toy & { setColor(id: string): vo
         stretchSnd = ctx.audio.createLoop(s.stretch);
         soundSource = 'samples';
         flushPendingTouch();
+        ctx.soundChanged();
       },
       (err) => {
-        console.warn('squishy samples failed, using synthesized fallback', err);
+        console.warn('[sfx] squishy: samples failed → FALLBACK to the synthesized set', err);
         useSynth();
       },
     );
@@ -311,6 +313,7 @@ export function createSquishy(ctx: ToyContext): Toy & { setColor(id: string): vo
     camera,
     resize,
     inputImmediate,
+    soundStatus: () => ({ state: soundSource === 'loading' ? 'loading' : 'ready' }),
     frame,
     setColor,
     reset() {

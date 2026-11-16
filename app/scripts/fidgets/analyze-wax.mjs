@@ -1,10 +1,10 @@
-// Strike detection report for the apple77771 wax recordings (public/sfx/wax/*.mp3).
+// Strike detection report for the apple77771 wax recordings (audio-src/sfx/wax/*.mp3).
 // Usage: FFMPEG=/path/to/ffmpeg node scripts/fidgets/analyze-wax.mjs
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { decode, SR, db, env, onsets, peakOf } from './lib.mjs';
-const dir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../public/sfx/wax');
+const dir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../audio-src/sfx/wax');
 for (const f of fs.readdirSync(dir).filter((n) => n.endsWith('.mp3')).sort()) {
   const x = decode(path.join(dir, f));
   const o = onsets(x, { jumpDb: 9, minAbove: 14, minGapMs: 45 });

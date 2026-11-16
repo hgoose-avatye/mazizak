@@ -1,9 +1,9 @@
 // Promote the cleared key presets (옥구슬 복숭아 몽돌 찌개 도자기) from the local dev folder to the public build:
-//   ~/Music/MANZIZAK/dev-keyboard-audio/presets/<id>.{wav,json}  →  public/sfx/keyboard/<id>.{wav,json}
+//   ~/Music/MANZIZAK/dev-keyboard-audio/presets/<id>.{wav,json}  →  audio-src/sfx/keyboard/<id>.{wav,json}
 //
 // The recordings come from third parties (YouTube typing videos, ThockHub, a Mechvibes pack). The project owner obtained permission to use them
 // in the public build (owner's statement, 2026-11-16). The permission texts are not kept in the repository, so the record says exactly that
-// (`clearance` in every shipped JSON, and public/sfx/keyboard/CREDITS.md). The generators (build-youtube-presets.mjs, clean-peach-v3.mjs,
+// (`clearance` in every shipped JSON, and audio-src/sfx/keyboard/CREDITS.md). The generators (build-youtube-presets.mjs, clean-peach-v3.mjs,
 // build-local-presets.py) keep writing their output with the local-only markers; this script is the one place that turns them into shippable files.
 //
 // Usage: node scripts/kbsamples/ship-cleared-presets.mjs        (re-runnable; the WAV bytes are copied unchanged and checked against MANIFEST.sha256)
@@ -15,7 +15,7 @@ import { fileURLToPath } from 'node:url';
 const HOME = process.env.HOME;
 const SRC = path.join(process.env.MANZIZAK_DEV_KEYBOARD_DIR ?? `${HOME}/Music/MANZIZAK/dev-keyboard-audio`, 'presets');
 const MANIFEST = path.join(SRC, '..', 'MANIFEST.sha256');
-const OUT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../public/sfx/keyboard');
+const OUT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../audio-src/sfx/keyboard');
 const sha = (b) => crypto.createHash('sha256').update(b).digest('hex');
 
 /** credit shown in CREDITS.md and the settings sheet: where each recording comes from */
