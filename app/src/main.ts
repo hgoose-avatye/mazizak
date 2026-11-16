@@ -386,6 +386,8 @@ function syncDock(scroll: boolean): void {
   // 말랑이 show their name only; the keyboard keeps its '키보드' label above the keycap name
   $('#now-category').textContent = currentId === 'keyboard' ? '키보드' : '';
   $('#now-category').classList.toggle('blank', currentId !== 'keyboard');
+  // only the 왁뿌볼 (shells that crack open) need a way back to the whole ball; the other toys settle back on their own
+  $('[data-action="reset"]').hidden = findFidget(currentId)?.category !== '왁뿌볼';
   if ($('#collection-count').textContent !== `${toyList.children.length}가지`) $('#collection-count').textContent = `${toyList.children.length}가지`;
   if (scroll && sel && settings.get().dockOpen) {
     const s = sel as HTMLButtonElement;
