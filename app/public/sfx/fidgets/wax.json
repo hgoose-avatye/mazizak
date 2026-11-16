@@ -124,7 +124,7 @@
    "retrieved": "2026-11-11",
    "usage": "fidget W01/W02 wax crack + knead",
    "materialMatch": "recording of the simulated wax ball (maintainer’s claim)",
-   "originalFile": "public/sfx/wax/apple_crack_1.mp3"
+   "originalFile": "scripts/fidgets/wax-src/apple_crack_1.mp3"
   },
   "wax:apple_crack_2": {
    "title": "apple_crack_2",
@@ -135,7 +135,7 @@
    "retrieved": "2026-11-11",
    "usage": "fidget W01/W02 wax crack + knead",
    "materialMatch": "recording of the simulated wax ball (maintainer’s claim)",
-   "originalFile": "public/sfx/wax/apple_crack_2.mp3"
+   "originalFile": "scripts/fidgets/wax-src/apple_crack_2.mp3"
   },
   "wax:apple_knead_1": {
    "title": "apple_knead_1",
@@ -146,7 +146,7 @@
    "retrieved": "2026-11-11",
    "usage": "fidget W01/W02 wax crack + knead",
    "materialMatch": "recording of the simulated wax ball (maintainer’s claim)",
-   "originalFile": "public/sfx/wax/apple_knead_1.mp3"
+   "originalFile": "scripts/fidgets/wax-src/apple_knead_1.mp3"
   },
   "wax:apple_knead_2": {
    "title": "apple_knead_2",
@@ -157,7 +157,7 @@
    "retrieved": "2026-11-11",
    "usage": "fidget W01/W02 wax crack + knead",
    "materialMatch": "recording of the simulated wax ball (maintainer’s claim)",
-   "originalFile": "public/sfx/wax/apple_knead_2.mp3"
+   "originalFile": "scripts/fidgets/wax-src/apple_knead_2.mp3"
   },
   "wax:choco_crack_1": {
    "title": "choco_crack_1",
@@ -168,7 +168,7 @@
    "retrieved": "2026-11-11",
    "usage": "fidget W01/W02 wax crack + knead",
    "materialMatch": "recording of the simulated wax ball (maintainer’s claim)",
-   "originalFile": "public/sfx/wax/choco_crack_1.mp3"
+   "originalFile": "scripts/fidgets/wax-src/choco_crack_1.mp3"
   },
   "wax:choco_crack_2": {
    "title": "choco_crack_2",
@@ -179,7 +179,7 @@
    "retrieved": "2026-11-11",
    "usage": "fidget W01/W02 wax crack + knead",
    "materialMatch": "recording of the simulated wax ball (maintainer’s claim)",
-   "originalFile": "public/sfx/wax/choco_crack_2.mp3"
+   "originalFile": "scripts/fidgets/wax-src/choco_crack_2.mp3"
   },
   "wax:choco_knead_1": {
    "title": "choco_knead_1",
@@ -190,7 +190,7 @@
    "retrieved": "2026-11-11",
    "usage": "fidget W01/W02 wax crack + knead",
    "materialMatch": "recording of the simulated wax ball (maintainer’s claim)",
-   "originalFile": "public/sfx/wax/choco_knead_1.mp3"
+   "originalFile": "scripts/fidgets/wax-src/choco_knead_1.mp3"
   },
   "wax:choco_knead_2": {
    "title": "choco_knead_2",
@@ -201,7 +201,7 @@
    "retrieved": "2026-11-11",
    "usage": "fidget W01/W02 wax crack + knead",
    "materialMatch": "recording of the simulated wax ball (maintainer’s claim)",
-   "originalFile": "public/sfx/wax/choco_knead_2.mp3"
+   "originalFile": "scripts/fidgets/wax-src/choco_knead_2.mp3"
   },
   "freesound:660866": {
    "title": "Chocolate Crumble and Snapping / Cutting ( Moderately thick and hard dark chocolate ).wav",

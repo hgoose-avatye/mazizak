@@ -12,21 +12,9 @@ import { numParam } from '../../core/params';
 import { round } from '../../core/metrics';
 import { DEFAULT_PARAMS, SquishyModel, type SquishyParams } from './model';
 import { createSquishyMaterial } from './material';
+import { SQUISHY_COLORS, type SquishyColor } from './colors';
 
-export interface SquishyColor {
-  id: string;
-  label: string;
-  color: number;
-  sss: number;
-  tint: [number, number, number];
-}
-
-export const SQUISHY_COLORS: SquishyColor[] = [
-  { id: 'pink', label: '핑크', color: 0xf0a0b2, sss: 0xff7f98, tint: [0.93, 0.84, 0.87] },
-  { id: 'mint', label: '민트', color: 0x9adbc4, sss: 0x5fe0b5, tint: [0.84, 0.93, 0.89] },
-  { id: 'lavender', label: '라벤더', color: 0xbcaee8, sss: 0xa07cff, tint: [0.89, 0.86, 0.95] },
-  { id: 'lemon', label: '레몬', color: 0xf3dc86, sss: 0xffc23f, tint: [0.95, 0.9, 0.78] },
-];
+export { SQUISHY_COLORS, type SquishyColor };
 
 const SCALE_Y = 0.8;
 
@@ -150,6 +138,12 @@ export function createSquishy(ctx: ToyContext): Toy & { setColor(id: string): vo
   let friction: ContinuousSound | null = null;
   let stretchSnd: ContinuousSound | null = null;
   let soundSource: 'samples' | 'synth' | 'loading' = 'loading';
+  let pendingTouch: { play: () => unknown; at: number } | null = null;
+  const flushPendingTouch = () => {
+    const p = pendingTouch;
+    pendingTouch = null;
+    if (p && performance.now() - p.at < 800) p.play();
+  };
   const useSynth = () => {
     const sfx = buildSquishySounds(ctx.audio.ctx);
     ctx.audio.register('sq:touch', sfx.press);
@@ -158,6 +152,7 @@ export function createSquishy(ctx: ToyContext): Toy & { setColor(id: string): vo
     friction = ctx.audio.createLoop(sfx.friction);
     stretchSnd = ctx.audio.createLoop(sfx.stretch);
     soundSource = 'synth';
+    flushPendingTouch();
   };
   if (param('sfx', 'samples') === 'synth') useSynth();
   else
@@ -169,6 +164,7 @@ export function createSquishy(ctx: ToyContext): Toy & { setColor(id: string): vo
         friction = ctx.audio.createLoop(s.rub);
         stretchSnd = ctx.audio.createLoop(s.stretch);
         soundSource = 'samples';
+        flushPendingTouch();
       },
       (err) => {
         console.warn('squishy samples failed, using synthesized fallback', err);
@@ -198,7 +194,10 @@ export function createSquishy(ctx: ToyContext): Toy & { setColor(id: string): vo
         // finger lands on the surface: soft contact, quieter for an additional finger
         stopRecover();
         const busy = model.touchingCount() > 0;
-        ctx.audio.play('sq:touch', { detuneCents: soundSource === 'samples' ? 12 : 35, gainJitterDb: 1.5, gainDb: (soundSource === 'samples' ? 3 : 0) + (busy ? -4 : 0) }, raw.type);
+        const playTouch = () => ctx.audio.play('sq:touch', { detuneCents: soundSource === 'samples' ? 12 : 35, gainJitterDb: 1.5, gainDb: (soundSource === 'samples' ? 3 : 0) + (busy ? -4 : 0) }, raw.type);
+        // samples are fetched when the toy opens: a touch that lands before they are ready is sounded once they are (if still fresh)
+        if (soundSource === 'loading') pendingTouch = { play: playTouch, at: performance.now() };
+        else playTouch();
         ctx.haptic(8);
       }
       compressed.delete(e.id);

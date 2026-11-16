@@ -9,7 +9,9 @@
     "preview": "vite preview --host --port 4320",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
-    "check:dist": "node scripts/check-dist.mjs"
+    "check:dist": "node scripts/check-dist.mjs",
+    "check:load": "node scripts/load-regression.mjs",
+    "bench:load": "node scripts/bench-load.mjs"
   },
   "dependencies": {
     "three": "^0.187.0"

@@ -40,7 +40,7 @@ function fsSource(id, usage, materialMatch) {
   if (sha !== m.sha256) throw new Error(`freesound:${id}: sha256 mismatch (${sha})`);
   return { id: `freesound:${id}`, file, title: m.title, author: m.author, url: m.page, license: m.license, licenseUrl: m.licenseUrl, retrieved: m.retrieved, usage, materialMatch };
 }
-const WAX_SOURCES = ['apple_crack_1', 'apple_crack_2', 'apple_knead_1', 'apple_knead_2', 'choco_crack_1', 'choco_crack_2', 'choco_knead_1', 'choco_knead_2'].map((n) => ({ id: `wax:${n}`, file: path.join(ROOT, `public/sfx/wax/${n}.mp3`), title: n, ...WAX_LICENSE, materialMatch: 'recording of the simulated wax ball (maintainer\u2019s claim)' }));
+const WAX_SOURCES = ['apple_crack_1', 'apple_crack_2', 'apple_knead_1', 'apple_knead_2', 'choco_crack_1', 'choco_crack_2', 'choco_knead_1', 'choco_knead_2'].map((n) => ({ id: `wax:${n}`, file: path.join(ROOT, `scripts/fidgets/wax-src/${n}.mp3`), title: n, ...WAX_LICENSE, materialMatch: 'recording of the simulated wax ball (maintainer\u2019s claim)' }));
 const ANALYSED = {};
 const SIMILAR = 'similar material only (not a recording of the toy)';
 function an(id, usage, match = SIMILAR) { return (ANALYSED[id] ??= analyse(fsSource(id, usage, match))); }

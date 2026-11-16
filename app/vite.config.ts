@@ -246,12 +246,9 @@ export default defineConfig(({ command, isPreview }) => {
     optimizeDeps: { include: ["three", "three/addons/loaders/GLTFLoader.js", "three/addons/utils/BufferGeometryUtils.js"] },
     build: {
       rollupOptions: {
-        input: {
-          main: r("./index.html"),
-          audio: r("./audio-test.html"),
-          labSound: r("./lab-sound.html"),
-          keyboardCompare: r("./keyboard-compare.html"),
-        },
+        // the public build is the app only: audio-test.html / lab-sound.html / keyboard-compare.html (and the other lab pages)
+        // stay available on the dev server, which serves every html file in this folder (scripts/check-dist.mjs enforces this)
+        input: { main: r("./index.html") },
       },
     },
   };

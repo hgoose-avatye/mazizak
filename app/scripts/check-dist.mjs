@@ -22,6 +22,12 @@ for (const f of files) {
   if (/\.(glb|gltf|usdz)$/.test(rel) && !SHIPPED_MODELS.has(rel)) problems.push(`model shipped: ${rel}`);
   if ((/(^|\/)thumbs\/[A-Z]\d+\.png$/.test(rel) || /(^|\/)audio\//.test(rel)) && !rel.startsWith('sfx/')) problems.push(`reference asset shipped: ${rel}`);
 }
+// 2b) development-only pages (audio-test, lab-*, keyboard-compare, candidates, …) and their bundles must not ship: index.html is the only page
+for (const f of files) {
+  const rel = path.relative(dist, f);
+  if (/\.html?$/.test(rel) && rel !== 'index.html') problems.push(`dev-only page shipped: ${rel}`);
+  if (/(^|\/)assets\/(audio|labSound|keyboardCompare|candidates|keyboardAb|lab[A-Z]\w*|keycapLab)-[\w-]+\.js$/.test(rel)) problems.push(`dev-only bundle shipped: ${rel}`);
+}
 // 3) every shipped fidget sprite pool has a source with an allowed licence and a usage note
 for (const k of ['wax', 'crunch', 'squish', 'picks']) {
   const j = JSON.parse(fs.readFileSync(path.join(dist, `sfx/fidgets/${k}.json`), 'utf8'));

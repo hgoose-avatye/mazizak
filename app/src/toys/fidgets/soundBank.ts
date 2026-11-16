@@ -238,3 +238,10 @@ export class VoiceGate {
 
 /** random value in [a,b] */
 export const between = (rng: () => number, [a, b]: [number, number]) => a + (b - a) * rng();
+
+/** The sprite files a toy plays from (nothing else is requested when it opens). */
+export function spritesNeeded(id: string): ("wax" | "crunch" | "squish" | "picks")[] {
+  const map = FIDGET_SOUND[id] ?? {}, mixMap = MIX_SOUND[id] ?? {}, stageMap = WAX_STAGES[id] ?? {};
+  const needs = (s: PoolRef["source"]) => EVENTS.some((e) => map[e]?.source === s) || [...Object.values(mixMap), ...Object.values(stageMap)].some((r) => r?.source === s);
+  return (["wax", "crunch", "squish", "picks"] as const).filter(needs);
+}

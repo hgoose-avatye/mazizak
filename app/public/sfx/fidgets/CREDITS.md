@@ -6,7 +6,7 @@ All clips were picked automatically from the waveforms and **have not been liste
 ## Wax (W01 청사과, W02 초콜릿)
 
 **apple77771 (CC BY 4.0, attribution required)** — WAK-PPU-BALL sound effects by apple77771, licensed under CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/).
-Source: https://github.com/apple77771/wakppuball-simulator, pinned commit 6882bebcc312b3be3b871b0729e22ceacf5a2f01. The upstream notice is preserved in `../wax/LICENSE.md`; the original, unmodified MP3 files stay in `../wax/`.
+Source: https://github.com/apple77771/wakppuball-simulator, pinned commit 6882bebcc312b3be3b871b0729e22ceacf5a2f01. The upstream notice is preserved in `../wax/LICENSE.md`; the original, unmodified MP3 files are kept in the repository at `scripts/fidgets/wax-src/` (not shipped).
 **Changes (CC BY 4.0 §3(a)(1)(B)): the clips in `wax.wav` were modified** — cut out of the original recordings at detected strike points, faded in/out, peak-normalised to −1 dBFS and loudness-matched within each pool. No filtering, EQ or pitch change is baked in.
 The upstream licence says the recordings are the maintainer's own; that claim was not independently verified.
 W02 also uses real chocolate-bar snapping/crumbling recordings (Freesound CC0, below). Counts: 34 clips from 10 files.

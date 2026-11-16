@@ -1,21 +1,22 @@
 import './style.css';
-import { Runtime } from './core/runtime';
 import { AudioEngine } from './core/audio';
 import { settings, type Settings } from './core/settings';
 import { haptic, hapticsSupported } from './core/haptics';
-import { StatsOverlay } from './core/hud';
+import type { Runtime } from './core/runtime';
+import type { StatsOverlay } from './core/hud';
 import type { Toy, ToyContext } from './core/toy';
-import { createSquishy, SQUISHY_COLORS } from './toys/squishy/toy';
-import { createKeyboard, KEY_PRESET_INFO } from './toys/keyboard/toy';
+import { SQUISHY_COLORS } from './toys/squishy/colors';
+import { KEY_PRESET_INFO } from './toys/keyboard/info';
 import type { KeyPresetId } from './audio/keyPresets';
 import { isLocalKeyPreset, isKeyPresetEnabled } from './audio/localKeyPresets';
 import { loadKeyboardSamples } from './audio/keyboardSamples';
 import { loadSquishySamples } from './audio/squishySamples';
-import { LOCAL_FIDGETS } from './toys/fidgets/references';
+// dev only (see references.ts; kept out of the static graph because that module pulls in three.js)
+const LOCAL_FIDGETS = import.meta.env.VITE_LOCAL_FIDGETS === '1';
 import { FIDGETS, findFidget } from './toys/fidgets/catalog';
 import { ORIGINAL_SOUNDS, ORIGINAL_FOLDER } from './toys/fidgets/originalMap';
-import { createFidget } from './toys/fidgets/toy';
-import { preloadFidgetAudio } from './toys/fidgets/audio';
+import { loadSprite } from './toys/fidgets/fidgetSprites';
+import { spritesNeeded } from './toys/fidgets/soundBank';
 import { KEYBOARD_COLORS } from './toys/keyboard/colors';
 
 const $ = <T extends HTMLElement>(sel: string) => document.querySelector(sel) as T;
@@ -29,23 +30,27 @@ if (!isKeyPresetEnabled(settings.get().keyPreset)) settings.set('keyPreset', 'pe
 
 // ---------- core services ----------
 const audio = new AudioEngine(24);
-const rt = new Runtime($('#stage'));
-const stats = new StatsOverlay(rt, audio);
-void preloadFidgetAudio(audio).catch(e => console.warn('Fidget audio preload', e));
-// preload recorded sample sets at boot (decoding works while the context is still suspended)
-if (new URLSearchParams(location.search).get('sfx') !== 'synth') {
-  void loadKeyboardSamples(audio.ctx, 'pebble').catch(() => {});
-  void loadKeyboardSamples(audio.ctx, 'clack').catch(() => {});
-  void loadSquishySamples(audio.ctx).catch(() => {});
-}
 
-const ctx: ToyContext = {
-  renderer: rt.renderer,
-  audio,
-  requestFrame: () => rt.requestFrame(),
-  size: () => ({ w: rt.width, h: rt.height }),
-  haptic,
-};
+// The home screen needs none of three.js, the toys or their sounds: the renderer, the toy modules and the audio files of a toy
+// are fetched when that toy is opened (route() below) and nothing is preloaded at boot.
+let rt: Runtime | null = null;
+let stats: StatsOverlay | null = null;
+let stageReady: Promise<ToyContext> | null = null;
+const wantStats = (s: Readonly<Settings>) => s.showStats || new URLSearchParams(location.search).get('stats') === '1';
+const ensureStage = (): Promise<ToyContext> => (stageReady ??= (async () => {
+  const [{ Runtime }, { StatsOverlay }] = await Promise.all([import('./core/runtime'), import('./core/hud')]);
+  const r = (rt = new Runtime($('#stage')));
+  stats = new StatsOverlay(r, audio);
+  stats.show(wantStats(settings.get()));
+  r.canvas.addEventListener('pointerdown', () => hint.classList.add('gone'));
+  return {
+    renderer: r.renderer,
+    audio,
+    requestFrame: () => r.requestFrame(),
+    size: () => ({ w: r.width, h: r.height }),
+    haptic,
+  };
+})().catch((e) => { stageReady = null; throw e; })); // a failed load can be retried by opening the toy again
 
 // Audio unlock: any user gesture anywhere (home card taps unlock before entering a toy).
 // Touch pointerdown may not count as activation on some browsers, so we also try on pointerup/touchend/click.
@@ -64,7 +69,7 @@ const applySettings = (s: Readonly<Settings>) => {
     ? '<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path fill="currentColor" d="M4 9h4l5-4v14l-5-4H4z"/><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M16 9a4 4 0 0 1 0 6M18.5 6.5a7.5 7.5 0 0 1 0 11"/></svg>'
     : '<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path fill="currentColor" d="M4 9h4l5-4v14l-5-4H4z"/><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M16.5 9.5l5 5m0-5l-5 5"/></svg>';
   document.documentElement.classList.toggle('reduce-motion', s.reduceMotion);
-  stats.show(s.showStats || new URLSearchParams(location.search).get('stats') === '1');
+  stats?.show(wantStats(s));
   syncSheet(s);
 };
 settings.subscribe((s) => applySettings(s));
@@ -124,13 +129,22 @@ const TOY_HINTS: Record<string, string> = {
   squishy: '꾹 눌러보세요 · 두 손가락으로 늘려보세요',
   keyboard: '키를 눌러보세요 · 여러 키를 동시에',
 };
-function getToy(id: string) {
-  if (!toys[id]) {
-    if (id === 'squishy') toys[id] = createSquishy(ctx);
-    else if (id === 'keyboard') toys[id] = createKeyboard(ctx);
-    else { const spec = findFidget(id); if (spec) toys[id] = createFidget(ctx, spec); }
-  }
+const isToyId = (id: string | undefined): id is string => id === 'squishy' || id === 'keyboard' || !!(id && findFidget(id));
+/** Build a toy on first use (its module and three.js are fetched then). Concurrent calls share one creation. */
+async function getToy(id: string): Promise<(typeof toys)[string]> {
+  if (toys[id]) return toys[id];
+  const c = await ensureStage();
+  if (id === 'squishy') { const m = await import('./toys/squishy/toy'); toys[id] ??= m.createSquishy(c); }
+  else if (id === 'keyboard') { const m = await import('./toys/keyboard/toy'); toys[id] ??= m.createKeyboard(c); }
+  else { const spec = findFidget(id); const m = await import('./toys/fidgets/toy'); if (spec) toys[id] ??= m.createFidget(c, spec); }
   return toys[id];
+}
+/** Start fetching exactly the audio the opened toy plays from, in parallel with its code (the toy's own request joins the same promise). */
+function warmAudio(id: string): void {
+  if (new URLSearchParams(location.search).get('sfx') === 'synth') return;
+  if (id === 'squishy') void loadSquishySamples(audio.ctx).catch(() => {});
+  else if (id === 'keyboard') void loadKeyboardSamples(audio.ctx, settings.get().keyPreset).catch(() => {});
+  else for (const k of spritesNeeded(id)) void loadSprite(audio.ctx, k).catch(() => {});
 }
 
 const variants = $('#variants');
@@ -146,7 +160,7 @@ function buildVariants(id: string): void {
         b.onclick = () => { toys[id]?.action?.('sound:' + v); pair.forEach((x) => x.setAttribute('aria-checked', String(x === b))); };
         pair.push(b); variants.append(b);
       }
-      getToy(id)?.action?.('sound:original'); // the chips start on 원본 소리: keep the toy in step after a revisit
+      void getToy(id).then((t) => t?.action?.('sound:original')); // the chips start on 원본 소리: keep the toy in step after a revisit
     }
     const select = document.createElement('select'); select.className = 'toy-jump'; select.setAttribute('aria-label', '다른 장난감');
     for (const f of FIDGETS) { const o = new Option(f.name, f.id); o.selected = f.id === id; select.add(o); }
@@ -202,15 +216,16 @@ const hint = $('#toy-hint');
 let cameFromHome = false;
 let hintTimer = 0;
 
-function route(): void {
+let routeSeq = 0;
+async function route(): Promise<void> {
+  const seq = ++routeSeq; // a later navigation (back, another card) makes an earlier, still-loading one a no-op
   const [id, presetId] = location.hash.replace(/^#\/?/, '').split('/');
   if (id === 'keyboard' && presetId && Object.hasOwn(KEY_PRESET_INFO, presetId) && isKeyPresetEnabled(presetId)) {
     settings.set('keyPreset', presetId as KeyPresetId); toys.keyboard?.setPreset?.(presetId as KeyPresetId);
   }
-  const toy = id ? getToy(id) : undefined;
   closeSheet();
-  if (!toy) {
-    rt.setToy(null);
+  if (!isToyId(id)) {
+    rt?.setToy(null);
     // swallow the click that may follow a touch which started on the toy canvas
     home.classList.add('lock');
     setTimeout(() => home.classList.remove('lock'), 450);
@@ -219,6 +234,7 @@ function route(): void {
     document.title = '만지작 MANZIZAK';
     return;
   }
+  // chrome first, so a tap answers at once while the toy's code and sounds arrive
   home.hidden = true;
   toyUi.hidden = false;
   $('#toy-title').textContent = TOY_TITLES[id];
@@ -228,14 +244,26 @@ function route(): void {
   hint.classList.remove('gone');
   clearTimeout(hintTimer);
   hintTimer = window.setTimeout(() => hint.classList.add('gone'), 6000);
-  rt.canvas.setAttribute('aria-label', `${TOY_TITLES[id]} 장난감 — 터치해서 조작`);
-  rt.canvas.setAttribute('role', 'img');
   variants.setAttribute('role', findFidget(id) ? 'group' : 'radiogroup');
   variants.setAttribute('aria-label', findFidget(id) ? '장난감 조작' : id === 'squishy' ? '색상' : '타건감');
+  if (!toys[id]) rt?.setToy(null); // the previous toy must not keep taking input while this one loads
+  warmAudio(id);
+  let toy: Awaited<ReturnType<typeof getToy>>;
+  try {
+    toy = await getToy(id);
+  } catch (e) {
+    console.warn('toy load failed', id, e);
+    if (seq !== routeSeq) return;
+    showNotice('불러오지 못했어요. 네트워크를 확인하고 다시 눌러주세요');
+    location.hash = '#/';
+    return;
+  }
+  if (seq !== routeSeq || !toy || !rt) return;
+  rt.canvas.setAttribute('aria-label', `${TOY_TITLES[id]} 장난감 — 터치해서 조작`);
+  rt.canvas.setAttribute('role', 'img');
   rt.setToy(toy);
 }
-window.addEventListener('hashchange', route);
-rt.canvas.addEventListener('pointerdown', () => hint.classList.add('gone'));
+window.addEventListener('hashchange', () => void route());
 
 document.addEventListener('click', (e) => {
   const el = (e.target as HTMLElement).closest<HTMLElement>('[data-action]');
@@ -244,7 +272,7 @@ document.addEventListener('click', (e) => {
     if (a === 'settings') openSheet();
     if (a === 'close-sheet') closeSheet();
     if (a === 'sound') settings.set('sound', !settings.get().sound);
-    if (a === 'reset') rt.toy?.reset();
+    if (a === 'reset') rt?.toy?.reset();
     if (a === 'back') {
       if (cameFromHome) history.back();
       else location.hash = '#/';
@@ -254,6 +282,14 @@ document.addEventListener('click', (e) => {
   const card = (e.target as HTMLElement).closest<HTMLElement>('.card');
   if (card) cameFromHome = true;
 });
+
+function showNotice(text: string): void {
+  const n = document.createElement('div');
+  n.className = 'notice';
+  n.textContent = text;
+  document.body.appendChild(n);
+  setTimeout(() => n.remove(), 3200);
+}
 
 // one-time hint that web audio follows the iOS silent switch
 let noticeShown = false;
@@ -270,12 +306,8 @@ audio.onStateChange = (s) => {
   } catch {
     /* ignore */
   }
-  if (!rt.toy) return;
-  const n = document.createElement('div');
-  n.className = 'notice';
-  n.textContent = '소리가 안 들리면 무음 모드·볼륨을 확인하세요';
-  document.body.appendChild(n);
-  setTimeout(() => n.remove(), 3200);
+  if (!rt?.toy) return;
+  showNotice('소리가 안 들리면 무음 모드·볼륨을 확인하세요');
 };
 
 const homeCards = document.querySelector<HTMLElement>('#content-cards')!;
@@ -328,7 +360,7 @@ showCategory('말랑이');
   if (ric) ric(warm, { timeout: 3000 }); else setTimeout(warm, 1500);
 }
 if (import.meta.env.DEV) (window as unknown as { __MANZIZAK__: unknown }).__MANZIZAK__ = {
-  report: () => rt.toy?.report?.(), audio: () => audio.playLogs.slice(-100), frames: () => rt.framesRendered,
+  report: () => rt?.toy?.report?.(), audio: () => audio.playLogs.slice(-100), frames: () => rt?.framesRendered ?? 0,
 };
 applySettings(settings.get());
-route();
+void route();

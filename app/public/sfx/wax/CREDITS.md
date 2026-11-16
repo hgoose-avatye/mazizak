@@ -6,7 +6,7 @@ Pinned commit: 6882bebcc312b3be3b871b0729e22ceacf5a2f01
 Copyright (c) 2026 apple77771.
 License: https://creativecommons.org/licenses/by/4.0/ — upstream notice preserved in LICENSE.md.
 
-The original MP3 files below are kept **unmodified** in this folder (nothing in the app plays them directly any more).
+The original MP3 files below are kept **unmodified** in the repository at `scripts/fidgets/wax-src/` (no longer shipped in the public build: nothing in the app plays them directly).
 They are cut into short clips at build time by `scripts/fidgets/build-clips.mjs`; the clips (modified, CC BY 4.0 change notice) and their
 source times are in `../fidgets/wax.json` and `../fidgets/CREDITS.md`. Original recordings: apple_crack_1/2, apple_knead_1/2,
 choco_crack_1/2, choco_knead_1/2. The upstream audio license states these are

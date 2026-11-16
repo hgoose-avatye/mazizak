@@ -11,6 +11,7 @@ import { ORIGINAL_SOUNDS, loadOriginalEvents, loadOriginalMix } from "./original
 const LOCAL_AUDIO = LOCAL_FIDGETS && import.meta.env.VITE_LOCAL_FIDGET_AUDIO !== "0";
 import {
   CLASS_LEVEL_DB,
+  spritesNeeded,
   ClipPicker,
   EVENTS,
   FALLBACK,
@@ -47,11 +48,6 @@ function cut(
       Math.max(0, Math.min(1, i / 48, (n - i - 1) / (b.sampleRate * 0.015)));
   return out;
 }
-/** warm the sprite cache a little after start-up (a toy loads what it needs itself; this only shortens the wait) */
-export const preloadFidgetAudio = async (audio: AudioEngine) => {
-  await new Promise((r) => setTimeout(r, 2500));
-  for (const n of ["squish", "wax", "crunch", "picks"] as const) await loadSprite(audio.ctx, n);
-};
 /** Segment at quiet envelope gaps, rather than looping a short impact recording. */
 function gestureCues(ctx: BaseAudioContext, buffer: AudioBuffer) {
   const x = buffer.getChannelData(0),
@@ -157,9 +153,8 @@ export async function resolveToy(ctx: BaseAudioContext, spec: FidgetSpec): Promi
   if (!map) throw Error(`no sound map for ${spec.id}`);
   const mixMap = MIX_SOUND[spec.id] ?? {};
   const stageMap = WAX_STAGES[spec.id] ?? {};
-  const needs = (s: PoolRef["source"]) => EVENTS.some((e) => map[e]?.source === s) || [...Object.values(mixMap), ...Object.values(stageMap)].some((r) => r?.source === s);
   const sprites: Partial<Record<PoolRef["source"], LoadedSprite>> = {};
-  for (const k of ["wax", "crunch", "squish", "picks"] as const) if (needs(k)) sprites[k] = await loadSprite(ctx, k);
+  await Promise.all(spritesNeeded(spec.id).map(async (k) => { sprites[k] = await loadSprite(ctx, k); }));
   const local = LOCAL_AUDIO ? await referenceSounds(ctx, spec.id) : {};
   const hasVideoReference = LOCAL_AUDIO && spec.id === "L01" && !!(await referenceManifest()).toys.L01?.referenceVideo;
   // dev-only local reference override (old role names → events); never present in production builds
@@ -268,8 +263,12 @@ interface PlayableSet {
   altMin?: number;
   origin: string;
 }
+/** a gesture older than this when its sound is ready is dropped (a late sound would feel detached from the touch) */
+const PENDING_MAX_MS = 800;
 export class FidgetAudio {
   state = "loading";
+  /** the one gesture made before the sounds finished loading (replayed on ready when still within PENDING_MAX_MS) */
+  private pending: { args: Parameters<FidgetAudio["play"]>; at: number } | null = null;
   source = "";
   /** events that have a sound for this toy (after fallbacks are applied by play()) */
   supportedRoles: string[] = [];
@@ -365,6 +364,9 @@ export class FidgetAudio {
       // owner-picked public sounds win over the dev-only reference-app ones (which stay switchable for comparison)
       this.useVariant(r.original && !OWNER_PICKED.has(this.spec.id) ? "original" : "public");
       this.state = "recorded/derived";
+      const p = this.pending;
+      this.pending = null;
+      if (p && this.now() - p.at < PENDING_MAX_MS) this.play(...p.args);
     } catch (e) {
       this.state = "failed";
       console.warn(`Fidget audio ${this.spec.id}`, e);
@@ -397,6 +399,11 @@ export class FidgetAudio {
   }
   enter() {
     this.enabled = true;
+    // a failed load (network drop) is retried when the toy is opened again
+    if (this.state === "failed") {
+      this.state = "loading";
+      void this.prepare();
+    }
   }
   /** restore per-object state (first crack) — call on toy reset */
   reset() {
@@ -411,6 +418,11 @@ export class FidgetAudio {
   }
   /** `delaySec` only places the sound later in an offline render (tests); the app always plays immediately */
   play(event: FidgetEvent, strength = 0.5, delaySec = 0, interrupt = false, extra: { rate?: number; lowpassHz?: number } = {}) {
+    if (this.state === "loading" && this.enabled) {
+      // sprites are fetched when the toy opens: keep the first gesture and sound it once they are ready (if still fresh)
+      this.pending = { args: [event, strength, delaySec, interrupt, extra], at: this.now() };
+      return false;
+    }
     if (!this.enabled || this.state !== "recorded/derived") return false;
     let ev: FidgetEvent = event;
     // the first crack after a reset is the "init" sound when the toy has one
