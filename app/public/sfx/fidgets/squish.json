@@ -525,6 +525,7 @@
    "loudnessClass": "continuous",
    "material": "memory foam / sponge",
    "note": "long slow presses",
+   "processing": "hiss-reduced (spectral subtraction, noise profile = quietest 10 % of the source)",
    "recordings": 3,
    "variants": 0,
    "entries": [
@@ -533,28 +534,28 @@
      "length": 37056,
      "offset": 3.883271,
      "duration": 0.772,
-     "gain": 0.8366,
+     "gain": 0.7877,
      "src": "freesound:390314",
      "srcStart": 37.8195,
      "srcEnd": 38.5915,
      "peakDbSource": -17.7,
      "centroidHz": 6043,
      "strikes": 7,
-     "boostDb": 16.7
+     "boostDb": 16.9
     },
     {
      "start": 223933,
      "length": 35520,
      "offset": 4.665271,
      "duration": 0.74,
-     "gain": 0.4248,
+     "gain": 0.3718,
      "src": "freesound:390315",
      "srcStart": 6.9543,
      "srcEnd": 7.6943,
      "peakDbSource": -13.3,
      "centroidHz": 5385,
      "strikes": 4,
-     "boostDb": 12.3
+     "boostDb": 12.4
     },
     {
      "start": 259933,
@@ -568,7 +569,7 @@
      "peakDbSource": -13.5,
      "centroidHz": 5548,
      "strikes": 7,
-     "boostDb": 12.5
+     "boostDb": 13
     }
    ]
   },
@@ -577,6 +578,7 @@
    "loudnessClass": "impact",
    "material": "soft dough",
    "note": "short dough presses (~0.34 s)",
+   "processing": "hiss-reduced (spectral subtraction, noise profile = quietest 10 % of the source)",
    "recordings": 4,
    "variants": 0,
    "entries": [
@@ -592,49 +594,49 @@
      "peakDbSource": -18.6,
      "centroidHz": 7248,
      "strikes": 8,
-     "boostDb": 17.6
+     "boostDb": 17.9
     },
     {
      "start": 322045,
      "length": 19008,
      "offset": 6.709271,
      "duration": 0.396,
-     "gain": 0.5835,
+     "gain": 0.585,
      "src": "freesound:403915",
      "srcStart": 16.2978,
      "srcEnd": 16.6938,
      "peakDbSource": -14.2,
      "centroidHz": 4853,
      "strikes": 8,
-     "boostDb": 13.2
+     "boostDb": 13.3
     },
     {
      "start": 341533,
      "length": 19776,
      "offset": 7.115271,
      "duration": 0.412,
-     "gain": 0.9531,
+     "gain": 0.9766,
      "src": "freesound:837964",
      "srcStart": 14.2761,
      "srcEnd": 14.6881,
      "peakDbSource": -14.2,
      "centroidHz": 7549,
      "strikes": 8,
-     "boostDb": 13.2
+     "boostDb": 13.5
     },
     {
      "start": 361789,
      "length": 17376,
      "offset": 7.537271,
      "duration": 0.362,
-     "gain": 0.3471,
+     "gain": 0.3439,
      "src": "freesound:837964",
      "srcStart": 16.2592,
      "srcEnd": 16.6212,
      "peakDbSource": -18.4,
      "centroidHz": 3723,
      "strikes": 6,
-     "boostDb": 17.4
+     "boostDb": 17.6
     }
    ]
   },
@@ -643,6 +645,7 @@
    "loudnessClass": "continuous",
    "material": "soft dough",
    "note": "kneading / rolling windows",
+   "processing": "hiss-reduced (spectral subtraction, noise profile = quietest 10 % of the source)",
    "recordings": 4,
    "variants": 0,
    "entries": [
@@ -658,49 +661,49 @@
      "peakDbSource": -18.6,
      "centroidHz": 5672,
      "strikes": 12,
-     "boostDb": 17.6
+     "boostDb": 17.9
     },
     {
      "start": 412861,
      "length": 33888,
      "offset": 8.601271,
      "duration": 0.706,
-     "gain": 0.8524,
+     "gain": 0.7727,
      "src": "freesound:403915",
      "srcStart": 13.7703,
      "srcEnd": 14.4763,
      "peakDbSource": -18.2,
      "centroidHz": 8395,
      "strikes": 12,
-     "boostDb": 17.2
+     "boostDb": 18.1
     },
     {
      "start": 447229,
      "length": 30624,
      "offset": 9.317271,
      "duration": 0.638,
-     "gain": 0.7575,
+     "gain": 0.6848,
      "src": "freesound:837964",
      "srcStart": 8.8387,
      "srcEnd": 9.4767,
      "peakDbSource": -18.1,
      "centroidHz": 7343,
      "strikes": 14,
-     "boostDb": 17.1
+     "boostDb": 18.2
     },
     {
      "start": 478333,
      "length": 32256,
      "offset": 9.965271,
      "duration": 0.672,
-     "gain": 0.8046,
+     "gain": 0.801,
      "src": "freesound:837964",
      "srcStart": 9.9682,
      "srcEnd": 10.6402,
      "peakDbSource": -17.9,
      "centroidHz": 6202,
      "strikes": 14,
-     "boostDb": 16.9
+     "boostDb": 17.2
     }
    ]
   },

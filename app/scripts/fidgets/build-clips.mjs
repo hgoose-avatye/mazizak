@@ -80,7 +80,7 @@ function clipOf(an, a, b, extra = {}) {
   for (let i = 0; i < raw.length; i++) { tot += raw[i] * raw[i]; if (i < ms(30)) head += raw[i] * raw[i]; }
   const tail = db(rmsOf(raw.subarray(Math.max(0, raw.length - ms(60)), Math.max(1, raw.length - ms(12)))) / Math.max(pk, 1e-9));
   const startDb = db(rmsOf(raw.subarray(0, Math.min(raw.length, ms(15)))) / Math.max(pk, 1e-9));
-  return { src: an.src, a, b, raw, peakDb: db(pk), centroid: centroid(raw, 0, Math.min(2048, raw.length >> 1 << 1)), strikes: an.strikes.filter((s) => s.start >= a && s.start < b).length, crest: crest(raw), sparse: frames ? quiet / frames : 0, headShare: head / Math.max(tot, 1e-12), tailDb: tail, startDb, ...extra };
+  return { src: an.src, x: an.x, a, b, raw, peakDb: db(pk), centroid: centroid(raw, 0, Math.min(2048, raw.length >> 1 << 1)), strikes: an.strikes.filter((s) => s.start >= a && s.start < b).length, crest: crest(raw), sparse: frames ? quiet / frames : 0, headShare: head / Math.max(tot, 1e-12), tailDb: tail, startDb, ...extra };
 }
 const overlaps = (list, c, pad = ms(20)) => list.some((o) => o.src === c.src && c.a < o.b + pad && c.b > o.a - pad);
 
@@ -216,7 +216,7 @@ function ownSources(pool, usage) {
     return ANALYSED[`own:${pool}/${f}`] ??= analyse({ id: `own:${pool}/${f}`, file: path.join(d, f), title: m.title, author: 'project owner', url: 'own recording', license: 'Own recording (project owner)', licenseUrl: '', retrieved: m.added, usage, materialMatch: m.material });
   });
 }
-function gpool(name, event, material, note, srcIds, usage, { kind, n, len = [50, 200], lenMs = 600, minStrikes = 3, relFloor = 14, scoreFn } = {}) {
+function gpool(name, event, material, note, srcIds, usage, { kind, n, len = [50, 200], lenMs = 600, minStrikes = 3, relFloor = 14, scoreFn, denoise = false } = {}) {
   const own = ownSources(name, usage);
   const srcs = own.length ? own : srcIds.map((id) => an(id, usage));
   const cands = srcs.flatMap((a) => kind === 'singles' ? singles(a, { minLen: len[0], maxLen: len[1] }).filter((c) => c.strikePeakDb >= a.maxPeakDb - relFloor) : windows(a, lenMs, { minStrikes }));
@@ -227,6 +227,7 @@ function gpool(name, event, material, note, srcIds, usage, { kind, n, len = [50,
   const chosen = keep ? keep.map((k) => passed.find((c) => c.src.id === k.src && Math.abs(c.a / SR - k.srcStart) <= 0.005)).filter(Boolean) : pick(passed, n, score, { diverse: true });
   if (keep && chosen.length !== keep.length) throw new Error(`${name}: ${keep.length - chosen.length} kept clip(s) no longer pass the gates`);
   addPool(name, event, own.length ? 'own recording of the actual toy' : material, chosen, note);
+  if (denoise && pools[name]) pools[name].denoise = true; // clip choice is unchanged: only the written sprite clips are hiss-reduced
 }
 // ── crunch bank: C01 soap crunch (dry crumbly foam), C02 sugar beads (small hard granules)
 const SOAP = ['560167', '868249', '774262', '389657'];
@@ -240,13 +241,13 @@ const TPR = ['168011', '344643', '622335'];
 gpool('tpr.tap', 'tap', 'stress balls / squeeze toy', 'short squeezes', TPR, 'S01 tap', { kind: 'singles', n: 6, len: [60, 240] });
 gpool('tpr.hold', 'hold', 'stress balls / squeeze toy', 'sustained squeezing', TPR, 'S01 hold', { kind: 'windows', n: 5, lenMs: 520, minStrikes: 2 });
 const FOAM = ['390315', '390314', '594753'];
-gpool('foam.tap', 'tap', 'memory foam / sponge', 'short presses', FOAM, 'S02 tap', { kind: 'singles', n: 5, len: [80, 260] });
-gpool('foam.hold', 'hold', 'memory foam / sponge', 'long slow presses', FOAM, 'S02 hold', { kind: 'windows', n: 5, lenMs: 800, minStrikes: 2 });
+gpool('foam.tap', 'tap', 'memory foam / sponge', 'short presses', FOAM, 'S02 tap', { kind: 'singles', n: 5, len: [80, 260] , denoise: true });
+gpool('foam.hold', 'hold', 'memory foam / sponge', 'long slow presses', FOAM, 'S02 hold', { kind: 'windows', n: 5, lenMs: 800, minStrikes: 2 , denoise: true });
 // (the first dough sources 241813 / 612769 were rejected by the listener on 2026-11-12; these replace them)
 const MOCHI = ['172489', '323769', '403915', '837964'];
 // a soft press is a short squish, not a click: ~0.34 s windows (dense dough recordings cut single hits at 60 ms)
-gpool('mochi.tap', 'tap', 'soft dough', 'short dough presses (~0.34 s)', MOCHI, 'S03 tap', { kind: 'windows', n: 5, lenMs: 340, minStrikes: 1 });
-gpool('mochi.hold', 'hold', 'soft dough', 'kneading / rolling windows', MOCHI, 'S03 hold', { kind: 'windows', n: 5, lenMs: 640, minStrikes: 3 });
+gpool('mochi.tap', 'tap', 'soft dough', 'short dough presses (~0.34 s)', MOCHI, 'S03 tap', { kind: 'windows', n: 5, lenMs: 340, minStrikes: 1 , denoise: true });
+gpool('mochi.hold', 'hold', 'soft dough', 'kneading / rolling windows', MOCHI, 'S03 hold', { kind: 'windows', n: 5, lenMs: 640, minStrikes: 3 , denoise: true });
 const SLIME = ['794270', '680447', '655814'];
 gpool('slime.hold', 'hold', 'slime', 'squishing windows', SLIME, 'L01 hold', { kind: 'windows', n: 6, lenMs: 600, minStrikes: 3 });
 gpool('slime.stretch', 'stretch', 'slime', 'slime stretching passages', ['794270'], 'L01 stretch', { kind: 'windows', n: 5, lenMs: 900, minStrikes: 2 });
@@ -262,6 +263,50 @@ gpool('mango.hold', 'hold', 'crunchy slime / fizzing foam', 'crackly slime knead
 const CREAM = ['578460', '578463', '197761', '849247'];
 gpool('cream.hold', 'hold', 'shaving foam / cream', 'foam squashing windows', CREAM, 'L03 hold', { kind: 'windows', n: 5, lenMs: 600, minStrikes: 2 });
 gpool('cream.fold', 'fold', 'shaving foam / cream', 'foam folding windows', CREAM, 'L03 fold', { kind: 'windows', n: 5, lenMs: 480, minStrikes: 2 });
+
+// ───────── hiss reduction (same method as scripts/fidgets/build-picks.py) ─────────
+// spectral subtraction: noise = mean power spectrum of the quietest 10 % of non-silent 1024-sample frames of the whole source;
+// gain = clip(1 − 2·noise/|S|², 0.1, 1), smoothed over 3 frames; Hann window, hop 256, overlap-add. Used for S02 / S03 (hiss boosted by normalisation).
+const NF = 1024, HOP = 256, HANN = Float64Array.from({ length: NF }, (_, i) => 0.5 - 0.5 * Math.cos((2 * Math.PI * i) / NF));
+function fft(re, im, inv = false) {
+  const n = re.length;
+  for (let i = 1, j = 0; i < n; i++) { let bit = n >> 1; for (; j & bit; bit >>= 1) j ^= bit; j ^= bit; if (i < j) { [re[i], re[j]] = [re[j], re[i]]; [im[i], im[j]] = [im[j], im[i]]; } }
+  for (let len = 2; len <= n; len <<= 1) {
+    const ang = ((inv ? 2 : -2) * Math.PI) / len, wr = Math.cos(ang), wi = Math.sin(ang);
+    for (let i = 0; i < n; i += len) { let cr = 1, ci = 0; for (let k = 0; k < len / 2; k++) { const a = i + k, b = a + len / 2, tr = re[b] * cr - im[b] * ci, ti = re[b] * ci + im[b] * cr; re[b] = re[a] - tr; im[b] = im[a] - ti; re[a] += tr; im[a] += ti; const t = cr * wr - ci * wi; ci = cr * wi + ci * wr; cr = t; } }
+  }
+  if (inv) for (let i = 0; i < n; i++) { re[i] /= n; im[i] /= n; }
+}
+const NOISE = new Map();
+function noiseProfile(x) {
+  if (NOISE.has(x)) return NOISE.get(x);
+  const fr = [];
+  for (let s = 0; s + NF <= x.length; s += NF) { let e = 0; for (let i = s; i < s + NF; i++) e += x[i] * x[i]; e /= NF; if (e > 1e-8) fr.push([s, e]); }
+  const thr = [...fr].map((f) => f[1]).sort((p, q) => p - q)[Math.floor(fr.length * 0.1)];
+  const P = new Float64Array(NF / 2 + 1); let n = 0;
+  for (const [s, e] of fr) { if (e > thr) continue; const re = new Float64Array(NF), im = new Float64Array(NF); for (let i = 0; i < NF; i++) re[i] = x[s + i] * HANN[i]; fft(re, im); for (let k = 0; k <= NF / 2; k++) P[k] += re[k] * re[k] + im[k] * im[k]; n++; }
+  for (let k = 0; k <= NF / 2; k++) P[k] /= Math.max(1, n);
+  NOISE.set(x, P); return P;
+}
+/** hiss-reduce source samples [a, b) of x, using up to NF samples of context on both sides */
+function denoiseClip(x, a, b) {
+  const noise = noiseProfile(x), c0 = Math.max(0, a - NF), c1 = Math.min(x.length, b + NF);
+  const pad = new Float64Array(NF + (c1 - c0) + NF); for (let i = c0; i < c1; i++) pad[NF + i - c0] = x[i];
+  const out = new Float64Array(pad.length), norm = new Float64Array(pad.length), specs = [], gains = [];
+  for (let s = 0; s < pad.length - NF; s += HOP) {
+    const re = new Float64Array(NF), im = new Float64Array(NF); for (let i = 0; i < NF; i++) re[i] = pad[s + i] * HANN[i]; fft(re, im);
+    const g = new Float64Array(NF / 2 + 1); for (let k = 0; k <= NF / 2; k++) g[k] = Math.min(1, Math.max(0.1, 1 - (2 * noise[k]) / Math.max(re[k] * re[k] + im[k] * im[k], 1e-12)));
+    specs.push([s, re, im]); gains.push(g);
+  }
+  specs.forEach(([s, re, im], f) => {
+    const lo = Math.max(0, f - 1), hi = Math.min(gains.length, f + 2);
+    for (let k = 0; k <= NF / 2; k++) { let g = 0; for (let q = lo; q < hi; q++) g += gains[q][k]; g /= hi - lo; re[k] *= g; im[k] *= g; if (k && k < NF / 2) { re[NF - k] = re[k]; im[NF - k] = -im[k]; } }
+    fft(re, im, true);
+    for (let i = 0; i < NF; i++) { out[s + i] += re[i] * HANN[i]; norm[s + i] += HANN[i] * HANN[i]; }
+  });
+  const y = new Float32Array(b - a); for (let i = 0; i < y.length; i++) { const j = NF + (a - c0) + i; y[i] = out[j] / Math.max(norm[j], 1e-6); }
+  return y;
+}
 
 // ───────── write sprites ─────────
 const CLASS = { init: 'impact', crack: 'impact', crunch: 'impact', tap: 'impact', hold: 'continuous', stretch: 'continuous', fold: 'continuous' };
@@ -279,7 +324,7 @@ function build(file, allNames, srcList) {
   // fade + peak-normalise each clip to −1 dBFS
   const prepared = {};
   for (const name of groupNames) prepared[name] = pools[name].clips.map((c) => {
-    const y = Float32Array.from(c.raw);
+    const y = pools[name].denoise ? denoiseClip(c.x, c.a, c.b) : Float32Array.from(c.raw);
     const fo = Math.min(y.length >> 1, ms(10)), fi = ms(0.5);
     for (let i = 0; i < y.length; i++) { let w = 1; if (i < fi) w *= i / fi; if (i >= y.length - fo) w *= 0.5 + 0.5 * Math.cos((Math.PI * (i - (y.length - fo))) / fo); y[i] *= w; }
     const k = PEAK / Math.max(peakOf(y), 1e-9);
@@ -298,6 +343,7 @@ function build(file, allNames, srcList) {
       loudnessClass: CLASS[pools[name].event],
       material: pools[name].material,
       note: pools[name].note,
+      ...(pools[name].denoise ? { processing: 'hiss-reduced (spectral subtraction, noise profile = quietest 10 % of the source)' } : {}),
       recordings: prepared[name].length, // distinct extracted source passages
       variants: 0,
       entries: prepared[name].map((c) => {
@@ -376,6 +422,7 @@ ${tbl(c)}
 ## Squish (S01–S03 말랑이, L01–L03 슬랑이) — Freesound CC0 1.0
 
 Replaces the earlier shared gel sprite. S01 stress balls / squeeze toy, S02 memory foam / sponge, S03 dough, L01 slime, L02 jelly / goo, L03 shaving foam. Counts: ${q.counts.extractedClips} clips from ${q.counts.sourceFiles} files.
+S02 and S03 clips are hiss-reduced (spectral subtraction; noise profile = the quietest 10 % of each source file) — modified from the source recordings.
 
 ${head}
 ${tbl(q)}
