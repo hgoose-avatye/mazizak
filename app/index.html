@@ -13,47 +13,42 @@
     <title>만지작 MANZIZAK</title>
   </head>
   <body>
+    <!-- BRAND SPLASH: shown until the first toy is on screen (main.ts reveal()), never longer than a few seconds -->
+    <div id="splash" aria-hidden="true">
+      <div class="splash-mark"><span class="wordmark">만지작</span><span class="latin">MANZIZAK</span></div>
+    </div>
+
     <div id="stage"></div>
 
-    <!-- HOME -->
-    <main id="home" class="screen" aria-label="장난감 선택">
-      <header class="home-head">
-        <div>
-          <h1 class="wordmark">만지작</h1>
-          <div class="sub">MANZIZAK · Touch. Squish. Relax.</div>
-        </div>
-        <button class="icon-btn" data-action="settings" aria-label="설정">
-          <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path fill="currentColor" d="M12 8.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7Zm8.9 4.6-.1-1.2 2-1.6-2-3.4-2.4.8c-.6-.5-1.3-.9-2-1.2L16 3h-4l-.4 2.5c-.7.3-1.4.7-2 1.2l-2.4-.8-2 3.4 2 1.6a7 7 0 0 0 0 2.4l-2 1.6 2 3.4 2.4-.8c.6.5 1.3.9 2 1.2L12 21h4l.4-2.5c.7-.3 1.4-.7 2-1.2l2.4.8 2-3.4-2-1.6c.1-.4.1-.8.1-1.2Z" transform="translate(-2 0)"/></svg>
+    <header id="app-head" class="app-head">
+      <h1 class="brand"><span class="wordmark">만지작</span><span class="latin">MANZIZAK</span></h1>
+      <div class="head-actions">
+        <button class="icon-btn ghost" data-action="reset" aria-label="처음 상태로">
+          <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M4.5 12a7.5 7.5 0 1 0 2.2-5.3M4.5 4.5v3.8h3.8" /></svg>
         </button>
-      </header>
-      <p class="lede">손끝으로 누르고, 늘리고, 두드리는<br />작은 휴식.</p>
-      <nav class="categories" aria-label="장난감 카테고리">
-        <button data-category="키캡">키캡</button><button data-category="말랑이">말랑이</button>
-      </nav>
-      <nav class="cards" id="content-cards" aria-label="콘텐츠 목록"></nav>
-      <footer class="home-foot">소리는 기기의 무음 모드·볼륨 설정을 따릅니다.</footer>
-    </main>
+        <button class="icon-btn ghost" data-action="sound" id="sound-btn" aria-label="소리 끄기" aria-pressed="true"></button>
+        <button class="icon-btn ghost" data-action="settings" aria-label="설정">
+          <svg viewBox="0 0 24 24" width="21" height="21" aria-hidden="true"><path fill="currentColor" d="M12 8.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7Zm8.9 4.6-.1-1.2 2-1.6-2-3.4-2.4.8c-.6-.5-1.3-.9-2-1.2L16 3h-4l-.4 2.5c-.7.3-1.4.7-2 1.2l-2.4-.8-2 3.4 2 1.6a7 7 0 0 0 0 2.4l-2 1.6 2 3.4 2.4-.8c.6.5 1.3.9 2 1.2L12 21h4l.4-2.5c.7-.3 1.4-.7 2-1.2l2.4.8 2-3.4-2-1.6c.1-.4.1-.8.1-1.2Z" transform="translate(-2 0)"/></svg>
+        </button>
+      </div>
+    </header>
 
-    <!-- TOY CHROME -->
-    <div id="toy-ui" class="screen" hidden>
-      <div class="topbar">
-        <button class="icon-btn" data-action="back" aria-label="뒤로">
-          <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" d="M15 5l-7 7 7 7" /></svg>
-        </button>
-        <div class="title" id="toy-title"></div>
-        <button class="icon-btn" data-action="sound" id="sound-btn" aria-label="소리 끄기" aria-pressed="true"></button>
-        <button class="icon-btn" data-action="settings" aria-label="설정">
-          <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><circle cx="5" cy="12" r="2" fill="currentColor"/><circle cx="12" cy="12" r="2" fill="currentColor"/><circle cx="19" cy="12" r="2" fill="currentColor"/></svg>
-        </button>
+    <!-- per-toy controls that are not toy choices: 말랑이(squishy) colours, dev-only sound A/B chips -->
+    <div class="variants" id="variants" role="radiogroup"></div>
+
+    <!-- TOY PICKER DOCK -->
+    <nav id="dock" class="dock" aria-label="장난감 선택">
+      <button class="dock-toggle" id="dock-toggle" aria-expanded="true" aria-controls="dock-body" aria-label="장난감 목록 접기">
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" d="M6 9.5l6 6 6-6" /></svg>
+        <span class="dock-current" id="dock-current"></span>
+      </button>
+      <div class="dock-body" id="dock-body">
+        <div class="cat-seg" role="radiogroup" aria-label="카테고리">
+          <button role="radio" data-category="fidget" aria-checked="true">말랑이</button><button role="radio" data-category="keyboard" aria-checked="false">키보드</button>
+        </div>
+        <div class="toy-list" id="toy-list" role="radiogroup" aria-label="장난감"></div>
       </div>
-      <div class="hint" id="toy-hint"></div>
-      <div class="bottombar">
-        <div class="variants" id="variants" role="radiogroup"></div>
-        <button class="icon-btn reset" data-action="reset" aria-label="처음 상태로">
-          <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" d="M4.5 12a7.5 7.5 0 1 0 2.2-5.3M4.5 4.5v3.8h3.8" /></svg>
-        </button>
-      </div>
-    </div>
+    </nav>
 
     <!-- SETTINGS SHEET -->
     <div id="sheet" class="sheet" hidden>
@@ -81,6 +76,7 @@
           키보드 ‘크림’: “My Sound Pack” by Chevy (<a href="https://mechvibes.com/sound-packs/my-sound-pack-5">Mechvibes</a>), <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>, 잘라내기·음량 보정·변환 등 가공함<br />
           왁뿌볼 음원: <a href="https://github.com/apple77771/wakppuball-simulator">apple77771</a>, <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>, 잘라서 수정함 · 크런치 음원: Freesound CC0(비슷한 재질로 대체) · <a href="./sfx/fidgets/CREDITS.md">피젯 음원·가공 내역</a><br />
           청사과·초콜릿·비누·레인보우 음원: 유튜브 <a href="https://www.youtube.com/watch?v=kKYelJAi3xE">까퓰러ASMR Gapular</a>, <a href="https://www.youtube.com/watch?v=OVPG4qZMl0U">Mochich! by Jolislime</a>, <a href="https://www.youtube.com/watch?v=416I3CavrD0">오마이비키</a>, <a href="https://www.youtube.com/watch?v=bExGHkTQmo4">ramit girdhar</a>, <a href="https://www.youtube.com/watch?v=-LJJrKD68bs">공짝지근</a>, <a href="https://www.youtube.com/watch?v=wK-jHC_7P6I">뿌직 PPUJIG</a> (<a href="https://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>), Freesound emilyws (CC0) — 잘라내기·잡음 제거·음량 보정함 · <a href="./sfx/fidgets/PICKS-CREDITS.md">상세 출처</a><br />
+          글꼴: <a href="https://github.com/sun-typeface/SUITE">SUITE</a> · <a href="https://github.com/sun-typeface/SUIT">SUIT</a> © SUNN, SIL OFL 1.1 (<a href="./fonts/OFL-SUITE.txt">SUITE 라이선스</a> · <a href="./fonts/OFL-SUIT.txt">SUIT 라이선스</a>), 원본 파일 그대로 사용<br />
           <a href="./audio-test.html">오디오 진단</a> · v0.1 MVP
         </p>
         <button class="primary" data-action="close-sheet">완료</button>

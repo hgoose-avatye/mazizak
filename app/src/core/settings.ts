@@ -11,6 +11,11 @@ export interface Settings {
   showStats: boolean;
   squishyColor: string;
   keyPreset: KeyPresetId;
+  /** the toy shown on the next launch: the category, and the last toy of each (the keyboard's is keyPreset) */
+  lastCategory: 'fidget' | 'keyboard';
+  lastFidget: string;
+  /** toy picker at the bottom expanded (false: folded to a small handle) */
+  dockOpen: boolean;
 }
 
 const KEY = 'mzk-settings-v1';
@@ -26,6 +31,9 @@ export const DEFAULTS: Settings = {
   showStats: false,
   squishyColor: 'pink',
   keyPreset: 'pebble',
+  lastCategory: 'fidget',
+  lastFidget: 'S01',
+  dockOpen: true,
 };
 
 type Listener = (s: Settings, changed: keyof Settings) => void;

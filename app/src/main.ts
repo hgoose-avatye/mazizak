@@ -26,7 +26,8 @@ const replacement = ({ 'hmx-cheese': 'turquoise-tealios', 'magnetic-jade': 'ibm-
 if (replacement) settings.set('keyPreset', replacement);
 
 // A saved local-only choice must not leave the public UI without an active preset.
-if (!isKeyPresetEnabled(settings.get().keyPreset)) settings.set('keyPreset', 'pebble');
+// An id this build does not know at all (older / newer version, hand-edited storage) falls back the same way.
+if (!Object.hasOwn(KEY_PRESET_INFO, settings.get().keyPreset) || !isKeyPresetEnabled(settings.get().keyPreset)) settings.set('keyPreset', 'pebble');
 
 // ---------- core services ----------
 const audio = new AudioEngine(24);
@@ -42,7 +43,8 @@ const ensureStage = (): Promise<ToyContext> => (stageReady ??= (async () => {
   const r = (rt = new Runtime($('#stage')));
   stats = new StatsOverlay(r, audio);
   stats.show(wantStats(settings.get()));
-  r.canvas.addEventListener('pointerdown', () => hint.classList.add('gone'));
+  // the stage sits between the header and the dock: follow its box (dock folded / unfolded, rotation), not only the window
+  new ResizeObserver(() => r.resize()).observe($('#stage'));
   return {
     renderer: r.renderer,
     audio,
@@ -52,7 +54,7 @@ const ensureStage = (): Promise<ToyContext> => (stageReady ??= (async () => {
   };
 })().catch((e) => { stageReady = null; throw e; })); // a failed load can be retried by opening the toy again
 
-// Audio unlock: any user gesture anywhere (home card taps unlock before entering a toy).
+// Audio unlock: any user gesture anywhere (the first touch on the toy itself, or a tap in the dock).
 // Touch pointerdown may not count as activation on some browsers, so we also try on pointerup/touchend/click.
 for (const type of ['pointerdown', 'pointerup', 'touchend', 'click', 'keydown']) {
   window.addEventListener(type, (ev) => audio.unlock(ev), { capture: true, passive: true });
@@ -100,20 +102,19 @@ if (!hapticsSupported) {
   h.disabled = true;
   $('#haptics-note').textContent = '이 기기의 브라우저는 지원하지 않음';
 }
+const shellParts = () => ['#app-head', '#dock', '#variants', '#stage'].map((q) => $(q));
 let sheetOpener: HTMLElement | null = null;
 const openSheet = () => {
   syncSheet(settings.get());
   sheetOpener = document.activeElement as HTMLElement | null;
   sheet.hidden = false;
-  $('#home').inert = true;
-  $('#toy-ui').inert = true;
+  for (const el of shellParts()) el.inert = true;
   sheet.querySelector<HTMLElement>('input, button')?.focus({ preventScroll: true });
 };
 const closeSheet = () => {
   if (sheet.hidden) return;
   sheet.hidden = true;
-  $('#home').inert = false;
-  $('#toy-ui').inert = false;
+  for (const el of shellParts()) el.inert = false;
   sheetOpener?.focus({ preventScroll: true });
   sheetOpener = null;
 };
@@ -124,6 +125,7 @@ window.addEventListener('keydown', (e) => {
 // ---------- toys ----------
 const toys: Record<string, (Toy & { setColor?(id: string): void; action?(name: string): void; setPreset?(p: KeyPresetId): void }) | undefined> = {};
 const TOY_TITLES: Record<string, string> = { squishy: '말랑이', keyboard: '키보드', ...Object.fromEntries(FIDGETS.map(f => [f.id, f.name])) };
+/** Gesture hints: no longer drawn on screen (the toy is meant to be touched without reading); kept as the canvas's accessible description. */
 const TOY_HINTS: Record<string, string> = {
   ...Object.fromEntries(FIDGETS.map(f => [f.id, f.hint])),
   squishy: '꾹 눌러보세요 · 두 손가락으로 늘려보세요',
@@ -162,9 +164,6 @@ function buildVariants(id: string): void {
       }
       void getToy(id).then((t) => t?.action?.('sound:original')); // the chips start on 원본 소리: keep the toy in step after a revisit
     }
-    const select = document.createElement('select'); select.className = 'toy-jump'; select.setAttribute('aria-label', '다른 장난감');
-    for (const f of FIDGETS) { const o = new Option(f.name, f.id); o.selected = f.id === id; select.add(o); }
-    select.onchange = () => { location.hash = '#/' + select.value; }; variants.append(select);
   } else if (id === 'squishy') {
     for (const c of SQUISHY_COLORS) {
       const b = document.createElement('button');
@@ -180,72 +179,50 @@ function buildVariants(id: string): void {
       };
       variants.appendChild(b);
     }
-  } else if (id === 'keyboard') {
-    for (const p of Object.keys(KEY_PRESET_INFO) as KeyPresetId[]) {
-      if (!isKeyPresetEnabled(p)) continue;
-      const b = document.createElement('button');
-      b.className = 'chip';
-      b.setAttribute('role', 'radio');
-      b.textContent = KEY_PRESET_INFO[p].label;
-      b.title = KEY_PRESET_INFO[p].desc;
-      b.setAttribute('aria-checked', String(settings.get().keyPreset === p));
-      b.onclick = () => {
-        settings.set('keyPreset', p);
-        toys.keyboard?.setPreset?.(p);
-        b.blur(); // the keyboard toy ignores key presses while a button has focus: give the physical keys back right away
-        if (isLocalKeyPreset(p) || p === 'turquoise-tealios' || p === 'ibm-buckling-spring') {
-          b.dataset.loadState = 'loading';
-          b.textContent = `${KEY_PRESET_INFO[p].label} · 로딩 중`;
-          void loadKeyboardSamples(audio.ctx, p).then(() => {
-            b.dataset.loadState = 'ready'; b.textContent = KEY_PRESET_INFO[p].label;
-          }, () => {
-            b.dataset.loadState = 'error'; b.textContent = `${KEY_PRESET_INFO[p].label} · 재시도`;
-          });
-        }
-        variants.querySelectorAll('button').forEach((x) => x.setAttribute('aria-checked', String(x === b)));
-      };
-      variants.appendChild(b);
-    }
   }
+  // keyboard presets and the other fidgets are chosen in the dock
 }
 
 // ---------- routing ----------
-const home = $('#home');
-const toyUi = $('#toy-ui');
-const hint = $('#toy-hint');
-let cameFromHome = false;
-let hintTimer = 0;
+// There is no home screen: the app opens on a toy (the last one used, else 슬랑이) and the dock below switches toys in place.
+// The hash still names the toy (#/S01, #/keyboard/<preset>, #/squishy) so links keep working; switching uses replaceState,
+// so Back leaves the app instead of stepping through every toy tried.
+const DEFAULT_FIDGET = 'S01';
+type Category = 'fidget' | 'keyboard';
+const enabledPresets = () => (Object.keys(KEY_PRESET_INFO) as KeyPresetId[]).filter((p) => isKeyPresetEnabled(p));
+const validFidget = (id: unknown): id is string => typeof id === 'string' && !!findFidget(id);
+const fidgetChoice = () => (validFidget(settings.get().lastFidget) ? settings.get().lastFidget : DEFAULT_FIDGET);
+const launchHash = () => (settings.get().lastCategory === 'keyboard' ? `#/keyboard/${settings.get().keyPreset}` : `#/${fidgetChoice()}`);
+// stored values from an older / hand-edited state fall back to 슬랑이
+if (settings.get().lastCategory !== 'keyboard' && settings.get().lastCategory !== 'fidget') settings.set('lastCategory', 'fidget');
+if (!validFidget(settings.get().lastFidget)) settings.set('lastFidget', DEFAULT_FIDGET);
+
+let currentId = '';
+let category: Category = settings.get().lastCategory;
 
 let routeSeq = 0;
 async function route(): Promise<void> {
-  const seq = ++routeSeq; // a later navigation (back, another card) makes an earlier, still-loading one a no-op
-  const [id, presetId] = location.hash.replace(/^#\/?/, '').split('/');
+  const seq = ++routeSeq; // a later switch makes an earlier, still-loading one a no-op
+  let [id, presetId] = location.hash.replace(/^#\/?/, '').split('/');
+  if (!isToyId(id)) {
+    history.replaceState(null, '', launchHash());
+    [id, presetId] = location.hash.replace(/^#\/?/, '').split('/');
+  }
   if (id === 'keyboard' && presetId && Object.hasOwn(KEY_PRESET_INFO, presetId) && isKeyPresetEnabled(presetId)) {
     settings.set('keyPreset', presetId as KeyPresetId); toys.keyboard?.setPreset?.(presetId as KeyPresetId);
   }
   closeSheet();
-  if (!isToyId(id)) {
-    rt?.setToy(null);
-    // swallow the click that may follow a touch which started on the toy canvas
-    home.classList.add('lock');
-    setTimeout(() => home.classList.remove('lock'), 450);
-    home.hidden = false;
-    toyUi.hidden = true;
-    document.title = '만지작 MANZIZAK';
-    return;
-  }
-  // chrome first, so a tap answers at once while the toy's code and sounds arrive
-  home.hidden = true;
-  toyUi.hidden = false;
-  $('#toy-title').textContent = TOY_TITLES[id];
+  // remember it for the next launch (the old 말랑이 toy is reachable by link only and is not remembered)
+  if (findFidget(id)) { settings.set('lastFidget', id); settings.set('lastCategory', 'fidget'); }
+  else if (id === 'keyboard') settings.set('lastCategory', 'keyboard');
+  const changed = id !== currentId;
+  currentId = id;
+  if (id !== 'squishy') category = id === 'keyboard' ? 'keyboard' : 'fidget';
+  syncDock(changed);
   document.title = `${TOY_TITLES[id]} · 만지작`;
-  buildVariants(id);
-  hint.textContent = TOY_HINTS[id];
-  hint.classList.remove('gone');
-  clearTimeout(hintTimer);
-  hintTimer = window.setTimeout(() => hint.classList.add('gone'), 6000);
-  variants.setAttribute('role', findFidget(id) ? 'group' : 'radiogroup');
-  variants.setAttribute('aria-label', findFidget(id) ? '장난감 조작' : id === 'squishy' ? '색상' : '타건감');
+  if (changed) buildVariants(id);
+  variants.setAttribute('role', id === 'squishy' ? 'radiogroup' : 'group');
+  variants.setAttribute('aria-label', id === 'squishy' ? '색상' : '장난감 조작');
   if (!toys[id]) rt?.setToy(null); // the previous toy must not keep taking input while this one loads
   warmAudio(id);
   let toy: Awaited<ReturnType<typeof getToy>>;
@@ -254,33 +231,44 @@ async function route(): Promise<void> {
   } catch (e) {
     console.warn('toy load failed', id, e);
     if (seq !== routeSeq) return;
+    currentId = ''; // tapping the same toy again retries
     showNotice('불러오지 못했어요. 네트워크를 확인하고 다시 눌러주세요');
-    location.hash = '#/';
+    setDockOpen(true);
+    reveal();
     return;
   }
   if (seq !== routeSeq || !toy || !rt) return;
-  rt.canvas.setAttribute('aria-label', `${TOY_TITLES[id]} 장난감 — 터치해서 조작`);
+  rt.canvas.setAttribute('aria-label', `${TOY_TITLES[id]} — ${TOY_HINTS[id]}`);
   rt.canvas.setAttribute('role', 'img');
   rt.setToy(toy);
+  // the page around the stage takes the toy's backdrop colour, so the header and dock do not frame the canvas as a box
+  const bg = toy.scene.background as { getHexString?: () => string } | null;
+  if (bg?.getHexString) {
+    const hex = '#' + bg.getHexString();
+    document.documentElement.style.setProperty('--stage-bg', hex);
+    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', hex);
+  }
+  requestAnimationFrame(() => requestAnimationFrame(reveal)); // after the toy's first frame is on screen
 }
 window.addEventListener('hashchange', () => void route());
+/** Switch toy in place (no history entry, no reload). Choosing the current toy again only retries a failed load. */
+function go(hash: string): void {
+  if (location.hash !== hash) history.replaceState(null, '', hash);
+  void route();
+}
 
 document.addEventListener('click', (e) => {
-  const el = (e.target as HTMLElement).closest<HTMLElement>('[data-action]');
-  if (el) {
-    const a = el.dataset.action;
-    if (a === 'settings') openSheet();
-    if (a === 'close-sheet') closeSheet();
-    if (a === 'sound') settings.set('sound', !settings.get().sound);
-    if (a === 'reset') rt?.toy?.reset();
-    if (a === 'back') {
-      if (cameFromHome) history.back();
-      else location.hash = '#/';
-    }
-    return;
-  }
-  const card = (e.target as HTMLElement).closest<HTMLElement>('.card');
-  if (card) cameFromHome = true;
+  const target = e.target as HTMLElement;
+  const el = target.closest<HTMLElement>('[data-action]');
+  const a = el?.dataset.action;
+  if (a === 'settings') openSheet();
+  if (a === 'close-sheet') closeSheet();
+  if (a === 'sound') settings.set('sound', !settings.get().sound);
+  if (a === 'reset') rt?.toy?.reset();
+  // the keyboard toy ignores key presses while a button has focus: after a pointer click (header, dock), hand the physical keys back.
+  // Keyboard-driven clicks (detail 0) keep focus for keyboard navigation.
+  const btn = target.closest<HTMLButtonElement>('button');
+  if (btn && e.detail > 0 && a !== 'settings' && !btn.closest('#sheet')) btn.blur();
 });
 
 function showNotice(text: string): void {
@@ -310,55 +298,140 @@ audio.onStateChange = (s) => {
   showNotice('소리가 안 들리면 무음 모드·볼륨을 확인하세요');
 };
 
-const homeCards = document.querySelector<HTMLElement>('#content-cards')!;
-/**
- * Real render of the toy (scripts/make-thumbs.mjs → public/thumbs/menu/<name>.jpg). The CSS-drawn shape / key tiles stay underneath as the
- * fallback while it loads or when no file exists (e.g. a preset that has no thumbnail yet), so a card never shows a broken image.
- */
+// ---------- brand splash ----------
+const splash = $('#splash');
+let revealed = false;
+/** Fade the brand out once the first toy is drawn (or failed). No minimum time: it leaves as soon as the app is ready. */
+function reveal(): void {
+  if (revealed) return;
+  revealed = true;
+  splash.classList.add('out');
+  setTimeout(() => splash.remove(), 400);
+}
+// never a stuck splash: on a very slow first load the dock and header show while the toy is still arriving
+setTimeout(reveal, 4000);
+
+// ---------- dock: category switch + toy picker ----------
+const dock = $('#dock');
+const toyList = $('#toy-list');
+const dockToggle = $('#dock-toggle');
+/** Real render of the toy (scripts/make-thumbs.mjs → public/thumbs/menu/<name>.jpg) over a CSS-drawn fallback shown while it loads. */
 const thumbSrc = (name: string) => `./thumbs/menu/${name}.jpg`;
 const thumbImage = (src: string) => {
   const img = document.createElement('img');
-  img.className = 'shot'; img.alt = ''; img.width = img.height = 116; img.decoding = 'async'; img.src = src;
+  img.className = 'shot'; img.alt = ''; img.width = img.height = 128; img.decoding = 'async'; img.draggable = false; img.src = src;
   img.onerror = () => img.remove();
   return img;
 };
-function showCategory(category: string) {
-  document.querySelectorAll<HTMLButtonElement>('[data-category]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.category === category)));
-  homeCards.replaceChildren();
-  if (category === '키캡') {
-    for (const p of Object.keys(KEY_PRESET_INFO) as KeyPresetId[]) {
-      if (!isKeyPresetEnabled(p)) continue;
-      const link = document.createElement('a'); link.className = 'card'; link.href = '#/keyboard/' + p;
+const hexColor = (c: number) => '#' + c.toString(16).padStart(6, '0');
+function dockItem(key: string, name: string, thumb: HTMLElement, onPick: (b: HTMLButtonElement) => void): HTMLButtonElement {
+  const b = document.createElement('button');
+  b.className = 'toy-item'; b.dataset.key = key;
+  b.setAttribute('role', 'radio'); b.setAttribute('aria-checked', 'false');
+  const label = document.createElement('span'); label.className = 'name'; label.textContent = name;
+  b.append(thumb, label);
+  b.onclick = () => onPick(b);
+  return b;
+}
+let listCategory: Category | null = null;
+function buildList(c: Category): void {
+  listCategory = c;
+  toyList.replaceChildren();
+  toyList.scrollLeft = 0;
+  if (c === 'keyboard') {
+    for (const p of enabledPresets()) {
       const thumb = document.createElement('div'); thumb.className = 'thumb preview-keyboard';
-      for (const color of KEYBOARD_COLORS[p].keys.slice(0, 9)) { const key = document.createElement('i'); key.style.background = '#' + color.toString(16).padStart(6, '0'); thumb.append(key); }
+      for (const color of KEYBOARD_COLORS[p].keys.slice(0, 9)) { const key = document.createElement('i'); key.style.background = hexColor(color); thumb.append(key); }
       thumb.append(thumbImage(thumbSrc('kb-' + p)));
-      const body = document.createElement('div'); body.className = 'card-body'; const title = document.createElement('b'); title.textContent = KEY_PRESET_INFO[p].label;
-      const desc = document.createElement('span'); desc.textContent = KEY_PRESET_INFO[p].desc; body.append(title, desc); link.append(thumb, body); homeCards.append(link);
+      const b = dockItem(p, KEY_PRESET_INFO[p].label, thumb, pickPreset);
+      b.title = KEY_PRESET_INFO[p].desc; // the keycap description stays as the hover text, as on the old preset chips
+      toyList.append(b);
     }
   } else {
-    // two categories only: 키캡 (the keyboards) and 말랑이 (every toy; the card's small label keeps its kind: 슬랑이 / 왁뿌볼 / 크런치 말랑이)
     for (const f of FIDGETS) {
-      const link = document.createElement('a'); link.className = 'card'; link.href = '#/' + f.id; link.dataset.toy = f.id;
-      const thumb = document.createElement('div'); thumb.className = 'thumb preview-fidget ' + f.shape; thumb.style.setProperty('--toy-color', '#' + f.color.toString(16).padStart(6, '0'));
+      const thumb = document.createElement('div'); thumb.className = 'thumb preview-fidget ' + f.shape; thumb.style.setProperty('--toy-color', hexColor(f.color));
       const shape = document.createElement('i'); thumb.append(shape, thumbImage(thumbSrc(f.id)));
-      // the reference app's thumbnails: not for the cheese (not in the reference set) nor the chocolate (the reference is a round ball; this app's bar has six pieces)
+      // dev only: the reference app's thumbnails (not for the cheese nor the chocolate, see git history of the home cards)
       if (LOCAL_FIDGETS && f.shape !== 'cheese' && f.shape !== 'chocolate') { const image = document.createElement('img'); image.src = '/__local-fidgets/thumbs/' + f.id + '.png'; image.alt = ''; image.onload = () => shape.hidden = true; image.onerror = () => image.remove(); thumb.append(image); }
-      const body = document.createElement('div'); body.className = 'card-body'; const title = document.createElement('b'); title.textContent = f.name;
-      const desc = document.createElement('span'); desc.textContent = f.hint; const label = document.createElement('i'); label.textContent = f.category; body.append(title, desc, label); link.append(thumb, body); homeCards.append(link);
+      toyList.append(dockItem(f.id, f.name, thumb, () => go('#/' + f.id)));
     }
   }
 }
-document.querySelectorAll<HTMLButtonElement>('[data-category]').forEach(b => b.onclick = () => showCategory(b.dataset.category!));
-showCategory('말랑이');
-// fetch every category's thumbnails once the browser is idle (≈140 KB), so switching categories shows the images at once
+function pickPreset(b: HTMLButtonElement): void {
+  const p = b.dataset.key as KeyPresetId;
+  settings.set('keyPreset', p);
+  toys.keyboard?.setPreset?.(p);
+  if (isLocalKeyPreset(p) || p === 'turquoise-tealios' || p === 'ibm-buckling-spring') {
+    b.dataset.loadState = 'loading'; b.setAttribute('aria-busy', 'true');
+    void loadKeyboardSamples(audio.ctx, p).then(() => { b.dataset.loadState = 'ready'; b.removeAttribute('aria-busy'); }, () => {
+      b.dataset.loadState = 'error'; b.removeAttribute('aria-busy'); b.title = `${KEY_PRESET_INFO[p].desc} · 불러오지 못함, 다시 누르면 재시도`;
+    });
+  }
+  go(`#/keyboard/${p}`);
+}
+/** Mark the current category and toy; with `scroll`, bring the chosen card into view (launch, category switch). */
+function syncDock(scroll: boolean): void {
+  if (listCategory !== category) { buildList(category); scroll = true; }
+  dock.querySelectorAll<HTMLButtonElement>('[data-category]').forEach((b) => b.setAttribute('aria-checked', String(b.dataset.category === category)));
+  const key = category === 'keyboard' ? (currentId === 'keyboard' ? settings.get().keyPreset : '') : currentId;
+  let sel: HTMLButtonElement | null = null;
+  toyList.querySelectorAll<HTMLButtonElement>('.toy-item').forEach((b) => { const on = b.dataset.key === key; b.setAttribute('aria-checked', String(on)); b.tabIndex = on ? 0 : -1; if (on) sel = b; });
+  if (!sel) toyList.querySelector<HTMLButtonElement>('.toy-item')?.setAttribute('tabindex', '0');
+  $('#dock-current').textContent = TOY_TITLES[currentId] === '키보드' ? KEY_PRESET_INFO[settings.get().keyPreset].label : TOY_TITLES[currentId] ?? '';
+  if (scroll && sel && settings.get().dockOpen) {
+    const s = sel as HTMLButtonElement;
+    toyList.scrollLeft = s.offsetLeft - (toyList.clientWidth - s.offsetWidth) / 2;
+  }
+}
+// fetch the other category's thumbnails once the browser is idle (≈140 KB in all), so a category switch shows them at once
 {
   const warm = () => {
     for (const f of FIDGETS) new Image().src = thumbSrc(f.id);
-    for (const p of Object.keys(KEY_PRESET_INFO) as KeyPresetId[]) if (isKeyPresetEnabled(p)) new Image().src = thumbSrc('kb-' + p);
+    for (const p of enabledPresets()) new Image().src = thumbSrc('kb-' + p);
   };
   const ric = (window as Window & { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number }).requestIdleCallback;
   if (ric) ric(warm, { timeout: 3000 }); else setTimeout(warm, 1500);
 }
+// category switch opens that category's last toy at once
+dock.querySelectorAll<HTMLButtonElement>('[data-category]').forEach((b) => b.addEventListener('click', () => {
+  if (b.dataset.category === 'keyboard') go(`#/keyboard/${settings.get().keyPreset}`);
+  else go('#/' + fidgetChoice());
+}));
+// arrow keys move within the radio groups (one tab stop each)
+for (const group of [toyList, dock.querySelector<HTMLElement>('.cat-seg')!]) {
+  group.addEventListener('keydown', (e) => {
+    const step = e.key === 'ArrowRight' || e.key === 'ArrowDown' ? 1 : e.key === 'ArrowLeft' || e.key === 'ArrowUp' ? -1 : 0;
+    if (!step) return;
+    const items = [...group.querySelectorAll<HTMLButtonElement>('button')];
+    const i = items.indexOf(document.activeElement as HTMLButtonElement);
+    const next = items[(i + step + items.length) % items.length];
+    if (!next) return;
+    e.preventDefault(); e.stopPropagation();
+    next.focus(); next.click();
+  });
+}
+// a mouse wheel scrolls the row sideways (trackpads already send horizontal deltas)
+toyList.addEventListener('wheel', (e) => {
+  if (Math.abs(e.deltaY) <= Math.abs(e.deltaX) || toyList.scrollWidth <= toyList.clientWidth) return;
+  toyList.scrollLeft += e.deltaY;
+  e.preventDefault();
+}, { passive: false });
+// folding: the stage takes the freed height (ResizeObserver above), the toy re-fits once
+function setDockOpen(open: boolean): void {
+  settings.set('dockOpen', open);
+  document.documentElement.classList.toggle('dock-folded', !open);
+  dockToggle.setAttribute('aria-expanded', String(open));
+  dockToggle.setAttribute('aria-label', open ? '장난감 목록 접기' : '장난감 목록 펼치기');
+  $('#dock-body').inert = !open;
+  if (open) syncDock(true);
+}
+dockToggle.addEventListener('click', () => setDockOpen(!settings.get().dockOpen));
+// the stage ends where the dock begins, whatever the dock's height on this screen
+const syncDockHeight = () => document.documentElement.style.setProperty('--dock-h', `${dock.offsetHeight}px`);
+new ResizeObserver(syncDockHeight).observe(dock);
+syncDockHeight();
+setDockOpen(settings.get().dockOpen);
+
 if (import.meta.env.DEV) (window as unknown as { __MANZIZAK__: unknown }).__MANZIZAK__ = {
   report: () => rt?.toy?.report?.(), audio: () => audio.playLogs.slice(-100), frames: () => rt?.framesRendered ?? 0,
 };

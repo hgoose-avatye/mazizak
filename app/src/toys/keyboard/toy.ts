@@ -73,7 +73,8 @@ export function createKeyboard(ctx: ToyContext): Toy & { setPreset(p: KeyPresetI
     camera.updateProjectionMatrix();
     const vfov = THREE.MathUtils.degToRad(camera.fov);
     const distW = (vis.size.x * 0.56) / (Math.tan(vfov / 2) * camera.aspect * 0.92);
-    const avail = Math.max(0.45, (h - 150) / h);
+    // the header and toy picker sit outside the canvas now (app shell), so only a small margin is kept clear (was 150 px of overlaid chrome)
+    const avail = Math.max(0.45, (h - 24) / h);
     const distH = (vis.size.z * 0.62) / (Math.tan(vfov / 2) * 0.66 * Math.min(1, avail / 0.8));
     const dist = Math.max(distW, distH);
     camera.position.copy(target).addScaledVector(new THREE.Vector3(0, 1.55, 1).normalize(), dist);
