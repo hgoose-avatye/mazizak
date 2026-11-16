@@ -59,6 +59,55 @@ function roundedSlab(w: number, h: number, d: number, r: number, sx: number, sy:
 }
 /** Chocolate bar: 2 columns × 3 rows = 6 pieces. Half-extents come from the spec (width, height, depth). */
 export const BAR = { cols: 2, rows: 3, gap: 0.02, shellThickness: 0.12, dome: 0.03 };
+/**
+ * 모닝빵 score lines: six grooves every 60° (offset 30°, so none sits on the sphere's seam), strongest near the top and fading out around
+ * mid height. `groove` ∈ [0,1] = depth of the nearest groove here, `lobe` ∈ [-1,1] = the soft bulge between grooves (−1 inside a groove).
+ */
+export function breadScore(theta: number, y: number) {
+  const step = Math.PI / 3, a = (((theta - Math.PI / 6) % step) + step) % step, dist = Math.min(a, step - a);
+  const mask = THREE.MathUtils.smoothstep(y, -0.15, 0.55) * (1 - 0.6 * THREE.MathUtils.smoothstep(y, 0.9, 1.0));
+  return { groove: Math.exp(-((dist / 0.13) ** 2)) * mask, lobe: -Math.cos(6 * (theta - Math.PI / 6)) * mask };
+}
+/** 찹쌀떡 filling window on the front face: elliptical distance from its centre in unit coordinates (0 = centre, 1 = edge of the cut) */
+export function mochiK(x: number, y: number) {
+  return Math.hypot(x / 0.74, (y - 0.05) / 0.52);
+}
+/**
+ * 모닝빵 / 찹쌀떡: paint the body so it looks like the real thing (vertex colours, the same approach as the beads).
+ * Bread roll: cream foot → golden sides → orange-brown top, the score lines show the pale crumb. Peach mochi: white skin, soft grey towards
+ * the foot, and the peach-pink filling inside the front window. Colours are read from the final (deformation-free) positions.
+ */
+export function paintBody(g: THREE.BufferGeometry, s: FidgetSpec) {
+  const p = g.getAttribute("position"), colors = new Float32Array(p.count * 3);
+  const C = (h: number) => new THREE.Color(h);
+  const cream = C(0xf2d9a4), gold = C(0xdea04e), orange = C(0xbd5a22), brown = C(0x8c4119), crumb = C(0xf1d8a4);
+  const white = C(0xf7f2ec), shade = C(0xe4ded7), flesh = C(0xf98a5c), pinkMid = C(0xfba188), pinkEdge = C(0xf9ab9c);
+  const c = new THREE.Color(), f = new THREE.Color();
+  for (let i = 0; i < p.count; i++) {
+    const x = p.getX(i) / s.width, y = p.getY(i) / s.height, z = p.getZ(i) / s.depth;
+    if (s.shape === "foam") {
+      const t = THREE.MathUtils.clamp((y + 0.25) / 1.15, 0, 1);
+      if (t < 0.35) c.copy(cream).lerp(gold, t / 0.35);
+      else if (t < 0.75) c.copy(gold).lerp(orange, (t - 0.35) / 0.4);
+      else c.copy(orange).lerp(brown, (t - 0.75) / 0.25);
+      c.lerp(crumb, Math.min(1, breadScore(Math.atan2(z, x), y).groove * 0.85));
+      c.multiplyScalar(0.94 + 0.12 * (0.5 + 0.25 * Math.sin(x * 7 + z * 5) + 0.25 * Math.sin(y * 9 - x * 4 + 1.3))); // slight browning mottle
+    } else {
+      c.copy(white).lerp(shade, THREE.MathUtils.smoothstep(-y, 0.3, 0.9) * 0.55);
+      const k = z > 0 ? mochiK(x, y) : 9;
+      if (k < 1.05) {
+        const r = Math.min(k, 1);
+        if (r < 0.55) f.copy(flesh).lerp(pinkMid, r / 0.55);
+        else f.copy(pinkMid).lerp(pinkEdge, (r - 0.55) / 0.45);
+        f.multiplyScalar(1 - 0.1 * THREE.MathUtils.smoothstep(r, 0.86, 1)); // the shaded inner edge of the lip
+        f.multiplyScalar(0.96 + 0.06 * Math.sin(Math.atan2(y - 0.05, x) * 14)); // radial fibres of the peach
+        c.lerp(f, 1 - THREE.MathUtils.smoothstep(k, 0.985, 1.03));
+      }
+    }
+    c.toArray(colors, i * 3);
+  }
+  g.setAttribute("color", new THREE.BufferAttribute(colors, 3));
+}
 export function bodyGeometry(s: FidgetSpec) {
   if (s.shape === "chocolate") {
     // the soft pink core behind the chocolate pieces: a plate as wide and tall as the bar, a little thinner than it
@@ -135,7 +184,8 @@ export function bodyGeometry(s: FidgetSpec) {
     g.computeVertexNormals();
     return g;
   }
-  const g = new THREE.SphereGeometry(1, 72, 48),
+  // foam (모닝빵) and mochi (찹쌀떡) get a finer grid: the score lines / the filling window need the vertices
+  const g = new THREE.SphereGeometry(1, s.shape === "foam" ? 120 : s.shape === "mochi" ? 144 : 72, s.shape === "foam" ? 64 : s.shape === "mochi" ? 80 : 48),
     p = g.getAttribute("position");
   for (let i = 0; i < p.count; i++) {
     let x = p.getX(i),
@@ -143,11 +193,18 @@ export function bodyGeometry(s: FidgetSpec) {
       z = p.getZ(i);
     const theta = Math.atan2(z, x);
     if (s.shape === "foam" || s.shape === "soap") {
-      const pow = s.shape === "soap" ? 0.5 : 0.38;
+      const pow = s.shape === "soap" ? 0.5 : 0.8; // foam: a rounded dome (the old 0.38 made a box)
       x = Math.sign(x) * Math.pow(Math.abs(x), pow);
       y = Math.sign(y) * Math.pow(Math.abs(y), pow);
       z = Math.sign(z) * Math.pow(Math.abs(z), pow);
-      if (s.shape === "foam") y += 0.04 * Math.cos(x * 6) * Math.cos(z * 6);
+      if (s.shape === "foam") {
+        // a soft bread roll: the dome narrows towards the top, six score lines run down from the top and fade out at mid height
+        const sc = breadScore(Math.atan2(z, x), y);
+        const k = 1 - 0.3 * Math.max(0, y) ** 1.4 - 0.07 * sc.groove + 0.02 * sc.lobe;
+        x *= k;
+        z *= k;
+        y *= 1 - 0.035 * sc.groove;
+      }
     }
     if (s.shape === "mango") {
       x *= 1 + 0.18 * y;
@@ -163,7 +220,11 @@ export function bodyGeometry(s: FidgetSpec) {
     if (s.shape === "mochi") {
       x *= 1 + 0.08 * y;
       z *= 1 + 0.08 * y;
-      y -= 0.08 * Math.exp((-x * x) / 0.025) * Math.max(0, y);
+      // peach mochi: the white skin is cut open on the front and the pink filling sits a little below the lip
+      if (z > 0) {
+        const k = mochiK(x, y);
+        z += 0.04 * Math.exp(-(((k - 1.1) / 0.1) ** 2)) - 0.085 * (1 - THREE.MathUtils.smoothstep(k, 0.55, 0.98)); // lip bulges, filling sinks
+      }
     }
     p.setXYZ(
       i,

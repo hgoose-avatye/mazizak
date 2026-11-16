@@ -10,6 +10,7 @@ import {
   STAGES,
   surfaceTexture,
   bodyGeometry,
+  paintBody,
   shellPatches,
   sugarColor,
   sugarTexture,
@@ -99,6 +100,12 @@ if (uMix > 0.0) {
     material.bumpScale = spec.shape === "foam" ? 0.025 : 0.006;
   }
   let geometry: THREE.BufferGeometry = bodyGeometry(spec);
+  if (spec.shape === "foam" || spec.shape === "mochi") {
+    // 모닝빵 / 찹쌀떡 look like the real thing: painted body (vertex colours multiply the material colour, so that stays white)
+    paintBody(geometry, spec);
+    material.vertexColors = true;
+    material.color.set(0xffffff);
+  }
   if (spec.shape === "beads") {
     const a = geometry.getAttribute("position"),
       colors = new Float32Array(a.count * 3);
@@ -331,6 +338,7 @@ if (uMix > 0.0) {
           geometry = geometry.clone();
           geometry.scale(0.89, 0.89, 0.89);
         } else {
+          material.vertexColors = false; // the reference mesh has no painted colours; its texture map is used instead
           material.map = result.map;
           material.color.set(0xffffff);
           material.roughness =

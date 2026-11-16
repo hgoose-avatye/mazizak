@@ -3,13 +3,14 @@
 //
 // Needs a PLAIN dev server so that no local reference models / folders / key presets are rendered:
 //   MANZIZAK_LOCAL_FIDGET_DIR= MANZIZAK_ORIGINAL_APP_DIR= MANZIZAK_ORIGINAL_WAKPPU_DIR= MANZIZAK_ORIGINAL_SOUNDS=0 MANZIZAK_DEV_KEYBOARD_DIR= npx vite --port 4354
-//   node scripts/make-thumbs.mjs http://127.0.0.1:4354/
+//   node scripts/make-thumbs.mjs http://127.0.0.1:4354/            (all)    node scripts/make-thumbs.mjs http://127.0.0.1:4354/ S02,S03   (only these)
 // Each page is opened in a 390×844 phone viewport, a square around the toy is cropped and downscaled to 256 px (card thumbnail is 116 px → 2.2× for retina).
 import { chromium } from "playwright-core";
 import { mkdirSync, writeFileSync } from "node:fs";
 
 const BASE = process.argv[2] ?? "http://127.0.0.1:4354/";
 const OUT = new URL("../public/thumbs/menu/", import.meta.url).pathname;
+const ONLY = process.argv[3]?.split(",").filter(Boolean);
 const SIZE = 256;
 mkdirSync(OUT, { recursive: true });
 
@@ -51,7 +52,7 @@ const toJpeg = (png) =>
   }, [png.toString("base64"), SIZE]);
 
 const jobs = [...toys.map((id) => ({ file: id, hash: `#/${id}`, crop: id.startsWith("W") ? CROP.wax : CROP.toy })), ...keyboards.map((p) => ({ file: `kb-${p}`, hash: `#/keyboard/${p}`, crop: CROP.keyboard }))];
-for (const j of jobs) {
+for (const j of jobs.filter((j) => !ONLY || ONLY.includes(j.file))) {
   await page.goto(BASE + j.hash);
   await page.waitForTimeout(400);
   const f0 = await page.evaluate(() => window.__MANZIZAK__.frames());
