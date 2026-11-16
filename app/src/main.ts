@@ -284,9 +284,9 @@ const homeCards = document.querySelector<HTMLElement>('#content-cards')!;
  * fallback while it loads or when no file exists (e.g. the dev-only key presets), so a card never shows a broken image.
  */
 const thumbSrc = (name: string) => `./thumbs/menu/${name}.jpg`;
-const thumbImage = (name: string) => {
+const thumbImage = (src: string) => {
   const img = document.createElement('img');
-  img.className = 'shot'; img.alt = ''; img.width = img.height = 116; img.decoding = 'async'; img.src = thumbSrc(name);
+  img.className = 'shot'; img.alt = ''; img.width = img.height = 116; img.decoding = 'async'; img.src = src;
   img.onerror = () => img.remove();
   return img;
 };
@@ -299,7 +299,9 @@ function showCategory(category: string) {
       const link = document.createElement('a'); link.className = 'card'; link.href = '#/keyboard/' + p;
       const thumb = document.createElement('div'); thumb.className = 'thumb preview-keyboard';
       for (const color of KEYBOARD_COLORS[p].keys.slice(0, 9)) { const key = document.createElement('i'); key.style.background = '#' + color.toString(16).padStart(6, '0'); thumb.append(key); }
-      thumb.append(thumbImage('kb-' + p));
+      // dev-only key presets are not in the public build: their thumbnails come from the local dev folder (never shipped)
+      if (!isLocalKeyPreset(p)) thumb.append(thumbImage(thumbSrc('kb-' + p)));
+      else if (LOCAL_FIDGETS) thumb.append(thumbImage('/__local-fidgets/thumbs/kb-' + p + '.jpg'));
       const body = document.createElement('div'); body.className = 'card-body'; const title = document.createElement('b'); title.textContent = KEY_PRESET_INFO[p].label;
       const desc = document.createElement('span'); desc.textContent = KEY_PRESET_INFO[p].desc; body.append(title, desc); link.append(thumb, body); homeCards.append(link);
     }
@@ -308,8 +310,9 @@ function showCategory(category: string) {
     for (const f of FIDGETS) {
       const link = document.createElement('a'); link.className = 'card'; link.href = '#/' + f.id; link.dataset.toy = f.id;
       const thumb = document.createElement('div'); thumb.className = 'thumb preview-fidget ' + f.shape; thumb.style.setProperty('--toy-color', '#' + f.color.toString(16).padStart(6, '0'));
-      const shape = document.createElement('i'); thumb.append(shape, thumbImage(f.id));
-      if (LOCAL_FIDGETS && f.shape !== 'cheese') { const image = document.createElement('img'); image.src = '/__local-fidgets/thumbs/' + f.id + '.png'; image.alt = ''; image.onload = () => shape.hidden = true; image.onerror = () => image.remove(); thumb.append(image); }
+      const shape = document.createElement('i'); thumb.append(shape, thumbImage(thumbSrc(f.id)));
+      // the reference app's thumbnails: not for the cheese (not in the reference set) nor the chocolate (the reference is a round ball; this app's bar has six pieces)
+      if (LOCAL_FIDGETS && f.shape !== 'cheese' && f.shape !== 'chocolate') { const image = document.createElement('img'); image.src = '/__local-fidgets/thumbs/' + f.id + '.png'; image.alt = ''; image.onload = () => shape.hidden = true; image.onerror = () => image.remove(); thumb.append(image); }
       const body = document.createElement('div'); body.className = 'card-body'; const title = document.createElement('b'); title.textContent = f.name;
       const desc = document.createElement('span'); desc.textContent = f.hint; const label = document.createElement('i'); label.textContent = f.category; body.append(title, desc, label); link.append(thumb, body); homeCards.append(link);
     }

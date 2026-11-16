@@ -175,7 +175,7 @@ export default defineConfig(({ command, isPreview }) => {
               configureServer(server: import("vite").ViteDevServer) {
                 server.middlewares.use(async (req, res, next) => {
                   const match =
-                    /^\/__local-fidgets\/(manifest\.json|models\/[a-z_]+\.glb|audio\/[a-z0-9_]+\.wav|thumbs\/[A-Z0-9]+\.png)$/.exec(
+                    /^\/__local-fidgets\/(manifest\.json|models\/[a-z_]+\.glb|audio\/[a-z0-9_]+\.wav|thumbs\/[A-Z0-9]+\.png|thumbs\/kb-[a-z0-9-]+\.jpg)$/.exec(
                       (req.url ?? "").split("?")[0],
                     );
                   if (!match) return next();
@@ -189,7 +189,9 @@ export default defineConfig(({ command, isPreview }) => {
                           ? "audio/wav"
                           : match[1].endsWith(".png")
                             ? "image/png"
-                            : "model/gltf-binary",
+                            : match[1].endsWith(".jpg")
+                              ? "image/jpeg"
+                              : "model/gltf-binary",
                     );
                     res.setHeader("Cache-Control", "no-store");
                     res.end(data);
@@ -240,6 +242,10 @@ export default defineConfig(({ command, isPreview }) => {
     ],
     base: "./",
     server: { host: true },
+    // one copy of three.js in dev: when the dependency optimizer ran twice at once (two dev servers on this folder) GLTFLoader's meshes came
+    // from a second copy, `instanceof THREE.Mesh` failed and the reference models of 모닝빵 / 찹쌀떡 / 망고 were "empty"
+    resolve: { dedupe: ["three"] },
+    optimizeDeps: { include: ["three", "three/addons/loaders/GLTFLoader.js", "three/addons/utils/BufferGeometryUtils.js"] },
     build: {
       rollupOptions: {
         input: {
