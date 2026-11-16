@@ -15,7 +15,7 @@ import {
   sugarColor,
   sugarTexture,
 } from "./visuals";
-import { LOCAL_FIDGETS, referenceMesh } from "./references";
+import { LOCAL_FIDGETS, SHIPPED_MODELS, referenceMesh, shippedMesh } from "./references";
 export interface FidgetToy extends Toy {
   action(name: string): void;
 }
@@ -327,10 +327,15 @@ if (uMix > 0.0) {
       scene.add(cap);
     }
   }
-  if (LOCAL_FIDGETS)
-    void referenceMesh(spec)
+  // 모닝빵 / 찹쌀떡 ship with their model (public/models). Until it has loaded the painted stand-in is hidden (no flash of another shape);
+  // it stays as the fallback when the file cannot be loaded. The dev reference folder (LOCAL_FIDGETS) works as before.
+  if (!LOCAL_FIDGETS && SHIPPED_MODELS[spec.id]) blob.visible = false;
+  void (LOCAL_FIDGETS ? referenceMesh(spec) : shippedMesh(spec))
       .then((result) => {
-        if (!result) return;
+        if (!result) {
+          blob.visible = true;
+          return;
+        }
         const old = geometry;
         geometry = result.geometry;
         if (spec.family === "wax") {
@@ -356,10 +361,13 @@ if (uMix > 0.0) {
         base = Float32Array.from(geometry.getAttribute("position").array);
         old.dispose();
         visualSource = result.source;
+        blob.visible = true;
         ctx.requestFrame();
       })
       .catch((e) => {
         visualSource = "reference-load-failed";
+        blob.visible = true;
+        ctx.requestFrame();
         console.warn(e);
       });
   const grains =

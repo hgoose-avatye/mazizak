@@ -14,10 +14,12 @@ for (const f of files.filter((f) => /\.(js|css|html|json|md|map)$/.test(f))) {
   const t = fs.readFileSync(f, 'utf8');
   for (const s of FORBIDDEN) if (t.includes(s)) problems.push(`${path.relative(dist, f)} contains "${s}"`);
 }
-// 2) no reference models / textures / audio outside the licensed sfx folders
+// 2) no reference models / textures / audio outside the licensed sfx folders. The only models allowed are the two shipped on purpose
+//    (모닝빵 / 찹쌀떡, public/models/, owner's permission record in CREDITS.md + models.json — checked in 6)
+const SHIPPED_MODELS = new Set(['models/bread.glb', 'models/peachmochi.glb']);
 for (const f of files) {
   const rel = path.relative(dist, f);
-  if (/\.(glb|gltf|usdz)$/.test(rel)) problems.push(`model shipped: ${rel}`);
+  if (/\.(glb|gltf|usdz)$/.test(rel) && !SHIPPED_MODELS.has(rel)) problems.push(`model shipped: ${rel}`);
   if ((/(^|\/)thumbs\/[A-Z]\d+\.png$/.test(rel) || /(^|\/)audio\//.test(rel)) && !rel.startsWith('sfx/')) problems.push(`reference asset shipped: ${rel}`);
 }
 // 3) every shipped fidget sprite pool has a source with an allowed licence and a usage note
@@ -48,5 +50,15 @@ for (const id of ['box-jade', 'silent-peach-v3', 'mongdol-pl87w', 'jjigae-topre'
   if (!fs.existsSync(f)) { problems.push(`cleared preset ${id} missing from dist/sfx/keyboard`); continue; }
   if (JSON.parse(fs.readFileSync(f, 'utf8')).clearance?.statedBy !== 'project owner') problems.push(`${id}.json has no clearance record`);
 }
+// 6) the shipped models: valid, small, and the owner's permission record travels with them
+for (const rel of SHIPPED_MODELS) {
+  const f = path.join(dist, rel);
+  if (!fs.existsSync(f)) { problems.push(`${rel} missing from dist`); continue; }
+  const b = fs.readFileSync(f);
+  if (b.toString('ascii', 0, 4) !== 'glTF') problems.push(`${rel} is not a glb`);
+  if (b.length > 1_000_000) problems.push(`${rel} is ${b.length} bytes (over 1 MB: pack it with scripts/fidgets/pack-reference-models.mjs)`);
+}
+for (const f of ['models/CREDITS.md', 'models/models.json']) if (!fs.existsSync(path.join(dist, f))) problems.push(`${f} missing from dist`);
+try { if (JSON.parse(fs.readFileSync(path.join(dist, 'models/models.json'), 'utf8')).clearance?.statedBy !== 'project owner') problems.push('models/models.json has no permission record'); } catch { problems.push('models/models.json unreadable'); }
 if (problems.length) { console.error('dist check FAILED:\n - ' + problems.join('\n - ')); process.exit(1); }
 console.log(`dist check OK: ${files.length} files, no local-reference strings or models, fidget sprites licensed`);

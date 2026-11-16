@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+import { GLTFLoader, type GLTF } from "three/addons/loaders/GLTFLoader.js";
 import type { FidgetSpec } from "./catalog";
 export const LOCAL_FIDGETS = import.meta.env.VITE_LOCAL_FIDGETS === "1";
 interface ReferenceToy {
@@ -93,10 +93,25 @@ export async function referenceSounds(ctx: BaseAudioContext, id: string) {
   }
   return roles;
 }
+/**
+ * The two models that ship with the app (public/models/: 모닝빵 S02 and 찹쌀떡 S03, packed by scripts/fidgets/pack-reference-models.mjs;
+ * the owner's permission record is public/models/CREDITS.md + models.json). Every build loads them; the dev reference folder still works the same way.
+ */
+export const SHIPPED_MODELS: Record<string, string> = { S02: "models/bread.glb", S03: "models/peachmochi.glb" };
+/** dev only (LOCAL_FIDGETS): the model listed in the local reference manifest */
 export async function referenceMesh(spec: FidgetSpec) {
   const path = (await referenceManifest()).toys[spec.id]?.model;
   if (typeof path !== "string") return null;
-  const gltf = await new GLTFLoader().loadAsync("/__local-fidgets/" + path);
+  return meshFromGltf(await new GLTFLoader().loadAsync("/__local-fidgets/" + path), spec, path);
+}
+/** every build: the shipped model of this toy, or null when it has none */
+export async function shippedMesh(spec: FidgetSpec) {
+  const path = SHIPPED_MODELS[spec.id];
+  if (!path) return null;
+  return meshFromGltf(await new GLTFLoader().loadAsync("./" + path), spec, path);
+}
+/** first mesh of the file, scaled to the toy's width / height / depth, with its base-colour texture (≤ 1024 px) */
+function meshFromGltf(gltf: GLTF, spec: FidgetSpec, source: string) {
   gltf.scene.updateMatrixWorld(true);
   let mesh: THREE.Mesh | undefined;
   gltf.scene.traverse((o) => {
@@ -158,5 +173,5 @@ export async function referenceMesh(spec: FidgetSpec) {
     map.dispose();
     map = resized;
   }
-  return { geometry, map, source: path };
+  return { geometry, map, source };
 }

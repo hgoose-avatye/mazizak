@@ -1,0 +1,59 @@
+{
+ "_doc": "Reference 3D models of 모닝빵 (S02) and 찹쌀떡 (S03) shipped with the app. Packed by scripts/fidgets/pack-reference-models.mjs; see CREDITS.md.",
+ "clearance": {
+  "status": "permission to use in the public build obtained",
+  "statedBy": "project owner",
+  "statedOn": "2026-11-16",
+  "note": "The owner's statement; the permission terms are not stored in the repository. The exact source of the files is not recorded (the local reference folder holds the originals)."
+ },
+ "models": [
+  {
+   "toy": "S02",
+   "name": "모닝빵",
+   "file": "bread.glb",
+   "original": {
+    "file": "bread.glb",
+    "bytes": 1339588,
+    "sha256": "c86c3ecd437fbf7dda96337b16047c622070292dc54a8e1c809c34ab4e86e20a",
+    "images": 1,
+    "mesh": "3771 vertices, 6000 triangles"
+   },
+   "packed": {
+    "bytes": 210776,
+    "sha256": "b69a2b9be29cdfab972419602dbba9973edee1e75732053b21a350db29c730a0",
+    "vertices": 3771,
+    "triangles": 6000,
+    "texture": {
+     "mime": "image/jpeg",
+     "width": 1024,
+     "height": 1024,
+     "bytes": 98153
+    }
+   }
+  },
+  {
+   "toy": "S03",
+   "name": "찹쌀떡",
+   "file": "peachmochi.glb",
+   "original": {
+    "file": "peachmochi.glb",
+    "bytes": 8328760,
+    "sha256": "8337e917316151c38ebfc04bfa54261ea31061ac574f350a25bb8940d0c0206f",
+    "images": 3,
+    "mesh": "3575 vertices, 6000 triangles"
+   },
+   "packed": {
+    "bytes": 300756,
+    "sha256": "b5760a0d27054e4ff8562d128a690780ef5e04270cfb570054ef16b4ce12ab2f",
+    "vertices": 3575,
+    "triangles": 6000,
+    "texture": {
+     "mime": "image/jpeg",
+     "width": 1024,
+     "height": 1024,
+     "bytes": 192050
+    }
+   }
+  }
+ ]
+}
