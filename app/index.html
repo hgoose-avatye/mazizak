@@ -21,7 +21,7 @@
     <div id="stage"></div>
 
     <header id="app-head" class="app-head">
-      <h1 class="brand"><span class="wordmark">만지작</span><span class="latin">MANZIZAK</span></h1>
+      <h1 class="brand"><svg class="brand-symbol" viewBox="0 0 36 36" width="32" height="32" aria-hidden="true"><rect x="3" y="13" width="8" height="20" rx="4" fill="currentColor"/><rect x="14" y="3" width="8" height="30" rx="4" fill="currentColor"/><rect x="25" y="9" width="8" height="24" rx="4" fill="currentColor"/><circle cx="7" cy="6" r="3" fill="#d88f72"/></svg><span class="brand-type"><span class="wordmark">만지작</span><span class="latin">MANZIZAK</span></span></h1>
       <div class="head-actions">
         <button class="icon-btn ghost" data-action="reset" aria-label="처음 상태로">
           <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M4.5 12a7.5 7.5 0 1 0 2.2-5.3M4.5 4.5v3.8h3.8" /></svg>
@@ -33,18 +33,27 @@
       </div>
     </header>
 
+    <div class="now-playing" id="now-playing" aria-live="polite" aria-atomic="true">
+      <span class="now-category" id="now-category">말랑이</span>
+      <h2 id="now-name">슬랑이</h2>
+    </div>
+
     <!-- per-toy controls that are not toy choices: 말랑이(squishy) colours, dev-only sound A/B chips -->
     <div class="variants" id="variants" role="radiogroup"></div>
 
     <!-- TOY PICKER DOCK -->
     <nav id="dock" class="dock" aria-label="장난감 선택">
       <button class="dock-toggle" id="dock-toggle" aria-expanded="true" aria-controls="dock-body" aria-label="장난감 목록 접기">
-        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" d="M6 9.5l6 6 6-6" /></svg>
-        <span class="dock-current" id="dock-current"></span>
+
+        <span class="dock-label"><span class="collection-dot" aria-hidden="true"></span>장난감 서랍</span>
+        <span class="dock-toggle-meta"><span class="dock-current" id="dock-current"></span><span id="dock-toggle-label">접기</span><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" d="M6 9.5l6 6 6-6" /></svg></span>
       </button>
       <div class="dock-body" id="dock-body">
+        <div class="dock-toolbar">
         <div class="cat-seg" role="radiogroup" aria-label="카테고리">
           <button role="radio" data-category="fidget" aria-checked="true">말랑이</button><button role="radio" data-category="keyboard" aria-checked="false">키보드</button>
+        </div>
+        <span class="collection-count" id="collection-count" aria-live="polite"></span>
         </div>
         <div class="toy-list" id="toy-list" role="radiogroup" aria-label="장난감"></div>
       </div>
@@ -55,10 +64,12 @@
       <div class="sheet-backdrop" data-action="close-sheet"></div>
       <section class="sheet-panel" role="dialog" aria-modal="true" aria-label="설정">
         <div class="sheet-grip"></div>
-        <h2>설정</h2>
+        <div class="sheet-top"><div><span class="eyebrow">MAKE IT YOURS</span><h2>설정</h2></div><button class="sheet-close icon-btn" data-action="close-sheet" aria-label="설정 닫기"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button></div>
+        <p class="setting-group">사운드와 터치</p>
         <label class="row"><span>소리</span><input type="checkbox" role="switch" data-setting="sound" /></label>
-        <label class="row"><span>볼륨</span><input type="range" min="0" max="1" step="0.01" data-setting="volume" /></label>
+        <label class="row"><span>볼륨</span><span class="range-wrap"><input id="volume-control" type="range" min="0" max="1" step="0.01" data-setting="volume" /><output id="volume-value" for="volume-control">90%</output></span></label>
         <label class="row" id="row-haptics"><span>진동 <small id="haptics-note"></small></span><input type="checkbox" role="switch" data-setting="haptics" /></label>
+        <p class="setting-group">화면과 움직임</p>
         <div class="row">
           <span>화질</span>
           <div class="seg" data-setting="quality">
@@ -67,7 +78,7 @@
         </div>
         <label class="row"><span>움직임 줄이기</span><input type="checkbox" role="switch" data-setting="reduceMotion" /></label>
         <label class="row"><span>성능 정보 표시</span><input type="checkbox" role="switch" data-setting="showStats" /></label>
-        <p class="sheet-note">
+        <details class="credits"><summary>출처와 라이선스<span aria-hidden="true">＋</span></summary><p class="sheet-note">
           무음 모드에서는 소리가 나지 않습니다. 효과음은 Freesound의 CC0(퍼블릭 도메인) 실제 녹음을 가공해 사용합니다 — <a href="./sfx/keyboard/CREDITS.md">키보드 출처</a> · <a href="./sfx/squishy/CREDITS.md">말랑이 출처</a><br />
           <a href="./keyboard-compare.html">키보드 6종 비교 청취</a><br />
           Topre · Turquoise Tealios · Buckling Spring: <a href="https://github.com/tplai/kbsim">tplai/kbsim</a>, Copyright (c) Thomas Lai, <a href="./sfx/keyboard/kbsim-LICENSE.md">MIT</a>. MP3→mono WAV 스프라이트 변환. 원 녹음 권리 출처는 별도 확인되지 않음<br />
@@ -78,7 +89,7 @@
           청사과·초콜릿·비누·레인보우 음원: 유튜브 <a href="https://www.youtube.com/watch?v=kKYelJAi3xE">까퓰러ASMR Gapular</a>, <a href="https://www.youtube.com/watch?v=OVPG4qZMl0U">Mochich! by Jolislime</a>, <a href="https://www.youtube.com/watch?v=416I3CavrD0">오마이비키</a>, <a href="https://www.youtube.com/watch?v=bExGHkTQmo4">ramit girdhar</a>, <a href="https://www.youtube.com/watch?v=-LJJrKD68bs">공짝지근</a>, <a href="https://www.youtube.com/watch?v=wK-jHC_7P6I">뿌직 PPUJIG</a> (<a href="https://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>), Freesound emilyws (CC0) — 잘라내기·잡음 제거·음량 보정함 · <a href="./sfx/fidgets/PICKS-CREDITS.md">상세 출처</a><br />
           글꼴: <a href="https://github.com/sun-typeface/SUITE">SUITE</a> · <a href="https://github.com/sun-typeface/SUIT">SUIT</a> © SUNN, SIL OFL 1.1 (<a href="./fonts/OFL-SUITE.txt">SUITE 라이선스</a> · <a href="./fonts/OFL-SUIT.txt">SUIT 라이선스</a>), 원본 파일 그대로 사용<br />
           <a href="./audio-test.html">오디오 진단</a> · v0.1 MVP
-        </p>
+        </p></details>
         <button class="primary" data-action="close-sheet">완료</button>
       </section>
     </div>

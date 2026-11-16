@@ -1,4 +1,5 @@
 import './style.css';
+import './ui.css';
 import { AudioEngine } from './core/audio';
 import { settings, type Settings } from './core/settings';
 import { haptic, hapticsSupported } from './core/haptics';
@@ -64,6 +65,7 @@ for (const type of ['pointerdown', 'pointerup', 'touchend', 'click', 'keydown'])
 const applySettings = (s: Readonly<Settings>) => {
   audio.setVolume(s.volume);
   audio.setMuted(!s.sound);
+  $('#volume-value').textContent = `${Math.round(s.volume * 100)}%`;
   const sb = $('#sound-btn');
   sb.setAttribute('aria-pressed', String(s.sound));
   sb.setAttribute('aria-label', s.sound ? '소리 끄기' : '소리 켜기');
@@ -102,7 +104,7 @@ if (!hapticsSupported) {
   h.disabled = true;
   $('#haptics-note').textContent = '이 기기의 브라우저는 지원하지 않음';
 }
-const shellParts = () => ['#app-head', '#dock', '#variants', '#stage'].map((q) => $(q));
+const shellParts = () => ['#app-head', '#dock', '#variants', '#stage', '#now-playing'].map((q) => $(q));
 let sheetOpener: HTMLElement | null = null;
 const openSheet = () => {
   syncSheet(settings.get());
@@ -329,7 +331,9 @@ function dockItem(key: string, name: string, thumb: HTMLElement, onPick: (b: HTM
   b.className = 'toy-item'; b.dataset.key = key;
   b.setAttribute('role', 'radio'); b.setAttribute('aria-checked', 'false');
   const label = document.createElement('span'); label.className = 'name'; label.textContent = name;
-  b.append(thumb, label);
+  const number = document.createElement('span'); number.className = 'item-number'; number.textContent = String(toyList.children.length + 1).padStart(2, '0'); number.setAttribute('aria-hidden', 'true');
+  const selected = document.createElement('span'); selected.className = 'item-selected'; selected.setAttribute('aria-hidden', 'true'); selected.innerHTML = '<svg width="10" height="10" viewBox="0 0 12 12"><path d="m2.5 6 2.2 2.2 4.8-4.8" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  b.append(number, thumb, label, selected);
   b.onclick = () => onPick(b);
   return b;
 }
@@ -378,6 +382,9 @@ function syncDock(scroll: boolean): void {
   toyList.querySelectorAll<HTMLButtonElement>('.toy-item').forEach((b) => { const on = b.dataset.key === key; b.setAttribute('aria-checked', String(on)); b.tabIndex = on ? 0 : -1; if (on) sel = b; });
   if (!sel) toyList.querySelector<HTMLButtonElement>('.toy-item')?.setAttribute('tabindex', '0');
   $('#dock-current').textContent = TOY_TITLES[currentId] === '키보드' ? KEY_PRESET_INFO[settings.get().keyPreset].label : TOY_TITLES[currentId] ?? '';
+  $('#now-name').textContent = $('#dock-current').textContent;
+  $('#now-category').textContent = currentId === 'keyboard' ? '키보드' : findFidget(currentId)?.category ?? '말랑이';
+  if ($('#collection-count').textContent !== `${toyList.children.length}가지`) $('#collection-count').textContent = `${toyList.children.length}가지`;
   if (scroll && sel && settings.get().dockOpen) {
     const s = sel as HTMLButtonElement;
     toyList.scrollLeft = s.offsetLeft - (toyList.clientWidth - s.offsetWidth) / 2;
@@ -421,6 +428,7 @@ function setDockOpen(open: boolean): void {
   settings.set('dockOpen', open);
   document.documentElement.classList.toggle('dock-folded', !open);
   dockToggle.setAttribute('aria-expanded', String(open));
+  $('#dock-toggle-label').textContent = open ? '접기' : '펼치기';
   dockToggle.setAttribute('aria-label', open ? '장난감 목록 접기' : '장난감 목록 펼치기');
   $('#dock-body').inert = !open;
   if (open) syncDock(true);
