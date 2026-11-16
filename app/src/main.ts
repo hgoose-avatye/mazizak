@@ -293,7 +293,7 @@ const thumbImage = (name: string) => {
 function showCategory(category: string) {
   document.querySelectorAll<HTMLButtonElement>('[data-category]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.category === category)));
   homeCards.replaceChildren();
-  if (category === '키보드') {
+  if (category === '키캡') {
     for (const p of Object.keys(KEY_PRESET_INFO) as KeyPresetId[]) {
       if (!isKeyPresetEnabled(p)) continue;
       const link = document.createElement('a'); link.className = 'card'; link.href = '#/keyboard/' + p;
@@ -304,7 +304,8 @@ function showCategory(category: string) {
       const desc = document.createElement('span'); desc.textContent = KEY_PRESET_INFO[p].desc; body.append(title, desc); link.append(thumb, body); homeCards.append(link);
     }
   } else {
-    for (const f of FIDGETS.filter(f => f.category === category)) {
+    // two categories only: 키캡 (the keyboards) and 말랑이 (every toy; the card's small label keeps its kind: 슬랑이 / 왁뿌볼 / 크런치 말랑이)
+    for (const f of FIDGETS) {
       const link = document.createElement('a'); link.className = 'card'; link.href = '#/' + f.id; link.dataset.toy = f.id;
       const thumb = document.createElement('div'); thumb.className = 'thumb preview-fidget ' + f.shape; thumb.style.setProperty('--toy-color', '#' + f.color.toString(16).padStart(6, '0'));
       const shape = document.createElement('i'); thumb.append(shape, thumbImage(f.id));

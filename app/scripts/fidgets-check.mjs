@@ -45,11 +45,8 @@ try {
   await p.goto(URL);
   await p.waitForTimeout(1000);
   for (const [category, count] of [
-    ["말랑이", 3],
-    ["슬랑이", 3],
-    ["왁뿌볼", 2],
-    ["크런치", 2],
-    ["키보드", 11],
+    ["말랑이", 10],
+    ["키캡", 11],
   ]) {
     await p.getByRole("button", { name: category, exact: true }).click();
     ok(
