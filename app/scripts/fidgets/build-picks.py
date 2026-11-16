@@ -47,7 +47,11 @@ PICKS = {
     "apple.after": ("hold", "impact", "W01 broken wax being pressed (owner picks: first round 1–5 + second round 1–8)", [("youtube:OVPG4qZMl0U", t, .6) for t in (21.860, 27.565, 33.748, 38.624, 42.702, 11.76, 19.38, 20.48, 22.95, 25.4, 26.63, 34.6, 36.82)]),
     "choco.crumbs": ("crunch", "impact", "W02 crumbs left after the first break, pressed (owner picks: #5 + second round 7, 10)", [("youtube:bExGHkTQmo4", t, .6) for t in (47.120, 27.41, 45.43)]),
     "wax.mixed": ("hold", "impact", "W01/W02 every piece broken and kneaded in (owner picks: #3–#8 + second round 1, 2, 3, 5, 9)", [("youtube:-LJJrKD68bs", t, .7) for t in (108.720, 139.880, 150.370, 173.770, 196.770, 350.930, 16.67, 32.81, 62.01, 76.43, 193.9)]),
-    "beads.crunch": ("crunch", "impact", "C02 rainbow beads crushed (owner pick, hiss reduced; short cut)", [("youtube:wK-jHC_7P6I", t, .45) for t in (17.56, 30.82, 37.04, 47.64, 58.28, 69.80, 75.14, 84.30)]),
+    # 8 owner picks + 17 crunches from the same video chosen automatically for similarity to them (centroid, peak, crest within
+    # 2.5 σ; ≥1.05 s apart; 2026-11-13, not yet listened) — the per-grain crunch cycled audibly through only 8 clips
+    "beads.crunch": ("crunch", "impact", "C02 rainbow beads crushed (8 owner picks + 17 similar crunches from the same video, auto-selected; hiss reduced; short cut)",
+                     [("youtube:wK-jHC_7P6I", t, .45) for t in (17.56, 30.82, 37.04, 47.64, 58.28, 69.80, 75.14, 84.30,
+                                                                20.14, 21.95, 26.64, 28.64, 41.65, 45.64, 49.48, 51.24, 56.36, 59.76, 64.73, 67.64, 71.34, 73.73, 77.01, 85.54, 87.16)]),
     "beads.hold": ("hold", "continuous", "C02 rainbow beads squeezed (owner pick, hiss reduced; full cut)", [("youtube:wK-jHC_7P6I", t, 1.0) for t in (17.56, 30.82, 37.04, 47.64, 58.28, 69.80, 75.14, 84.30)]),
 }
 # hiss reduction: the rainbow beads (2026-11-13) and, at the owner's request, every wax-ball source (second pick round)
