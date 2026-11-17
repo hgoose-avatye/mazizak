@@ -5,7 +5,7 @@
   "L03"
  ],
  "sampleRate": 48000,
- "totalSamples": 298270,
+ "totalSamples": 296221,
  "sources": {
   "freesound:197761": {
    "title": "shaving cream.wav",
@@ -192,5 +192,5 @@
    ]
   }
  },
- "file": "squish.L03.7c13c1d04f.flac"
+ "file": "squish.L03.8802a813c9.flac"
 }

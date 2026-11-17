@@ -27,8 +27,6 @@ W02 also uses real chocolate-bar snapping/crumbling recordings (Freesound CC0, b
 ## Crunch (C01 비누 크런치, C02 슈가비즈 말랑이)
 
 **C01 비누 크런치 uses the project owner's own recordings of the actual soap crunch squishy** (rows `own:` below; `soap.crunch` short crushing from one take, `soap.hold` continuous squeezing from another). Own recordings — no third-party licence; the owner holds the rights.
-
-**S02 모닝빵 uses the project owner's own recording** (row `own:bread/morningbread.wav`, given on 2026-11-17 as "모닝빵.mp3"). Own recording — no third-party licence; the owner holds the rights. Its clips were cut by `scripts/fidgets/add-bread.py`.
 C02 uses Freesound recordings marked Creative Commons 0 (https://creativecommons.org/publicdomain/zero/1.0/) on their pages on the retrieval date (public HQ preview MP3s). CC0 needs no attribution; we credit the authors anyway.
 **C02 is not a recording of sugar beads** — similar materials: glass beads, sprinkles, pop rocks, rock candy. Counts: 29 clips from 9 files.
 
@@ -43,7 +41,6 @@ C02 uses Freesound recordings marked Creative Commons 0 (https://creativecommons
 | freesound:829549 | Shaking hagelslag (chocolate sprinkles) HZA | hz37 | https://freesound.org/people/hz37/sounds/829549/ | CC0 1.0 | 2026-11-12 | C02 crunch | similar material only (not a recording of the toy) |
 | own:soap.crunch/rec28.wav | 새로운 녹음 28.m4a (C01 비누 크런치 — short crushing) | project owner | own recording | Own recording (project owner) | 2026-11-13 | C01 crunch | recording of the actual toy (C01 soap crunch squishy), per the project owner |
 | own:soap.hold/rec27.wav | 새로운 녹음 27.m4a (C01 비누 크런치 — continuous squeezing) | project owner | own recording | Own recording (project owner) | 2026-11-13 | C01 hold | recording of the actual toy (C01 soap crunch squishy), per the project owner |
-| own:bread/morningbread.wav | 모닝빵.mp3 (S02 모닝빵 — the project owner's own recording; 95 s, 44.1 kHz stereo MP3 128 kbps, converted with afconvert) | project owner | own recording | Own recording (project owner) | 2026-11-17 | S02 tap, S02 hold | the project owner's own recording for S02 모닝빵, per the project owner |
 
 ## Squish (S01–S03 말랑이, L01–L03 슬랑이) — Freesound CC0 1.0
 

@@ -1,0 +1,100 @@
+{
+ "version": 1,
+ "chunkOf": "squish.wav",
+ "toys": [
+  "S02"
+ ],
+ "sampleRate": 48000,
+ "totalSamples": 118750,
+ "sources": {
+  "freesound:390314": {
+   "title": "082816 ASMR.mp3",
+   "author": "pflanigan",
+   "url": "https://freesound.org/people/pflanigan/sounds/390314/",
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "retrieved": "2026-11-12",
+   "usage": "S02 tap",
+   "materialMatch": "similar material only (not a recording of the toy)",
+   "originalFile": "bench-out/fidget-src/fs_390314.mp3"
+  },
+  "freesound:390315": {
+   "title": "082816 the foam remembers.mp3",
+   "author": "pflanigan",
+   "url": "https://freesound.org/people/pflanigan/sounds/390315/",
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "retrieved": "2026-11-12",
+   "usage": "S02 tap",
+   "materialMatch": "similar material only (not a recording of the toy)",
+   "originalFile": "bench-out/fidget-src/fs_390315.mp3"
+  },
+  "freesound:594753": {
+   "title": "Pressing down on sponge",
+   "author": "emilyneiswonger",
+   "url": "https://freesound.org/people/emilyneiswonger/sounds/594753/",
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "retrieved": "2026-11-12",
+   "usage": "S02 tap",
+   "materialMatch": "similar material only (not a recording of the toy)",
+   "originalFile": "bench-out/fidget-src/fs_594753.mp3"
+  }
+ },
+ "pools": {
+  "foam.hold": {
+   "event": "hold",
+   "loudnessClass": "continuous",
+   "material": "memory foam / sponge",
+   "note": "long slow presses",
+   "processing": "hiss-reduced (spectral subtraction, noise profile = quietest 10 % of the source)",
+   "recordings": 3,
+   "variants": 0,
+   "entries": [
+    {
+     "start": 2077,
+     "length": 37056,
+     "offset": 0.043271,
+     "duration": 0.772,
+     "gain": 0.7877,
+     "src": "freesound:390314",
+     "srcStart": 37.8195,
+     "srcEnd": 38.5915,
+     "peakDbSource": -17.7,
+     "centroidHz": 6043,
+     "strikes": 7,
+     "boostDb": 16.9
+    },
+    {
+     "start": 39613,
+     "length": 35520,
+     "offset": 0.825271,
+     "duration": 0.74,
+     "gain": 0.3718,
+     "src": "freesound:390315",
+     "srcStart": 6.9543,
+     "srcEnd": 7.6943,
+     "peakDbSource": -13.3,
+     "centroidHz": 5385,
+     "strikes": 4,
+     "boostDb": 12.4
+    },
+    {
+     "start": 75613,
+     "length": 41088,
+     "offset": 1.575271,
+     "duration": 0.856,
+     "gain": 1,
+     "src": "freesound:594753",
+     "srcStart": 6.0911,
+     "srcEnd": 6.9471,
+     "peakDbSource": -13.5,
+     "centroidHz": 5548,
+     "strikes": 7,
+     "boostDb": 13
+    }
+   ]
+  }
+ },
+ "file": "squish.S02.b7fc8f29ed.flac"
+}
