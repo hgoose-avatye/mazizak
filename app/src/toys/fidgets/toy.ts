@@ -32,6 +32,7 @@ export function createFidget(ctx: ToyContext, spec: FidgetSpec): FidgetToy {
   scene.add(light, new THREE.HemisphereLight(0xfff8ea, 0xa9a1a3, 1.2));
   const model = new FidgetModel(spec),
     sound = new FidgetAudio(ctx.audio, spec);
+  sound.onChange = () => ctx.soundChanged();
   const material = new THREE.MeshPhysicalMaterial({
     color: spec.family === "wax" ? spec.inner : spec.color,
     roughness: spec.roughness,
@@ -847,6 +848,10 @@ if (uMix > 0.0) {
     camera,
     resize,
     inputImmediate,
+    soundStatus: () => ({
+      state: sound.state === "loading" ? "loading" : sound.state === "failed" ? "error" : "ready",
+      retry: sound.state === "failed" && !sound.decodeFailed ? () => sound.retry() : undefined,
+    }),
     frame,
     reset,
     action(name) {

@@ -1,7 +1,7 @@
 /**
  * Recorded squishy (slow-rising foam) sample set.
  *
- * One 16-bit mono WAV sprite (public/sfx/squishy/squishy.wav, 32 kHz) + JSON slice map
+ * One 16-bit mono WAV sprite (audio-src/sfx/squishy/squishy.wav, 32 kHz) + JSON slice map
  * (squishy.json) built by scripts/squishy/build.mjs from CC0 Freesound recordings.
  * Each slice carries its provenance (src, srcStart, srcEnd) in the JSON.
  *
@@ -49,12 +49,15 @@ export const SQUISHY_SAMPLE_CREDITS =
   '"squishing gel between hands" by breadparticles (#575333); "Dry Sponge Rubbing" by qubodup (#50579); ' +
   '"stretching rubber glove" by mistakenforathing (#827006); "Fabric touched by hand" by Sadiquecat (#716374); ' +
   '"Soft Impact - Pillow Hit" by KoimeMatsuchiya (#872227); "Rubbing Spiky Sound Insulation Foam" by imnotdubMass (#680000). ' +
-  'The "recover" sounds are derived (slowed, filtered, reversed) from #405654 and #680000. See public/sfx/squishy/CREDITS.md.';
+  'The "recover" sounds are derived (slowed, filtered, reversed) from #405654 and #680000. See audio-src/sfx/squishy/CREDITS.md.';
 
 /** All categories are cut from real recordings (no synthesis). Note: `recover` is re-edited
  *  (slowed/reversed) recorded material rather than a direct recording of foam recovering. */
 /** false: `recover` is re-edited (slowed/reversed) real material, not a direct recording of foam rising. */
 export const SQUISHY_SAMPLES_ARE_RECORDED = false;
+
+import { SFX_SQUISHY } from './sfxManifest';
+import { fetchSprite, forgetUnlessDecodeError } from './fetchSprite';
 
 const cache = new WeakMap<BaseAudioContext, Map<string, Promise<SquishySoundsV2>>>();
 
@@ -66,17 +69,22 @@ export function loadSquishySamples(ctx: BaseAudioContext, baseUrl = './sfx/squis
   if (hit) return hit;
   const p = load(ctx, base);
   perCtx.set(base, p);
-  p.catch(() => perCtx!.delete(base)); // allow retry after a failed load
+  forgetUnlessDecodeError(perCtx, base, p); // a network error can be retried; an undecodable file is not fetched again
   return p;
 }
 
 async function load(ctx: BaseAudioContext, base: string): Promise<SquishySoundsV2> {
-  const mapRes = await fetch(base + 'squishy.json');
-  if (!mapRes.ok) throw new Error(`squishy.json: HTTP ${mapRes.status}`);
-  const map = (await mapRes.json()) as SpriteMap;
-  const wavRes = await fetch(base + map.file);
-  if (!wavRes.ok) throw new Error(`${map.file}: HTTP ${wavRes.status}`);
-  const sprite = await ctx.decodeAudioData(await wavRes.arrayBuffer()); // resampled to ctx rate
+  let map: SpriteMap, sprite: AudioBuffer;
+  // the shipped sprite: hashed FLAC + map from the manifest, requested at once; any other base: map, then its file
+  if (base === './sfx/squishy/') ({ map, buffer: sprite } = await fetchSprite<SpriteMap>(ctx, `./${SFX_SQUISHY.json}`, `./${SFX_SQUISHY.audio}`));
+  else {
+    const mapRes = await fetch(base + 'squishy.json');
+    if (!mapRes.ok) throw new Error(`squishy.json: HTTP ${mapRes.status}`);
+    map = (await mapRes.json()) as SpriteMap;
+    const wavRes = await fetch(base + map.file);
+    if (!wavRes.ok) throw new Error(`${map.file}: HTTP ${wavRes.status}`);
+    sprite = await ctx.decodeAudioData(await wavRes.arrayBuffer()); // resampled to ctx rate
+  }
   const src = sprite.getChannelData(0);
   const sr = sprite.sampleRate;
 

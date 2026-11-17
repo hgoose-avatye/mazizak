@@ -1,6 +1,6 @@
-// Build keyboard sample sprites from CC0 recordings (see public/sfx/keyboard/CREDITS.md).
+// Build keyboard sample sprites from CC0 recordings (see audio-src/sfx/keyboard/CREDITS.md).
 // Inputs: bench-out/audio-src/keyboard/*.f32 (mono Float32 @48k, produced by decode.mjs from the
-// downloaded Freesound previews). Outputs: public/sfx/keyboard/{pebble,clack}.wav + .json
+// downloaded Freesound previews). Outputs: audio-src/sfx/keyboard/{pebble,clack}.wav + .json
 //
 // Usage: node scripts/kbsamples/build.mjs
 import fs from 'node:fs';
@@ -11,7 +11,7 @@ import { hp2, centroidPow } from './features.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const SRC_DIR = path.join(ROOT, 'bench-out/audio-src/keyboard');
-const OUT_DIR = path.join(ROOT, 'public/sfx/keyboard');
+const OUT_DIR = path.join(ROOT, 'audio-src/sfx/keyboard');
 const ms = (v) => Math.round((v * SR) / 1000);
 
 const SOURCES = {

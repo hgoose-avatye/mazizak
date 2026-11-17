@@ -21,7 +21,7 @@ export type PoolKind = "recording" | "derived" | "proxy";
 
 export interface PoolRef {
   source: "wax" | "crunch" | "squish" | "picks";
-  /** sprite pool name in public/sfx/fidgets/<source>.json, e.g. "apple.crack" */
+  /** sprite pool name in audio-src/sfx/fidgets/<source>.json, e.g. "apple.crack" */
   pool: string;
   /** a second pool that replaces `pool` when the event strength reaches `minStrength` (dense, continuous breaking) */
   alt?: { pool: string; minStrength: number };
@@ -44,7 +44,7 @@ const wax = (pool: string, note: string, o: Partial<PoolRef> = {}): PoolRef => (
 
 const crunch = (pool: string, note: string, o: Partial<PoolRef> = {}): PoolRef => ({ source: "crunch", pool, kind: "proxy", rate: jitter(0.04), note, ...o });
 
-/** owner-picked clips (public/sfx/fidgets/picks.json, scripts/fidgets/build-picks.py; YouTube CC BY 3.0 + Freesound CC0) */
+/** owner-picked clips (audio-src/sfx/fidgets/picks.json, scripts/fidgets/build-picks.py; YouTube CC BY 3.0 + Freesound CC0) */
 const pick = (pool: string, kind: PoolKind, note: string, o: Partial<PoolRef> = {}): PoolRef => ({ source: "picks", pool, kind, rate: jitter(0.03), note, ownerPick: true, ...o });
 
 /**
@@ -70,7 +70,7 @@ const waxToy = (k: "apple" | "choco"): ToySound => ({
 });
 
 export const FIDGET_SOUND: Record<string, ToySound> = {
-  // Each toy has its own recordings (Freesound CC0, see public/sfx/fidgets/CREDITS.md); nothing is shared between S01/S02/S03 or with the crunch/wax toys.
+  // Each toy has its own recordings (Freesound CC0, see audio-src/sfx/fidgets/CREDITS.md); nothing is shared between S01/S02/S03 or with the crunch/wax toys.
   S01: { init: NONE, tap: sqz("tpr.tap", "recording", "stress-ball / squeeze-toy squeezes"), hold: sqz("tpr.hold", "recording", "sustained stress-ball squeezing"), release: NONE, stretch: NONE, fold: NONE, crack: NONE, crunch: NONE },
   S02: { init: NONE, tap: NONE, hold: sqz("foam.hold", "recording", "memory-foam / sponge slow presses", { rate: jitter(0.025) }), release: NONE, stretch: NONE, fold: NONE, crack: NONE, crunch: NONE },
   S03: { init: NONE, tap: sqz("mochi.tap", "proxy", "short soft-dough presses (dough stands in for mochi)"), hold: sqz("mochi.hold", "proxy", "dough kneading / rolling (stands in for mochi)"), release: NONE, stretch: NONE, fold: NONE, crack: NONE, crunch: NONE },
@@ -78,7 +78,7 @@ export const FIDGET_SOUND: Record<string, ToySound> = {
   // L02: modelled on the reference app's rainbow-sharbet clips (bright, continuous fine crackle; short ≈0.7 s, long ≈1.2 s)
   L02: { init: NONE, tap: sqz("mango.tap", "proxy", "crunchy-slime presses (stands in for the crackly mango slime)"), hold: sqz("mango.hold", "proxy", "crunchy-slime kneading passages (stands in for the crackly mango slime)"), release: NONE, stretch: sqz("slime.stretch", "recording", "slime stretching passages", { trimDb: -1 }), fold: sqz("slime.fold", "recording", "slime slaps / folds"), crack: NONE, crunch: NONE },
   L03: { init: NONE, tap: NONE, hold: sqz("cream.hold", "proxy", "shaving-foam squashing (stands in for whipped cream)"), release: NONE, stretch: NONE, fold: sqz("cream.fold", "proxy", "shaving-foam folding (stands in for whipped cream)"), crack: NONE, crunch: NONE },
-  // W01/W02/C01/C02: the owner picked these by ear (2026-11-13) — see public/sfx/fidgets/PICKS-CREDITS.md
+  // W01/W02/C01/C02: the owner picked these by ear (2026-11-13) — see audio-src/sfx/fidgets/PICKS-CREDITS.md
   W01: {
     init: pick("apple.init", "recording", "a real wax ball's first break", { trimDb: BAL["apple.init"] }),
     tap: NONE,
@@ -238,10 +238,3 @@ export class VoiceGate {
 
 /** random value in [a,b] */
 export const between = (rng: () => number, [a, b]: [number, number]) => a + (b - a) * rng();
-
-/** The sprite files a toy plays from (nothing else is requested when it opens). */
-export function spritesNeeded(id: string): ("wax" | "crunch" | "squish" | "picks")[] {
-  const map = FIDGET_SOUND[id] ?? {}, mixMap = MIX_SOUND[id] ?? {}, stageMap = WAX_STAGES[id] ?? {};
-  const needs = (s: PoolRef["source"]) => EVENTS.some((e) => map[e]?.source === s) || [...Object.values(mixMap), ...Object.values(stageMap)].some((r) => r?.source === s);
-  return (["wax", "crunch", "squish", "picks"] as const).filter(needs);
-}

@@ -1,0 +1,130 @@
+{
+ "version": 1,
+ "chunkOf": "wax.wav",
+ "toys": [
+  "W02"
+ ],
+ "sampleRate": 48000,
+ "totalSamples": 169255,
+ "sources": {
+  "wax:choco_knead_1": {
+   "title": "choco_knead_1",
+   "author": "apple77771",
+   "url": "https://github.com/apple77771/wakppuball-simulator",
+   "license": "CC BY 4.0",
+   "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+   "retrieved": "2026-11-11",
+   "usage": "fidget W01/W02 wax crack + knead",
+   "materialMatch": "recording of the simulated wax ball (maintainer’s claim)",
+   "originalFile": "scripts/fidgets/wax-src/choco_knead_1.mp3"
+  },
+  "wax:choco_knead_2": {
+   "title": "choco_knead_2",
+   "author": "apple77771",
+   "url": "https://github.com/apple77771/wakppuball-simulator",
+   "license": "CC BY 4.0",
+   "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+   "retrieved": "2026-11-11",
+   "usage": "fidget W01/W02 wax crack + knead",
+   "materialMatch": "recording of the simulated wax ball (maintainer’s claim)",
+   "originalFile": "scripts/fidgets/wax-src/choco_knead_2.mp3"
+  }
+ },
+ "pools": {
+  "choco.knead": {
+   "event": "hold",
+   "loudnessClass": "continuous",
+   "material": "wax",
+   "note": "crackle runs of the knead recordings",
+   "recordings": 6,
+   "variants": 0,
+   "entries": [
+    {
+     "start": 3751,
+     "length": 22464,
+     "offset": 0.078146,
+     "duration": 0.468,
+     "gain": 1,
+     "src": "wax:choco_knead_1",
+     "srcStart": 2.5168,
+     "srcEnd": 2.9848,
+     "peakDbSource": -12.7,
+     "centroidHz": 8732,
+     "strikes": 8,
+     "boostDb": 11.7
+    },
+    {
+     "start": 26695,
+     "length": 22272,
+     "offset": 0.556146,
+     "duration": 0.464,
+     "gain": 0.3061,
+     "src": "wax:choco_knead_1",
+     "srcStart": 3.2782,
+     "srcEnd": 3.7422,
+     "peakDbSource": -15.3,
+     "centroidHz": 6856,
+     "strikes": 7,
+     "boostDb": 14.3
+    },
+    {
+     "start": 49447,
+     "length": 27456,
+     "offset": 1.030146,
+     "duration": 0.572,
+     "gain": 0.6629,
+     "src": "wax:choco_knead_1",
+     "srcStart": 3.8859,
+     "srcEnd": 4.4579,
+     "peakDbSource": -16.4,
+     "centroidHz": 2559,
+     "strikes": 11,
+     "boostDb": 15.4
+    },
+    {
+     "start": 77383,
+     "length": 30624,
+     "offset": 1.612146,
+     "duration": 0.638,
+     "gain": 0.5381,
+     "src": "wax:choco_knead_2",
+     "srcStart": 0.6899,
+     "srcEnd": 1.3279,
+     "peakDbSource": -13,
+     "centroidHz": 2473,
+     "strikes": 11,
+     "boostDb": 12
+    },
+    {
+     "start": 108487,
+     "length": 30336,
+     "offset": 2.260146,
+     "duration": 0.632,
+     "gain": 0.5043,
+     "src": "wax:choco_knead_2",
+     "srcStart": 1.4372,
+     "srcEnd": 2.0692,
+     "peakDbSource": -14.5,
+     "centroidHz": 5192,
+     "strikes": 10,
+     "boostDb": 13.5
+    },
+    {
+     "start": 139303,
+     "length": 29952,
+     "offset": 2.902146,
+     "duration": 0.624,
+     "gain": 0.8336,
+     "src": "wax:choco_knead_2",
+     "srcStart": 2.1815,
+     "srcEnd": 2.8055,
+     "peakDbSource": -13.7,
+     "centroidHz": 3562,
+     "strikes": 10,
+     "boostDb": 12.7
+    }
+   ]
+  }
+ },
+ "file": "wax.W02.272990edca.flac"
+}

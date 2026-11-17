@@ -1,11 +1,12 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { loadKeyboardSamples } from '../src/audio/keyboardSamples';
 import { topreRole, topreRow } from '../src/audio/keyboardRouting';
+import { readPublic } from './shippedSfx';
 
 const fsName = 'node:fs', cryptoName = 'node:crypto';
 const { readFileSync } = await import(/* @vite-ignore */ fsName);
 const { createHash } = await import(/* @vite-ignore */ cryptoName);
-const file = (name: string): Uint8Array => readFileSync(new URL(`../public/sfx/keyboard/${name}`, import.meta.url));
+const file = (name: string): Uint8Array => readFileSync(new URL(`../audio-src/sfx/keyboard/${name}`, import.meta.url));
 const map = JSON.parse(new TextDecoder().decode(file('topre.json')));
 const bytes = file('topre.wav');
 const wav = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
@@ -63,7 +64,7 @@ describe('Topre source and sprite integrity', () => {
     expect(new TextDecoder().decode(file('CREDITS.md'))).toContain('Recording rights provenance: unverified');
   });
   it('loads precisely 12 buffers and reuses the same five down buffers for row routing', async () => {
-    const fetch = vi.fn(async (url: string) => ({ ok: true, json: async () => map, arrayBuffer: async () => file(url.split('/').pop()!).buffer }));
+    const fetch = vi.fn(async (url: string) => ({ ok: true, json: async () => map, arrayBuffer: async () => readPublic(url).buffer }));
     vi.stubGlobal('fetch', fetch);
     const c = ctx();
     const create = vi.spyOn(c, 'createBuffer');

@@ -44,14 +44,16 @@ try {
   };
   await p.goto(URL);
   await p.waitForTimeout(1000);
+  // dock UI (fe041b9): the category switch is a radio pair, the toys are .toy-item buttons in #toy-list
   for (const [category, count] of [
-    ["말랑이", 10],
-    ["키캡", 11],
+    ["fidget", 10],
+    ["keyboard", 11],
   ]) {
-    await p.getByRole("button", { name: category, exact: true }).click();
+    await p.locator(`[data-category="${category}"]`).click();
+    await p.waitForTimeout(300);
     ok(
       "category " + category,
-      (await p.locator("#content-cards .card").count()) === count,
+      (await p.locator("#toy-list .toy-item").count()) === count,
     );
   }
   const snapshots = {};
@@ -154,7 +156,8 @@ try {
       // the 접기 / 뭉치기 buttons were removed (2026-11-13); the two-finger gesture above still folds
       ok(id + " no fold / gather buttons", (await p.getByRole("button", { name: /^(접기|뭉치기)$/ }).count()) === 0);
     }
-    await p.getByRole("button", { name: "처음 상태로" }).click();
+    // f08aa50 shows the reset button for 왁뿌볼 only; the reset itself still exists for every toy: trigger it through the same element
+    await p.evaluate(() => document.querySelector('[data-action="reset"]').click());
     await p.waitForTimeout(150);
     const reset = await report();
     ok(
@@ -175,13 +178,14 @@ try {
     new Set(Object.values(snapshots).map((x) => x.shape)).size === 10,
   );
   await open("S01");
-  await p.selectOption(".toy-jump", "W02");
+  // dock UI (fe041b9): toys are switched with the .toy-item buttons in the dock (the old .toy-jump select is gone)
+  await p.locator('.toy-item[data-key="W02"]').click();
   await p.waitForFunction(() => window.__MANZIZAK__.report().id === "W02");
-  await p.selectOption(".toy-jump", "L02");
+  await p.locator('.toy-item[data-key="L02"]').click();
   await p.waitForFunction(() => window.__MANZIZAK__.report().id === "L02");
   ok("quick toy navigation", true);
   // the mute check needs a toy that has a press sound (L02 only has a stretch pool now)
-  await p.selectOption(".toy-jump", "L03");
+  await p.locator('.toy-item[data-key="L03"]').click();
   await p.waitForFunction(() => window.__MANZIZAK__.report().id === "L03");
   await p.getByRole("button", { name: "소리 끄기", exact: true }).click();
   await p.mouse.move(195, 420);
@@ -197,9 +201,9 @@ try {
   await p.waitForTimeout(1700);
   ok(
     "keyboard 11 presets (8 + 몽돌·찌개·도자기) and reserved assets preserved",
-    (await p.getByRole("radio").count()) === 11,
+    (await p.locator("#toy-list .toy-item").count()) === 11,
   );
-  await p.getByRole("radio", { name: "마시멜로", exact: true }).click();
+  await p.locator('.toy-item[data-key="topre"]').click(); // 마시멜로
   await p.evaluate(() => document.activeElement?.blur());
   await p.keyboard.press("KeyQ");
   ok("no page errors", errors.length === 0);

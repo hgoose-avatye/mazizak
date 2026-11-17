@@ -3,7 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { centroidPow } from './features.mjs';
-const DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../public/sfx/keyboard');
+const DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../audio-src/sfx/keyboard');
 const db = (v) => 20 * Math.log10(Math.max(v, 1e-9));
 export function readSprite(name) {
   const map = JSON.parse(fs.readFileSync(path.join(DIR, name + '.json'), 'utf8'));

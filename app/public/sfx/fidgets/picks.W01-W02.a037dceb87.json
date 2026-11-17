@@ -1,0 +1,297 @@
+{
+ "version": 1,
+ "chunkOf": "picks.wav",
+ "toys": [
+  "W01",
+  "W02"
+ ],
+ "sampleRate": 44100,
+ "totalSamples": 591815,
+ "sources": {
+  "youtube:-LJJrKD68bs": {
+   "title": "너덜너덜해진 슬랑이 ASMR",
+   "author": "공짝지근",
+   "url": "https://www.youtube.com/watch?v=-LJJrKD68bs",
+   "license": "CC BY 3.0",
+   "licenseUrl": "https://creativecommons.org/licenses/by/3.0/",
+   "retrieved": "2026-11-13",
+   "usage": "owner-picked fidget clips (see pool notes); cut, faded, normalised, hiss-reduced",
+   "materialMatch": "worn crunchy slime squish — stands in for fully mixed wax",
+   "originalFile": "https://www.youtube.com/watch?v=-LJJrKD68bs"
+  },
+  "youtube:kKYelJAi3xE": {
+   "title": "ASMR | 말랑이 17개 털었어요 +슬랑이, 왁뿌볼, 크랑이",
+   "author": "까퓰러ASMR Gapular",
+   "url": "https://www.youtube.com/watch?v=kKYelJAi3xE",
+   "license": "CC BY 3.0",
+   "licenseUrl": "https://creativecommons.org/licenses/by/3.0/",
+   "retrieved": "2026-11-13",
+   "usage": "owner-picked fidget clips (see pool notes); cut, faded, normalised, hiss-reduced",
+   "materialMatch": "real wax ball (왁뿌볼) being broken by hand",
+   "originalFile": "https://www.youtube.com/watch?v=kKYelJAi3xE"
+  }
+ },
+ "pools": {
+  "wax.nearDone": {
+   "event": "crack",
+   "loudnessClass": "impact",
+   "material": "owner pick",
+   "note": "W01/W02 nearly every piece broken (owner picks: #5 + second round 3–10 of the same passage)",
+   "recordings": 9,
+   "variants": 0,
+   "entries": [
+    {
+     "start": 2650,
+     "length": 25478,
+     "offset": 0.060091,
+     "duration": 0.577732,
+     "gain": 0.6326,
+     "src": "youtube:kKYelJAi3xE",
+     "srcStart": 356.6123,
+     "srcEnd": 357.19,
+     "centroidHz": 4914,
+     "boostDb": 0
+    },
+    {
+     "start": 29451,
+     "length": 25485,
+     "offset": 0.667823,
+     "duration": 0.577891,
+     "gain": 0.4944,
+     "src": "youtube:kKYelJAi3xE",
+     "srcStart": 354.5321,
+     "srcEnd": 355.11,
+     "centroidHz": 5564,
+     "boostDb": 0
+    },
+    {
+     "start": 56259,
+     "length": 25241,
+     "offset": 1.275714,
+     "duration": 0.572358,
+     "gain": 0.7419,
+     "src": "youtube:kKYelJAi3xE",
+     "srcStart": 362.0376,
+     "srcEnd": 362.61,
+     "centroidHz": 5296,
+     "boostDb": 0
+    },
+    {
+     "start": 82823,
+     "length": 25547,
+     "offset": 1.878073,
+     "duration": 0.579297,
+     "gain": 1,
+     "src": "youtube:kKYelJAi3xE",
+     "srcStart": 368.7607,
+     "srcEnd": 369.34,
+     "centroidHz": 6127,
+     "boostDb": 0
+    },
+    {
+     "start": 109693,
+     "length": 25538,
+     "offset": 2.48737,
+     "duration": 0.579093,
+     "gain": 0.7652,
+     "src": "youtube:kKYelJAi3xE",
+     "srcStart": 369.4909,
+     "srcEnd": 370.07,
+     "centroidHz": 2998,
+     "boostDb": 0
+    },
+    {
+     "start": 136554,
+     "length": 25371,
+     "offset": 3.096463,
+     "duration": 0.575306,
+     "gain": 0.9114,
+     "src": "youtube:kKYelJAi3xE",
+     "srcStart": 370.8847,
+     "srcEnd": 371.46,
+     "centroidHz": 4837,
+     "boostDb": 0
+    },
+    {
+     "start": 163248,
+     "length": 25541,
+     "offset": 3.701769,
+     "duration": 0.579161,
+     "gain": 0.8136,
+     "src": "youtube:kKYelJAi3xE",
+     "srcStart": 372.4408,
+     "srcEnd": 373.02,
+     "centroidHz": 5813,
+     "boostDb": 0
+    },
+    {
+     "start": 190112,
+     "length": 25532,
+     "offset": 4.31093,
+     "duration": 0.578957,
+     "gain": 0.8131,
+     "src": "youtube:kKYelJAi3xE",
+     "srcStart": 373.741,
+     "srcEnd": 374.32,
+     "centroidHz": 2799,
+     "boostDb": 0
+    },
+    {
+     "start": 216967,
+     "length": 25517,
+     "offset": 4.919887,
+     "duration": 0.578617,
+     "gain": 0.8109,
+     "src": "youtube:kKYelJAi3xE",
+     "srcStart": 375.1114,
+     "srcEnd": 375.69,
+     "centroidHz": 4307,
+     "boostDb": 0
+    }
+   ]
+  },
+  "wax.mixed": {
+   "event": "hold",
+   "loudnessClass": "impact",
+   "material": "owner pick",
+   "note": "W01/W02 every piece broken and kneaded in (owner picks: #3–#8 + second round 1, 2, 3, 5, 9)",
+   "recordings": 11,
+   "variants": 0,
+   "entries": [
+    {
+     "start": 247368,
+     "length": 29989,
+     "offset": 5.609252,
+     "duration": 0.680023,
+     "gain": 0.6383,
+     "src": "youtube:-LJJrKD68bs",
+     "srcStart": 108.74,
+     "srcEnd": 109.42,
+     "centroidHz": 3820,
+     "boostDb": 0
+    },
+    {
+     "start": 278680,
+     "length": 29769,
+     "offset": 6.319274,
+     "duration": 0.675034,
+     "gain": 0.6165,
+     "src": "youtube:-LJJrKD68bs",
+     "srcStart": 139.9049,
+     "srcEnd": 140.5799,
+     "centroidHz": 4416,
+     "boostDb": 0
+    },
+    {
+     "start": 309772,
+     "length": 30040,
+     "offset": 7.024308,
+     "duration": 0.681179,
+     "gain": 0.7118,
+     "src": "youtube:-LJJrKD68bs",
+     "srcStart": 150.3888,
+     "srcEnd": 151.07,
+     "centroidHz": 4064,
+     "boostDb": 0
+    },
+    {
+     "start": 341135,
+     "length": 29853,
+     "offset": 7.735488,
+     "duration": 0.676939,
+     "gain": 0.747,
+     "src": "youtube:-LJJrKD68bs",
+     "srcStart": 173.793,
+     "srcEnd": 174.4699,
+     "centroidHz": 6582,
+     "boostDb": 0
+    },
+    {
+     "start": 372311,
+     "length": 29905,
+     "offset": 8.442426,
+     "duration": 0.678118,
+     "gain": 0.9536,
+     "src": "youtube:-LJJrKD68bs",
+     "srcStart": 196.7919,
+     "srcEnd": 197.47,
+     "centroidHz": 3914,
+     "boostDb": 0
+    },
+    {
+     "start": 403539,
+     "length": 29801,
+     "offset": 9.150544,
+     "duration": 0.67576,
+     "gain": 1,
+     "src": "youtube:-LJJrKD68bs",
+     "srcStart": 350.9542,
+     "srcEnd": 351.63,
+     "centroidHz": 5709,
+     "boostDb": 0
+    },
+    {
+     "start": 434663,
+     "length": 30030,
+     "offset": 9.856304,
+     "duration": 0.680952,
+     "gain": 0.66,
+     "src": "youtube:-LJJrKD68bs",
+     "srcStart": 16.689,
+     "srcEnd": 17.37,
+     "centroidHz": 3495,
+     "boostDb": 0
+    },
+    {
+     "start": 466016,
+     "length": 29811,
+     "offset": 10.567256,
+     "duration": 0.675986,
+     "gain": 0.8132,
+     "src": "youtube:-LJJrKD68bs",
+     "srcStart": 32.834,
+     "srcEnd": 33.51,
+     "centroidHz": 4153,
+     "boostDb": 0
+    },
+    {
+     "start": 497150,
+     "length": 30047,
+     "offset": 11.273243,
+     "duration": 0.681338,
+     "gain": 0.7031,
+     "src": "youtube:-LJJrKD68bs",
+     "srcStart": 62.0286,
+     "srcEnd": 62.7099,
+     "centroidHz": 3051,
+     "boostDb": 0
+    },
+    {
+     "start": 528520,
+     "length": 29906,
+     "offset": 11.98458,
+     "duration": 0.678141,
+     "gain": 0.9129,
+     "src": "youtube:-LJJrKD68bs",
+     "srcStart": 76.4518,
+     "srcEnd": 77.1299,
+     "centroidHz": 4413,
+     "boostDb": 0
+    },
+    {
+     "start": 559749,
+     "length": 30018,
+     "offset": 12.692721,
+     "duration": 0.68068,
+     "gain": 0.5397,
+     "src": "youtube:-LJJrKD68bs",
+     "srcStart": 193.9193,
+     "srcEnd": 194.6,
+     "centroidHz": 3067,
+     "boostDb": 0
+    }
+   ]
+  }
+ },
+ "file": "picks.W01-W02.9f7713ffa2.flac"
+}

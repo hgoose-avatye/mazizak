@@ -1,0 +1,252 @@
+{
+ "version": 1,
+ "chunkOf": "crunch.wav",
+ "toys": [
+  "C01"
+ ],
+ "sampleRate": 48000,
+ "totalSamples": 213782,
+ "sources": {
+  "own:soap.crunch/rec28.wav": {
+   "title": "새로운 녹음 28.m4a (C01 비누 크런치 — short crushing)",
+   "author": "project owner",
+   "url": "own recording",
+   "license": "Own recording (project owner)",
+   "licenseUrl": "",
+   "retrieved": "2026-11-13",
+   "usage": "C01 crunch",
+   "materialMatch": "recording of the actual toy (C01 soap crunch squishy), per the project owner",
+   "originalFile": "scripts/fidgets/own/soap.crunch/rec28.wav"
+  },
+  "own:soap.hold/rec27.wav": {
+   "title": "새로운 녹음 27.m4a (C01 비누 크런치 — continuous squeezing)",
+   "author": "project owner",
+   "url": "own recording",
+   "license": "Own recording (project owner)",
+   "licenseUrl": "",
+   "retrieved": "2026-11-13",
+   "usage": "C01 hold",
+   "materialMatch": "recording of the actual toy (C01 soap crunch squishy), per the project owner",
+   "originalFile": "scripts/fidgets/own/soap.hold/rec27.wav"
+  }
+ },
+ "pools": {
+  "soap.crunch": {
+   "event": "crunch",
+   "loudnessClass": "impact",
+   "material": "own recording of the actual toy",
+   "note": "short dry crushing hits",
+   "recordings": 8,
+   "variants": 0,
+   "entries": [
+    {
+     "start": 0,
+     "length": 2160,
+     "offset": 0,
+     "duration": 0.045,
+     "gain": 1,
+     "src": "own:soap.crunch/rec28.wav",
+     "srcStart": 5.1619,
+     "srcEnd": 5.2069,
+     "peakDbSource": -11.4,
+     "centroidHz": 4751,
+     "strikes": 1,
+     "boostDb": 10.4
+    },
+    {
+     "start": 2640,
+     "length": 2476,
+     "offset": 0.055,
+     "duration": 0.051583,
+     "gain": 0.4571,
+     "src": "own:soap.crunch/rec28.wav",
+     "srcStart": 13.0053,
+     "srcEnd": 13.0569,
+     "peakDbSource": -13.6,
+     "centroidHz": 3073,
+     "strikes": 1,
+     "boostDb": 12.6
+    },
+    {
+     "start": 5596,
+     "length": 2279,
+     "offset": 0.116583,
+     "duration": 0.047479,
+     "gain": 0.589,
+     "src": "own:soap.crunch/rec28.wav",
+     "srcStart": 14.8994,
+     "srcEnd": 14.9469,
+     "peakDbSource": -9.8,
+     "centroidHz": 1906,
+     "strikes": 1,
+     "boostDb": 8.8
+    },
+    {
+     "start": 8355,
+     "length": 2160,
+     "offset": 0.174063,
+     "duration": 0.045,
+     "gain": 0.4815,
+     "src": "own:soap.crunch/rec28.wav",
+     "srcStart": 18.2213,
+     "srcEnd": 18.2663,
+     "peakDbSource": -4.9,
+     "centroidHz": 2605,
+     "strikes": 1,
+     "boostDb": 3.9
+    },
+    {
+     "start": 10995,
+     "length": 4490,
+     "offset": 0.229063,
+     "duration": 0.093542,
+     "gain": 0.5081,
+     "src": "own:soap.crunch/rec28.wav",
+     "srcStart": 19.8955,
+     "srcEnd": 19.9891,
+     "peakDbSource": -15.5,
+     "centroidHz": 1958,
+     "strikes": 1,
+     "boostDb": 14.5
+    },
+    {
+     "start": 15965,
+     "length": 2160,
+     "offset": 0.332604,
+     "duration": 0.045,
+     "gain": 0.5618,
+     "src": "own:soap.crunch/rec28.wav",
+     "srcStart": 24.4728,
+     "srcEnd": 24.5178,
+     "peakDbSource": -1,
+     "centroidHz": 2398,
+     "strikes": 1,
+     "boostDb": 0
+    },
+    {
+     "start": 18605,
+     "length": 2342,
+     "offset": 0.387604,
+     "duration": 0.048792,
+     "gain": 0.5233,
+     "src": "own:soap.crunch/rec28.wav",
+     "srcStart": 25.303,
+     "srcEnd": 25.3518,
+     "peakDbSource": -1.3,
+     "centroidHz": 2311,
+     "strikes": 1,
+     "boostDb": 0.3
+    },
+    {
+     "start": 21427,
+     "length": 3107,
+     "offset": 0.446396,
+     "duration": 0.064729,
+     "gain": 0.4863,
+     "src": "own:soap.crunch/rec28.wav",
+     "srcStart": 28.0195,
+     "srcEnd": 28.0842,
+     "peakDbSource": -11.2,
+     "centroidHz": 2882,
+     "strikes": 1,
+     "boostDb": 10.2
+    }
+   ]
+  },
+  "soap.hold": {
+   "event": "hold",
+   "loudnessClass": "continuous",
+   "material": "own recording of the actual toy",
+   "note": "dense continuous crumbling windows",
+   "recordings": 6,
+   "variants": 0,
+   "entries": [
+    {
+     "start": 25014,
+     "length": 34464,
+     "offset": 0.521125,
+     "duration": 0.718,
+     "gain": 0.8981,
+     "src": "own:soap.hold/rec27.wav",
+     "srcStart": 1.0651,
+     "srcEnd": 1.7831,
+     "peakDbSource": -7.7,
+     "centroidHz": 2466,
+     "strikes": 13,
+     "boostDb": 6.7
+    },
+    {
+     "start": 59958,
+     "length": 29760,
+     "offset": 1.249125,
+     "duration": 0.62,
+     "gain": 0.7697,
+     "src": "own:soap.hold/rec27.wav",
+     "srcStart": 2.6094,
+     "srcEnd": 3.2294,
+     "peakDbSource": -1.2,
+     "centroidHz": 2550,
+     "strikes": 12,
+     "boostDb": 0.2
+    },
+    {
+     "start": 90198,
+     "length": 26304,
+     "offset": 1.879125,
+     "duration": 0.548,
+     "gain": 0.6714,
+     "src": "own:soap.hold/rec27.wav",
+     "srcStart": 10.3756,
+     "srcEnd": 10.9236,
+     "peakDbSource": -11,
+     "centroidHz": 2997,
+     "strikes": 11,
+     "boostDb": 10
+    },
+    {
+     "start": 116982,
+     "length": 32256,
+     "offset": 2.437125,
+     "duration": 0.672,
+     "gain": 1,
+     "src": "own:soap.hold/rec27.wav",
+     "srcStart": 12.7152,
+     "srcEnd": 13.3872,
+     "peakDbSource": -7.2,
+     "centroidHz": 2255,
+     "strikes": 14,
+     "boostDb": 6.2
+    },
+    {
+     "start": 149718,
+     "length": 29664,
+     "offset": 3.119125,
+     "duration": 0.618,
+     "gain": 0.6344,
+     "src": "own:soap.hold/rec27.wav",
+     "srcStart": 26.0633,
+     "srcEnd": 26.6813,
+     "peakDbSource": -11.9,
+     "centroidHz": 1915,
+     "strikes": 12,
+     "boostDb": 10.9
+    },
+    {
+     "start": 179862,
+     "length": 31872,
+     "offset": 3.747125,
+     "duration": 0.664,
+     "gain": 0.7694,
+     "src": "own:soap.hold/rec27.wav",
+     "srcStart": 34.0433,
+     "srcEnd": 34.7073,
+     "peakDbSource": -5.1,
+     "centroidHz": 2504,
+     "strikes": 14,
+     "boostDb": 4.1
+    }
+   ]
+  }
+ },
+ "file": "crunch.C01.40ec2fb53f.flac"
+}

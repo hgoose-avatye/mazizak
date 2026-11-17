@@ -1,7 +1,7 @@
 // Pre-extract short clips from the licensed source recordings of the fidget toys.
 //
-//   wax    : apple77771 wakppuball-simulator recordings (CC BY 4.0)   public/sfx/wax/*.mp3          → public/sfx/fidgets/wax.{wav,json}
-//   crunch : Freesound CC0 recordings (see SOURCES below)             scripts/fidgets/source/crunch/ → public/sfx/fidgets/crunch.{wav,json}
+//   wax    : apple77771 wakppuball-simulator recordings (CC BY 4.0)   audio-src/sfx/wax/*.mp3          → audio-src/sfx/fidgets/wax.{wav,json}
+//   crunch : Freesound CC0 recordings (see SOURCES below)             scripts/fidgets/source/crunch/ → audio-src/sfx/fidgets/crunch.{wav,json}
 //
 // Usage: FFMPEG=/path/to/ffmpeg node scripts/fidgets/build-clips.mjs     (re-runnable; output is deterministic)
 //
@@ -18,7 +18,7 @@ import { decode, SR, db, env, onsets, peakOf, rmsOf } from './lib.mjs';
 import { centroid } from '../kbsamples/lib.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
-const OUT = path.join(ROOT, 'public/sfx/fidgets');
+const OUT = path.join(ROOT, 'audio-src/sfx/fidgets');
 const ms = (v) => Math.round((v * SR) / 1000);
 const GAP = ms(10);
 const PEAK = Math.pow(10, -1 / 20);

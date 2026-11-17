@@ -8,6 +8,7 @@ import { isLocalKeyPreset, isKeyPresetEnabled } from '../../audio/localKeyPreset
 import { topreRole, topreRow, isKbsimMappedPreset } from '../../audio/keyboardRouting';
 import { param } from '../../core/params';
 import { KEY_PRESET_INFO } from './info';
+import { SfxDecodeError } from '../../audio/fetchSprite';
 import { radialShadowTexture, studioEnvironment } from '../../core/studio';
 import { settings } from '../../core/settings';
 import { round, summarize } from '../../core/metrics';
@@ -97,6 +98,7 @@ export function createKeyboard(ctx: ToyContext): Toy & { setPreset(p: KeyPresetI
     s.rowDown?.forEach((buffer, row) => ctx.audio.register(`kb:${p}:downR${row}`, [buffer]));
     if (!ready.includes(p)) ready.push(p);
     flushPendingDown();
+    ctx.soundChanged();
   };
   // samples are fetched when the keyboard opens: a key pressed before any set is ready is sounded once one is (if still fresh)
   let pendingDown: { args: [number, string, string | undefined, string | undefined]; at: number } | null = null;
@@ -109,6 +111,7 @@ export function createKeyboard(ctx: ToyContext): Toy & { setPreset(p: KeyPresetI
   const audible = (p: KeyPresetId): KeyPresetId => (ready.includes(p) ? p : (ready[ready.length - 1] ?? p));
   // recording-based samples; synthesized set only with ?sfx=synth (A/B) or if loading fails
   const ownRecordingOnly = (p: KeyPresetId) => isLocalKeyPreset(p) || p === 'turquoise-tealios' || p === 'ibm-buckling-spring';
+  const undecodable = new Set<KeyPresetId>();
   const ensurePreset = (p: KeyPresetId) => {
     if (loaded.has(p)) return;
     loaded.add(p);
@@ -118,6 +121,7 @@ export function createKeyboard(ctx: ToyContext): Toy & { setPreset(p: KeyPresetI
       return;
     }
     soundSource[p] = 'loading';
+    ctx.soundChanged();
     loadKeyboardSamples(ctx.audio.ctx, p).then(
       (s) => {
         registerSet(p, s);
@@ -126,10 +130,13 @@ export function createKeyboard(ctx: ToyContext): Toy & { setPreset(p: KeyPresetI
       (err) => {
         if (ownRecordingOnly(p)) {
           soundSource[p] = 'error'; loaded.delete(p);
-          console.warn(`Local keyboard samples (${p}) failed; no replacement sound`, err);
+          if (err instanceof SfxDecodeError) undecodable.add(p);
+          pendingDown = null;
+          console.warn(`[sfx] keyboard ${p}: samples failed; no replacement sound (own recordings only)`, err);
+          ctx.soundChanged();
           return;
         }
-        console.warn(`keyboard samples (${p}) failed, using synthesized fallback`, err);
+        console.warn(`[sfx] keyboard ${p}: samples failed → FALLBACK to the synthesized set`, err);
         registerSet(p, buildKeyboardSounds(ctx.audio.ctx, SYNTH_BASE[p]));
         soundSource[p] = 'synth';
       },
@@ -265,6 +272,16 @@ export function createKeyboard(ctx: ToyContext): Toy & { setPreset(p: KeyPresetI
       ensurePreset(p);
       vis.setStyle(VISUAL_STYLE[p]);
       ctx.requestFrame();
+      ctx.soundChanged();
+    },
+    soundStatus() {
+      // a preset without a synthesized stand-in is silent until its own recordings are in; the others sound as soon as any set is ready
+      if (ownRecordingOnly(preset)) {
+        if (soundSource[preset] === 'samples') return { state: 'ready' as const };
+        if (soundSource[preset] === 'error') return { state: 'error' as const, retry: undecodable.has(preset) ? undefined : () => ensurePreset(preset) };
+        return { state: 'loading' as const };
+      }
+      return { state: ready.length ? ('ready' as const) : ('loading' as const) };
     },
     reset() {
       heldPhysical.clear();

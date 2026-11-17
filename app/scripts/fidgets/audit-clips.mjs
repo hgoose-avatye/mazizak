@@ -10,7 +10,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-const dir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../public/sfx/fidgets');
+const dir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../audio-src/sfx/fidgets');
 const SR = 48000;
 const db = (v) => 20 * Math.log10(Math.max(v, 1e-9));
 const med = (a) => [...a].sort((p, q) => p - q)[Math.floor(a.length / 2)];

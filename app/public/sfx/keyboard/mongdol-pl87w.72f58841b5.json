@@ -1,0 +1,151 @@
+{
+ "version": 1,
+ "preset": "mongdol-pl87w",
+ "file": "mongdol-pl87w.fad06ef531.flac",
+ "sampleRate": 48000,
+ "upMode": "none",
+ "entries": {
+  "down": [
+   {
+    "offset": 0,
+    "duration": 0.119,
+    "gain": 1,
+    "src": "youtube:https://www.youtube.com/shorts/BgO3pE7VnI8@0.37s",
+    "sourceDetail": "peak -19.9 dB, boost +16.9 dB",
+    "qc": {
+     "snrDb": 36.1,
+     "lenMs": 119,
+     "decayMs": 36,
+     "secondDb": -16.6,
+     "leadDb": -18.6
+    }
+   },
+   {
+    "offset": 0.129,
+    "duration": 0.092,
+    "gain": 1,
+    "src": "youtube:https://www.youtube.com/shorts/BgO3pE7VnI8@1.86s",
+    "sourceDetail": "peak -18.6 dB, boost +15.6 dB",
+    "qc": {
+     "snrDb": 39.6,
+     "lenMs": 92,
+     "decayMs": 40,
+     "secondDb": -20.5,
+     "leadDb": -21.6
+    }
+   },
+   {
+    "offset": 0.231,
+    "duration": 0.149,
+    "gain": 1,
+    "src": "youtube:https://www.youtube.com/shorts/BgO3pE7VnI8@2.53s",
+    "sourceDetail": "peak -18.5 dB, boost +15.5 dB",
+    "qc": {
+     "snrDb": 39.4,
+     "lenMs": 149,
+     "decayMs": 44,
+     "secondDb": -24.5,
+     "leadDb": -23
+    }
+   },
+   {
+    "offset": 0.39,
+    "duration": 0.119,
+    "gain": 1,
+    "src": "youtube:https://www.youtube.com/shorts/BgO3pE7VnI8@3.67s",
+    "sourceDetail": "peak -18.8 dB, boost +15.8 dB",
+    "qc": {
+     "snrDb": 41.8,
+     "lenMs": 119,
+     "decayMs": 38,
+     "secondDb": -17.1,
+     "leadDb": -25.6
+    }
+   },
+   {
+    "offset": 0.519,
+    "duration": 0.073,
+    "gain": 1,
+    "src": "youtube:https://www.youtube.com/shorts/BgO3pE7VnI8@6.10s",
+    "sourceDetail": "peak -18.0 dB, boost +15.0 dB",
+    "qc": {
+     "snrDb": 37.7,
+     "lenMs": 73,
+     "decayMs": 46,
+     "secondDb": -26.3,
+     "leadDb": -22.8
+    }
+   },
+   {
+    "offset": 0.602,
+    "duration": 0.086,
+    "gain": 1,
+    "src": "youtube:https://www.youtube.com/shorts/BgO3pE7VnI8@6.61s",
+    "sourceDetail": "peak -21.2 dB, boost +18.2 dB",
+    "qc": {
+     "snrDb": 34.4,
+     "lenMs": 86,
+     "decayMs": 38,
+     "secondDb": -23.3,
+     "leadDb": -25.1
+    }
+   },
+   {
+    "offset": 0.698,
+    "duration": 0.093,
+    "gain": 1,
+    "src": "youtube:https://www.youtube.com/shorts/BgO3pE7VnI8@7.66s",
+    "sourceDetail": "peak -20.8 dB, boost +17.8 dB",
+    "qc": {
+     "snrDb": 34,
+     "lenMs": 93,
+     "decayMs": 44,
+     "secondDb": -16.7,
+     "leadDb": -18
+    }
+   }
+  ],
+  "up": [],
+  "spaceDown": [],
+  "spaceUp": []
+ },
+ "source": {
+  "video": "https://www.youtube.com/shorts/BgO3pE7VnI8",
+  "file": "mongdol.webm",
+  "windowSeconds": [
+   0,
+   9
+  ]
+ },
+ "processing": {
+  "gates": {
+   "minLenMs": 60,
+   "minDecayMs": 18,
+   "decayDb": -20,
+   "maxSecondDb": -10,
+   "maxLeadDb": -18,
+   "maxBoostDb": 20
+  },
+  "rejected": {
+   "BOOST": 2,
+   "NOISY-LEAD": 4,
+   "2ND-HIT": 6,
+   "SPIKE": 1,
+   "TRUNCATED": 1
+  },
+  "note": "Typical isolated keystrokes (closest to the median peak) that pass the objective gates, picked automatically from the waveform and not listened to. Key-down only; no release sound claimed; the key identity (which key was struck) is unknown."
+ },
+ "clearance": {
+  "status": "permission to use in the public build obtained",
+  "statedBy": "project owner",
+  "statedOn": "2026-11-16",
+  "note": "The owner's statement; the permission terms are not stored in the repository. A required credit, if any, belongs in CREDITS.md (sfx/keyboard)."
+ },
+ "credit": {
+  "label": "몽돌",
+  "title": "SPM PL87W 몽돌축 ASMR",
+  "by": "세계 SEGYE (YouTube)",
+  "url": "https://www.youtube.com/shorts/BgO3pE7VnI8"
+ },
+ "wavSha256": "b9c07ce80b28c6d2e3469e8bfc981df9f4d7ab306c359d2768a368271aca0af9"
+}

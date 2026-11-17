@@ -2,7 +2,7 @@
 // Freesound 755222 "Keyboard slow typing with Gateron Blue switches + low echo" (forfii, CC0).
 // Source: scripts/kbsamples/source/clack-b/ (27 mono 48 kHz 16-bit WAVs + clack-b.json), cut and level-matched by that
 // branch's scripts/sound/build_bank.py; they are copied here UNCHANGED (no re-trim, no re-level).
-// Output: public/sfx/keyboard/clack.{wav,json}   (replaces the previous WhiteFox sprite built by build.mjs)
+// Output: audio-src/sfx/keyboard/clack.{wav,json}   (replaces the previous WhiteFox sprite built by build.mjs)
 //
 // The toy plays recorded keyboard samples with +6 dB makeup; branch B was designed for gain 0, so every entry carries
 // gain = 10^(-6/20) to land at the same loudness as in branch B.
@@ -14,7 +14,7 @@ import { fileURLToPath } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const SRC = path.join(ROOT, 'scripts/kbsamples/source/clack-b');
-const OUT = path.join(ROOT, 'public/sfx/keyboard');
+const OUT = path.join(ROOT, 'audio-src/sfx/keyboard');
 const SR = 48000;
 const GAP = 480; // 10 ms silence between entries
 const GAIN = Math.round(Math.pow(10, -6 / 20) * 1e4) / 1e4;

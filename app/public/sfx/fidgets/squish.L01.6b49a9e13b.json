@@ -1,0 +1,119 @@
+{
+ "version": 1,
+ "chunkOf": "squish.wav",
+ "toys": [
+  "L01"
+ ],
+ "sampleRate": 48000,
+ "totalSamples": 194302,
+ "sources": {
+  "freesound:794270": {
+   "title": "Slime stretching and squeezing",
+   "author": "greenlinker",
+   "url": "https://freesound.org/people/greenlinker/sounds/794270/",
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "retrieved": "2026-11-12",
+   "usage": "L01 hold",
+   "materialMatch": "similar material only (not a recording of the toy)",
+   "originalFile": "bench-out/fidget-src/fs_794270.mp3"
+  }
+ },
+ "pools": {
+  "slime.hold": {
+   "event": "hold",
+   "loudnessClass": "continuous",
+   "material": "slime",
+   "note": "squishing windows",
+   "recordings": 6,
+   "variants": 0,
+   "entries": [
+    {
+     "start": 2269,
+     "length": 29664,
+     "offset": 0.047271,
+     "duration": 0.618,
+     "gain": 0.635,
+     "src": "freesound:794270",
+     "srcStart": 84.5131,
+     "srcEnd": 85.1311,
+     "peakDbSource": -19,
+     "centroidHz": 2950,
+     "strikes": 13,
+     "boostDb": 18
+    },
+    {
+     "start": 32413,
+     "length": 31776,
+     "offset": 0.675271,
+     "duration": 0.662,
+     "gain": 0.8907,
+     "src": "freesound:794270",
+     "srcStart": 85.5771,
+     "srcEnd": 86.2391,
+     "peakDbSource": -18.5,
+     "centroidHz": 5204,
+     "strikes": 14,
+     "boostDb": 17.5
+    },
+    {
+     "start": 64669,
+     "length": 32544,
+     "offset": 1.347271,
+     "duration": 0.678,
+     "gain": 0.7782,
+     "src": "freesound:794270",
+     "srcStart": 91.2953,
+     "srcEnd": 91.9733,
+     "peakDbSource": -16.7,
+     "centroidHz": 5565,
+     "strikes": 13,
+     "boostDb": 15.7
+    },
+    {
+     "start": 97693,
+     "length": 32640,
+     "offset": 2.035271,
+     "duration": 0.68,
+     "gain": 0.3054,
+     "src": "freesound:794270",
+     "srcStart": 99.8519,
+     "srcEnd": 100.5319,
+     "peakDbSource": -15.8,
+     "centroidHz": 6178,
+     "strikes": 13,
+     "boostDb": 14.8
+    },
+    {
+     "start": 130813,
+     "length": 28704,
+     "offset": 2.725271,
+     "duration": 0.598,
+     "gain": 0.6739,
+     "src": "freesound:794270",
+     "srcStart": 114.3003,
+     "srcEnd": 114.8983,
+     "peakDbSource": -18.5,
+     "centroidHz": 6459,
+     "strikes": 12,
+     "boostDb": 17.5
+    },
+    {
+     "start": 159997,
+     "length": 32256,
+     "offset": 3.333271,
+     "duration": 0.672,
+     "gain": 1,
+     "src": "freesound:794270",
+     "srcStart": 128.3739,
+     "srcEnd": 129.0459,
+     "peakDbSource": -12.8,
+     "centroidHz": 6030,
+     "strikes": 14,
+     "boostDb": 11.8
+    }
+   ]
+  }
+ },
+ "file": "squish.L01.2255e890ec.flac"
+}

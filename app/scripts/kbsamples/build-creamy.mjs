@@ -3,11 +3,11 @@
 // Input (decoded, NOT committed): bench-out/audio-src/creamy-thocky/<name>.wav
 //   for f in scripts/kbsamples/source/creamy-thocky/*.ogg; do
 //     ffmpeg -i "$f" -c:a pcm_s16le "bench-out/audio-src/creamy-thocky/$(basename "${f%.ogg}").wav"; done
-// Output: public/sfx/keyboard/creamy-thocky.{wav,json}
+// Output: audio-src/sfx/keyboard/creamy-thocky.{wav,json}
 //
 // Usage: node scripts/kbsamples/build-creamy.mjs
 //
-// What is (and is not) done — see public/sfx/keyboard/CREDITS.md:
+// What is (and is not) done — see audio-src/sfx/keyboard/CREDITS.md:
 //   • each source clip is used whole as one key-DOWN sound (that is how the Mechvibes pack plays it);
 //     clips are NOT split into down/up halves and the pack's key mapping is NOT used (unverified by ear)
 //   • leading/trailing near-silence (below peak −45 / −50 dB) trimmed, 0.5 ms fade-in + 8 ms fade-out
@@ -18,7 +18,7 @@ import { fileURLToPath } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const IN = path.join(ROOT, 'bench-out/audio-src/creamy-thocky');
-const OUT = path.join(ROOT, 'public/sfx/keyboard');
+const OUT = path.join(ROOT, 'audio-src/sfx/keyboard');
 const SR = 48000;
 const GAP = 480; // 10 ms of silence between sprite entries (same as pebble/clack)
 const MAX_GAIN_DB = 26; // guard against excessive amplification

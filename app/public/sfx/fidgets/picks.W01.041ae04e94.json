@@ -1,0 +1,473 @@
+{
+ "version": 1,
+ "chunkOf": "picks.wav",
+ "toys": [
+  "W01"
+ ],
+ "sampleRate": 44100,
+ "totalSamples": 894486,
+ "sources": {
+  "youtube:DT-BjNH0iAo": {
+   "title": "Wax Cracking ASMR — What should I crack next?",
+   "author": "Mochich! by Jolislime",
+   "url": "https://www.youtube.com/watch?v=DT-BjNH0iAo",
+   "license": "CC BY 3.0",
+   "licenseUrl": "https://creativecommons.org/licenses/by/3.0/",
+   "retrieved": "2026-11-13",
+   "usage": "owner-picked fidget clips (see pool notes); cut, faded, normalised, hiss-reduced",
+   "materialMatch": "real wax-coated squishy, cracked wax skin",
+   "originalFile": "https://www.youtube.com/watch?v=DT-BjNH0iAo"
+  },
+  "youtube:OVPG4qZMl0U": {
+   "title": "ULTIMATE Wax Cracking ASMR! Best Crunchy Sounds",
+   "author": "Mochich! by Jolislime",
+   "url": "https://www.youtube.com/watch?v=OVPG4qZMl0U",
+   "license": "CC BY 3.0",
+   "licenseUrl": "https://creativecommons.org/licenses/by/3.0/",
+   "retrieved": "2026-11-13",
+   "usage": "owner-picked fidget clips (see pool notes); cut, faded, normalised, hiss-reduced",
+   "materialMatch": "real wax-coated squishy, cracked wax skin",
+   "originalFile": "https://www.youtube.com/watch?v=OVPG4qZMl0U"
+  },
+  "youtube:kKYelJAi3xE": {
+   "title": "ASMR | 말랑이 17개 털었어요 +슬랑이, 왁뿌볼, 크랑이",
+   "author": "까퓰러ASMR Gapular",
+   "url": "https://www.youtube.com/watch?v=kKYelJAi3xE",
+   "license": "CC BY 3.0",
+   "licenseUrl": "https://creativecommons.org/licenses/by/3.0/",
+   "retrieved": "2026-11-13",
+   "usage": "owner-picked fidget clips (see pool notes); cut, faded, normalised, hiss-reduced",
+   "materialMatch": "real wax ball (왁뿌볼) being broken by hand",
+   "originalFile": "https://www.youtube.com/watch?v=kKYelJAi3xE"
+  }
+ },
+ "pools": {
+  "apple.init": {
+   "event": "init",
+   "loudnessClass": "impact",
+   "material": "owner pick",
+   "note": "W01 first break (owner picks: 처음 깰 때 #4 + second round 3–10)",
+   "recordings": 9,
+   "variants": 0,
+   "entries": [
+    {
+     "start": 0,
+     "length": 25644,
+     "offset": 0,
+     "duration": 0.581497,
+     "gain": 0.5445,
+     "src": "youtube:kKYelJAi3xE",
+     "srcStart": 347.3385,
+     "srcEnd": 347.92,
+     "centroidHz": 4638,
+     "boostDb": 0
+    },
+    {
+     "start": 26967,
+     "length": 25485,
+     "offset": 0.611497,
+     "duration": 0.577891,
+     "gain": 0.4944,
+     "src": "youtube:kKYelJAi3xE",
+     "srcStart": 354.5321,
+     "srcEnd": 355.11,
+     "centroidHz": 5564,
+     "boostDb": 0
+    },
+    {
+     "start": 53775,
+     "length": 25241,
+     "offset": 1.219388,
+     "duration": 0.572358,
+     "gain": 0.7419,
+     "src": "youtube:kKYelJAi3xE",
+     "srcStart": 362.0376,
+     "srcEnd": 362.61,
+     "centroidHz": 5296,
+     "boostDb": 0
+    },
+    {
+     "start": 80339,
+     "length": 25547,
+     "offset": 1.821746,
+     "duration": 0.579297,
+     "gain": 1,
+     "src": "youtube:kKYelJAi3xE",
+     "srcStart": 368.7607,
+     "srcEnd": 369.34,
+     "centroidHz": 6127,
+     "boostDb": 0
+    },
+    {
+     "start": 107209,
+     "length": 25538,
+     "offset": 2.431043,
+     "duration": 0.579093,
+     "gain": 0.7652,
+     "src": "youtube:kKYelJAi3xE",
+     "srcStart": 369.4909,
+     "srcEnd": 370.07,
+     "centroidHz": 2998,
+     "boostDb": 0
+    },
+    {
+     "start": 134070,
+     "length": 25371,
+     "offset": 3.040136,
+     "duration": 0.575306,
+     "gain": 0.9114,
+     "src": "youtube:kKYelJAi3xE",
+     "srcStart": 370.8847,
+     "srcEnd": 371.46,
+     "centroidHz": 4837,
+     "boostDb": 0
+    },
+    {
+     "start": 160764,
+     "length": 25541,
+     "offset": 3.645442,
+     "duration": 0.579161,
+     "gain": 0.8136,
+     "src": "youtube:kKYelJAi3xE",
+     "srcStart": 372.4408,
+     "srcEnd": 373.02,
+     "centroidHz": 5813,
+     "boostDb": 0
+    },
+    {
+     "start": 187628,
+     "length": 25532,
+     "offset": 4.254603,
+     "duration": 0.578957,
+     "gain": 0.8131,
+     "src": "youtube:kKYelJAi3xE",
+     "srcStart": 373.741,
+     "srcEnd": 374.32,
+     "centroidHz": 2799,
+     "boostDb": 0
+    },
+    {
+     "start": 214483,
+     "length": 25517,
+     "offset": 4.86356,
+     "duration": 0.578617,
+     "gain": 0.8109,
+     "src": "youtube:kKYelJAi3xE",
+     "srcStart": 375.1114,
+     "srcEnd": 375.69,
+     "centroidHz": 4307,
+     "boostDb": 0
+    }
+   ]
+  },
+  "apple.crack": {
+   "event": "crack",
+   "loudnessClass": "impact",
+   "material": "owner pick",
+   "note": "W01 while breaking (owner picks: #1 apple only; #2/#3 and second round 1, 2, 4, 5, 6, 8, 9, 10 shared with W02)",
+   "recordings": 11,
+   "variants": 0,
+   "entries": [
+    {
+     "start": 244763,
+     "length": 25908,
+     "offset": 5.550181,
+     "duration": 0.587483,
+     "gain": 0.6233,
+     "src": "youtube:DT-BjNH0iAo",
+     "srcStart": 7.3035,
+     "srcEnd": 7.891,
+     "centroidHz": 5905,
+     "boostDb": 0
+    },
+    {
+     "start": 271994,
+     "length": 25424,
+     "offset": 6.167664,
+     "duration": 0.576508,
+     "gain": 0.8512,
+     "src": "youtube:DT-BjNH0iAo",
+     "srcStart": 14.3965,
+     "srcEnd": 14.973,
+     "centroidHz": 5878,
+     "boostDb": 0
+    },
+    {
+     "start": 298741,
+     "length": 26124,
+     "offset": 6.774172,
+     "duration": 0.592381,
+     "gain": 0.6043,
+     "src": "youtube:DT-BjNH0iAo",
+     "srcStart": 23.0236,
+     "srcEnd": 23.616,
+     "centroidHz": 6378,
+     "boostDb": 0
+    },
+    {
+     "start": 326188,
+     "length": 25417,
+     "offset": 7.396553,
+     "duration": 0.576349,
+     "gain": 0.9652,
+     "src": "youtube:DT-BjNH0iAo",
+     "srcStart": 0.3437,
+     "srcEnd": 0.92,
+     "centroidHz": 5992,
+     "boostDb": 0
+    },
+    {
+     "start": 352928,
+     "length": 25456,
+     "offset": 8.002902,
+     "duration": 0.577234,
+     "gain": 1,
+     "src": "youtube:DT-BjNH0iAo",
+     "srcStart": 1.1428,
+     "srcEnd": 1.72,
+     "centroidHz": 7071,
+     "boostDb": 0
+    },
+    {
+     "start": 379707,
+     "length": 25332,
+     "offset": 8.610136,
+     "duration": 0.574422,
+     "gain": 0.732,
+     "src": "youtube:DT-BjNH0iAo",
+     "srcStart": 6.4556,
+     "srcEnd": 7.03,
+     "centroidHz": 5918,
+     "boostDb": 0
+    },
+    {
+     "start": 406362,
+     "length": 25506,
+     "offset": 9.214558,
+     "duration": 0.578367,
+     "gain": 0.925,
+     "src": "youtube:DT-BjNH0iAo",
+     "srcStart": 8.4616,
+     "srcEnd": 9.04,
+     "centroidHz": 6277,
+     "boostDb": 0
+    },
+    {
+     "start": 433191,
+     "length": 25598,
+     "offset": 9.822925,
+     "duration": 0.580454,
+     "gain": 0.5646,
+     "src": "youtube:DT-BjNH0iAo",
+     "srcStart": 12.0995,
+     "srcEnd": 12.68,
+     "centroidHz": 5672,
+     "boostDb": 0
+    },
+    {
+     "start": 460112,
+     "length": 25267,
+     "offset": 10.433379,
+     "duration": 0.572948,
+     "gain": 0.8988,
+     "src": "youtube:DT-BjNH0iAo",
+     "srcStart": 19.6171,
+     "srcEnd": 20.19,
+     "centroidHz": 5628,
+     "boostDb": 0
+    },
+    {
+     "start": 486702,
+     "length": 25663,
+     "offset": 11.036327,
+     "duration": 0.581927,
+     "gain": 0.6613,
+     "src": "youtube:DT-BjNH0iAo",
+     "srcStart": 20.3681,
+     "srcEnd": 20.95,
+     "centroidHz": 4530,
+     "boostDb": 0
+    },
+    {
+     "start": 513688,
+     "length": 25385,
+     "offset": 11.648254,
+     "duration": 0.575624,
+     "gain": 0.9804,
+     "src": "youtube:DT-BjNH0iAo",
+     "srcStart": 24.5244,
+     "srcEnd": 25.1,
+     "centroidHz": 6202,
+     "boostDb": 0
+    }
+   ]
+  },
+  "apple.after": {
+   "event": "hold",
+   "loudnessClass": "impact",
+   "material": "owner pick",
+   "note": "W01 broken wax being pressed (owner picks: first round 1–5 + second round 1–8)",
+   "recordings": 13,
+   "variants": 0,
+   "entries": [
+    {
+     "start": 543687,
+     "length": 25424,
+     "offset": 12.328503,
+     "duration": 0.576508,
+     "gain": 0.9403,
+     "src": "youtube:OVPG4qZMl0U",
+     "srcStart": 21.8835,
+     "srcEnd": 22.46,
+     "centroidHz": 7038,
+     "boostDb": 0
+    },
+    {
+     "start": 570434,
+     "length": 26293,
+     "offset": 12.935011,
+     "duration": 0.596213,
+     "gain": 0.6137,
+     "src": "youtube:OVPG4qZMl0U",
+     "srcStart": 27.5688,
+     "srcEnd": 28.165,
+     "centroidHz": 6460,
+     "boostDb": 0
+    },
+    {
+     "start": 598050,
+     "length": 25129,
+     "offset": 13.561224,
+     "duration": 0.569819,
+     "gain": 0.8505,
+     "src": "youtube:OVPG4qZMl0U",
+     "srcStart": 33.7782,
+     "srcEnd": 34.348,
+     "centroidHz": 5402,
+     "boostDb": 0
+    },
+    {
+     "start": 624502,
+     "length": 26169,
+     "offset": 14.161043,
+     "duration": 0.593401,
+     "gain": 0.6182,
+     "src": "youtube:OVPG4qZMl0U",
+     "srcStart": 38.6306,
+     "srcEnd": 39.224,
+     "centroidHz": 6283,
+     "boostDb": 0
+    },
+    {
+     "start": 651994,
+     "length": 25927,
+     "offset": 14.784444,
+     "duration": 0.587914,
+     "gain": 0.6724,
+     "src": "youtube:OVPG4qZMl0U",
+     "srcStart": 42.7141,
+     "srcEnd": 43.302,
+     "centroidHz": 6991,
+     "boostDb": 0
+    },
+    {
+     "start": 679244,
+     "length": 25415,
+     "offset": 15.402358,
+     "duration": 0.576304,
+     "gain": 0.5482,
+     "src": "youtube:OVPG4qZMl0U",
+     "srcStart": 11.7837,
+     "srcEnd": 12.36,
+     "centroidHz": 6300,
+     "boostDb": 0
+    },
+    {
+     "start": 705982,
+     "length": 25459,
+     "offset": 16.008662,
+     "duration": 0.577302,
+     "gain": 0.7297,
+     "src": "youtube:OVPG4qZMl0U",
+     "srcStart": 19.4027,
+     "srcEnd": 19.98,
+     "centroidHz": 6348,
+     "boostDb": 0
+    },
+    {
+     "start": 732764,
+     "length": 25283,
+     "offset": 16.615964,
+     "duration": 0.573311,
+     "gain": 0.7634,
+     "src": "youtube:OVPG4qZMl0U",
+     "srcStart": 20.5067,
+     "srcEnd": 21.08,
+     "centroidHz": 7630,
+     "boostDb": 0
+    },
+    {
+     "start": 759370,
+     "length": 25625,
+     "offset": 17.219274,
+     "duration": 0.581066,
+     "gain": 0.7036,
+     "src": "youtube:OVPG4qZMl0U",
+     "srcStart": 22.9689,
+     "srcEnd": 23.55,
+     "centroidHz": 6891,
+     "boostDb": 0
+    },
+    {
+     "start": 786318,
+     "length": 25439,
+     "offset": 17.83034,
+     "duration": 0.576848,
+     "gain": 1,
+     "src": "youtube:OVPG4qZMl0U",
+     "srcStart": 25.4232,
+     "srcEnd": 26,
+     "centroidHz": 8712,
+     "boostDb": 0
+    },
+    {
+     "start": 813080,
+     "length": 25307,
+     "offset": 18.437188,
+     "duration": 0.573855,
+     "gain": 0.4851,
+     "src": "youtube:OVPG4qZMl0U",
+     "srcStart": 26.6561,
+     "srcEnd": 27.23,
+     "centroidHz": 5296,
+     "boostDb": 0
+    },
+    {
+     "start": 839710,
+     "length": 25580,
+     "offset": 19.041043,
+     "duration": 0.580045,
+     "gain": 0.7665,
+     "src": "youtube:OVPG4qZMl0U",
+     "srcStart": 34.62,
+     "srcEnd": 35.2,
+     "centroidHz": 6348,
+     "boostDb": 0
+    },
+    {
+     "start": 866613,
+     "length": 25825,
+     "offset": 19.651088,
+     "duration": 0.585601,
+     "gain": 0.7982,
+     "src": "youtube:OVPG4qZMl0U",
+     "srcStart": 36.8344,
+     "srcEnd": 37.42,
+     "centroidHz": 7830,
+     "boostDb": 0
+    }
+   ]
+  }
+ },
+ "file": "picks.W01.8b3a7910df.flac"
+}

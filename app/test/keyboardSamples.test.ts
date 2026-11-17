@@ -1,12 +1,14 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { KEYBOARD_SAMPLE_CREDITS, loadKeyboardSamples } from '../src/audio/keyboardSamples';
+import { decodePcm, shippedFetch } from './shippedSfx';
+import { SFX_KEYBOARD } from '../src/audio/sfxManifest';
 
 // Parses the SHIPPED sprite WAV + JSON straight from disk (no fetch) and checks the audio itself.
 
 // node:fs via a dynamic specifier (same pattern as squishySamples.test.ts) so `tsc` needs no @types/node
 const fsName = 'node:fs';
 const { readFileSync } = (await import(/* @vite-ignore */ fsName)) as { readFileSync(p: URL): Uint8Array };
-const file = (name: string) => readFileSync(new URL(`../public/sfx/keyboard/${name}`, import.meta.url));
+const file = (name: string) => readFileSync(new URL(`../audio-src/sfx/keyboard/${name}`, import.meta.url));
 const ascii = (b: Uint8Array, a: number, z: number) => String.fromCharCode(...b.subarray(a, z));
 const PRESETS = ['pebble', 'clack'] as const;
 const ROLES = ['down', 'up', 'spaceDown', 'spaceUp'] as const;
@@ -158,7 +160,7 @@ function fakeCtx(sampleRate: number) {
     sampleRate,
     createBuffer: (c: number, n: number, sr: number) => new FakeBuffer(c, n, sr),
     decodeAudioData: async (ab: ArrayBuffer) => {
-      const { fmt, data: pcm } = readWav(new Uint8Array(ab));
+      const { sr: fmtSr, data: pcm } = await decodePcm(ab); const fmt = { sr: fmtSr };
       // naive linear resample to the context rate, like a real decodeAudioData would
       const n = Math.round((pcm.length * sampleRate) / fmt.sr), b = new FakeBuffer(1, n, sampleRate), o = b.getChannelData();
       for (let i = 0; i < n; i++) { const t = (i * fmt.sr) / sampleRate, k = Math.floor(t), a = t - k; o[i] = (pcm[k] ?? 0) * (1 - a) + (pcm[k + 1] ?? 0) * a; }
@@ -170,11 +172,7 @@ function fakeCtx(sampleRate: number) {
 describe('loadKeyboardSamples', () => {
   afterEach(() => vi.unstubAllGlobals());
   const stubFetch = () => {
-    const f = vi.fn(async (url: string) => {
-      const name = String(url).split('/').pop()!;
-      const buf = file(name);
-      return { ok: true, status: 200, json: async () => JSON.parse(new TextDecoder().decode(buf)), arrayBuffer: async () => buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.length) };
-    });
+    const f = shippedFetch();
     vi.stubGlobal('fetch', f);
     return f;
   };
@@ -192,15 +190,16 @@ describe('loadKeyboardSamples', () => {
         expect(peak(b.getChannelData(0))).toBeCloseTo(peak(ref), 5);
       });
     }
-    expect(f).toHaveBeenCalledWith('./sfx/keyboard/pebble.json');
+    expect(f).toHaveBeenCalledWith('./' + SFX_KEYBOARD.pebble.json); // map and FLAC requested together
+    expect(f).toHaveBeenCalledWith('./' + SFX_KEYBOARD.pebble.audio);
     const again = await loadKeyboardSamples(ctx, 'pebble');
     expect(again).toBe(s);
-    expect(f).toHaveBeenCalledTimes(2); // json + wav, once
+    expect(f).toHaveBeenCalledTimes(2); // json + flac, once
   });
 
   it('works when the context runs at 44.1 kHz (addresses the sprite in seconds)', async () => {
     stubFetch();
-    const s = await loadKeyboardSamples(fakeCtx(44100), 'clack', '/x/');
+    const s = await loadKeyboardSamples(fakeCtx(44100), 'clack');
     const e = data.clack.map.entries.down[0];
     expect(s.down[0].sampleRate).toBe(44100);
     expect(Math.abs(s.down[0].length - Math.round(e.duration * 44100))).toBeLessThanOrEqual(1);

@@ -10,7 +10,7 @@ import { chromium } from 'playwright-core';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 for (const [preset, upstream] of [['turquoise-tealios', 'turquoise'], ['ibm-buckling-spring', 'buckling']]) {
 const source = path.join(root, `scripts/kbsamples/source/${preset}`);
-const out = path.join(root, 'public/sfx/keyboard');
+const out = path.join(root, 'audio-src/sfx/keyboard');
 const sr = 48000, gap = 480;
 const spec = [
   ...Array.from({ length: 5 }, (_, i) => ['down', `press/GENERIC_R${i}.mp3`]),

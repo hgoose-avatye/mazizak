@@ -1,0 +1,106 @@
+{
+ "version": 1,
+ "chunkOf": "squish.wav",
+ "toys": [
+  "L01",
+  "L02"
+ ],
+ "sampleRate": 48000,
+ "totalSamples": 219742,
+ "sources": {
+  "freesound:794270": {
+   "title": "Slime stretching and squeezing",
+   "author": "greenlinker",
+   "url": "https://freesound.org/people/greenlinker/sounds/794270/",
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "retrieved": "2026-11-12",
+   "usage": "L01 hold",
+   "materialMatch": "similar material only (not a recording of the toy)",
+   "originalFile": "bench-out/fidget-src/fs_794270.mp3"
+  }
+ },
+ "pools": {
+  "slime.stretch": {
+   "event": "stretch",
+   "loudnessClass": "continuous",
+   "material": "slime",
+   "note": "slime stretching passages",
+   "recordings": 5,
+   "variants": 0,
+   "entries": [
+    {
+     "start": 2653,
+     "length": 41088,
+     "offset": 0.055271,
+     "duration": 0.856,
+     "gain": 0.6532,
+     "src": "freesound:794270",
+     "srcStart": 84.5131,
+     "srcEnd": 85.3691,
+     "peakDbSource": -19,
+     "centroidHz": 2950,
+     "strikes": 16,
+     "boostDb": 18
+    },
+    {
+     "start": 44221,
+     "length": 45312,
+     "offset": 0.921271,
+     "duration": 0.944,
+     "gain": 1,
+     "src": "freesound:794270",
+     "srcStart": 85.5771,
+     "srcEnd": 86.5211,
+     "peakDbSource": -18.5,
+     "centroidHz": 5204,
+     "strikes": 20,
+     "boostDb": 17.5
+    },
+    {
+     "start": 90013,
+     "length": 43488,
+     "offset": 1.875271,
+     "duration": 0.906,
+     "gain": 0.839,
+     "src": "freesound:794270",
+     "srcStart": 91.2953,
+     "srcEnd": 92.2013,
+     "peakDbSource": -16.7,
+     "centroidHz": 5565,
+     "strikes": 18,
+     "boostDb": 15.7
+    },
+    {
+     "start": 133981,
+     "length": 43680,
+     "offset": 2.791271,
+     "duration": 0.91,
+     "gain": 0.3398,
+     "src": "freesound:794270",
+     "srcStart": 99.8519,
+     "srcEnd": 100.7619,
+     "peakDbSource": -15.8,
+     "centroidHz": 6178,
+     "strikes": 15,
+     "boostDb": 14.8
+    },
+    {
+     "start": 178141,
+     "length": 39552,
+     "offset": 3.711271,
+     "duration": 0.824,
+     "gain": 0.6951,
+     "src": "freesound:794270",
+     "srcStart": 114.3003,
+     "srcEnd": 115.1243,
+     "peakDbSource": -18.5,
+     "centroidHz": 6459,
+     "strikes": 17,
+     "boostDb": 17.5
+    }
+   ]
+  }
+ },
+ "file": "squish.L01-L02.7eb5143d7a.flac"
+}

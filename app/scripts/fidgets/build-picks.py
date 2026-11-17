@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Owner-picked fidget clips → public/sfx/fidgets/picks.{wav,json} + PICKS-CREDITS.md.
+"""Owner-picked fidget clips → audio-src/sfx/fidgets/picks.{wav,json} + PICKS-CREDITS.md.
 
 The owner listened to candidate clips (dev page candidates.html, 2026-11-13) and picked these by ear for the wax balls,
 and the rainbow beads. Sources are YouTube videos the uploaders published under YouTube's
@@ -21,7 +21,7 @@ from datetime import date
 import numpy as np
 
 SRC = os.path.expanduser(os.environ.get("MANZIZAK_PICKS_SOURCES", "~/Music/MANZIZAK/dev-reference"))
-OUT = os.path.join(os.path.dirname(__file__), "../../public/sfx/fidgets")
+OUT = os.path.join(os.path.dirname(__file__), "../../audio-src/sfx/fidgets")
 SR = 44100
 YT_LICENSE, YT_LICENSE_URL = "CC BY 3.0", "https://creativecommons.org/licenses/by/3.0/"
 

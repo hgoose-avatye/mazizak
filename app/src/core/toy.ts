@@ -9,6 +9,14 @@ export interface ToyContext {
   /** canvas size in CSS px */
   size: () => { w: number; h: number };
   haptic: (ms: number) => void;
+  /** a toy calls this when its soundStatus() changes (the app shows / hides the small sound-loading chip) */
+  soundChanged: () => void;
+}
+
+/** Can the toy's sounds play yet? `retry` is offered after a network failure (never after a file that cannot be decoded). */
+export interface SoundStatus {
+  state: 'loading' | 'ready' | 'error';
+  retry?: () => void;
 }
 
 /** A toy owns its scene + camera; the runtime drives input/frames. */
@@ -26,5 +34,6 @@ export interface Toy {
   enter(): void;
   leave(): void;
   stats?(): Record<string, string | number>;
+  soundStatus?(): SoundStatus;
   report?(): Record<string, unknown>;
 }

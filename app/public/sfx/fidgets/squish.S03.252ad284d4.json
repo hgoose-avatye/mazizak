@@ -1,0 +1,170 @@
+{
+ "version": 1,
+ "chunkOf": "squish.wav",
+ "toys": [
+  "S03"
+ ],
+ "sampleRate": 48000,
+ "totalSamples": 215038,
+ "sources": {
+  "freesound:403915": {
+   "title": "Squishing Sound.WAV",
+   "author": "Radio-Brain",
+   "url": "https://freesound.org/people/Radio-Brain/sounds/403915/",
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "retrieved": "2026-11-12",
+   "usage": "S03 tap",
+   "materialMatch": "similar material only (not a recording of the toy)",
+   "originalFile": "bench-out/fidget-src/fs_403915.mp3"
+  },
+  "freesound:837964": {
+   "title": "Wet Sourdough Starter Kneading",
+   "author": "marlonnnnnn",
+   "url": "https://freesound.org/people/marlonnnnnn/sounds/837964/",
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "retrieved": "2026-11-12",
+   "usage": "S03 tap",
+   "materialMatch": "similar material only (not a recording of the toy)",
+   "originalFile": "bench-out/fidget-src/fs_837964.mp3"
+  }
+ },
+ "pools": {
+  "mochi.tap": {
+   "event": "tap",
+   "loudnessClass": "impact",
+   "material": "soft dough",
+   "note": "short dough presses (~0.34 s)",
+   "processing": "hiss-reduced (spectral subtraction, noise profile = quietest 10 % of the source)",
+   "recordings": 4,
+   "variants": 0,
+   "entries": [
+    {
+     "start": 3901,
+     "length": 20064,
+     "offset": 0.081271,
+     "duration": 0.418,
+     "gain": 1,
+     "src": "freesound:403915",
+     "srcStart": 7.7895,
+     "srcEnd": 8.2075,
+     "peakDbSource": -18.6,
+     "centroidHz": 7248,
+     "strikes": 8,
+     "boostDb": 17.9
+    },
+    {
+     "start": 24445,
+     "length": 19008,
+     "offset": 0.509271,
+     "duration": 0.396,
+     "gain": 0.585,
+     "src": "freesound:403915",
+     "srcStart": 16.2978,
+     "srcEnd": 16.6938,
+     "peakDbSource": -14.2,
+     "centroidHz": 4853,
+     "strikes": 8,
+     "boostDb": 13.3
+    },
+    {
+     "start": 43933,
+     "length": 19776,
+     "offset": 0.915271,
+     "duration": 0.412,
+     "gain": 0.9766,
+     "src": "freesound:837964",
+     "srcStart": 14.2761,
+     "srcEnd": 14.6881,
+     "peakDbSource": -14.2,
+     "centroidHz": 7549,
+     "strikes": 8,
+     "boostDb": 13.5
+    },
+    {
+     "start": 64189,
+     "length": 17376,
+     "offset": 1.337271,
+     "duration": 0.362,
+     "gain": 0.3439,
+     "src": "freesound:837964",
+     "srcStart": 16.2592,
+     "srcEnd": 16.6212,
+     "peakDbSource": -18.4,
+     "centroidHz": 3723,
+     "strikes": 6,
+     "boostDb": 17.6
+    }
+   ]
+  },
+  "mochi.hold": {
+   "event": "hold",
+   "loudnessClass": "continuous",
+   "material": "soft dough",
+   "note": "kneading / rolling windows",
+   "processing": "hiss-reduced (spectral subtraction, noise profile = quietest 10 % of the source)",
+   "recordings": 4,
+   "variants": 0,
+   "entries": [
+    {
+     "start": 82045,
+     "length": 32736,
+     "offset": 1.709271,
+     "duration": 0.682,
+     "gain": 1,
+     "src": "freesound:403915",
+     "srcStart": 7.5254,
+     "srcEnd": 8.2074,
+     "peakDbSource": -18.6,
+     "centroidHz": 5672,
+     "strikes": 12,
+     "boostDb": 17.9
+    },
+    {
+     "start": 115261,
+     "length": 33888,
+     "offset": 2.401271,
+     "duration": 0.706,
+     "gain": 0.7727,
+     "src": "freesound:403915",
+     "srcStart": 13.7703,
+     "srcEnd": 14.4763,
+     "peakDbSource": -18.2,
+     "centroidHz": 8395,
+     "strikes": 12,
+     "boostDb": 18.1
+    },
+    {
+     "start": 149629,
+     "length": 30624,
+     "offset": 3.117271,
+     "duration": 0.638,
+     "gain": 0.6848,
+     "src": "freesound:837964",
+     "srcStart": 8.8387,
+     "srcEnd": 9.4767,
+     "peakDbSource": -18.1,
+     "centroidHz": 7343,
+     "strikes": 14,
+     "boostDb": 18.2
+    },
+    {
+     "start": 180733,
+     "length": 32256,
+     "offset": 3.765271,
+     "duration": 0.672,
+     "gain": 0.801,
+     "src": "freesound:837964",
+     "srcStart": 9.9682,
+     "srcEnd": 10.6402,
+     "peakDbSource": -17.9,
+     "centroidHz": 6202,
+     "strikes": 14,
+     "boostDb": 17.2
+    }
+   ]
+  }
+ },
+ "file": "squish.S03.aa987a5463.flac"
+}

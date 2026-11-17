@@ -86,7 +86,7 @@ await browser.close();
 
 const { execFileSync } = await import('node:child_process');
 const metrics = JSON.parse(execFileSync('node', [path.join(ROOT, 'scripts/kbsamples/metrics.mjs')], { encoding: 'utf8' }));
-const sizes = Object.fromEntries(fs.readdirSync(path.join(ROOT, 'public/sfx/keyboard')).map((f) => [f, fs.statSync(path.join(ROOT, 'public/sfx/keyboard', f)).size]));
+const sizes = Object.fromEntries(fs.readdirSync(path.join(ROOT, 'audio-src/sfx/keyboard')).map((f) => [f, fs.statSync(path.join(ROOT, 'audio-src/sfx/keyboard', f)).size]));
 const report = { generated: new Date().toISOString(), chain: 'voice gain(±1.2 dB jitter, −2 dB rapid) → pan ±0.22 → master 0.9 → DynamicsCompressor(thr −6, knee 0, ratio 20, atk 2 ms, rel 80 ms)', render: result, sliceMetrics: metrics, shippedBytes: sizes };
 const outFile = path.join(ROOT, 'bench-out/audio-src/keyboard/report.json');
 fs.writeFileSync(outFile, JSON.stringify(report, null, 1) + '\n');
