@@ -327,13 +327,13 @@ const stubFetch = () =>
   }));
 async function make(id: string) {
   stubFetch();
-  const { engine, plays, stops } = makeEngine();
+  const { engine, plays, stops, registered } = makeEngine();
   let t = 0;
   const a = new FidgetAudio(engine as never, FIDGETS.find((f) => f.id === id)!, () => t);
   // up to 10 s: the shipped chunks are real FLAC, decoded by the pure-JS libFLAC in this test (slower than the browser, more so under load)
   for (let i = 0; i < 2000 && a.state === "loading"; i++) await new Promise((r) => setTimeout(r, 5));
   a.enter();
-  return { a, plays, stops, at: (ms: number) => (t = ms) };
+  return { a, plays, stops, registered, at: (ms: number) => (t = ms) };
 }
 
 describe("FidgetAudio event routing", () => {
@@ -360,6 +360,18 @@ describe("FidgetAudio event routing", () => {
     a.reset(); at(3000); expect(a.playNearDone()).toBe(true);
   });
 
+  it("W02 breaking sounds are the snap only (no tumbling tail), the crumbs keep their length; W01 is uncut", async () => {
+    const len = (r: Map<string, { duration: number }[]>, re: RegExp) => [...r].filter(([n]) => re.test(n)).map(([, b]) => b[0].duration);
+    const w02 = (await make("W02")).registered, w01 = (await make("W01")).registered;
+    for (const re of [/^fg:W02:init:m:/, /^fg:W02:crack:m:/, /^fg:W02:crack:second:/, /^fg:W02:init:nearDone:/]) {
+      const d = len(w02, re);
+      expect(d.length, String(re)).toBeGreaterThan(1);
+      expect(Math.max(...d), String(re)).toBeLessThanOrEqual(0.08); // 70 ms after the snap (+ up to 5 ms before it)
+    }
+    expect(Math.min(...len(w02, /^fg:W02:crunch:m:/))).toBeGreaterThan(0.4);
+    expect(Math.min(...len(w01, /^fg:W01:crack:m:/))).toBeGreaterThan(0.4);
+  });
+
   it("W01: kneading is `hold`; `tap` falls back to hold; releases and stretch are silent (no pool, no fallback)", async () => {
     const { a, plays, at } = await make("W01");
     at(0); expect(a.play("hold", 0.5)).toBe(true);
@@ -381,13 +393,15 @@ describe("FidgetAudio event routing", () => {
       for (let i = 1; i < names.length; i++) expect(names[i]).not.toBe(names[i - 1]);
       t += 2000; at(t); a.play("hold", 0.6);
       expect(plays[plays.length - 1].name).toMatch(new RegExp(`^fg:${id}:hold:m:`));
-      expect(plays.every((p) => p.opts.rate >= 0.94 && p.opts.rate <= 1.06)).toBe(true);
+      // small jitter around 1; C02 레인보우 is played lower on purpose (owner, 2026-11-17: "하이피치 좀 내려봐요")
+      const [lo, hi] = id === "C02" ? [0.84, 0.94] : [0.94, 1.06];
+      expect(plays.every((p) => p.opts.rate >= lo && p.opts.rate <= hi)).toBe(true);
     }
   });
 
   it("each squish toy has only the pools that survived the listener verdict and the gates", async () => {
     // S03 (new CC0 dough recordings) and L02 (CC0 crunchy slime) answer touch and kneading in the public build; their fold falls back to hold
-    const expected: Record<string, string[]> = { S01: ["tap", "hold"], S02: ["hold"], S03: ["tap", "hold"], L01: ["hold", "stretch"], L02: ["tap", "hold", "stretch"], L03: ["hold", "fold"] };
+    const expected: Record<string, string[]> = { S01: ["tap", "hold"], S02: ["tap", "hold"], S03: ["tap", "hold"], L01: ["hold", "stretch"], L02: ["tap", "hold", "stretch"], L03: ["hold", "fold"] };
     for (const [id, roles] of Object.entries(expected)) {
       const t = await make(id);
       expect(t.a.state, id).toBe("recorded/derived");
@@ -447,7 +461,9 @@ describe("FidgetAudio event routing", () => {
       let t = 0, ok = 0;
       for (let i = 0; i < 20; i++) { t += 60; at(t); if (a.play(first, 0.55, 0, true)) ok++; }
       expect(ok, id).toBe(20);
-      expect(plays.length).toBe(20);
+      // S01 blends two materials: each press also plays a layer clip (registered as …:l:<i>) under the main one
+      expect(plays.filter((p) => !/:l:\d+$/.test(p.name)).length).toBe(20);
+      expect(plays.filter((p) => /:l:\d+$/.test(p.name)).length).toBe(id === "S01" ? 20 : 0);
       expect(stops.length, `${id} replaced voices`).toBeGreaterThan(0);
     }
   });

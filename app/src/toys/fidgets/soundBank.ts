@@ -33,6 +33,16 @@ export interface PoolRef {
   note: string;
   /** picked by ear by the owner: allowed to rest on fewer clips than the automatic pools */
   ownerPick?: boolean;
+  /** a second pool played together with every clip (a blend of two materials); it is cut to the length of the main clip */
+  layer?: { source: PoolRef["source"]; pool: string; trimDb?: number };
+  /** tone shaping applied to this pool (and its layer) when played */
+  highpassHz?: number;
+  lowpassHz?: number;
+  peak?: { hz: number; db: number; q: number };
+  /** clips left out of this pool, as "<src>@<srcStart, 2 decimals>" (e.g. a clip with a table thump in it) */
+  drop?: string[];
+  /** play only the main hit of each clip: from just before its loudest moment to this many ms after it (fade-out included) */
+  hitMs?: number;
 }
 export type ToySound = Record<FidgetEvent, PoolRef | null>;
 
@@ -57,6 +67,23 @@ const pick = (pool: string, kind: PoolKind, note: string, o: Partial<PoolRef> = 
  */
 const BAL: Record<string, number> = { "apple.init": 8, "choco.init": 11, "choco.second": 11, "apple.crack": 6, "choco.crack": 7, "wax.nearDone": 4, "apple.after": 3, "choco.crumbs": 3, "wax.mixed": 2 };
 
+/**
+ * Owner's listening notes of 2026-11-17, answered with tone shaping on the existing clips (nothing re-cut):
+ * - 청사과 "진동 소리": several first-break clips carry 40–130 Hz thumps (table / handling noise of the source video) — a
+ *   250 Hz high-pass on every W01 sound, a cut at the 750 Hz ring the video's clips share, and the two clips whose energy is
+ *   mostly below 300 Hz are left out.
+ * - 초콜릿 "나무 큐브 굴리는 소리": dull, hollow knocks (centroid 0.3–1.3 kHz, the same 750 Hz ring) — a 500 Hz high-pass and
+ *   the ring cut make the breaks crisper; the duller first-break / second-click / crumb clips are left out.
+ * - 초콜릿 "뚝 소리 난 후 뚜르르": after the snap the clips carry a run of small hits (pieces tumbling) for 0.3–0.5 s — only the
+ *   snap itself is played (70 ms from just before the loudest moment), which also brings a late snap to the touch.
+ * - 레인보우 "하이피치": played ≈ 1.5–2.5 semitones lower with a gentle 9 kHz low-pass (brightness ≈ −30 %).
+ */
+const APPLE_TONE: Partial<PoolRef> = { highpassHz: 250, peak: { hz: 750, db: -5, q: 3 } };
+const APPLE_THUMPS = ["youtube:kKYelJAi3xE@362.04", "youtube:kKYelJAi3xE@368.76"];
+const CHOCO_TONE: Partial<PoolRef> = { highpassHz: 500, peak: { hz: 750, db: -6, q: 3 } };
+const CHOCO_SNAP: Partial<PoolRef> = { ...CHOCO_TONE, hitMs: 70 };
+const RAINBOW_TONE: Partial<PoolRef> = { rate: [0.86, 0.92], lowpassHz: 9000 };
+
 const waxToy = (k: "apple" | "choco"): ToySound => ({
   init: wax(`${k}.init`, "strongest isolated first-break hits"),
   tap: NONE,
@@ -71,27 +98,30 @@ const waxToy = (k: "apple" | "choco"): ToySound => ({
 
 export const FIDGET_SOUND: Record<string, ToySound> = {
   // Each toy has its own recordings (Freesound CC0, see audio-src/sfx/fidgets/CREDITS.md); nothing is shared between S01/S02/S03 or with the crunch/wax toys.
-  S01: { init: NONE, tap: sqz("tpr.tap", "recording", "stress-ball / squeeze-toy squeezes"), hold: sqz("tpr.hold", "recording", "sustained stress-ball squeezing"), release: NONE, stretch: NONE, fold: NONE, crack: NONE, crunch: NONE },
-  S02: { init: NONE, tap: NONE, hold: sqz("foam.hold", "recording", "memory-foam / sponge slow presses", { rate: jitter(0.025) }), release: NONE, stretch: NONE, fold: NONE, crack: NONE, crunch: NONE },
+  // S01 슬랑이 and L02 망고 (owner, 2026-11-17): a blend of the 찹쌀떡 (S03 dough) and 치즈 (L01 slime) sounds — every press plays a
+  // dough clip with a slime clip layered under it (cut to the dough clip's length)
+  S01: { init: NONE, tap: sqz("mochi.tap", "proxy", "찹쌀떡 dough press + 치즈 slime squish (blend)", { layer: { source: "squish", pool: "slime.hold", trimDb: -3 }, trimDb: -1.5 }), hold: sqz("mochi.hold", "proxy", "찹쌀떡 dough kneading + 치즈 slime squishing (blend)", { layer: { source: "squish", pool: "slime.hold", trimDb: -2 }, trimDb: -1.5 }), release: NONE, stretch: NONE, fold: NONE, crack: NONE, crunch: NONE },
+  // S02 모닝빵: the project owner's own recording (2026-11-17, scripts/fidgets/add-bread.py)
+  S02: { init: NONE, tap: sqz("bread.tap", "recording", "soft bread-squishy presses (the owner's own recording)"), hold: sqz("bread.hold", "recording", "bread-squishy pressing (the owner's own recording)", { rate: jitter(0.025) }), release: NONE, stretch: NONE, fold: NONE, crack: NONE, crunch: NONE },
   S03: { init: NONE, tap: sqz("mochi.tap", "proxy", "short soft-dough presses (dough stands in for mochi)"), hold: sqz("mochi.hold", "proxy", "dough kneading / rolling (stands in for mochi)"), release: NONE, stretch: NONE, fold: NONE, crack: NONE, crunch: NONE },
   L01: { init: NONE, tap: NONE, hold: sqz("slime.hold", "recording", "slime squishing"), release: NONE, stretch: sqz("slime.stretch", "recording", "slime stretching passages"), fold: sqz("slime.fold", "recording", "slime slaps / folds"), crack: NONE, crunch: NONE },
   // L02: modelled on the reference app's rainbow-sharbet clips (bright, continuous fine crackle; short ≈0.7 s, long ≈1.2 s)
-  L02: { init: NONE, tap: sqz("mango.tap", "proxy", "crunchy-slime presses (stands in for the crackly mango slime)"), hold: sqz("mango.hold", "proxy", "crunchy-slime kneading passages (stands in for the crackly mango slime)"), release: NONE, stretch: sqz("slime.stretch", "recording", "slime stretching passages", { trimDb: -1 }), fold: sqz("slime.fold", "recording", "slime slaps / folds"), crack: NONE, crunch: NONE },
+  L02: { init: NONE, tap: sqz("mochi.tap", "proxy", "찹쌀떡 dough press + 치즈 slime squish (blend)", { layer: { source: "squish", pool: "slime.hold", trimDb: -3 }, trimDb: -1.5 }), hold: sqz("mochi.hold", "proxy", "찹쌀떡 dough kneading + 치즈 slime squishing (blend)", { layer: { source: "squish", pool: "slime.hold", trimDb: -1 }, trimDb: -1.5 }), release: NONE, stretch: sqz("slime.stretch", "recording", "치즈 slime stretching + 찹쌀떡 dough (blend)", { layer: { source: "squish", pool: "mochi.hold", trimDb: -4 }, trimDb: -1.5 }), fold: sqz("slime.fold", "recording", "slime slaps / folds"), crack: NONE, crunch: NONE },
   L03: { init: NONE, tap: NONE, hold: sqz("cream.hold", "proxy", "shaving-foam squashing (stands in for whipped cream)"), release: NONE, stretch: NONE, fold: sqz("cream.fold", "proxy", "shaving-foam folding (stands in for whipped cream)"), crack: NONE, crunch: NONE },
   // W01/W02/C01/C02: the owner picked these by ear (2026-11-13) — see audio-src/sfx/fidgets/PICKS-CREDITS.md
   W01: {
-    init: pick("apple.init", "recording", "a real wax ball's first break", { trimDb: BAL["apple.init"] }),
+    init: pick("apple.init", "recording", "a real wax ball's first break", { trimDb: BAL["apple.init"], ...APPLE_TONE, drop: APPLE_THUMPS }),
     tap: NONE,
-    hold: pick("apple.after", "recording", "broken wax skin being pressed (real wax squishy)", { trimDb: BAL["apple.after"] }),
+    hold: pick("apple.after", "recording", "broken wax skin being pressed (real wax squishy)", { trimDb: BAL["apple.after"], ...APPLE_TONE }),
     release: NONE, stretch: NONE, fold: NONE,
-    crack: pick("apple.crack", "recording", "wax skin cracking while the shell breaks (real wax squishy)", { trimDb: BAL["apple.crack"] }),
+    crack: pick("apple.crack", "recording", "wax skin cracking while the shell breaks (real wax squishy)", { trimDb: BAL["apple.crack"], ...APPLE_TONE }),
     crunch: NONE,
   },
   W02: {
     ...waxToy("choco"),
-    init: pick("choco.init", "recording", "a real wax ball's first break", { trimDb: BAL["choco.init"] }),
-    crack: pick("choco.crack", "recording", "wax skin cracking while the shell breaks (real wax squishy)", { trimDb: BAL["choco.crack"] }),
-    crunch: pick("choco.crumbs", "proxy", "chocolate crumbs pressed (real chocolate stands in for chocolate wax crumbs)", { trimDb: BAL["choco.crumbs"] }),
+    init: pick("choco.init", "recording", "a real wax ball's first break", { trimDb: BAL["choco.init"], ...CHOCO_SNAP, drop: ["youtube:kKYelJAi3xE@74.66", "youtube:kKYelJAi3xE@104.91", "youtube:kKYelJAi3xE@114.70", "youtube:kKYelJAi3xE@121.84"] }),
+    crack: pick("choco.crack", "recording", "wax skin cracking while the shell breaks (real wax squishy)", { trimDb: BAL["choco.crack"], ...CHOCO_SNAP }),
+    crunch: pick("choco.crumbs", "proxy", "chocolate crumbs pressed (real chocolate stands in for chocolate wax crumbs)", { trimDb: BAL["choco.crumbs"], ...CHOCO_TONE, drop: ["youtube:bExGHkTQmo4@27.44"] }),
   },
   C01: {
     init: NONE, tap: NONE,
@@ -102,9 +132,9 @@ export const FIDGET_SOUND: Record<string, ToySound> = {
   },
   C02: {
     init: NONE, tap: NONE,
-    hold: pick("beads.hold", "proxy", "crunchy bead slime squeezed, hiss reduced (stands in for the bead squishy)"),
+    hold: pick("beads.hold", "proxy", "crunchy bead slime squeezed, hiss reduced (stands in for the bead squishy)", { ...RAINBOW_TONE }),
     release: NONE, stretch: NONE, fold: NONE, crack: NONE,
-    crunch: pick("beads.crunch", "proxy", "crunchy bead slime, short cut, hiss reduced", { rate: jitter(0.04) }),
+    crunch: pick("beads.crunch", "proxy", "crunchy bead slime, short cut, hiss reduced", { ...RAINBOW_TONE, rate: [0.85, 0.93] }),
   },
 };
 
@@ -115,8 +145,8 @@ export const MIX_SOUND: Record<string, Partial<Record<"tap" | "hold", PoolRef>>>
 };
 /** wax balls: one-off stages of the break — `second` = the crack right after the first break, `nearDone` = nearly every piece broken */
 export const WAX_STAGES: Record<string, Partial<Record<"second" | "nearDone", PoolRef>>> = {
-  W01: { nearDone: pick("wax.nearDone", "recording", "a real wax ball nearly broken", { trimDb: BAL["wax.nearDone"] }) },
-  W02: { second: pick("choco.second", "recording", "the click right after the first break", { trimDb: BAL["choco.second"] }), nearDone: pick("wax.nearDone", "recording", "a real wax ball nearly broken", { trimDb: BAL["wax.nearDone"] }) },
+  W01: { nearDone: pick("wax.nearDone", "recording", "a real wax ball nearly broken", { trimDb: BAL["wax.nearDone"], ...APPLE_TONE, drop: APPLE_THUMPS }) },
+  W02: { second: pick("choco.second", "recording", "the click right after the first break", { trimDb: BAL["choco.second"], ...CHOCO_SNAP, drop: ["youtube:kKYelJAi3xE@160.21", "youtube:kKYelJAi3xE@165.62", "youtube:kKYelJAi3xE@173.73"] }), nearDone: pick("wax.nearDone", "recording", "a real wax ball nearly broken", { trimDb: BAL["wax.nearDone"], ...CHOCO_SNAP, drop: APPLE_THUMPS }) },
 };
 /** toys whose public sounds the owner picked by ear: on the dev server they play these by default (the reference-app sounds stay switchable) */
 export const OWNER_PICKED: ReadonlySet<string> = new Set(["W01", "W02", "C01", "C02"]);

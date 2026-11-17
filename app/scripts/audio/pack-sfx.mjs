@@ -87,7 +87,11 @@ for (const f of fs.readdirSync(path.join(SRC, 'keyboard')).filter((f) => f.endsW
 
 // ---- fidget sprites → per-toy-set chunks ----
 const usage = {}; // source → pool → Set(toy)
-const use = (toy, ref) => { if (!ref) return; for (const p of [ref.pool, ref.alt?.pool].filter(Boolean)) ((usage[ref.source] ??= {})[p] ??= new Set()).add(toy); };
+const use = (toy, ref) => {
+  if (!ref) return;
+  for (const p of [ref.pool, ref.alt?.pool].filter(Boolean)) ((usage[ref.source] ??= {})[p] ??= new Set()).add(toy);
+  if (ref.layer) ((usage[ref.layer.source] ??= {})[ref.layer.pool] ??= new Set()).add(toy); // a blended-in pool ships with the toy too
+};
 for (const [toy, m] of Object.entries(FIDGET_SOUND)) for (const r of Object.values(m)) use(toy, r);
 for (const [toy, m] of Object.entries(MIX_SOUND)) for (const r of Object.values(m)) use(toy, r);
 for (const [toy, m] of Object.entries(WAX_STAGES)) for (const r of Object.values(m)) use(toy, r);

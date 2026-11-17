@@ -2,7 +2,9 @@
  "version": 1,
  "chunkOf": "squish.wav",
  "toys": [
-  "L01"
+  "L01",
+  "L02",
+  "S01"
  ],
  "sampleRate": 48000,
  "totalSamples": 194302,
@@ -115,5 +117,5 @@
    ]
   }
  },
- "file": "squish.L01.2255e890ec.flac"
+ "file": "squish.L01-L02-S01.2255e890ec.flac"
 }

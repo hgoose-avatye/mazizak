@@ -131,6 +131,9 @@ export interface ResolvedEvent {
   main: ResolvedClip[];
   alt?: ResolvedClip[];
   altMin?: number;
+  /** clips of the pool blended in with every main clip (PoolRef.layer), and their trim in dB */
+  layer?: ResolvedClip[];
+  layerDb?: number;
   baseDb: number;
   rate: [number, number];
   origin: string;
@@ -169,12 +172,26 @@ export async function resolveToy(ctx: BaseAudioContext, spec: FidgetSpec): Promi
           : { hold: local.compress ?? local.press, ...(spec.family === "viscous" ? { stretch: local.stretch, fold: local.fold } : {}) };
   const shapeDb = SHAPE_TARGET_DB[spec.shape] ?? -27;
   const events: ResolvedToy["events"] = {};
-  const poolsOf = (r: PoolRef, name: string): ResolvedClip[] => {
+  /** the main hit of a clip only: 5 ms before its loudest 5 ms to `ms` after it, with a 20 ms fade-out (PoolRef.hitMs) */
+  const hitOnly = (b: AudioBuffer, ms: number): AudioBuffer => {
+    const x = b.getChannelData(0), sr = b.sampleRate, w = Math.round(sr / 200);
+    let best = 0, at = 0;
+    for (let i = 0; i + w <= x.length; i += w) { let e = 0; for (let j = i; j < i + w; j++) e += x[j] * x[j]; if (e > best) { best = e; at = i; } }
+    const a = Math.max(0, at - w), n = Math.min(x.length - a, Math.round((ms / 1000) * sr) + (at - a)), fade = Math.round(0.02 * sr);
+    const out = ctx.createBuffer(1, n, sr), y = out.getChannelData(0);
+    for (let i = 0; i < n; i++) y[i] = x[a + i] * (i > n - fade ? (n - i) / fade : 1);
+    return out;
+  };
+  const poolsOf = (r: Pick<PoolRef, "source" | "drop" | "hitMs">, name: string): ResolvedClip[] => {
       const sprite = sprites[r.source];
       const p = sprite?.pools[name];
       if (!sprite || !p) return []; // pool dropped by the clip audit (not shipped): the event simply has no sound
       const entries = sprite.json.pools[name].entries;
-      return p.map((buffer, i) => ({ buffer, label: `${entries[i].src} @${entries[i].srcStart.toFixed(2)}s`, src: entries[i].src, srcStart: entries[i].srcStart, info: `${(entries[i].duration * 1000).toFixed(0)} ms · ${(entries[i] as unknown as { centroidHz: number }).centroidHz} Hz · boost +${(entries[i] as unknown as { boostDb: number }).boostDb} dB` }));
+      const drop = new Set(r.drop ?? []);
+      return p
+        .map((buffer, i) => ({ buffer, label: `${entries[i].src} @${entries[i].srcStart.toFixed(2)}s`, src: entries[i].src, srcStart: entries[i].srcStart, info: `${(entries[i].duration * 1000).toFixed(0)} ms · ${(entries[i] as unknown as { centroidHz: number }).centroidHz} Hz · boost +${(entries[i] as unknown as { boostDb: number }).boostDb} dB` }))
+        .filter((c) => !drop.has(`${c.src}@${c.srcStart.toFixed(2)}`))
+        .map((c) => (r.hitMs ? { ...c, buffer: hitOnly(c.buffer, r.hitMs), info: `${c.info} · main hit only (${r.hitMs} ms)` } : c));
   };
   for (const event of EVENTS) {
     const ref = map[event];
@@ -207,6 +224,14 @@ export async function resolveToy(ctx: BaseAudioContext, spec: FidgetSpec): Promi
       if (alt.length) {
         e.alt = alt;
         e.altMin = ref.alt.minStrength;
+      }
+    }
+    if (ref?.layer && !override?.length) {
+      const layer = poolsOf({ source: ref.layer.source }, ref.layer.pool);
+      if (layer.length) {
+        e.layer = layer;
+        e.layerDb = ref.layer.trimDb ?? 0;
+        e.origin += ` + ${ref.layer.source}/${ref.layer.pool}`;
       }
     }
     events[event] = e;
@@ -257,10 +282,22 @@ interface PlayableSet {
   main: string[];
   alt?: string[];
   durations: Record<string, number>;
+  /** registered names of the blended-in layer pool (PoolRef.layer) */
+  layer?: string[];
+  layerDb?: number;
   baseDb: number;
   rate: [number, number];
   altMin?: number;
   origin: string;
+}
+/** the pool's own tone shaping (PoolRef highpass / lowpass / peak), with a caller's low-pass on top (the lower cutoff wins) */
+function toneOf(ref: PoolRef | null, lowpassHz?: number) {
+  const lp = Math.min(lowpassHz ?? Infinity, ref?.lowpassHz ?? Infinity);
+  return {
+    ...(Number.isFinite(lp) ? { lowpassHz: lp } : {}),
+    ...(ref?.highpassHz ? { highpassHz: ref.highpassHz } : {}),
+    ...(ref?.peak ? { peak: ref.peak } : {}),
+  };
 }
 /** a gesture older than this when its sound is ready is dropped (a late sound would feel detached from the touch) */
 const PENDING_MAX_MS = 800;
@@ -348,6 +385,14 @@ export class FidgetAudio {
         set.altMin = e.altMin;
         for (const [name, d] of this.register(event, tag + "a", e.alt.map((c) => c.buffer))) {
           set.alt.push(name);
+          set.durations[name] = d;
+        }
+      }
+      if (e.layer) {
+        set.layer = [];
+        set.layerDb = e.layerDb;
+        for (const [name, d] of this.register(event, tag + "l", e.layer.map((c) => c.buffer))) {
+          set.layer.push(name);
           set.durations[name] = d;
         }
       }
@@ -475,20 +520,26 @@ export class FidgetAudio {
     const names = useAlt ? set.alt! : set.main;
     const name = names[this.picker.pick(`${ev}:${second ? "second" : mixSet ? "mix" : useAlt ? "a" : "m"}`, names.length)];
     const rate = between(this.rng, set.rate) * (extra.rate ?? 1);
+    const gainDb = set.baseDb + strengthDb(strength) + d.attenuationDb + (muffle ? -2 : 0) + blendDb + exposeDb;
+    const tone = toneOf(set.ref, extra.lowpassHz);
     const log = this.audio.play(
       name,
-      {
-        rate,
-        detuneCents: 0,
-        gainJitterDb: 0.4,
-        gainDb: set.baseDb + strengthDb(strength) + d.attenuationDb + (muffle ? -2 : 0) + blendDb + exposeDb,
-        ...(extra.lowpassHz ? { lowpassHz: extra.lowpassHz } : {}),
-        ...(delaySec > 0 ? { delaySec } : {}),
-      },
+      { rate, detuneCents: 0, gainJitterDb: 0.4, gainDb, ...tone, ...(delaySec > 0 ? { delaySec } : {}) },
       `fidget:${ev}`,
     );
     if (!log) return false;
-    this.gate.commit(ev, now, (set.durations[name] / rate) * 1000 + 25, log.stop);
+    // a blend of two materials: a clip of the layer pool sounds together with the main clip, cut to its length
+    let stop = log.stop;
+    if (set.layer?.length && !mixSet && !second) {
+      const lname = set.layer[this.picker.pick(`${ev}:layer`, set.layer.length)];
+      const llog = this.audio.play(
+        lname,
+        { rate, detuneCents: 0, gainJitterDb: 0.4, gainDb: gainDb + (set.layerDb ?? 0), maxSec: set.durations[name] / rate, ...tone, ...(delaySec > 0 ? { delaySec } : {}) },
+        `fidget:${ev}:layer`,
+      );
+      if (llog) stop = (fadeSec?: number) => { log.stop?.(fadeSec); llog.stop?.(fadeSec); };
+    }
+    this.gate.commit(ev, now, (set.durations[name] / rate) * 1000 + 25, stop);
     if (second) this.secondDone = true;
     if (ev === "init" || event === "crack") this.firstCrackDone = true;
     return true;
@@ -503,7 +554,7 @@ export class FidgetAudio {
     for (const v of d.evict ?? []) v.stop?.(0.03);
     const name = set.main[this.picker.pick("nearDone", set.main.length)];
     const rate = between(this.rng, set.rate);
-    const log = this.audio.play(name, { rate, detuneCents: 0, gainJitterDb: 0.4, gainDb: set.baseDb + strengthDb(strength) + d.attenuationDb }, "fidget:crack");
+    const log = this.audio.play(name, { rate, detuneCents: 0, gainJitterDb: 0.4, gainDb: set.baseDb + strengthDb(strength) + d.attenuationDb, ...toneOf(set.ref) }, "fidget:crack");
     if (!log) return false;
     this.gate.commit("crack", now, (set.durations[name] / rate) * 1000 + 25, log.stop);
     this.nearDoneDone = this.firstCrackDone = this.secondDone = true;

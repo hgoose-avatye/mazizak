@@ -27,6 +27,12 @@ export interface PlayOpts {
   rate?: number;
   /** optional low-pass cutoff in Hz (gentle, for soft-touch variants) */
   lowpassHz?: number;
+  /** optional high-pass cutoff in Hz (removes rumble / thumps) */
+  highpassHz?: number;
+  /** optional peaking EQ (e.g. a negative gain to tame a resonance) */
+  peak?: { hz: number; db: number; q: number };
+  /** fade the voice out and stop it after this many seconds (a layer that must not outlast the sound it goes with) */
+  maxSec?: number;
 }
 
 export interface UnlockLog {
@@ -281,6 +287,21 @@ export class AudioEngine {
       f.Q.value = 0.5;
       node = node.connect(f);
     }
+    if (opts.highpassHz) {
+      const f = this.ctx.createBiquadFilter();
+      f.type = 'highpass';
+      f.frequency.value = opts.highpassHz;
+      f.Q.value = 0.7;
+      node = node.connect(f);
+    }
+    if (opts.peak) {
+      const f = this.ctx.createBiquadFilter();
+      f.type = 'peaking';
+      f.frequency.value = opts.peak.hz;
+      f.gain.value = opts.peak.db;
+      f.Q.value = opts.peak.q;
+      node = node.connect(f);
+    }
     node = node.connect(g);
     if (opts.pan) {
       const p = this.ctx.createStereoPanner();
@@ -290,6 +311,12 @@ export class AudioEngine {
     node.connect(this.master);
     const when = (opts.delaySec ?? 0) + spread;
     src.start(when > 0 ? this.ctx.currentTime + when : 0);
+    if (opts.maxSec && src.buffer && opts.maxSec < src.buffer.duration / (opts.rate ?? 1)) {
+      const t0 = this.ctx.currentTime + Math.max(0, when), end = t0 + opts.maxSec;
+      g.gain.setValueAtTime(g.gain.value, Math.max(t0, end - 0.08));
+      g.gain.linearRampToValueAtTime(0, end);
+      src.stop(end + 0.01);
+    }
     const v: Voice = { src, gain: g, started: this.ctx.currentTime };
     src.onended = () => {
       const i = this.voices.indexOf(v);

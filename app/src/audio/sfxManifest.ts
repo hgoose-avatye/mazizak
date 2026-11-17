@@ -73,33 +73,25 @@ export const SFX_FIDGET_CHUNKS: Record<string, SfxFile> = {
     "json": "sfx/fidgets/picks.W02.a10ee4a3e7.json",
     "audio": "sfx/fidgets/picks.W02.d2a03d3c82.flac"
   },
-  "squish.L01": {
-    "json": "sfx/fidgets/squish.L01.6b49a9e13b.json",
-    "audio": "sfx/fidgets/squish.L01.2255e890ec.flac"
-  },
   "squish.L01-L02": {
     "json": "sfx/fidgets/squish.L01-L02.9443a3fec4.json",
     "audio": "sfx/fidgets/squish.L01-L02.7eb5143d7a.flac"
   },
-  "squish.L02": {
-    "json": "sfx/fidgets/squish.L02.588143f63d.json",
-    "audio": "sfx/fidgets/squish.L02.40de29c7bf.flac"
+  "squish.L01-L02-S01": {
+    "json": "sfx/fidgets/squish.L01-L02-S01.9e1c28e7a5.json",
+    "audio": "sfx/fidgets/squish.L01-L02-S01.2255e890ec.flac"
+  },
+  "squish.L02-S01-S03": {
+    "json": "sfx/fidgets/squish.L02-S01-S03.176b27c3c0.json",
+    "audio": "sfx/fidgets/squish.L02-S01-S03.aa987a5463.flac"
   },
   "squish.L03": {
-    "json": "sfx/fidgets/squish.L03.b8959cd7f5.json",
-    "audio": "sfx/fidgets/squish.L03.8802a813c9.flac"
-  },
-  "squish.S01": {
-    "json": "sfx/fidgets/squish.S01.d0ef229df7.json",
-    "audio": "sfx/fidgets/squish.S01.1b24d96139.flac"
+    "json": "sfx/fidgets/squish.L03.6a801c98b3.json",
+    "audio": "sfx/fidgets/squish.L03.7c13c1d04f.flac"
   },
   "squish.S02": {
-    "json": "sfx/fidgets/squish.S02.ce819561cd.json",
-    "audio": "sfx/fidgets/squish.S02.b7fc8f29ed.flac"
-  },
-  "squish.S03": {
-    "json": "sfx/fidgets/squish.S03.252ad284d4.json",
-    "audio": "sfx/fidgets/squish.S03.aa987a5463.flac"
+    "json": "sfx/fidgets/squish.S02.7f19d5db28.json",
+    "audio": "sfx/fidgets/squish.S02.c5631ad35b.flac"
   },
   "wax.W02": {
     "json": "sfx/fidgets/wax.W02.b9da8c224b.json",
@@ -115,24 +107,26 @@ export const SFX_FIDGET_TOYS: Record<string, string[]> = {
     "picks.C02"
   ],
   "L01": [
-    "squish.L01",
-    "squish.L01-L02"
+    "squish.L01-L02",
+    "squish.L01-L02-S01"
   ],
   "L02": [
     "squish.L01-L02",
-    "squish.L02"
+    "squish.L01-L02-S01",
+    "squish.L02-S01-S03"
   ],
   "L03": [
     "squish.L03"
   ],
   "S01": [
-    "squish.S01"
+    "squish.L01-L02-S01",
+    "squish.L02-S01-S03"
   ],
   "S02": [
     "squish.S02"
   ],
   "S03": [
-    "squish.S03"
+    "squish.L02-S01-S03"
   ],
   "W01": [
     "picks.W01",
