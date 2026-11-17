@@ -46,6 +46,9 @@ export class Runtime {
   private running = false;
   private activePointers = new Set<number>();
   private dprCap = 2;
+  private deviceDpr = window.devicePixelRatio || 1;
+  private fitted = '';
+  private resizeQueued = false;
   private recent = new Rolling(90);
   private alwaysLoop = new URLSearchParams(location.search).get('loop') === 'always';
 
@@ -64,8 +67,8 @@ export class Runtime {
     });
 
     this.bindInput();
+    // the stage's own box is watched in main.ts (ResizeObserver); this catches DPR changes (other monitor, browser zoom)
     window.addEventListener('resize', () => this.resize());
-    window.visualViewport?.addEventListener('resize', () => this.resize());
     document.addEventListener('visibilitychange', () => {
       if (document.hidden) {
         this.releaseAll();
@@ -89,11 +92,11 @@ export class Runtime {
   }
 
   private applyQuality(q: Quality): void {
-    const dpr = window.devicePixelRatio || 1;
+    this.deviceDpr = window.devicePixelRatio || 1;
     this.dprCap = q === 'saver' ? 1 : 2;
-    this.renderer.setPixelRatio(Math.min(dpr, this.dprCap));
+    this.renderer.setPixelRatio(Math.min(this.deviceDpr, this.dprCap));
     this.recent.clear();
-    this.resize();
+    this.fit(true);
   }
 
   setToy(toy: Toy | null): void {
@@ -103,16 +106,35 @@ export class Runtime {
     this.container.classList.toggle('active', !!toy);
     if (toy) {
       toy.enter();
-      this.resize();
+      this.fit(true);
       this.renderer.compile(toy.scene, toy.camera);
     }
     this.requestFrame();
   }
 
+  /** Size change from outside (window, stage box): at most one re-fit per frame. */
   resize(): void {
+    if (this.resizeQueued) return;
+    this.resizeQueued = true;
+    requestAnimationFrame(() => {
+      this.resizeQueued = false;
+      this.fit(false);
+    });
+  }
+
+  /** Match the drawing buffer and the toy's camera to the stage; skipped when neither the size nor the pixel ratio changed. */
+  private fit(force: boolean): void {
     const w = this.container.clientWidth;
     const h = this.container.clientHeight;
     if (!w || !h) return;
+    const dpr = window.devicePixelRatio || 1;
+    if (dpr !== this.deviceDpr) { // moved to another display / browser zoom: start again from that display's ratio
+      this.deviceDpr = dpr;
+      this.renderer.setPixelRatio(Math.min(dpr, this.dprCap));
+    }
+    const key = `${w}x${h}@${this.renderer.getPixelRatio()}`;
+    if (!force && key === this.fitted) return;
+    this.fitted = key;
     this.renderer.setSize(w, h, true);
     this.toy?.resize(w, h);
     this.requestFrame();
@@ -181,7 +203,7 @@ export class Runtime {
       const next = DPR_STEPS.find((d) => d < cur - 0.01);
       if (next !== undefined) {
         this.renderer.setPixelRatio(next);
-        this.resize();
+        this.fit(true);
         this.dprDowngrades++;
       }
     }
