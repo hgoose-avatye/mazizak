@@ -58,8 +58,8 @@ export const SFX_FIDGET_CHUNKS: Record<string, SfxFile> = {
     "audio": "sfx/fidgets/crunch.C01.40ec2fb53f.flac"
   },
   "picks.C02": {
-    "json": "sfx/fidgets/picks.C02.aa36743b02.json",
-    "audio": "sfx/fidgets/picks.C02.c697f022a8.flac"
+    "json": "sfx/fidgets/picks.C02.503c868c82.json",
+    "audio": "sfx/fidgets/picks.C02.27fce07ea0.flac"
   },
   "picks.W01": {
     "json": "sfx/fidgets/picks.W01.041ae04e94.json",
