@@ -24,7 +24,29 @@ interface Shard {
   popAxis: THREE.Vector3;
   area: number;
   sink: number; // how deep it sinks into a kneaded core
+  poly: [number, number][]; // outline in body-local x/y (so a later press can break it again)
 }
+/** cut polygon `poly` into Voronoi cells around `seeds` (x/y); returns the non-degenerate cells */
+function voronoiCells(poly: [number, number][], seeds: THREE.Vector2[]) {
+  return seeds.map((sd, k) => {
+    let cell = poly;
+    for (let j = 0; j < seeds.length && cell.length; j++) {
+      if (j === k) continue;
+      const o = seeds[j], mx = (sd.x + o.x) / 2, my = (sd.y + o.y) / 2, nx = o.x - sd.x, ny = o.y - sd.y;
+      const next: [number, number][] = [];
+      for (let m = 0; m < cell.length; m++) {
+        const p = cell[m], q = cell[(m + 1) % cell.length];
+        const dp = (p[0] - mx) * nx + (p[1] - my) * ny, dq = (q[0] - mx) * nx + (q[1] - my) * ny;
+        if (dp <= 0) next.push(p);
+        if (dp <= 0 !== dq <= 0) { const t = dp / (dp - dq); next.push([p[0] + (q[0] - p[0]) * t, p[1] + (q[1] - p[1]) * t]); }
+      }
+      cell = next;
+    }
+    return cell;
+  }).filter((c) => c.length >= 3);
+}
+/** most shards a bar breaks into: past it pressing a shard no longer breaks it smaller */
+export const MAX_SHARDS = 40;
 const rand = (n: number) => {
   const x = Math.sin(n * 91.345 + 7.13) * 43758.5453;
   return x - Math.floor(x);
@@ -50,64 +72,90 @@ export class ChocolateBar {
   get rigidity() {
     return this.state === "solid" ? 0.85 : this.state === "fracturing" ? 0.35 : 0;
   }
-  /** cut piece `i` into Voronoi shards around `press` (body-local), stretched along `dir`; returns the shards' mean area */
+  /**
+   * cut piece `i` into shards around `press` (body-local), stretched along `dir`; returns the shards' mean area.
+   * Uneven like real chocolate: 2–6 shards, small chips crowded at the press point and a few big chunks further out.
+   */
   snap(i: number, press: THREE.Vector3, dir: THREE.Vector2) {
     const r = barPieceRect(this.spec, i);
     const px = THREE.MathUtils.clamp(press.x, r.x0 + 0.02, r.x1 - 0.02),
       py = THREE.MathUtils.clamp(press.y, r.y0 + 0.02, r.y1 - 0.02);
     const d = dir.lengthSq() > 1e-6 ? dir.clone().normalize() : new THREE.Vector2(1, 0);
-    const n = 3 + Math.floor(rand(this.seed++) * 3); // 3–5 shards
+    const n = 2 + Math.floor(rand(this.seed++) * 5); // 2–6 shards
     const seeds: THREE.Vector2[] = [new THREE.Vector2(px, py)];
     for (let k = 1; k < n; k++) {
-      // wedge-like shards: seeds spread along the drag direction, less across it
-      const a = rand(this.seed++) * Math.PI * 2, along = (rand(this.seed++) - 0.5) * 0.5, across = (rand(this.seed++) - 0.5) * 0.22;
-      seeds.push(new THREE.Vector2(px + d.x * along - d.y * across + Math.cos(a) * 0.05, py + d.y * along + d.x * across + Math.sin(a) * 0.05));
-    }
-    const zIn = this.spec.depth - BAR.shellThickness;
-    let areaSum = 0;
-    seeds.forEach((sd, k) => {
-      let poly: [number, number][] = [[r.x0, r.y0], [r.x1, r.y0], [r.x1, r.y1], [r.x0, r.y1]];
-      for (let j = 0; j < seeds.length && poly.length; j++) {
-        if (j === k) continue;
-        const o = seeds[j], mx = (sd.x + o.x) / 2, my = (sd.y + o.y) / 2, nx = o.x - sd.x, ny = o.y - sd.y;
-        const next: [number, number][] = [];
-        for (let m = 0; m < poly.length; m++) {
-          const p = poly[m], q = poly[(m + 1) % poly.length];
-          const dp = (p[0] - mx) * nx + (p[1] - my) * ny, dq = (q[0] - mx) * nx + (q[1] - my) * ny;
-          if (dp <= 0) next.push(p);
-          if (dp <= 0 !== dq <= 0) { const t = dp / (dp - dq); next.push([p[0] + (q[0] - p[0]) * t, p[1] + (q[1] - p[1]) * t]); }
-        }
-        poly = next;
+      if (rand(this.seed++) < 0.5) {
+        // a chip right at the press point
+        const a = rand(this.seed++) * Math.PI * 2, rr = 0.03 + rand(this.seed++) * 0.07;
+        seeds.push(new THREE.Vector2(px + Math.cos(a) * rr, py + Math.sin(a) * rr));
+      } else {
+        // a chunk anywhere in the piece, pulled a little along the drag direction (wedge-like)
+        const x = r.x0 + rand(this.seed++) * (r.x1 - r.x0), y = r.y0 + rand(this.seed++) * (r.y1 - r.y0);
+        seeds.push(new THREE.Vector2(x + d.x * 0.05, y + d.y * 0.05));
       }
-      if (poly.length < 3) return;
-      let cx = 0, cy = 0, area = 0;
-      for (let m = 0; m < poly.length; m++) { const a = poly[m], b = poly[(m + 1) % poly.length], c = a[0] * b[1] - b[0] * a[1]; area += c; cx += (a[0] + b[0]) * c; cy += (a[1] + b[1]) * c; }
-      area /= 2; cx /= 6 * area; cy /= 6 * area; area = Math.abs(area);
-      const shape = new THREE.Shape(poly.map(([x, y]) => new THREE.Vector2((x - cx) * 0.97, (y - cy) * 0.97)));
-      const geo = new THREE.ExtrudeGeometry(shape, { depth: BAR.shellThickness, bevelEnabled: true, bevelThickness: 0.01, bevelSize: 0.008, bevelSegments: 1 });
-      const mesh = new THREE.Mesh(geo, [this.top, this.cut]);
-      this.scene.add(mesh);
-      const out = new THREE.Vector2(cx - px, cy - py);
-      if (out.lengthSq() < 1e-6) out.set(d.x, d.y);
-      out.normalize();
-      // tilt about the in-plane axis across the outward direction: the edge near the press point dips, the far edge lifts
-      const axis = new THREE.Vector3(-out.y, out.x, 0);
-      const rest = new THREE.Vector3(cx, cy, zIn);
-      mesh.position.copy(rest).add(this.origin);
-      this.shards.push({
-        mesh,
-        rest,
-        last: rest.clone(),
-        pop: 1,
-        tilt: new THREE.Quaternion().setFromAxisAngle(axis, 0.05 + rand(this.seed++) * 0.07),
-        popAxis: axis,
-        area,
-        sink: 0.04 + rand(this.seed++) * 0.04,
-      });
-      areaSum += area;
-    });
+    }
+    const cells = voronoiCells([[r.x0, r.y0], [r.x1, r.y0], [r.x1, r.y1], [r.x0, r.y1]], seeds);
+    const areaSum = cells.reduce((sum, cell) => sum + this.addShard(cell, px, py, d), 0);
     if (this.state === "solid") this.state = "fracturing";
-    return areaSum / Math.max(1, n);
+    return areaSum / Math.max(1, cells.length);
+  }
+  /** press on a shard already off the bar: it breaks again into 2–3 smaller pieces; returns their mean area, or 0 if none broke */
+  split(press: THREE.Vector3, dir: THREE.Vector2) {
+    if (this.state !== "fracturing" || this.shards.length >= MAX_SHARDS) return 0;
+    const inside = (poly: [number, number][]) => {
+      let c = false;
+      for (let a = 0, b = poly.length - 1; a < poly.length; b = a++)
+        if ((poly[a][1] > press.y) !== (poly[b][1] > press.y) && press.x < ((poly[b][0] - poly[a][0]) * (press.y - poly[a][1])) / (poly[b][1] - poly[a][1]) + poly[a][0]) c = !c;
+      return c;
+    };
+    const k = this.shards.findIndex((s) => inside(s.poly));
+    if (k < 0 || this.shards[k].area < 0.004) return 0; // crumbs are too small to break again
+    const old = this.shards[k];
+    const d = dir.lengthSq() > 1e-6 ? dir.clone().normalize() : new THREE.Vector2(1, 0);
+    const n = 2 + Math.floor(rand(this.seed++) * 2);
+    const xs = old.poly.map((p) => p[0]), ys = old.poly.map((p) => p[1]);
+    const seeds = [new THREE.Vector2(press.x, press.y)];
+    for (let m = 1; m < n; m++)
+      seeds.push(new THREE.Vector2(
+        Math.min(...xs) + rand(this.seed++) * (Math.max(...xs) - Math.min(...xs)),
+        Math.min(...ys) + rand(this.seed++) * (Math.max(...ys) - Math.min(...ys)),
+      ));
+    const cells = voronoiCells(old.poly, seeds);
+    if (cells.length < 2) return 0;
+    this.scene.remove(old.mesh);
+    old.mesh.geometry.dispose();
+    this.shards.splice(k, 1);
+    const areaSum = cells.reduce((sum, cell) => sum + this.addShard(cell, press.x, press.y, d), 0);
+    return areaSum / cells.length;
+  }
+  /** add one shard with outline `poly`; it pops at the snap and keeps a small tilt (edge near the press dips, far edge lifts) */
+  private addShard(poly: [number, number][], px: number, py: number, d: THREE.Vector2) {
+    const zIn = this.spec.depth - BAR.shellThickness;
+    let cx = 0, cy = 0, area = 0;
+    for (let m = 0; m < poly.length; m++) { const a = poly[m], b = poly[(m + 1) % poly.length], c = a[0] * b[1] - b[0] * a[1]; area += c; cx += (a[0] + b[0]) * c; cy += (a[1] + b[1]) * c; }
+    area /= 2; cx /= 6 * area; cy /= 6 * area; area = Math.abs(area);
+    const shape = new THREE.Shape(poly.map(([x, y]) => new THREE.Vector2((x - cx) * 0.97, (y - cy) * 0.97)));
+    const geo = new THREE.ExtrudeGeometry(shape, { depth: BAR.shellThickness, bevelEnabled: true, bevelThickness: 0.01, bevelSize: 0.008, bevelSegments: 1 });
+    const mesh = new THREE.Mesh(geo, [this.top, this.cut]);
+    this.scene.add(mesh);
+    const out = new THREE.Vector2(cx - px, cy - py);
+    if (out.lengthSq() < 1e-6) out.set(d.x, d.y);
+    out.normalize();
+    const axis = new THREE.Vector3(-out.y, out.x, 0);
+    const rest = new THREE.Vector3(cx, cy, zIn);
+    mesh.position.copy(rest).add(this.origin);
+    this.shards.push({
+      mesh,
+      rest,
+      last: rest.clone(),
+      pop: 1,
+      tilt: new THREE.Quaternion().setFromAxisAngle(axis, 0.05 + rand(this.seed++) * 0.07),
+      popAxis: axis,
+      area,
+      sink: 0.04 + rand(this.seed++) * 0.04,
+      poly,
+    });
+    return area;
   }
   /** advance shards (they ride the core); returns the area-weighted speed of the shards rubbing against each other this frame */
   step(dt: number, opts: { allBroken: boolean; kneading: boolean; mix: number; deform: (p: THREE.Vector3, out: THREE.Vector3) => void }) {

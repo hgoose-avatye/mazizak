@@ -84,7 +84,9 @@ describe("fidget material mechanics", () => {
       apple.step(1 / 120, m.held);
       choco.step(1 / 120, m.held);
     }
-    expect(apple.damage[0]).toBeGreaterThan(choco.damage[0]);
+    // each press cracks a chocolate piece part of the way (1–3 presses snap it); wax cracks under the finger as it presses
+    expect(apple.damage[0]).toBeGreaterThan(0);
+    expect(choco.damage[0]).toBeGreaterThan(0.3);
     for (let i = 0; i < 240; i++) {
       m.step(1 / 120);
       apple.step(1 / 120, m.held);
@@ -236,6 +238,30 @@ describe("shell craze cascade (observed in the installed 왁뿌볼 app)", () => 
     expect(f.brokenCount).toBe(0);
     expect(f.crazing).toBe(false);
     expect(f.crazeEvents).toBe(0);
+  });
+});
+
+describe("W02 chocolate: every press cracks a piece further, and it stops at 4 of 6 pieces", () => {
+  it("1–3 presses snap a piece; pressing on stops once 4 pieces are off", () => {
+    const spec = FIDGETS.find((f) => f.id === "W02")!;
+    const p = shellPatches(bodyGeometry(spec), spec), f = new FractureModel(p.centers, true), m = new FidgetModel(spec);
+    const presses: number[] = [];
+    for (let piece = 0; piece < 6; piece++) {
+      let n = 0;
+      while (!f.broken[piece] && n < 6) {
+        const c = p.centers[piece];
+        m.press(1, c.clone(), new Vector3(0, 0, 1));
+        m.setSurfacePatch(1, piece);
+        m.step(1 / 120); f.step(1 / 120, m.held);
+        m.release(1);
+        for (let t = 0; t < 0.3; t += 1 / 120) { m.step(1 / 120); f.step(1 / 120, m.held); }
+        n++;
+      }
+      presses.push(n);
+    }
+    expect(presses.slice(0, 4).every((n) => n >= 1 && n <= 3)).toBe(true);
+    expect(f.done).toBe(true);
+    expect(f.brokenCount).toBe(4); // the last two pieces hold
   });
 });
 

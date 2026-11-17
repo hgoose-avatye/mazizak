@@ -504,6 +504,15 @@ if (uMix > 0.0) {
       if (spec.family === "wax" && h.object === blob) {
         coreTouches++;
         corePointers.add(e.id);
+        // chocolate: pressing a shard already off the bar breaks it smaller (until the bar has broken as far as it goes)
+        if (choco && fracture && !fracture.done) {
+          const area = choco.split(local, new THREE.Vector2(1, 0));
+          if (area > 0) {
+            sound.play("crack", 0.6, 0, false, { rate: THREE.MathUtils.clamp(1.12 - area * 1.2, 0.92, 1.12) });
+            ctx.haptic(10);
+            ctx.requestFrame();
+          }
+        }
       }
       strokeReady = true;
       dragBudget = 0;
@@ -636,9 +645,11 @@ if (uMix > 0.0) {
     if (spec.family === "wax" && fracture) {
       // as much broken as pressing can break (apple: FractureModel.LIMIT; chocolate: nearly every piece) — kneading the core mixes
       // the pieces in (about 5 s of kneading to fully mix); the shell still standing comes off as soon as mixing starts
-      const allBroken = choco ? fracture.brokenCount >= centers.length * 0.9 : fracture.done;
+      const allBroken = fracture.done;
       if (allBroken && held.length && corePointers.size && model.frameTravel > 0.0004) {
-        if (mix === 0) for (let i = 0; i < centers.length; i++) fracture.forceBreak(i);
+        // the pieces still standing come off as mixing starts (chocolate: as shards, like any snapped piece)
+        if (mix === 0)
+          for (let i = 0; i < centers.length; i++) if (fracture.forceBreak(i)) choco?.snap(i, centers[i], new THREE.Vector2(1, 0));
         mix = Math.min(1, mix + dt * 0.2);
       }
       mixU.value = mix;
@@ -665,7 +676,7 @@ if (uMix > 0.0) {
         broken = fracture.step(dt, held);
       crackClock -= dt;
       // nearly every piece broken: the owner-picked "거의 다 깨졌을 때" sound replaces this frame's crack sound (once per reset)
-      const nearNow = !nearDoneFired && broken.length > 0 && (choco ? fracture.brokenCount >= Math.ceil(centers.length * 0.75) : fracture.brokenShare >= FractureModel.LIMIT * 0.9);
+      const nearNow = !nearDoneFired && broken.length > 0 && fracture.brokenShare >= fracture.limit * 0.9;
       const crackSound = (strength: number, extra: { rate?: number } = {}) => {
         if (nearNow && !nearDoneFired && sound.playNearDone()) return (nearDoneFired = true);
         return sound.play("crack", strength, 0, false, extra);
@@ -673,9 +684,10 @@ if (uMix > 0.0) {
       if (choco) {
         // line fracture: a snapped piece takes its row-mate across the seam; both are cut into Voronoi shards at the press point
         const snapped = [...broken];
+        // only now and then does the snap run on across the seam into the row-mate
         for (const i of broken) {
           const mate = i % 2 ? i - 1 : i + 1;
-          if (fracture.forceBreak(mate)) snapped.push(mate);
+          if (!fracture.done && Math.random() < 0.35 && fracture.forceBreak(mate)) snapped.push(mate);
         }
         if (snapped.length) {
           let press = centers[snapped[0]], dir = new THREE.Vector2();
@@ -768,7 +780,7 @@ if (uMix > 0.0) {
     }
     if (choco && fracture) {
       const { rub, popping } = choco.step(dt, {
-        allBroken: fracture.brokenCount === centers.length,
+        allBroken: fracture.done,
         mix,
         kneading: held.length > 0 && corePointers.size > 0 && model.frameTravel > 0.0004,
         deform: (p, o) => model.deform(p, o),

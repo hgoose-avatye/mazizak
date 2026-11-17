@@ -252,6 +252,8 @@ export class FractureModel {
   crazeEvents = 0;
   /** share of the shell (by area) that can break by pressing; past it the rest holds (kneading the core then mixes it in, toy.ts) */
   static readonly LIMIT = 0.25;
+  /** chocolate: 4 of the 6 pieces */
+  static readonly CHOCOLATE_LIMIT = 0.66;
   private weights: number[];
   private totalWeight: number;
   /** contacts already counted as a hit (each new press counts once) */
@@ -326,7 +328,10 @@ export class FractureModel {
   }
   /** as much of the shell has broken as pressing can break */
   get done() {
-    return this.brokenShare >= FractureModel.LIMIT;
+    return this.brokenShare >= this.limit;
+  }
+  get limit() {
+    return this.chocolate ? FractureModel.CHOCOLATE_LIMIT : FractureModel.LIMIT;
   }
   /** deterministic per-patch pseudo random in [0,1) */
   private rnd(i: number, k: number) {
@@ -350,6 +355,21 @@ export class FractureModel {
       }
     for (const z of this.zones) z.age += dt;
     const done = this.done;
+    if (choc && !done)
+      for (const c of contacts) {
+        if (!c.held || this.seen.has(c.id)) continue;
+        this.seen.add(c.id);
+        // every press on a piece cracks it further: 1–3 presses snap it, each piece its own toughness
+        let i = c.surfacePatch ?? -1;
+        if (i < 0) {
+          let best = Infinity;
+          this.centers.forEach((p, k) => { const d = p.distanceToSquared(c.anchor); if (d < best) { best = d; i = k; } });
+        }
+        if (i >= 0 && !this.broken[i]) {
+          this.damage[i] = Math.min(1, this.damage[i] + 0.38 + 0.5 * this.rnd(i + this.variation * 131, 7));
+          if (this.damage[i] >= 0.999) this.crackEvents++;
+        }
+      }
     if (!choc && !done) {
       const near = (at: Vector3) => this.zones.find((z) => z.from.distanceTo(at) < z.reach + 0.3);
       for (const c of contacts) {
@@ -393,7 +413,7 @@ export class FractureModel {
         if (inside > 0 && !done && !this.survivor[i] && z.age >= 0.15 + this.breakAt[i] * 0.6) target = 1;
       }
       // past the limit the wax only cracks, it no longer comes off (the core is then kneaded to mix it in)
-      if (done && !choc) target = Math.min(target, 0.95);
+      if (done) target = Math.min(target, 0.95);
       const before = this.damage[i];
       if (target > before)
         this.damage[i] = Math.min(
