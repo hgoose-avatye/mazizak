@@ -248,25 +248,85 @@ export class FractureModel {
   readonly broken: Uint8Array;
   crackEvents = 0;
   breakEvents = 0;
-  /** number of times a deep press started the whole-shell craze (the "first break") */
+  /** number of break zones opened by a deep press (the first one is the "first break") */
   crazeEvents = 0;
-  /** seconds of deep pressing so far / seconds since the craze started (-1: not crazed) */
-  private pressT = 0;
-  cascadeT = -1;
-  private cascadeFrom = new Vector3();
+  /** share of the shell (by area) that can break by pressing; past it the rest holds (kneading the core then mixes it in, toy.ts) */
+  static readonly LIMIT = 0.25;
+  private weights: number[];
+  private totalWeight: number;
+  /** contacts already counted as a hit (each new press counts once) */
+  private seen = new Set<number>();
+  /**
+   * Where the shell is breaking. A deep press opens a zone around the finger; it widens while the finger stays down (up to about
+   * half the shell) and stops growing when it lifts. Pressing elsewhere opens another zone. The rest of the shell stays whole.
+   */
+  private zones: { from: Vector3; reach: number; age: number; v: number }[] = [];
+  /** per patch, fixed for the shell: crack depth (0.45–0.9), a jagged-edge factor for the zone border, a fall delay, survivor */
+  private crackDepth: Float32Array;
+  private edge: Float32Array;
   private breakAt: Float32Array;
   private survivor: Uint8Array;
+  /** counts every zone of this session (not reset), so each break of the shell falls apart differently */
+  private variation = 0;
   constructor(
     readonly centers: Vector3[],
     readonly chocolate: boolean,
+    /** each patch's share of the shell (its area); equal shares when not given */
+    weights?: number[],
   ) {
+    this.weights = weights?.length === centers.length ? weights : centers.map(() => 1);
+    this.totalWeight = this.weights.reduce((a, b) => a + b, 0);
     this.damage = new Float32Array(centers.length);
     this.broken = new Uint8Array(centers.length);
+    this.crackDepth = new Float32Array(centers.length);
+    this.edge = new Float32Array(centers.length);
     this.breakAt = new Float32Array(centers.length);
     this.survivor = new Uint8Array(centers.length);
+    this.vary();
+  }
+  /** a fresh, uneven pattern: neighbouring patches share values (smooth field), so they crack, fall and stay in clumps */
+  private vary() {
+    const n = this.centers.length,
+      keep = new Float32Array(n),
+      v = this.variation;
+    for (let i = 0; i < n; i++) {
+      const c = this.centers[i], r = (k: number) => this.rnd(i + v * 131, k);
+      this.crackDepth[i] = 0.45 + 0.45 * (this.field(c, 2, v) * 0.5 + 0.5) * (0.7 + 0.3 * r(4));
+      this.edge[i] = 0.6 + 0.8 * (this.field(c, 5, v) * 0.5 + 0.5) * (0.8 + 0.2 * r(5));
+      this.breakAt[i] = (this.field(c, 3, v) * 0.5 + 0.5) * 1.1 + r(1) * 0.35;
+      keep[i] = this.field(c, 4, v) + r(2) * 0.35;
+    }
+    // islands of shell that never fall by themselves: the ≈12 % of patches where the "keep" field is highest, so they come in
+    // connected pieces of different sizes rather than as evenly spread single flakes
+    this.survivor.fill(0);
+    if (n >= 20) {
+      const order = Array.from({ length: n }, (_, i) => i).sort((a, b) => keep[b] - keep[a]);
+      for (let k = 0; k < Math.round(n * 0.12); k++) this.survivor[order[k]] = 1;
+    }
+  }
+  /** smooth random field over the shell (three low-frequency waves with directions and phases from `v`), in about [-1, 1] */
+  private field(p: Vector3, k: number, v: number) {
+    let sum = 0;
+    for (let w = 0; w < 3; w++) {
+      const a = this.rnd(v, k * 10 + w * 3) * Math.PI * 2,
+        b = Math.acos(this.rnd(v, k * 10 + w * 3 + 1) * 2 - 1),
+        f = 2.2 + w * 1.7;
+      sum += Math.sin(f * (p.x * Math.sin(b) * Math.cos(a) + p.y * Math.cos(b) + p.z * Math.sin(b) * Math.sin(a)) + this.rnd(v, k * 10 + w * 3 + 2) * 6.283) / (w + 1);
+    }
+    return sum / 1.83;
   }
   get crazing() {
-    return this.cascadeT >= 0;
+    return this.zones.length > 0;
+  }
+  /** share of the shell broken off, by area */
+  get brokenShare() {
+    let w = 0;
+    for (let i = 0; i < this.broken.length; i++) if (this.broken[i]) w += this.weights[i];
+    return w / this.totalWeight;
+  }
+  /** as much of the shell has broken as pressing can break */
+  get done() {
+    return this.brokenShare >= FractureModel.LIMIT;
   }
   /** deterministic per-patch pseudo random in [0,1) */
   private rnd(i: number, k: number) {
@@ -274,14 +334,13 @@ export class FractureModel {
     return x - Math.floor(x);
   }
   /**
-   * Observed in the installed 왁뿌볼 app (청사과): pressing and holding for a moment turns the WHOLE green shell into a polygon
-   * pattern within ≈0.4 s; the polygons then drop away over ≈2 s while the ball squashes, leaving a white clay ball with a few
-   * green flakes. A light touch only dents it. Thin wax (apple) goes faster than chocolate, which breaks in slower, coarser steps.
+   * Every press breaks the shell a little more: a press opens a small break zone under the finger, pressing again near it (or
+   * holding on) widens it, pressing elsewhere opens another. The border is jagged and pieces fall in clumps, with islands left
+   * standing. Once LIMIT of the shell is gone nothing more breaks. Chocolate never does this: it snaps piece by piece.
    */
   step(dt: number, contacts: Contact[]) {
     const events: number[] = [];
     const choc = this.chocolate;
-    // deep, sustained press → craze cascade
     let deepest = 0,
       anchor: Vector3 | null = null;
     for (const c of contacts)
@@ -289,24 +348,26 @@ export class FractureModel {
         deepest = c.depth.x;
         anchor = c.anchor;
       }
-    if (!this.crazing && !choc) {
-      this.pressT = deepest > 0.02 ? this.pressT + dt : Math.max(0, this.pressT - dt * 2);
-      if (this.pressT > (choc ? 0.25 : 0.07) && anchor) {
-        this.cascadeT = 0;
-        this.cascadeFrom.copy(anchor);
-        this.crazeEvents++;
-        this.crackEvents++;
-        for (let i = 0; i < this.centers.length; i++) {
-          const d = Math.min(1, this.centers[i].distanceTo(anchor) / 1.6);
-          // nearer patches go first; flakes (≈10–15 %) never fall by themselves
-          this.breakAt[i] = (choc ? 0.5 : 0.25) + d * (choc ? 1.2 : 0.7) + this.rnd(i, 1) * (choc ? 1.5 : 1.1);
-          this.survivor[i] = this.centers.length >= 20 && this.rnd(i, 2) < (choc ? 0.15 : 0.1) ? 1 : 0;
+    for (const z of this.zones) z.age += dt;
+    const done = this.done;
+    if (!choc && !done) {
+      const near = (at: Vector3) => this.zones.find((z) => z.from.distanceTo(at) < z.reach + 0.3);
+      for (const c of contacts) {
+        if (!c.held || this.seen.has(c.id)) continue;
+        this.seen.add(c.id);
+        const zone = near(c.anchor);
+        if (zone) zone.reach = Math.min(1.1, zone.reach + 0.14); // another press there: the break spreads
+        else {
+          this.crazeEvents++;
+          this.crackEvents++;
+          this.zones.push({ from: c.anchor.clone(), reach: 0.22, age: 0, v: this.variation });
         }
       }
-    } else if (this.crazing) {
-      // the cascade keeps running while the finger is down and, more slowly, after it lifts
-      this.cascadeT += dt * (deepest > 0.05 ? 1 : 0.35);
+      // holding a deep press widens the break slowly too
+      const held = anchor && deepest > 0.05 ? near(anchor) : undefined;
+      if (held) held.reach = Math.min(1.1, held.reach + dt * 0.3);
     }
+    for (const id of this.seen) if (!contacts.some((c) => c.id === id && c.held)) this.seen.delete(id);
     for (let i = 0; i < this.centers.length; i++) {
       if (this.broken[i]) continue;
       let strain = 0;
@@ -323,12 +384,16 @@ export class FractureModel {
       const strength =
         (choc ? 0.24 : 0.18) * (1 + 0.12 * Math.sin(i * 19.7));
       let target = strain / strength;
-      if (this.crazing) {
-        // every patch shows its crack network almost at once…
-        target = Math.max(target, Math.min(0.85, (this.cascadeT / (choc ? 0.6 : 0.35)) * 0.85));
-        // …and then falls away at its own time (flakes stay)
-        if (!this.survivor[i] && this.cascadeT >= this.breakAt[i]) target = 1;
+      for (const z of this.zones) {
+        // how far inside the zone's jagged border this patch lies (> 0: inside)
+        const inside = z.reach * this.edge[i] - this.centers[i].distanceTo(z.from);
+        // cracks run a little past the border, opening to each patch's own depth…
+        if (inside > -0.25) target = Math.max(target, this.crackDepth[i] * Math.min(1, (inside + 0.25) / 0.25));
+        // …and inside it the pieces fall away at their own time (islands stay)
+        if (inside > 0 && !done && !this.survivor[i] && z.age >= 0.15 + this.breakAt[i] * 0.6) target = 1;
       }
+      // past the limit the wax only cracks, it no longer comes off (the core is then kneaded to mix it in)
+      if (done && !choc) target = Math.min(target, 0.95);
       const before = this.damage[i];
       if (target > before)
         this.damage[i] = Math.min(
@@ -359,8 +424,10 @@ export class FractureModel {
     this.crackEvents = 0;
     this.breakEvents = 0;
     this.crazeEvents = 0;
-    this.pressT = 0;
-    this.cascadeT = -1;
+    this.seen.clear();
+    this.zones = [];
+    this.variation++;
+    this.vary(); // a new shell breaks differently
   }
   get brokenCount() {
     return this.broken.reduce((a, b) => a + b, 0);

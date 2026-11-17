@@ -284,7 +284,7 @@ if (uMix > 0.0) {
     );
     shellBase = Float32Array.from(g.getAttribute("position").array);
     shellNormals = Float32Array.from(g.getAttribute("normal").array);
-    fracture = new FractureModel(centers, spec.shape === "chocolate");
+    fracture = new FractureModel(centers, spec.shape === "chocolate", patches.areas);
     shell = new THREE.Mesh(
       g,
       new THREE.MeshPhysicalMaterial({
@@ -634,9 +634,9 @@ if (uMix > 0.0) {
       }
     }
     if (spec.family === "wax" && fracture) {
-      // (nearly) every piece broken — the apple's craze leaves a few stubborn patches — kneading the core mixes the pieces in
-      // (about 5 s of kneading to fully mix); the stubborn patches come off as soon as mixing starts
-      const allBroken = fracture.brokenCount >= centers.length * 0.9;
+      // as much broken as pressing can break (apple: FractureModel.LIMIT; chocolate: nearly every piece) — kneading the core mixes
+      // the pieces in (about 5 s of kneading to fully mix); the shell still standing comes off as soon as mixing starts
+      const allBroken = choco ? fracture.brokenCount >= centers.length * 0.9 : fracture.done;
       if (allBroken && held.length && corePointers.size && model.frameTravel > 0.0004) {
         if (mix === 0) for (let i = 0; i < centers.length; i++) fracture.forceBreak(i);
         mix = Math.min(1, mix + dt * 0.2);
@@ -665,7 +665,7 @@ if (uMix > 0.0) {
         broken = fracture.step(dt, held);
       crackClock -= dt;
       // nearly every piece broken: the owner-picked "거의 다 깨졌을 때" sound replaces this frame's crack sound (once per reset)
-      const nearNow = !nearDoneFired && broken.length > 0 && fracture.brokenCount >= Math.ceil(centers.length * 0.75);
+      const nearNow = !nearDoneFired && broken.length > 0 && (choco ? fracture.brokenCount >= Math.ceil(centers.length * 0.75) : fracture.brokenShare >= FractureModel.LIMIT * 0.9);
       const crackSound = (strength: number, extra: { rate?: number } = {}) => {
         if (nearNow && !nearDoneFired && sound.playNearDone()) return (nearDoneFired = true);
         return sound.play("crack", strength, 0, false, extra);
@@ -899,6 +899,7 @@ if (uMix > 0.0) {
         stretch: model.stretch.x,
         folds: model.foldCount,
         brokenFaces: fracture?.brokenCount ?? 0,
+        brokenShare: fracture?.brokenShare ?? 0,
         chocoState: choco?.state ?? null,
         chocoShards: choco?.shards.length ?? 0,
         waxMix: mix,

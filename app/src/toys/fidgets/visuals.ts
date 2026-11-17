@@ -244,6 +244,8 @@ export interface ShellPatches {
   centers: THREE.Vector3[];
   vertices: number[][];
   faceToPatch: Uint16Array;
+  /** outer surface area of each patch (irregular wax shells: the share of the shell broken is measured by area) */
+  areas?: number[];
 }
 /** rectangle [x0, x1] × [y0, y1] of bar piece `i` (row-major, 2 columns) in body-local coordinates */
 export function barPieceRect(spec: FidgetSpec, i: number) {
@@ -332,6 +334,39 @@ function chocolateBarPatches(spec: FidgetSpec): ShellPatches {
   return { geometry, centers, vertices, faceToPatch: new Uint16Array(ids) };
 }
 
+/** small deterministic PRNG (mulberry32): the same irregular shell on every launch */
+function prng(seed: number) {
+  return () => {
+    seed = (seed + 0x6d2b79f5) | 0;
+    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+/**
+ * Voronoi seeds on the unit sphere for a wax shell that breaks unevenly: a few broad plates (seeds kept far apart) cut up by
+ * several shatter zones where many seeds crowd together into small chips — instead of an even Fibonacci net of equal cells.
+ */
+export function irregularShellSeeds(count: number, seed = 0x5eed): THREE.Vector3[] {
+  const rnd = prng(seed);
+  const unit = () => {
+    const y = rnd() * 2 - 1, a = rnd() * Math.PI * 2, r = Math.sqrt(1 - y * y);
+    return new THREE.Vector3(Math.cos(a) * r, y, Math.sin(a) * r);
+  };
+  const seeds: THREE.Vector3[] = [];
+  const place = (p: THREE.Vector3, gap: number) => seeds.every((s) => s.distanceTo(p) >= gap) && seeds.push(p);
+  const plates = Math.round(count * 0.2);
+  for (let tries = 0; seeds.length < plates && tries < 20000; tries++) place(unit(), 0.55);
+  const hubs = Array.from({ length: 6 }, unit);
+  for (let gap = 0.12; seeds.length < count; gap *= 0.85)
+    for (let tries = 0; seeds.length < count && tries < 4000; tries++) {
+      const hub = hubs[Math.floor(rnd() * hubs.length)];
+      // most chips gather around a shatter zone (tighter near its middle), the rest land anywhere
+      const p = rnd() < 0.8 ? hub.clone().addScaledVector(unit(), 0.45 * rnd() * rnd()).normalize() : unit();
+      place(p, gap);
+    }
+  return seeds;
+}
 /** Closed curved Voronoi wax cells: straight fracture boundaries, real pale cut edges. */
 export function shellPatches(
   _source: THREE.BufferGeometry,
@@ -344,13 +379,9 @@ export function shellPatches(
     colors: number[] = [],
     ids: number[] = [],
     vertices = Array.from({ length: count }, () => [] as number[]),
-    centers: THREE.Vector3[] = [];
-  const seeds = Array.from({ length: count }, (_, i) => {
-    const y = 1 - ((i + 0.5) * 2) / count,
-      r = Math.sqrt(1 - y * y),
-      a = i * 2.399963;
-    return new THREE.Vector3(Math.cos(a) * r, y, Math.sin(a) * r);
-  });
+    centers: THREE.Vector3[] = [],
+    areas = new Array<number>(count).fill(0);
+  const seeds = irregularShellSeeds(count);
   const outerColor = new THREE.Color(spec.color),
     innerColor = new THREE.Color(spec.shape === "apple" ? 0xf0e9cc : 0x9d7660),
     rimColor = innerColor.clone().lerp(outerColor, 0.2),
@@ -477,8 +508,21 @@ export function shellPatches(
           ob = shape(ub),
           ia = shape(ua, true),
           ib = shape(ub, true);
-        emit(shape(seed), oa, ob, patch, outerColor, true);
-        emit(shape(seed, true), ib, ia, patch, innerColor, true, true);
+        // a ring halfway out keeps a broad plate on the curved surface instead of a flat fan sinking below it
+        const ma = seed.clone().lerp(ua, 0.5).normalize(),
+          mb = seed.clone().lerp(ub, 0.5).normalize(),
+          oma = shape(ma),
+          omb = shape(mb),
+          ima = shape(ma, true),
+          imb = shape(mb, true);
+        emit(shape(seed), oma, omb, patch, outerColor, true);
+        emit(oma, oa, ob, patch, outerColor, true);
+        emit(oma, ob, omb, patch, outerColor, true);
+        const tri = (a: THREE.Vector3, b: THREE.Vector3, c: THREE.Vector3) => new THREE.Vector3().subVectors(b, a).cross(new THREE.Vector3().subVectors(c, a)).length() / 2;
+        areas[patch] += tri(shape(seed), oma, omb) + tri(oma, oa, ob) + tri(oma, ob, omb);
+        emit(shape(seed, true), imb, ima, patch, innerColor, true, true);
+        emit(ima, ib, ia, patch, innerColor, true, true);
+        emit(ima, imb, ib, patch, innerColor, true, true);
         emit(oa, ia, ob, patch, rimColor, false);
         emit(ob, ia, ib, patch, rimColor, false);
       }
@@ -491,7 +535,7 @@ export function shellPatches(
   );
   geometry.setAttribute("normal", new THREE.Float32BufferAttribute(normals, 3));
   geometry.setAttribute("color", new THREE.Float32BufferAttribute(colors, 3));
-  return { geometry, centers, vertices, faceToPatch: new Uint16Array(ids) };
+  return { geometry, centers, vertices, faceToPatch: new Uint16Array(ids), areas };
 }
 
 /** Fine embedded sugar grains, based on the user's photo rather than large exposed pearls. */

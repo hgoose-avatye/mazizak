@@ -182,13 +182,29 @@ describe("shell craze cascade (observed in the installed 왁뿌볼 app)", () => 
     }
     return { f, log };
   };
-  it("a held deep press crazes the whole shell once, and most patches fall within ~3 s; a few flakes stay", () => {
-    const { f, log } = run(false, 3, 10);
+  it("a held deep press breaks the shell around the finger only, wider the longer it is held; the rest stays whole", () => {
+    const short = run(false, 3, 0.4).f, { f, log } = run(false, 3, 10);
     expect(f.crazeEvents).toBe(1);
     expect(f.crazing).toBe(true);
-    expect(f.brokenCount).toBeGreaterThan(80 * 0.6);
-    expect(f.brokenCount).toBeLessThan(80 * 0.97);
+    expect(f.brokenCount).toBeGreaterThan(80 * 0.1);
+    expect(f.brokenCount).toBeLessThan(80 * 0.7); // never the whole shell from one press
+    expect(short.brokenCount).toBeGreaterThan(0);
+    expect(short.brokenCount).toBeLessThan(f.brokenCount); // a shorter hold breaks a smaller area
     expect(log.every((v, i) => i === 0 || v >= log[i - 1])).toBe(true); // monotone: pieces only fall
+  });
+  it("pressing another spot opens a second break zone there", () => {
+    const centers = sphere(80), f = new FractureModel(centers, false), m = new FidgetModel(spec("W01"));
+    const hold = (at: Vector3, normal: Vector3, seconds: number) => {
+      m.press(1, at, normal);
+      for (let t = 0; t < seconds; t += 1 / 120) { m.step(1 / 120); f.step(1 / 120, m.held); }
+      m.release(1);
+      for (let t = 0; t < 1.5; t += 1 / 120) { m.step(1 / 120); f.step(1 / 120, m.held); }
+    };
+    hold(new Vector3(0, 0.2, 0.9), new Vector3(0, 0, 1), 1);
+    const first = f.brokenCount;
+    hold(new Vector3(0, 0.2, -0.9), new Vector3(0, 0, -1), 1);
+    expect(f.crazeEvents).toBe(2);
+    expect(f.brokenCount).toBeGreaterThan(first);
   });
   it("chocolate never crazes as a whole: it breaks piece by piece where it is pressed (line fractures are added by the bar)", () => {
     const apple = run(false, 1.5, 10).f, choco = run(true, 1.5, 10).f;
@@ -197,15 +213,29 @@ describe("shell craze cascade (observed in the installed 왁뿌볼 app)", () => 
     expect(choco.crazing).toBe(false);
     expect(choco.forceBreak(0) || choco.broken[0] === 1).toBe(true);
   });
-  it("a very short tap does not craze the shell, and reset restores everything", () => {
-    const { f } = run(false, 2, 0.02);
+  it("each tap breaks a little more, it stops at the limit, and reset restores everything", () => {
+    const one = run(false, 2, 0.02).f;
+    expect(one.crazeEvents).toBe(1);
+    expect(one.brokenCount).toBeLessThan(80 * 0.2); // one short tap: a small hole
+    const centers = sphere(80), f = new FractureModel(centers, false), m = new FidgetModel(spec("W01"));
+    const counts: number[] = [];
+    for (let tap = 0; tap < 40; tap++) {
+      // taps wander over the front and sides
+      const a = tap * 0.9, at = new Vector3(Math.sin(a) * 0.8, ((tap % 5) - 2) * 0.3, Math.cos(a) * 0.8);
+      m.press(1, at, at.clone().normalize());
+      for (let t = 0; t < 0.08; t += 1 / 120) { m.step(1 / 120); f.step(1 / 120, m.held); }
+      m.release(1);
+      for (let t = 0; t < 0.8; t += 1 / 120) { m.step(1 / 120); f.step(1 / 120, m.held); }
+      counts.push(f.brokenCount);
+    }
+    expect(counts[9]).toBeGreaterThan(one.brokenCount); // more taps, more broken
+    expect(f.done).toBe(true);
+    expect(f.brokenCount).toBeLessThan(80 * (FractureModel.LIMIT + 0.15)); // then it holds
+    expect(counts.at(-1)).toBe(counts.at(-6));
+    f.reset();
+    expect(f.brokenCount).toBe(0);
+    expect(f.crazing).toBe(false);
     expect(f.crazeEvents).toBe(0);
-    expect(f.brokenCount).toBeLessThan(80 * 0.2);
-    const g = run(false, 3, 10).f;
-    g.reset();
-    expect(g.brokenCount).toBe(0);
-    expect(g.crazing).toBe(false);
-    expect(g.crazeEvents).toBe(0);
   });
 });
 
