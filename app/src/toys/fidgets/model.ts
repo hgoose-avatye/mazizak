@@ -252,8 +252,8 @@ export class FractureModel {
   crazeEvents = 0;
   /** share of the shell (by area) that can break by pressing; past it the rest holds (kneading the core then mixes it in, toy.ts) */
   static readonly LIMIT = 0.25;
-  /** chocolate: 4 of the 6 pieces */
-  static readonly CHOCOLATE_LIMIT = 0.66;
+  /** chocolate: every piece can be broken by pressing (all 6) */
+  static readonly CHOCOLATE_LIMIT = 1;
   private weights: number[];
   private totalWeight: number;
   /** contacts already counted as a hit (each new press counts once) */

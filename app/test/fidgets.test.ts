@@ -241,8 +241,8 @@ describe("shell craze cascade (observed in the installed 왁뿌볼 app)", () => 
   });
 });
 
-describe("W02 chocolate: every press cracks a piece further, and it stops at 4 of 6 pieces", () => {
-  it("1–3 presses snap a piece; pressing on stops once 4 pieces are off", () => {
+describe("W02 chocolate: every press cracks a piece further, and every piece can be broken", () => {
+  it("1–3 presses snap each of the 6 pieces", () => {
     const spec = FIDGETS.find((f) => f.id === "W02")!;
     const p = shellPatches(bodyGeometry(spec), spec), f = new FractureModel(p.centers, true), m = new FidgetModel(spec);
     const presses: number[] = [];
@@ -259,9 +259,9 @@ describe("W02 chocolate: every press cracks a piece further, and it stops at 4 o
       }
       presses.push(n);
     }
-    expect(presses.slice(0, 4).every((n) => n >= 1 && n <= 3)).toBe(true);
+    expect(presses.every((n) => n >= 1 && n <= 3)).toBe(true);
+    expect(f.brokenCount).toBe(6); // the bottom row breaks too
     expect(f.done).toBe(true);
-    expect(f.brokenCount).toBe(4); // the last two pieces hold
   });
 });
 
