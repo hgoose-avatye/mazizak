@@ -4,12 +4,12 @@
  "sampleRate": 44100,
  "channels": 1,
  "bitDepth": 16,
- "totalSamples": 2901642,
+ "totalSamples": 3253118,
  "built": "2026-11-13",
  "note": "Clips picked by ear by the owner from candidate cuts (2026-11-13). Peak-normalised to −1 dBFS; `gain` (≤1) matches loudness within a pool; relative loudness between event classes is set by the player.",
  "counts": {
   "sourceFiles": 6,
-  "extractedClips": 103,
+  "extractedClips": 120,
   "derivedVariants": 0
  },
  "dropped": [],
@@ -1220,8 +1220,8 @@
    "event": "crunch",
    "loudnessClass": "impact",
    "material": "owner pick",
-   "note": "C02 rainbow beads crushed (owner pick, hiss reduced; short cut)",
-   "recordings": 8,
+   "note": "C02 rainbow beads crushed (8 owner picks + 17 similar crunches from the same video, auto-selected; hiss reduced; short cut)",
+   "recordings": 25,
    "variants": 0,
    "entries": [
     {
@@ -1319,6 +1319,210 @@
      "srcEnd": 84.75,
      "centroidHz": 6199,
      "boostDb": 0
+    },
+    {
+     "start": 2545458,
+     "length": 19845,
+     "offset": 57.720136,
+     "duration": 0.45,
+     "gain": 0.683,
+     "src": "youtube:wK-jHC_7P6I",
+     "srcStart": 20.14,
+     "srcEnd": 20.59,
+     "centroidHz": 6891,
+     "boostDb": 0
+    },
+    {
+     "start": 2566626,
+     "length": 15396,
+     "offset": 58.200136,
+     "duration": 0.349116,
+     "gain": 0.6341,
+     "src": "youtube:wK-jHC_7P6I",
+     "srcStart": 22.0509,
+     "srcEnd": 22.4,
+     "centroidHz": 6276,
+     "boostDb": 0
+    },
+    {
+     "start": 2583345,
+     "length": 19576,
+     "offset": 58.579252,
+     "duration": 0.4439,
+     "gain": 0.6096,
+     "src": "youtube:wK-jHC_7P6I",
+     "srcStart": 26.6461,
+     "srcEnd": 27.09,
+     "centroidHz": 6034,
+     "boostDb": 0
+    },
+    {
+     "start": 2604244,
+     "length": 19845,
+     "offset": 59.053152,
+     "duration": 0.45,
+     "gain": 0.7094,
+     "src": "youtube:wK-jHC_7P6I",
+     "srcStart": 28.64,
+     "srcEnd": 29.09,
+     "centroidHz": 8293,
+     "boostDb": 0
+    },
+    {
+     "start": 2625412,
+     "length": 19778,
+     "offset": 59.533152,
+     "duration": 0.448481,
+     "gain": 0.8019,
+     "src": "youtube:wK-jHC_7P6I",
+     "srcStart": 41.6515,
+     "srcEnd": 42.1,
+     "centroidHz": 6066,
+     "boostDb": 0
+    },
+    {
+     "start": 2646513,
+     "length": 19703,
+     "offset": 60.011633,
+     "duration": 0.44678,
+     "gain": 0.7011,
+     "src": "youtube:wK-jHC_7P6I",
+     "srcStart": 45.6432,
+     "srcEnd": 46.09,
+     "centroidHz": 5511,
+     "boostDb": 0
+    },
+    {
+     "start": 2667539,
+     "length": 19574,
+     "offset": 60.488413,
+     "duration": 0.443855,
+     "gain": 0.7333,
+     "src": "youtube:wK-jHC_7P6I",
+     "srcStart": 49.4861,
+     "srcEnd": 49.93,
+     "centroidHz": 6267,
+     "boostDb": 0
+    },
+    {
+     "start": 2688436,
+     "length": 19368,
+     "offset": 60.962268,
+     "duration": 0.439184,
+     "gain": 0.8635,
+     "src": "youtube:wK-jHC_7P6I",
+     "srcStart": 51.2508,
+     "srcEnd": 51.69,
+     "centroidHz": 7309,
+     "boostDb": 0
+    },
+    {
+     "start": 2709127,
+     "length": 19140,
+     "offset": 61.431451,
+     "duration": 0.434014,
+     "gain": 0.5776,
+     "src": "youtube:wK-jHC_7P6I",
+     "srcStart": 56.376,
+     "srcEnd": 56.81,
+     "centroidHz": 6602,
+     "boostDb": 0
+    },
+    {
+     "start": 2729590,
+     "length": 19845,
+     "offset": 61.895465,
+     "duration": 0.45,
+     "gain": 0.6449,
+     "src": "youtube:wK-jHC_7P6I",
+     "srcStart": 59.76,
+     "srcEnd": 60.21,
+     "centroidHz": 6455,
+     "boostDb": 0
+    },
+    {
+     "start": 2750758,
+     "length": 19559,
+     "offset": 62.375465,
+     "duration": 0.443515,
+     "gain": 0.5869,
+     "src": "youtube:wK-jHC_7P6I",
+     "srcStart": 64.7365,
+     "srcEnd": 65.18,
+     "centroidHz": 5380,
+     "boostDb": 0
+    },
+    {
+     "start": 2771640,
+     "length": 19845,
+     "offset": 62.84898,
+     "duration": 0.45,
+     "gain": 0.6446,
+     "src": "youtube:wK-jHC_7P6I",
+     "srcStart": 67.64,
+     "srcEnd": 68.09,
+     "centroidHz": 6992,
+     "boostDb": 0
+    },
+    {
+     "start": 2792808,
+     "length": 19391,
+     "offset": 63.32898,
+     "duration": 0.439705,
+     "gain": 0.5515,
+     "src": "youtube:wK-jHC_7P6I",
+     "srcStart": 71.3503,
+     "srcEnd": 71.79,
+     "centroidHz": 6264,
+     "boostDb": 0
+    },
+    {
+     "start": 2813522,
+     "length": 19818,
+     "offset": 63.798685,
+     "duration": 0.449388,
+     "gain": 0.6317,
+     "src": "youtube:wK-jHC_7P6I",
+     "srcStart": 73.7306,
+     "srcEnd": 74.18,
+     "centroidHz": 6121,
+     "boostDb": 0
+    },
+    {
+     "start": 2834663,
+     "length": 19544,
+     "offset": 64.278073,
+     "duration": 0.443175,
+     "gain": 0.7399,
+     "src": "youtube:wK-jHC_7P6I",
+     "srcStart": 77.0168,
+     "srcEnd": 77.46,
+     "centroidHz": 7117,
+     "boostDb": 0
+    },
+    {
+     "start": 2855530,
+     "length": 19471,
+     "offset": 64.751247,
+     "duration": 0.441519,
+     "gain": 0.6316,
+     "src": "youtube:wK-jHC_7P6I",
+     "srcStart": 85.5485,
+     "srcEnd": 85.99,
+     "centroidHz": 5644,
+     "boostDb": 0
+    },
+    {
+     "start": 2876324,
+     "length": 19287,
+     "offset": 65.222766,
+     "duration": 0.437347,
+     "gain": 0.8041,
+     "src": "youtube:wK-jHC_7P6I",
+     "srcStart": 87.1727,
+     "srcEnd": 87.61,
+     "centroidHz": 5965,
+     "boostDb": 0
     }
    ]
   },
@@ -1331,9 +1535,9 @@
    "variants": 0,
    "entries": [
     {
-     "start": 2545458,
+     "start": 2896934,
      "length": 42991,
-     "offset": 57.720136,
+     "offset": 65.690113,
      "duration": 0.974853,
      "gain": 0.8715,
      "src": "youtube:wK-jHC_7P6I",
@@ -1343,9 +1547,9 @@
      "boostDb": 0
     },
     {
-     "start": 2589772,
+     "start": 2941248,
      "length": 43839,
-     "offset": 58.724989,
+     "offset": 66.694966,
      "duration": 0.994082,
      "gain": 0.6639,
      "src": "youtube:wK-jHC_7P6I",
@@ -1355,9 +1559,9 @@
      "boostDb": 0
     },
     {
-     "start": 2634934,
+     "start": 2986410,
      "length": 43102,
-     "offset": 59.74907,
+     "offset": 67.719048,
      "duration": 0.97737,
      "gain": 0.7709,
      "src": "youtube:wK-jHC_7P6I",
@@ -1367,9 +1571,9 @@
      "boostDb": 0
     },
     {
-     "start": 2679359,
+     "start": 3030835,
      "length": 43267,
-     "offset": 60.75644,
+     "offset": 68.726417,
      "duration": 0.981111,
      "gain": 0.9538,
      "src": "youtube:wK-jHC_7P6I",
@@ -1379,9 +1583,9 @@
      "boostDb": 0
     },
     {
-     "start": 2723949,
+     "start": 3075425,
      "length": 43005,
-     "offset": 61.767551,
+     "offset": 69.737528,
      "duration": 0.97517,
      "gain": 1.0,
      "src": "youtube:wK-jHC_7P6I",
@@ -1391,9 +1595,9 @@
      "boostDb": 0
     },
     {
-     "start": 2768277,
+     "start": 3119753,
      "length": 43007,
-     "offset": 62.772721,
+     "offset": 70.742698,
      "duration": 0.975215,
      "gain": 0.714,
      "src": "youtube:wK-jHC_7P6I",
@@ -1403,9 +1607,9 @@
      "boostDb": 0
     },
     {
-     "start": 2812607,
+     "start": 3164083,
      "length": 43294,
-     "offset": 63.777937,
+     "offset": 71.747914,
      "duration": 0.981723,
      "gain": 0.564,
      "src": "youtube:wK-jHC_7P6I",
@@ -1415,9 +1619,9 @@
      "boostDb": 0
     },
     {
-     "start": 2857224,
+     "start": 3208700,
      "length": 43095,
-     "offset": 64.78966,
+     "offset": 72.759637,
      "duration": 0.977211,
      "gain": 0.7635,
      "src": "youtube:wK-jHC_7P6I",

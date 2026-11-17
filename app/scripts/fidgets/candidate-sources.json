@@ -1,0 +1,386 @@
+{
+ "_doc": "Freesound CC0 sources of the round-3 listening candidates (scripts/fidgets/candidates-r3.py; dev listening page only, nothing here ships). Each entry: the licence was read from the sound's own page (creativecommons.org/publicdomain/zero/1.0 link) on the retrieval date; the preview MP3 (HQ) is pinned by sha256 and cached in bench-out/fidget-src/ (git-ignored).",
+ "sources": {
+  "freesound:759544": {
+   "title": "Crunchy sounds getting faster and louder",
+   "author": "Valerie-Vivegnis",
+   "page": "https://freesound.org/people/Valerie-Vivegnis/sounds/759544/",
+   "preview": "https://cdn.freesound.org/previews/759/759544_15375955-hq.mp3",
+   "sha256": "85a45dd2aa736f8fe0706560d1aebd0862276a34c130e78a2d1c4b402c10f286",
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "retrieved": "2026-11-13",
+   "durationSec": 26.6027,
+   "searchQueries": [
+    "putty"
+   ]
+  },
+  "freesound:448893": {
+   "title": "slime noise 8_1.wav",
+   "author": "jtap97",
+   "page": "https://freesound.org/people/jtap97/sounds/448893/",
+   "preview": "https://cdn.freesound.org/previews/448/448893_9094377-hq.mp3",
+   "sha256": "921029a4bed29ba5d8dbbdc5f4d247d2937382fb135eee73ee19b4dced07c5a8",
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "retrieved": "2026-11-13",
+   "durationSec": 6.58333,
+   "searchQueries": [
+    "slime",
+    "putty"
+   ]
+  },
+  "freesound:850226": {
+   "title": "Slime Sounds",
+   "author": "gettinsomegamesounds",
+   "page": "https://freesound.org/people/gettinsomegamesounds/sounds/850226/",
+   "preview": "https://cdn.freesound.org/previews/850/850226_13695398-hq.mp3",
+   "sha256": "43c0b626cbf271cc9384227050535a57326d17a1c11ef352f8fab5c1c90b5f76",
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "retrieved": "2026-11-13",
+   "durationSec": 31.5178,
+   "searchQueries": [
+    "slime"
+   ]
+  },
+  "freesound:848946": {
+   "title": "Slime",
+   "author": "IENBA",
+   "page": "https://freesound.org/people/IENBA/sounds/848946/",
+   "preview": "https://cdn.freesound.org/previews/848/848946_9616576-hq.mp3",
+   "sha256": "caeb3feb88d4f82115630be1f831c10cb9e2679955e4ef124ea6259cee7d842c",
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "retrieved": "2026-11-13",
+   "durationSec": 17.0425,
+   "searchQueries": [
+    "slime squish"
+   ]
+  },
+  "freesound:587848": {
+   "title": "Guck, Slime, slippery Jelly slowly kneading squeezing with Hands, some Bubbles.wav",
+   "author": "breiti",
+   "page": "https://freesound.org/people/breiti/sounds/587848/",
+   "preview": "https://cdn.freesound.org/previews/587/587848_567141-hq.mp3",
+   "sha256": "934986c38044ca009f47cd209c7da97c245acb41e3d1fa1e7a3becc58caf3f5a",
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "retrieved": "2026-11-13",
+   "durationSec": 98.9847,
+   "searchQueries": [
+    "slime bubbles"
+   ]
+  },
+  "freesound:811615": {
+   "title": "WET SLAP NOISE",
+   "author": "MaddieCooper",
+   "page": "https://freesound.org/people/MaddieCooper/sounds/811615/",
+   "preview": "https://cdn.freesound.org/previews/811/811615_15793736-hq.mp3",
+   "sha256": "57f947db0545c0af5003234e220e267fb10a01011cabd938d4b8c77daebc41fc",
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "retrieved": "2026-11-13",
+   "durationSec": 64.3604,
+   "searchQueries": [
+    "slime pop"
+   ]
+  },
+  "freesound:448641": {
+   "title": "Squish.wav",
+   "author": "SaxOman7",
+   "page": "https://freesound.org/people/SaxOman7/sounds/448641/",
+   "preview": "https://cdn.freesound.org/previews/448/448641_2658604-hq.mp3",
+   "sha256": "cc71ad29b8677faf6c0d337528b0240bb6d2fbf5736297b971ecfb17d54832da",
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "retrieved": "2026-11-13",
+   "durationSec": 90.5,
+   "searchQueries": [
+    "squishy slime"
+   ]
+  },
+  "freesound:389689": {
+   "title": "Squishy Sounds; Near .wav",
+   "author": "Shamewap",
+   "page": "https://freesound.org/people/Shamewap/sounds/389689/",
+   "preview": "https://cdn.freesound.org/previews/389/389689_6861640-hq.mp3",
+   "sha256": "16fcd8af79359f0044545de9df275aef5181a032e8c2f1657565f1baf693e509",
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "retrieved": "2026-11-13",
+   "durationSec": 19.2427,
+   "searchQueries": [
+    "squishy slime"
+   ]
+  },
+  "freesound:851648": {
+   "title": "Slimy Squish Stabs",
+   "author": "MattSum03",
+   "page": "https://freesound.org/people/MattSum03/sounds/851648/",
+   "preview": "https://cdn.freesound.org/previews/851/851648_16381145-hq.mp3",
+   "sha256": "4cb966a5d96cb0203290d50418b238df34e1f464b7b24a64578ea09fb34d8430",
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "retrieved": "2026-11-13",
+   "durationSec": 53.2578,
+   "searchQueries": [
+    "cornstarch"
+   ]
+  },
+  "freesound:757640": {
+   "title": "Oobleck",
+   "author": "eclectic-kitty",
+   "page": "https://freesound.org/people/eclectic-kitty/sounds/757640/",
+   "preview": "https://cdn.freesound.org/previews/757/757640_13041382-hq.mp3",
+   "sha256": "d193b99b4344c0136e9fbf321803acd52dee5d39eb2a46f04348ef245cfb4c83",
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "retrieved": "2026-11-13",
+   "durationSec": 39.8702,
+   "searchQueries": [
+    "squishy slime",
+    "oobleck"
+   ]
+  },
+  "freesound:652733": {
+   "title": "Corn Starch Packing Sheet Flex.wav",
+   "author": "alexanderdanner",
+   "page": "https://freesound.org/people/alexanderdanner/sounds/652733/",
+   "preview": "https://cdn.freesound.org/previews/652/652733_5476954-hq.mp3",
+   "sha256": "1199db824f56f2206f5d5fcec51e8cf34cde62ea5227908d32d21f2e2777e6d4",
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "retrieved": "2026-11-13",
+   "durationSec": 51.6374,
+   "searchQueries": [
+    "cornstarch",
+    "crunchy foam"
+   ]
+  },
+  "freesound:329627": {
+   "title": "beer foam - old record.wav",
+   "author": "paualm",
+   "page": "https://freesound.org/people/paualm/sounds/329627/",
+   "preview": "https://cdn.freesound.org/previews/329/329627_3557736-hq.mp3",
+   "sha256": "4ddc8044b0cb4d59b60848a049a94be173f568254708f66fd583f55e3d333ca0",
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "retrieved": "2026-11-13",
+   "durationSec": 17.372,
+   "searchQueries": [
+    "crackling foam"
+   ]
+  },
+  "freesound:769028": {
+   "title": "Cutting Crackles and Crunches",
+   "author": "greysound",
+   "page": "https://freesound.org/people/greysound/sounds/769028/",
+   "preview": "https://cdn.freesound.org/previews/769/769028_189568-hq.mp3",
+   "sha256": "4d99d94e6bfe78c0ee5597bc08232459f23787a10c228d79ca3a68a0a63c08d1",
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "retrieved": "2026-11-13",
+   "durationSec": 148.743,
+   "searchQueries": [
+    "crispy crunch",
+    "rice krispies"
+   ]
+  },
+  "freesound:846514": {
+   "title": "whipped cream",
+   "author": "nincamindza07",
+   "page": "https://freesound.org/people/nincamindza07/sounds/846514/",
+   "preview": "https://cdn.freesound.org/previews/846/846514_17462872-hq.mp3",
+   "sha256": "ceb02c7cb9e0db9b0797733f3e1ea44f3d01c5bd7761386a36876986b690855b",
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "retrieved": "2026-11-13",
+   "durationSec": 4.36927,
+   "searchQueries": [
+    "whipped cream dispenser"
+   ]
+  },
+  "freesound:32921": {
+   "title": "whipped cream.wav",
+   "author": "ToddBradley",
+   "page": "https://freesound.org/people/ToddBradley/sounds/32921/",
+   "preview": "https://cdn.freesound.org/previews/32/32921_30464-hq.mp3",
+   "sha256": "1a4315797c0ba4f65135a30e3a3620fa88b467b17ac4aae282d678b90ad4a160",
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "retrieved": "2026-11-13",
+   "durationSec": 10.199,
+   "searchQueries": [
+    "whipped_cream",
+    "whipping_cream"
+   ]
+  },
+  "freesound:480895": {
+   "title": "Whipping Cream",
+   "author": "Sheyvan",
+   "page": "https://freesound.org/people/Sheyvan/sounds/480895/",
+   "preview": "https://cdn.freesound.org/previews/480/480895_3248005-hq.mp3",
+   "sha256": "163f76fe5be408a6b564006c9ba748188861f0fd9613ee94ca2838bdced900ef",
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "retrieved": "2026-11-13",
+   "durationSec": 32,
+   "searchQueries": [
+    "whipped_cream",
+    "whipping_cream"
+   ]
+  },
+  "freesound:469199": {
+   "title": "Shaving Cream.WAV",
+   "author": "meghannmiller",
+   "page": "https://freesound.org/people/meghannmiller/sounds/469199/",
+   "preview": "https://cdn.freesound.org/previews/469/469199_9699126-hq.mp3",
+   "sha256": "4936f389b3aa48e636921bb15fb014cfc3023fc3da039a6dbf9f0e54df797be3",
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "retrieved": "2026-11-13",
+   "durationSec": 9.43333,
+   "searchQueries": [
+    "shaving foam",
+    "shaving cream",
+    "cream"
+   ]
+  },
+  "freesound:844310": {
+   "title": "Shaving Cream from Canister",
+   "author": "Joedozer",
+   "page": "https://freesound.org/people/Joedozer/sounds/844310/",
+   "preview": "https://cdn.freesound.org/previews/844/844310_2400821-hq.mp3",
+   "sha256": "273f8a807f8ab31b98283108302343a8ede5a4379cb06336903c83c44643e086",
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "retrieved": "2026-11-13",
+   "durationSec": 11.428,
+   "searchQueries": [
+    "cream"
+   ]
+  },
+  "freesound:578461": {
+   "title": "Shaving foam on face",
+   "author": "MicheleFalleri",
+   "page": "https://freesound.org/people/MicheleFalleri/sounds/578461/",
+   "preview": "https://cdn.freesound.org/previews/578/578461_13048145-hq.mp3",
+   "sha256": "4aefc3017095ecdb5595b9553ba86842a666f75f3537bd42437442a118febab0",
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "retrieved": "2026-11-13",
+   "durationSec": 9.57423,
+   "searchQueries": [
+    "shaving foam",
+    "shaving cream"
+   ]
+  },
+  "freesound:631969": {
+   "title": "Shaving Cream sounds.wav",
+   "author": "PDaefaul",
+   "page": "https://freesound.org/people/PDaefaul/sounds/631969/",
+   "preview": "https://cdn.freesound.org/previews/631/631969_11018779-hq.mp3",
+   "sha256": "126ae934151e6168546df5284ddfc7ba622338a89bfb552877e2d0a041ea1cd4",
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "retrieved": "2026-11-13",
+   "durationSec": 45.5741,
+   "searchQueries": [
+    "shaving foam",
+    "shaving cream"
+   ]
+  },
+  "freesound:560248": {
+   "title": "Shaving foam.wav",
+   "author": "Pipelenisf",
+   "page": "https://freesound.org/people/Pipelenisf/sounds/560248/",
+   "preview": "https://cdn.freesound.org/previews/560/560248_12494160-hq.mp3",
+   "sha256": "218ecfc31aae5cc361cc4cb661dbf67b91fbff0591b5a1134d3320deabf200e0",
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "retrieved": "2026-11-13",
+   "durationSec": 3.07,
+   "searchQueries": [
+    "shaving foam"
+   ]
+  },
+  "freesound:67160": {
+   "title": "shaving cream.wav",
+   "author": "jrssandoval",
+   "page": "https://freesound.org/people/jrssandoval/sounds/67160/",
+   "preview": "https://cdn.freesound.org/previews/67/67160_908488-hq.mp3",
+   "sha256": "b2872a93ce9528e6112624bdbbdc8378c1017d78c1f84ef6315f7f937b8d514d",
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "retrieved": "2026-11-13",
+   "durationSec": 1.25867,
+   "searchQueries": [
+    "shaving cream",
+    "cream"
+   ]
+  },
+  "freesound:586041": {
+   "title": "Shaving Cream_2.wav",
+   "author": "nome_diva",
+   "page": "https://freesound.org/people/nome_diva/sounds/586041/",
+   "preview": "https://cdn.freesound.org/previews/586/586041_10659034-hq.mp3",
+   "sha256": "e344eec2db63ca71e702d0a76da928ef4a6495fd4c2727942f8a638e77b92b51",
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "retrieved": "2026-11-14",
+   "durationSec": 68.9952,
+   "searchQueries": [
+    "shaving cream"
+   ]
+  },
+  "youtube:QhCXe8gtqLU": {
+   "title": "Satisfying bingsu bead slime asmr!!",
+   "author": "sara asmr",
+   "page": "https://www.youtube.com/watch?v=QhCXe8gtqLU",
+   "license": "CC BY 3.0",
+   "licenseUrl": "https://creativecommons.org/licenses/by/3.0/",
+   "licenseNote": "YouTube \"Creative Commons Attribution license (reuse allowed)\" read from the video page",
+   "retrieved": "2026-11-14",
+   "localFile": "youtube-cc/beads/QhCXe8gtqLU.wav",
+   "sha256": "bb8d7234cccea47d13800954b3abb23db5f2ddfa49f7599a6ea2349b8b0382d5",
+   "sizeBytes": 32899152
+  },
+  "youtube:Kq_UCqk_--Q": {
+   "title": "The Most Satisfying Cosmic Classic Bingsu Slime | ASMR | Cosmic Fox Slime Crunch Session",
+   "author": "Cosmic Fox Slime",
+   "page": "https://www.youtube.com/watch?v=Kq_UCqk_--Q",
+   "license": "CC BY 3.0",
+   "licenseUrl": "https://creativecommons.org/licenses/by/3.0/",
+   "licenseNote": "YouTube \"Creative Commons Attribution license (reuse allowed)\" read from the video page",
+   "retrieved": "2026-11-14",
+   "localFile": "youtube-cc/beads/Kq_UCqk_--Q.wav",
+   "sha256": "5bda9ff912ff41e1894c199feb55d33f356d4b945af2973cb3f7324dce38f069",
+   "sizeBytes": 25315126
+  },
+  "youtube:6SE7APqq9_w": {
+   "title": "Caviar Micro Beads Multicolored in Crystal Clear Slime",
+   "author": "MonaJedPOV",
+   "page": "https://www.youtube.com/watch?v=6SE7APqq9_w",
+   "license": "CC BY 3.0",
+   "licenseUrl": "https://creativecommons.org/licenses/by/3.0/",
+   "licenseNote": "YouTube \"Creative Commons Attribution license (reuse allowed)\" read from the video page",
+   "retrieved": "2026-11-14",
+   "localFile": "youtube-cc/beads/6SE7APqq9_w.wav",
+   "sha256": "303e67a0d58e2d5ee9edb5d614e23a22f703635f73ac6685edb8af321bf8d934",
+   "sizeBytes": 50092112
+  },
+  "youtube:x4utTO0k-bY": {
+   "title": "ASMR, Slime, No talking. Making slimes from clay, kinetic sand, glitter, foam beads in a bowl.",
+   "author": "ASMR Fun For You",
+   "page": "https://www.youtube.com/watch?v=x4utTO0k-bY",
+   "license": "CC BY 3.0",
+   "licenseUrl": "https://creativecommons.org/licenses/by/3.0/",
+   "licenseNote": "YouTube \"Creative Commons Attribution license (reuse allowed)\" read from the video page",
+   "retrieved": "2026-11-14",
+   "localFile": "youtube-cc/beads/x4utTO0k-bY.wav",
+   "sha256": "493e6d3db93a8439a3f0a8de824d8ed0018855af1e192009ed11968c64a7354c",
+   "sizeBytes": 23933008
+  }
+ }
+}
