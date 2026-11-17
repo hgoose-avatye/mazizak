@@ -3,6 +3,8 @@ import { Vector3 } from "three";
 import { MaterialCage } from "../src/toys/fidgets/cage";
 import { FIDGETS } from "../src/toys/fidgets/catalog";
 const spec = (id: string) => FIDGETS.find((s) => s.id === id)!;
+/** liquid-filled slime without plasticity: every shipped slime is plastic now, but the cage keeps this path */
+const springySlime = () => ({ ...spec("L02"), plastic: undefined });
 const contact = {
   anchor: new Vector3(0, 0.2, 0.95),
   normal: new Vector3(0, 0, 1),
@@ -23,7 +25,7 @@ it("fixed substeps produce consistent pressure deformation at 60 and 120 Hz", ()
   expect(a.volumeRatio).toBeLessThan(1.1);
 });
 it("liquid-filled skin transfers pressure to neighbouring nodes and restores on release", () => {
-  const cage = new MaterialCage(spec("L01"));
+  const cage = new MaterialCage(springySlime());
   for (let i = 0; i < 120; i++) cage.step(1 / 120, [contact], 0);
   const front = new Vector3(0, 0.2, 0.7),
     other = new Vector3(0.5, 0.2, 0.1);
@@ -42,7 +44,7 @@ it("liquid-filled skin transfers pressure to neighbouring nodes and restores on 
   expect([...cage.position]).toEqual([...cage.rest]);
 });
 it("opposed finger grips push filling into the free front surface rather than creating two front dents", () => {
-  const cage = new MaterialCage(spec("L01"));
+  const cage = new MaterialCage(springySlime());
   const fingers = [-1, 1].map((sign) => ({
     anchor: new Vector3(sign * 0.8, 0.1, 0.3),
     normal: new Vector3(0, 0, 1),
@@ -55,4 +57,27 @@ it("opposed finger grips push filling into the free front surface rather than cr
   expect(cage.deform(p, new Vector3()).z).toBeGreaterThan(p.z + 0.01);
   expect(cage.volumeRatio).toBeGreaterThan(0.85);
   expect(cage.volumeRatio).toBeLessThan(1.15);
+});
+it("plastic slime (치즈) stays stretched after release, flows back over time, and reset snaps it home", () => {
+  const cage = new MaterialCage(spec("L01"));
+  const tip = new Vector3(1.2, 0, 0);
+  const pull = { anchor: tip.clone(), normal: new Vector3(1, 0, 0), drag: new Vector3(0.44, 0, 0), depth: { x: 0, v: 0 }, held: true };
+  // the largest pull the toy allows from here: model.drag keeps the pulled point at 0.9 of the bounds (1.35 × 1.35 × 0.9 ≈ 1.64)
+  for (let i = 0; i < 240; i++) cage.step(1 / 120, [pull], 0); // 2 s pulled to the right
+  const pulled = cage.deform(tip, new Vector3()).x - tip.x;
+  expect(pulled).toBeGreaterThan(0.2); // drawn out…
+  const box = cage.position; // …but never past its bounds (it stays in the fixed view)
+  for (let i = 0; i < box.length; i += 3) expect(Math.abs(box[i])).toBeLessThanOrEqual(1.35 * 1.35 + 1e-9);
+  expect([...cage.position].every(Number.isFinite)).toBe(true);
+  expect(cage.volumeRatio).toBeGreaterThan(0.8); // it thins as it lengthens rather than gaining volume
+  expect(cage.volumeRatio).toBeLessThan(1.2);
+  for (let i = 0; i < 120; i++) cage.step(1 / 120, [], 0); // 1 s after release
+  expect(cage.deform(tip, new Vector3()).x - tip.x).toBeGreaterThan(pulled * 0.6); // still stretched
+  for (let i = 0; i < 120 * 40; i++) cage.step(1 / 120, [], 0); // 40 s later (time constant 8 s)
+  expect(cage.deform(tip, new Vector3()).distanceTo(tip)).toBeLessThan(0.05);
+  for (let i = 0; i < 240; i++) cage.step(1 / 120, [pull], 0);
+  cage.reset();
+  expect([...cage.rest]).toEqual([...cage.origin]);
+  expect([...cage.position]).toEqual([...cage.origin]);
+  expect(cage.plasticOffset).toBe(0);
 });

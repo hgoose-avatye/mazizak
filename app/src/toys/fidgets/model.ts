@@ -1,5 +1,5 @@
 import { Vector3 } from "three";
-import { MaterialCage } from "./cage";
+import { MaterialCage, PLASTIC_BOUNDS, isStretchy } from "./cage";
 import { Spring } from "../../core/spring";
 import { SquishyModel, DEFAULT_PARAMS } from "../squishy/model";
 import type { FidgetSpec } from "./catalog";
@@ -81,7 +81,15 @@ export class FidgetModel {
     if (!c?.held) return;
     const d = delta
       .clone()
-      .clampLength(0, this.spec.family === "viscous" ? 2.8 : 0.65);
+      // elastic 말랑이 pull out a long way too (they spring back on release); crunch / wax keep their small give
+      .clampLength(0, this.spec.family === "viscous" ? 2.8 : this.spec.family === "elastic" ? 1.6 : 0.65);
+    if (isStretchy(this.spec)) {
+      // the pulled point stays a little inside the slime's box, so the pulled end stays round instead of flattening on the edge
+      const s = this.spec, a = c.anchor, m = 0.9;
+      d.x = Math.max(-s.width * PLASTIC_BOUNDS.x * m - a.x, Math.min(s.width * PLASTIC_BOUNDS.x * m - a.x, d.x));
+      d.y = Math.min(s.height * PLASTIC_BOUNDS.y * m - a.y, d.y);
+      d.z = Math.max(-s.depth * PLASTIC_BOUNDS.z * m - a.z, Math.min(s.depth * PLASTIC_BOUNDS.z * m - a.z, d.z));
+    }
     this.pendingTravel += d.distanceTo(c.drag);
     this.motion = Math.max(this.motion, d.distanceTo(c.drag) * 12);
     c.drag.copy(d);
@@ -100,6 +108,8 @@ export class FidgetModel {
     const c = this.contacts.get(id);
     if (c) {
       c.held = false;
+      // plastic slime keeps the pulled shape in its rest (cage.flow); a lingering pull would stretch it further after release
+      if (this.spec.plastic) c.drag.set(0, 0, 0);
       this.foam?.release(id);
     }
     this.pinchStart = 0;

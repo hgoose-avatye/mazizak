@@ -26,6 +26,11 @@ export interface FidgetSpec {
   recovery: number;
   damping: number;
   stretch: number;
+  /**
+   * Plastic slime: pulling reshapes the material itself, so it stays stretched after the finger lifts and then flows back to its
+   * original shape over `plastic` seconds (≈ time constant; mostly home after ~3×). One finger can pull it far. The reset button shows.
+   */
+  plastic?: number;
   sound:
     | "gel"
     | "foam"
@@ -58,7 +63,7 @@ export const FIDGETS: readonly FidgetSpec[] = [
     damping: 0.36,
     stretch: 1.25,
     sound: "gel",
-    hint: "꾹 누르고 놓아보세요 · 탱글하게 출렁여요",
+    hint: "꾹 누르거나 쭉 당겨보세요 · 놓으면 탱글하게 돌아와요",
   },
   {
     id: "S02",
@@ -78,7 +83,7 @@ export const FIDGETS: readonly FidgetSpec[] = [
     damping: 1,
     stretch: 1.1,
     sound: "foam",
-    hint: "길게 누른 뒤 놓아보세요 · 자국이 천천히 차올라요",
+    hint: "길게 누르거나 당겨보세요 · 놓으면 천천히 차올라요",
   },
   {
     id: "S03",
@@ -98,7 +103,7 @@ export const FIDGETS: readonly FidgetSpec[] = [
     damping: 0.78,
     stretch: 1.35,
     sound: "mochi",
-    hint: "손끝으로 깊게 눌러보세요 · 주변이 말랑하게 밀려나요",
+    hint: "깊게 누르거나 쭉 당겨보세요 · 놓으면 말랑하게 돌아와요",
   },
   {
     id: "W01",
@@ -157,8 +162,9 @@ export const FIDGETS: readonly FidgetSpec[] = [
     recovery: 1.5,
     damping: 1,
     stretch: 2.7,
+    plastic: 8,
     sound: "cheese",
-    hint: "두 손가락을 모아 누르고 · 벌려서 길게 늘려보세요",
+    hint: "꾹 잡고 쭉 당겨 늘려보세요 · 늘어난 채로 천천히 돌아와요",
   },
   {
     id: "L02",
@@ -177,8 +183,9 @@ export const FIDGETS: readonly FidgetSpec[] = [
     recovery: 1.9,
     damping: 1,
     stretch: 2.6,
+    plastic: 8,
     sound: "mango",
-    hint: "꾹 눌러 촉촉하게 퍼뜨리고 · 천천히 늘려보세요",
+    hint: "꾹 잡고 쭉 당겨 늘려보세요 · 늘어난 채로 천천히 퍼져 돌아와요",
   },
   {
     id: "L03",
@@ -197,8 +204,9 @@ export const FIDGETS: readonly FidgetSpec[] = [
     recovery: 2.4,
     damping: 1,
     stretch: 2.1,
+    plastic: 10,
     sound: "cream",
-    hint: "폭신한 봉우리를 뭉개고 · 접어서 다시 주물러요",
+    hint: "봉우리를 뭉개고 당겨보세요 · 빚은 모양이 한동안 남아요",
   },
   {
     id: "C01",

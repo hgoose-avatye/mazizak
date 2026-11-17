@@ -13,12 +13,27 @@ interface Profile {
   returnHz: number;
   damping: number;
 }
+/**
+ * Toys you can pull well out of shape: plastic slime (stays stretched) and the elastic 말랑이 (spring back). Both stretch inside
+ * PLASTIC_BOUNDS, under a fixed camera that leaves room for it (toy.ts resize). Crunch / wax toys keep their small give.
+ */
+export const isStretchy = (s: FidgetSpec) => !!s.plastic || s.family === "elastic";
+/** How far a stretchy toy may reach, as multiples of its half width / height / depth (the view leaves room for ≈1.65× the width). */
+export const PLASTIC_BOUNDS = { x: 1.35, y: 2, z: 1.1 } as const;
 /** A shared tetrahedral material cage. Mesh UVs/textures stay intact; vertices sample
  * its displacement. Foam is compressible; gel/encapsulated slime preserve local volume.
  * This is a bounded real-time approximation, not a fluid/rupture FEM solver. */
 export class MaterialCage {
   readonly n = 6;
+  /** Current rest shape. Equal to `origin` except for plastic slime, whose rest follows the pull and then flows back. */
   readonly rest: Float64Array;
+  /** The material's original lattice: the coordinate frame of the mesh embedding (deform / undeform) and of contact anchors. */
+  readonly origin: Float64Array;
+  /** Rest shape when the current grab began (plastic only): finger targets are measured from it, so the creep cannot run away. */
+  private grabRest: Float64Array;
+  private grabbing = false;
+  /** Plastic slime: largest offset of the rest shape from its origin (0 when fully home). */
+  plasticOffset = 0;
   readonly position: Float64Array;
   readonly velocity: Float64Array;
   private previous: Float64Array;
@@ -38,6 +53,8 @@ export class MaterialCage {
       count = n * n * n;
     this.dimensions = new Vector3(spec.width, spec.height, spec.depth);
     this.rest = new Float64Array(count * 3);
+    this.origin = new Float64Array(count * 3);
+    this.grabRest = new Float64Array(count * 3);
     this.position = new Float64Array(count * 3);
     this.velocity = new Float64Array(count * 3);
     this.previous = new Float64Array(count * 3);
@@ -104,6 +121,8 @@ export class MaterialCage {
             }
         }
     this.position.set(this.rest);
+    this.origin.set(this.rest);
+    this.grabRest.set(this.rest);
     for (let z = 0; z < n - 1; z++)
       for (let y = 0; y < n - 1; y++)
         for (let x = 0; x < n - 1; x++) {
@@ -154,6 +173,7 @@ export class MaterialCage {
   step(dt: number, contacts: Iterable<CageContact>, fold: number) {
     this.accumulator += Math.min(0.05, Math.max(0, dt));
     const list = Array.from(contacts);
+    if (this.spec.plastic) this.flow(Math.min(0.05, Math.max(0, dt)), list.some((c) => c.held));
     const h = 1 / 120;
     let iterations = 0;
     while (this.accumulator >= h && iterations++ < 6) {
@@ -173,14 +193,43 @@ export class MaterialCage {
       );
     }
     this.volumeRatio = volume / this.initialVolume;
-    return this.speed > 0.002;
+    return this.speed > 0.002 || this.plasticOffset > 0.003;
+  }
+  /**
+   * Plastic slime. While held, the rest shape creeps toward where the fingers have pulled the material (it yields), so on release
+   * it stays put; once let go it flows back to the original shape with time constant `spec.plastic`. Finger targets use the
+   * rest shape snapshotted at the start of the grab, otherwise rest ← position ← rest + pull would grow without bound.
+   */
+  private flow(dt: number, held: boolean) {
+    const r = this.rest,
+      p = this.position,
+      o = this.origin;
+    if (held && !this.grabbing) this.grabRest.set(r);
+    this.grabbing = held;
+    const k = held ? 1 - Math.exp(-dt / 0.25) : 1 - Math.exp(-dt / this.spec.plastic!),
+      // let go, what was lifted sags down first (≈1 s); spreading back to the original outline takes the full `plastic` time
+      sag = held ? k : 1 - Math.exp(-dt / Math.min(1, this.spec.plastic!));
+    let offset = 0;
+    for (let i = 0; i < r.length; i++) {
+      const lifted = !held && i % 3 === 1 && r[i] > o[i];
+      r[i] += ((held ? p[i] : o[i]) - r[i]) * (lifted ? sag : k);
+      offset = Math.max(offset, Math.abs(r[i] - o[i]));
+    }
+    // the floor holds the rest shape too: what flows back slumps along the table, not through it
+    for (let i = 1; i < r.length; i += 3) r[i] = Math.max(-this.spec.height, r[i]);
+    if (offset < 0.003 && !held) r.set(o);
+    this.plasticOffset = offset < 0.003 && !held ? 0 : offset;
   }
   private integrate(dt: number, contacts: CageContact[], fold: number) {
     const p = this.position,
       r = this.rest,
       v = this.velocity,
       old = this.previous,
-      profile = this.profile;
+      profile = this.profile,
+      o = this.origin,
+      plastic = !!this.spec.plastic,
+      stretchy = isStretchy(this.spec),
+      g = plastic && this.grabbing ? this.grabRest : r;
     old.set(p);
     const omega = 2 * Math.PI * profile.returnHz,
       damping = Math.exp(-profile.damping * dt);
@@ -274,7 +323,10 @@ export class MaterialCage {
           z = p[b + 2] - p[a + 2],
           length = Math.hypot(x, y, z);
         if (length < 1e-8) continue;
-        const rest = this.lengths[e],
+        // plastic slime: the skin keeps the current (stretched) shape's edge lengths, so it does not pull itself back together
+        const rest = plastic
+            ? Math.hypot(r[b] - r[a], r[b + 1] - r[a + 1], r[b + 2] - r[a + 2])
+            : this.lengths[e],
           stiffness = profile.skin * this.skinWeights[e],
           correction = ((length - rest) / length) * 0.5 * stiffness;
         p[a] += x * correction;
@@ -300,20 +352,24 @@ export class MaterialCage {
           this.spec.shape === "mochi"
             ? 0.95
             : this.spec.family === "viscous"
-              ? 0.85
+              ? // plastic slime: a long pull draws out more of the body, so it thins into a strand instead of a spike
+                0.85 * (plastic ? 1 + Math.min(0.6, dragLength * 0.3) : 1)
               : 0.72;
         for (let i = 0; i < p.length; i += 3) {
-          const dx = r[i] - c.anchor.x,
-            dy = r[i + 1] - c.anchor.y,
-            dz = r[i + 2] - c.anchor.z,
-            w = Math.exp(
-              -(dx * dx + dy * dy + dz * dz) / (radius * radius * 0.65),
-            );
+          const dx = o[i] - c.anchor.x,
+            dy = o[i + 1] - c.anchor.y,
+            dz = o[i + 2] - c.anchor.z;
+          let w = Math.exp(
+            -(dx * dx + dy * dy + dz * dz) / (radius * radius * 0.65),
+          );
           if (w < 0.005) continue;
+          // plastic slime lifted off the table: its underside stays stuck down, so an upward pull draws a strand from a base
+          if (plastic && c.held && c.drag.y > 0)
+            w *= 0.25 + 0.75 * ((o[i + 1] + this.spec.height) / (2 * this.spec.height));
           const grip = 0.5 * w,
-            tx = r[i] + c.drag.x * w - normal.x * depth * w,
-            ty = r[i + 1] + c.drag.y * w - normal.y * depth * w,
-            tz = r[i + 2] + c.drag.z * w - normal.z * depth * w;
+            tx = g[i] + c.drag.x * w - normal.x * depth * w,
+            ty = g[i + 1] + c.drag.y * w - normal.y * depth * w,
+            tz = g[i + 2] + c.drag.z * w - normal.z * depth * w;
           const ex = tx - p[i],
             ey = ty - p[i + 1],
             ez = tz - p[i + 2],
@@ -335,6 +391,7 @@ export class MaterialCage {
           }
         }
       }
+      const d = this.dimensions;
       for (let i = 0; i < p.length; i += 3) {
         p[i + 1] = Math.max(-this.spec.height, p[i + 1]);
         for (let k = 0; k < 3; k++)
@@ -342,6 +399,13 @@ export class MaterialCage {
             r[i + k] - 2.5,
             Math.min(r[i + k] + 2.5, p[i + k]),
           );
+        // a stretchy toy stretches inside a fixed box around where it sits: it never leaves the (fixed) view, and it barely
+        // moves toward / away from the camera, so a pull reads as stretching rather than as the piece tilting into depth
+        if (stretchy) {
+          p[i] = Math.max(-d.x * PLASTIC_BOUNDS.x, Math.min(d.x * PLASTIC_BOUNDS.x, p[i]));
+          p[i + 1] = Math.min(d.y * PLASTIC_BOUNDS.y, p[i + 1]);
+          p[i + 2] = Math.max(-d.z * PLASTIC_BOUNDS.z, Math.min(d.z * PLASTIC_BOUNDS.z, p[i + 2]));
+        }
       }
     }
     let speed = 0;
@@ -371,9 +435,9 @@ export class MaterialCage {
         for (let dx = 0; dx < 2; dx++) {
           const weight = (dx ? u : 1 - u) * (dy ? v : 1 - v) * (dz ? w : 1 - w),
             i = (x + dx + n * (y + dy + n * (z + dz))) * 3;
-          out.x += (this.position[i] - this.rest[i]) * weight;
-          out.y += (this.position[i + 1] - this.rest[i + 1]) * weight;
-          out.z += (this.position[i + 2] - this.rest[i + 2]) * weight;
+          out.x += (this.position[i] - this.origin[i]) * weight;
+          out.y += (this.position[i + 1] - this.origin[i + 1]) * weight;
+          out.z += (this.position[i + 2] - this.origin[i + 2]) * weight;
         }
     return out;
   }
@@ -391,6 +455,10 @@ export class MaterialCage {
     return out;
   }
   reset() {
+    this.rest.set(this.origin);
+    this.grabRest.set(this.origin);
+    this.grabbing = false;
+    this.plasticOffset = 0;
     this.position.set(this.rest);
     this.velocity.fill(0);
     this.previous.set(this.rest);

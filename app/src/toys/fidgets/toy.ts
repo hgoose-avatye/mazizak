@@ -4,6 +4,7 @@ import type { InputEvt } from "../../core/runtime";
 import { radialShadowTexture, studioEnvironment } from "../../core/studio";
 import type { FidgetSpec } from "./catalog";
 import { FidgetModel, FractureModel, GrainModel } from "./model";
+import { isStretchy } from "./cage";
 import { FidgetAudio } from "./audio";
 import { ChocolateBar } from "./chocolate";
 import {
@@ -450,7 +451,8 @@ if (uMix > 0.0) {
       .addScaledVector(
         new THREE.Vector3(0, 0.82, 2.2).normalize(),
         fitDistance *
-          (spec.family === "viscous"
+          // the view stays put while slime is pulled: its stretch is bounded to fit the room left around it (resize)
+          (spec.family === "viscous" && !isStretchy(spec)
             ? Math.max(1, 1 + (model.stretch.x - 1) * 0.6)
             : 1),
       );
@@ -465,7 +467,8 @@ if (uMix > 0.0) {
       (spec.width * 1.12) /
         (Math.tan(THREE.MathUtils.degToRad(17)) * camera.aspect * 0.85),
     );
-    fitDistance = dist;
+    // stretchy toys: a fixed view with room around them for their bounded stretch (cage.ts PLASTIC_BOUNDS)
+    fitDistance = dist * (isStretchy(spec) ? 1.25 : 1);
     positionCamera();
   };
   const hit = (x: number, y: number) => {
