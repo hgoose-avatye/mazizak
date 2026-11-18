@@ -30,6 +30,6 @@ local dent fields, volume-redistributing bulges, directional stretch/necking, pe
 fold state, per-face fracture and instanced particles. No finite-element simulation,
 true self-colliding folding, free fluid flow or volumetric topology reconstruction is claimed.
 
-Audio: app/public/sfx/wax/CREDITS.md. All sources are CC0 or CC BY 4.0; recordings are
+Audio: all sources are CC0 or CC BY 4.0; recordings are
 processed into gesture-specific foley. Exact slime, bead, soap and foam-rise recordings
 are missing, and are not reported as acquired. Playback is machine-verified only.

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Owner-picked fidget clips → audio-src/sfx/fidgets/picks.{wav,json} + PICKS-CREDITS.md.
+"""Owner-picked fidget clips → audio-src/sfx/fidgets/picks.{wav,json}.
 
 The owner listened to candidate clips (dev page candidates.html, 2026-11-13) and picked these by ear for the wax balls,
 and the rainbow beads. Sources are YouTube videos the uploaders published under YouTube's
@@ -183,7 +183,7 @@ def main():
              "YouTube videos: published by their uploaders under YouTube's “Creative Commons Attribution license (reuse allowed)” —",
              f"CC BY 3.0 ({YT_LICENSE_URL})." + (" Freesound: CC0 1.0 (no attribution needed; credited anyway)." if FREESOUND else ""), "",
              "C01 비누 크런치 is not in this bundle: its provisional pick (Freesound 414538 “Crunch Sound 1” by emilyws, CC0) was removed",
-             "on 2026-11-13 and is no longer shipped. C01 plays the project owner's own recordings of the actual toy — see `CREDITS.md` (`own:` rows).", "",
+             "on 2026-11-13 and is no longer shipped. C01 plays the project owner's own recordings of the actual toy (`own:` rows in fidgets.json).", "",
              "| source | title | author | licence | used for |", "|---|---|---|---|---|"]
     used = {}
     for name, (_, _, note, made) in pools.items():

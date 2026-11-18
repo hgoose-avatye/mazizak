@@ -1,7 +1,7 @@
 // Pack the reference 3D models of 모닝빵 (S02) and 찹쌀떡 (S03) for the PUBLIC build:
 //   <local reference folder>/models/{bread,peachmochi}.glb   →   public/models/{bread,peachmochi}.glb  (+ models.json)
 //
-// The project owner chose to ship these two models (2026-11-16, the owner's statement; see public/models/CREDITS.md). The originals are
+// The project owner chose to ship these two models (2026-11-16, the owner's statement). The originals are
 // 1.3 MB and 8.3 MB because they carry 4096-pixel PNG textures (three of them for the mochi). The game reads only the FIRST mesh and its
 // base-colour texture (references.ts: meshFromGltf), shrinks that texture to 1024 px anyway and recomputes the normals, so the packed file
 // keeps exactly that: positions (with the node transforms baked in), UVs, indices and the base-colour texture as a 1024 px JPEG.
@@ -136,7 +136,7 @@ function pack(name) {
 }
 const entries = Object.keys(MODELS).map(pack);
 const manifest = {
-  _doc: 'Reference 3D models of 모닝빵 (S02) and 찹쌀떡 (S03) shipped with the app. Packed by scripts/fidgets/pack-reference-models.mjs; see CREDITS.md.',
+  _doc: 'Reference 3D models of 모닝빵 (S02) and 찹쌀떡 (S03) shipped with the app. Packed by scripts/fidgets/pack-reference-models.mjs.',
   clearance: {
     status: 'permission to use in the public build obtained',
     statedBy: 'project owner',

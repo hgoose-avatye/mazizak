@@ -3,7 +3,7 @@
 //
 // The recordings come from third parties (YouTube typing videos, ThockHub, a Mechvibes pack). The project owner obtained permission to use them
 // in the public build (owner's statement, 2026-11-16). The permission texts are not kept in the repository, so the record says exactly that
-// (`clearance` in every shipped JSON, and audio-src/sfx/keyboard/CREDITS.md). The generators (build-youtube-presets.mjs, clean-peach-v3.mjs,
+// (`clearance` in every shipped JSON). The generators (build-youtube-presets.mjs, clean-peach-v3.mjs,
 // build-local-presets.py) keep writing their output with the local-only markers; this script is the one place that turns them into shippable files.
 //
 // Usage: node scripts/kbsamples/ship-cleared-presets.mjs        (re-runnable; the WAV bytes are copied unchanged and checked against MANIFEST.sha256)
@@ -18,7 +18,7 @@ const MANIFEST = path.join(SRC, '..', 'MANIFEST.sha256');
 const OUT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../audio-src/sfx/keyboard');
 const sha = (b) => crypto.createHash('sha256').update(b).digest('hex');
 
-/** credit shown in CREDITS.md and the settings sheet: where each recording comes from */
+/** credit shown in the settings sheet: where each recording comes from */
 export const CLEARED = {
   'box-jade': { label: '옥구슬', title: 'Kailh Box Jade sound pack', by: 'Mechvibes pack (author as listed on the pack page)', url: 'https://mechvibes.com/sound-packs/kailh-box-jade' },
   'silent-peach-v3': { label: '복숭아', title: 'Outemu Silent Peach V3 sound test (ThockHub K09)', by: 'ThockHub / the sound-test author', url: 'https://thockhub.com/audio/ct/ultimate-outemu-silent-peach-v3-sound-test-better-than-the-original/' },
@@ -41,7 +41,7 @@ for (const [id, credit] of Object.entries(CLEARED)) {
     status: 'permission to use in the public build obtained',
     statedBy: 'project owner',
     statedOn: '2026-11-16',
-    note: "The owner's statement; the permission terms are not stored in the repository. A required credit, if any, belongs in CREDITS.md (sfx/keyboard).",
+    note: "The owner's statement; the permission terms are not stored in the repository.",
   };
   map.credit = credit;
   map.wavSha256 = sha(wav);

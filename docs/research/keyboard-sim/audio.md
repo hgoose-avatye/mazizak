@@ -10,7 +10,7 @@
 - **프리셋**: `KeySwitchPreset = 'pebble' | 'clack'` 2종(조약돌/까랑까랑). 역할(role)은 `down / up / spaceDown / spaceUp` 4개뿐이며 velocity layer는 없음 [확인: `src/toys/keyboard/toy.ts`].
 - **선택 로직**: `soundDown`은 키가 스페이스면 `kb:{preset}:spaceDown`, 아니면 `kb:{preset}:down`. 키별 고정 detune `((i*37)%31)-15` cent, 랜덤 detune ±12 cent, gain jitter ±1.2 dB, 직전 down과의 간격 < 85 ms면 −2 dB, 팬 = x·0.22, 녹음 샘플이면 +6 dB makeup. `soundUp`은 **누를 때의 프리셋을 기억**(`heldPreset`)해서 같은 프리셋의 up을 재생 [확인].
 - **엔진**: `AudioBufferSourceNode` 원샷, `Bag`(shuffle-bag, 직전 2개 회피), 전역 보이스 20개(초과 시 가장 오래된 것 3 ms 시상수 페이드), 30 ms 창 안의 동시 시작은 1–6 ms 흩뿌림 + 약 −8·log10(n+1) dB, 리미터(−8 dB, 20:1) + tanh 소프트클립, `latencyHint:'interactive'`, suspended 중 요청은 80 ms 안에 resume되면 재생·아니면 폐기 [확인: `src/core/audio.ts`]. **키당 보이스 제한은 없음** [확인].
-- **샘플**: `public/sfx/keyboard/pebble.wav`(Rainy 75, 가스켓·윤활 리니어, Freesound 815614, CC0) — down 10 / up 7 / spaceDown 4 / spaceUp 3, 총 2.36 s(디코딩 후 약 0.45 MB). `clack.wav`(WhiteFox, Hako Violet 택타일, Freesound 546045·546167, CC0) — down 10 / up 8 / spaceDown 4 / spaceUp 3, 총 3.27 s(약 0.63 MB) [확인: JSON 계산]. **스페이스바는 둘 다 대체(proxy)**, 조약돌 up은 추정된 복귀음 [확인: CREDITS.md, RECORDING_SPEC_keyboard.md].
+- **샘플**: `public/sfx/keyboard/pebble.wav`(Rainy 75, 가스켓·윤활 리니어, Freesound 815614, CC0) — down 10 / up 7 / spaceDown 4 / spaceUp 3, 총 2.36 s(디코딩 후 약 0.45 MB). `clack.wav`(WhiteFox, Hako Violet 택타일, Freesound 546045·546167, CC0) — down 10 / up 8 / spaceDown 4 / spaceUp 3, 총 3.27 s(약 0.63 MB) [확인: JSON 계산]. **스페이스바는 둘 다 대체(proxy)**, 조약돌 up은 추정된 복귀음 [확인: RECORDING_SPEC_keyboard.md].
 - **병렬 브랜치**(`/Users/hgoose/mazizak-sound`): B 뱅크 = Gateron Yellow 윤활(665075, 조약돌, down 중심주파수 약 1.7 kHz) / Gateron Blue 클릭(755222, 까랑까랑, 약 4.6 kHz). 블라인드 A/B 페이지(`sound-ab.html`)가 이미 있음 [확인]. 주목할 점: **clack(Blue) down의 onset→최대 프레임이 28 ms**(pebble 8 ms) — 클릭이 먼저 나고 더 큰 바닥 충격이 뒤에 오는 2-이벤트 구조일 가능성 [추정, 파형 확인 필요].
 - 기획서 §8.2의 "서각서각 = 2–8 kHz 마찰음이 주인공", "보글보글 = 무접점(돔+스프링)" 설정은 [가설] 상태. §8.6: 직접 폴리 녹음이 주력, CC0는 보조 [확인].
 
@@ -263,4 +263,4 @@ interface KeyboardPreset {
 - S8: Milktooth, Magnetic Jade comparisons — https://milktooth.com/comparisons/magnetic-jade-vs-sunset-gleam
 - S9: Chromium blink-dev, Intent to Ship: AudioContext.outputLatency — https://groups.google.com/a/chromium.org/g/blink-dev/c/dTQniJNVVMY
 - S10: web.dev, Synchronize audio and video playback (outputLatency 지원 표) — https://web.dev/articles/audio-output-latency
-- 내부: `docs/MANZIZAK_기획_기술설계_v0.1.md` §6.2/6.3/8/10/17, `docs/MVP_STATUS.md`, `docs/RECORDING_SPEC_keyboard.md`, `app/src/core/audio.ts`, `app/src/toys/keyboard/toy.ts`, `app/public/sfx/keyboard/CREDITS.md`, `/Users/hgoose/mazizak-sound/app/SOUND_AB.md`, `sound-src/ab-metrics.md`
+- 내부: `docs/MANZIZAK_기획_기술설계_v0.1.md` §6.2/6.3/8/10/17, `docs/MVP_STATUS.md`, `docs/RECORDING_SPEC_keyboard.md`, `app/src/core/audio.ts`, `app/src/toys/keyboard/toy.ts`, `/Users/hgoose/mazizak-sound/app/SOUND_AB.md`, `sound-src/ab-metrics.md`

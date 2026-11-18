@@ -15,7 +15,7 @@ for (const f of files.filter((f) => /\.(js|css|html|json|md|map)$/.test(f))) {
   for (const s of FORBIDDEN) if (t.includes(s)) problems.push(`${path.relative(dist, f)} contains "${s}"`);
 }
 // 2) no reference models / textures / audio outside the licensed sfx folders. The only models allowed are the two shipped on purpose
-//    (모닝빵 / 찹쌀떡, public/models/, owner's permission record in CREDITS.md + models.json — checked in 6)
+//    (모닝빵 / 찹쌀떡, public/models/, owner's permission record in models.json — checked in 6)
 const SHIPPED_MODELS = new Set(['models/bread.glb', 'models/peachmochi.glb']);
 for (const f of files) {
   const rel = path.relative(dist, f);

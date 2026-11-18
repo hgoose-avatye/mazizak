@@ -97,7 +97,7 @@ const waxToy = (k: "apple" | "choco"): ToySound => ({
 });
 
 export const FIDGET_SOUND: Record<string, ToySound> = {
-  // Each toy has its own recordings (Freesound CC0, see audio-src/sfx/fidgets/CREDITS.md); nothing is shared between S01/S02/S03 or with the crunch/wax toys.
+  // Each toy has its own recordings (Freesound CC0); nothing is shared between S01/S02/S03 or with the crunch/wax toys.
   // S01 슬랑이 and L02 망고 (owner, 2026-11-17): a blend of the 찹쌀떡 (S03 dough) and 치즈 (L01 slime) sounds — every press plays a
   // dough clip with a slime clip layered under it (cut to the dough clip's length)
   S01: { init: NONE, tap: sqz("mochi.tap", "proxy", "찹쌀떡 dough press + 치즈 slime squish (blend)", { layer: { source: "squish", pool: "slime.hold", trimDb: -3 }, trimDb: -1.5 }), hold: sqz("mochi.hold", "proxy", "찹쌀떡 dough kneading + 치즈 slime squishing (blend)", { layer: { source: "squish", pool: "slime.hold", trimDb: -2 }, trimDb: -1.5 }), release: NONE, stretch: NONE, fold: NONE, crack: NONE, crunch: NONE },
@@ -109,7 +109,7 @@ export const FIDGET_SOUND: Record<string, ToySound> = {
   // L02: modelled on the reference app's rainbow-sharbet clips (bright, continuous fine crackle; short ≈0.7 s, long ≈1.2 s)
   L02: { init: NONE, tap: sqz("mochi.tap", "proxy", "찹쌀떡 dough press + 치즈 slime squish (blend)", { layer: { source: "squish", pool: "slime.hold", trimDb: -3 }, trimDb: -1.5 }), hold: sqz("mochi.hold", "proxy", "찹쌀떡 dough kneading + 치즈 slime squishing (blend)", { layer: { source: "squish", pool: "slime.hold", trimDb: -1 }, trimDb: -1.5 }), release: NONE, stretch: sqz("slime.stretch", "recording", "치즈 slime stretching + 찹쌀떡 dough (blend)", { layer: { source: "squish", pool: "mochi.hold", trimDb: -4 }, trimDb: -1.5 }), fold: sqz("slime.fold", "recording", "slime slaps / folds"), crack: NONE, crunch: NONE },
   L03: { init: NONE, tap: NONE, hold: sqz("cream.hold", "proxy", "shaving-foam squashing (stands in for whipped cream)"), release: NONE, stretch: NONE, fold: sqz("cream.fold", "proxy", "shaving-foam folding (stands in for whipped cream)"), crack: NONE, crunch: NONE },
-  // W01/W02/C01/C02: the owner picked these by ear (2026-11-13) — see audio-src/sfx/fidgets/PICKS-CREDITS.md
+  // W01/W02/C01/C02: the owner picked these by ear (2026-11-13)
   W01: {
     init: pick("apple.init", "recording", "a real wax ball's first break", { trimDb: BAL["apple.init"], ...APPLE_TONE, drop: APPLE_THUMPS }),
     tap: NONE,

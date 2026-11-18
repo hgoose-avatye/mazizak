@@ -1,5 +1,5 @@
 {
- "_doc": "Reference 3D models of 모닝빵 (S02) and 찹쌀떡 (S03) shipped with the app. Packed by scripts/fidgets/pack-reference-models.mjs; see CREDITS.md.",
+ "_doc": "Reference 3D models of 모닝빵 (S02) and 찹쌀떡 (S03) shipped with the app. Packed by scripts/fidgets/pack-reference-models.mjs.",
  "clearance": {
   "status": "permission to use in the public build obtained",
   "statedBy": "project owner",

@@ -1,5 +1,5 @@
 /**
- * Recording-based keyboard sounds (per-preset licenses: audio-src/sfx/keyboard/CREDITS.md).
+ * Recording-based keyboard sounds.
  *
  * Each preset ships as ONE 16-bit mono WAV sprite + a JSON map. We fetch both, decode once,
  * slice every entry into its own AudioBuffer (channel data copied, map gain applied) and cache

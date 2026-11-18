@@ -279,7 +279,7 @@ interface ToyManifest { id: string; family: string; title: string; hint: string;
 
 ### 2.5 사운드 콘텐츠 매니페스트와 출처 구조 [추천]
 
-기존 자산을 확장한다. `squishy.json`의 슬라이스별 `src`, `srcUrl`, `srcStart/End`, `processing`, `recorded`와 `clack.json`의 `sources{title, author, url, license, licenseUrl, retrieved, file}`을 하나의 스키마 v2로 합치고, `CREDITS.md`는 **이 매니페스트에서 생성**한다.
+기존 자산을 확장한다. `squishy.json`의 슬라이스별 `src`, `srcUrl`, `srcStart/End`, `processing`, `recorded`와 `clack.json`의 `sources{title, author, url, license, licenseUrl, retrieved, file}`을 하나의 스키마 v2로 합치고.
 
 ```jsonc
 // public/sfx/<bank>/<bank>.json  (sprite schema v2)

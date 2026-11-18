@@ -49,7 +49,7 @@ export const SQUISHY_SAMPLE_CREDITS =
   '"squishing gel between hands" by breadparticles (#575333); "Dry Sponge Rubbing" by qubodup (#50579); ' +
   '"stretching rubber glove" by mistakenforathing (#827006); "Fabric touched by hand" by Sadiquecat (#716374); ' +
   '"Soft Impact - Pillow Hit" by KoimeMatsuchiya (#872227); "Rubbing Spiky Sound Insulation Foam" by imnotdubMass (#680000). ' +
-  'The "recover" sounds are derived (slowed, filtered, reversed) from #405654 and #680000. See audio-src/sfx/squishy/CREDITS.md.';
+  'The "recover" sounds are derived (slowed, filtered, reversed) from #405654 and #680000.';
 
 /** All categories are cut from real recordings (no synthesis). Note: `recover` is re-edited
  *  (slowed/reversed) recorded material rather than a direct recording of foam recovering. */
