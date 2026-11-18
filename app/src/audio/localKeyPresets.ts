@@ -70,12 +70,13 @@ export const LOCAL_KEY_PRESETS = {
 } as const;
 export type LocalKeyPresetId = keyof typeof LOCAL_KEY_PRESETS;
 /** the presets the owner has permission for: shipped in audio-src/sfx/keyboard/ and enabled in every build */
-export const CLEARED_KEY_PRESETS: ReadonlySet<string> = new Set(["box-jade", "silent-peach-v3", "mongdol-pl87w", "jjigae-topre", "dojagi-space65"]);
+export const CLEARED_KEY_PRESETS: ReadonlySet<string> = new Set(["silent-peach-v3", "mongdol-pl87w", "jjigae-topre", "dojagi-space65"]);
 export const isClearedKeyPreset = (id: string) => CLEARED_KEY_PRESETS.has(id);
 export const isLocalKeyPreset = (id: string): id is LocalKeyPresetId =>
   Object.hasOwn(LOCAL_KEY_PRESETS, id);
 /** Reserved for replacement: assets and visual palettes are intentionally retained. */
-export const RETIRED_KEY_PRESETS = new Set<string>(["oil-king", "boba-u4t"]);
+// box-jade (옥구슬) retired 2026-11-18: its Mechvibes pack is "Personal use" (no redistribution) and the maker's account is deleted
+export const RETIRED_KEY_PRESETS = new Set<string>(["oil-king", "boba-u4t", "box-jade"]);
 export const isRetiredKeyPreset = (id: string) => RETIRED_KEY_PRESETS.has(id);
 export const isKeyPresetEnabled = (id: string) =>
   !isRetiredKeyPreset(id) &&

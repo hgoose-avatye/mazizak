@@ -29,7 +29,7 @@ const jpegSize = (b: Uint8Array) => {
 
 describe("menu thumbnails", () => {
   it("every toy and every public key preset has one; presets that are not in the public build must not ship one", () => {
-    expect(publicPresets.length).toBeGreaterThanOrEqual(11);
+    expect(publicPresets.length).toBeGreaterThanOrEqual(10); // 옥구슬 retired 2026-11-18
     for (const name of expected) expect(fs.existsSync(new URL(`${name}.jpg`, dir)), `${name}.jpg`).toBe(true);
     for (const p of Object.keys(KEYBOARD_COLORS).filter((p) => isLocalKeyPreset(p) && !isKeyPresetEnabled(p))) expect(fs.existsSync(new URL(`kb-${p}.jpg`, dir)), `kb-${p}.jpg (not in the public build)`).toBe(false);
   });
