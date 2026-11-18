@@ -2,10 +2,6 @@
 // Content-hashed URLs (relative to the page): a changed sound gets a new name, an unchanged one is cached forever.
 export interface SfxFile { json: string; audio: string }
 export const SFX_KEYBOARD: Record<string, SfxFile> = {
-  "box-jade": {
-    "json": "sfx/keyboard/box-jade.7c2bf2d8f6.json",
-    "audio": "sfx/keyboard/box-jade.4d3007e452.flac"
-  },
   "clack": {
     "json": "sfx/keyboard/clack.e4bc4d0293.json",
     "audio": "sfx/keyboard/clack.7f786e77c7.flac"

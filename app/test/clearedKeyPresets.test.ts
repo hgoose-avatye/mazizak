@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { loadKeyboardSamples } from "../src/audio/keyboardSamples";
 import { CLEARED_KEY_PRESETS, isKeyPresetEnabled } from "../src/audio/localKeyPresets";
 
-// 옥구슬 · 복숭아 · 몽돌 · 찌개 · 도자기: third-party recordings the project owner obtained permission to use in the public build (2026-11-16).
+// 몽돌 · 찌개 · 도자기: third-party recordings the project owner obtained permission to use in the public build (2026-11-16); 복숭아: the owner's own recording.
 // These tests guard the shipped files and the record of that permission; they cannot (and do not) verify the permission itself.
 // node:fs via a dynamic specifier so `tsc` needs no @types/node (same pattern as the other sample tests)
 const fsName = "node:fs";

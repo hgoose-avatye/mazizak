@@ -75,7 +75,6 @@ try {
     const locals = [
       ["민트", "turquoise-tealios"],
       ["타자기", "ibm-buckling-spring"],
-      ["옥구슬", "box-jade"],
       ["복숭아", "silent-peach-v3"],
     ];
     for (const [label, id] of locals) {

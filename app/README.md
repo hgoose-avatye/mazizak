@@ -21,7 +21,7 @@ node scripts/make-thumbs.mjs   # 메뉴 썸네일 다시 만들기 (장난감 �
 
 - `#/` 홈: 장난감 선택 카드(실제 3D 렌더 썸네일 — `public/thumbs/menu/<ID>.jpg`, `kb-<프리셋>.jpg`; 이미지가 없으면 CSS로 그린 모양이 대신 보임)
 - `#/squishy` 말랑이(슬로우 라이징 폼): 누르면 즉시 들어가고, 놓으면 자국이 잠시 남았다가 1.4~3초에 걸쳐 천천히 복원(반동 없음) · 끌기 · 두 손가락 늘리기 · 색상 4종 · 초기화
-- `#/keyboard` 키캡: 9키+스페이스, 동시 입력, 누른 위치에 따른 미세 기울기, 프리셋 11종(조약돌·얼음·크림·마시멜로·민트·타자기 + 몽돌·찌개·도자기·복숭아·옥구슬), 물리 키보드(QWE/ASD/ZXC/Space).
+- `#/keyboard` 키캡: 9키+스페이스, 동시 입력, 누른 위치에 따른 미세 기울기, 프리셋 10종(조약돌·얼음·크림·마시멜로·민트·타자기 + 몽돌·찌개·도자기·복숭아), 물리 키보드(QWE/ASD/ZXC/Space).
 - 모닝빵(S02)·찹쌀떡(S03)은 직접 만든 3D 모델(`public/models/`, 0.5MB로 재포장: `scripts/fidgets/pack-reference-models.mjs`)을 공개 빌드에서도 쓴다.. 불러오지 못하면 `visuals.ts`가 칠한 대체 모양이 보인다
 - 설정 시트: 소리·볼륨·진동(Android)·화질(자동/고화질/절약)·움직임 줄이기·성능 정보
 - `audio-test.html`: 모바일 오디오 활성화(pointerdown/pointerup/touchstart) 실기기 검증 도구

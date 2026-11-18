@@ -61,7 +61,7 @@ for (const f of files.filter((f) => /(^|\/)sfx\/keyboard\/[^/]+\.json$/.test(f))
   if (/LOCAL_DEVELOPMENT_ONLY|NOT_FOR_PUBLIC_DISTRIBUTION/.test(t)) problems.push(`${rel} still carries the local-only marker`);
   if (/\/(Users|private)\//.test(t)) problems.push(`${rel} contains a local absolute path`);
 }
-for (const id of ['box-jade', 'silent-peach-v3', 'mongdol-pl87w', 'jjigae-topre', 'dojagi-space65']) {
+for (const id of ['silent-peach-v3', 'mongdol-pl87w', 'jjigae-topre', 'dojagi-space65']) {
   const f = files.find((x) => new RegExp(`(^|/)sfx/keyboard/${id}\\.[0-9a-f]{10}\\.json$`).test(path.relative(dist, x)));
   if (!f) { problems.push(`cleared preset ${id} missing from dist/sfx/keyboard`); continue; }
   if (JSON.parse(fs.readFileSync(f, 'utf8')).clearance?.statedBy !== 'project owner') problems.push(`${id}.json has no clearance record`);

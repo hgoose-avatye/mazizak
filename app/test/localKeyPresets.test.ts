@@ -12,7 +12,7 @@ afterEach(() => vi.unstubAllGlobals());
 
 it("enables the owner-cleared presets in every build and keeps the other local choices disabled unless the dev server enables them", () => {
   expect(LOCAL_KEY_PRESETS_ENABLED).toBe(false);
-  expect([...CLEARED_KEY_PRESETS].sort()).toEqual(["box-jade", "dojagi-space65", "jjigae-topre", "mongdol-pl87w", "silent-peach-v3"]);
+  expect([...CLEARED_KEY_PRESETS].sort()).toEqual(["dojagi-space65", "jjigae-topre", "mongdol-pl87w", "silent-peach-v3"]);
   for (const id of Object.keys(LOCAL_KEY_PRESETS))
     expect(isKeyPresetEnabled(id), id).toBe(CLEARED_KEY_PRESETS.has(id));
   for (const id of ["pebble", "clack", "creamy-thocky", "topre"])
