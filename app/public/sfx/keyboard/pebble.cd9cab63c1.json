@@ -7,7 +7,7 @@
  "bitDepth": 16,
  "totalSamples": 113489,
  "source": "Rainy 75 (gasket, lubed linear) — freesound:815614 by Techrul, CC0",
- "notes": "down = strongest well-separated presses; up/spaceUp = weaker transients 50–220 ms after a press (inferred top-outs); spaceDown = heaviest low-body presses (spacebar proxy, not confirmed by ear). See CREDITS.md.",
+ "notes": "down = strongest well-separated presses; up/spaceUp = weaker transients 50–220 ms after a press (inferred top-outs); spaceDown = heaviest low-body presses (spacebar proxy, not confirmed by ear).",
  "sources": {
   "freesound:815614": {
    "title": "Typing on a rainy 75",

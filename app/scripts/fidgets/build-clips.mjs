@@ -432,5 +432,5 @@ ${tbl(q)}
 \`recordings\` = distinct passages cut from the files above; \`variants\` = derived copies (0). The player adds a ±3–5 % speed/pitch jitter and picks clips so that none repeats back-to-back — that jitter is playback variation, not additional recordings.
 Sources are downloaded (Freesound preview MP3s, sha256-pinned in \`scripts/fidgets/freesound-sources.json\`) into the git-ignored \`bench-out/fidget-src/\` when missing.
 `;
-  void t; // credits file no longer written (CREDITS.md removed 2026-11-18)
+  void t;
 }

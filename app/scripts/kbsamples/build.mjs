@@ -1,4 +1,4 @@
-// Build keyboard sample sprites from CC0 recordings (see audio-src/sfx/keyboard/CREDITS.md).
+// Build keyboard sample sprites from CC0 recordings.
 // Inputs: bench-out/audio-src/keyboard/*.f32 (mono Float32 @48k, produced by decode.mjs from the
 // downloaded Freesound previews). Outputs: audio-src/sfx/keyboard/{pebble,clack}.wav + .json
 //
@@ -252,8 +252,8 @@ const SRC_INFO = {
   'freesound:546167': { title: 'Keyboard Typing 10 (WhiteFox, Mechanical)', author: 'grcekh', url: 'https://freesound.org/people/grcekh/sounds/546167/', license: 'CC0 1.0', licenseUrl: 'https://creativecommons.org/publicdomain/zero/1.0/', retrieved: '2026-11-09', file: 'https://cdn.freesound.org/previews/546/546167_12206738-hq.mp3' },
 };
 const META = {
-  pebble: { source: 'Rainy 75 (gasket, lubed linear) — freesound:815614 by Techrul, CC0', notes: 'down = strongest well-separated presses; up/spaceUp = weaker transients 50–220 ms after a press (inferred top-outs); spaceDown = heaviest low-body presses (spacebar proxy, not confirmed by ear). See CREDITS.md.' },
-  clack: { source: 'WhiteFox, Hako Violet tactile — freesound:546045 + 546167 by grcekh, CC0', notes: 'isolated press/release pairs from the "individual keys" tail; spaceDown/spaceUp = spacebar PROXY: the heaviest pairs (loud + longest ring + lowest centroid) with their own releases; not confirmed spacebar hits. See CREDITS.md.' },
+  pebble: { source: 'Rainy 75 (gasket, lubed linear) — freesound:815614 by Techrul, CC0', notes: 'down = strongest well-separated presses; up/spaceUp = weaker transients 50–220 ms after a press (inferred top-outs); spaceDown = heaviest low-body presses (spacebar proxy, not confirmed by ear).' },
+  clack: { source: 'WhiteFox, Hako Violet tactile — freesound:546045 + 546167 by grcekh, CC0', notes: 'isolated press/release pairs from the "individual keys" tail; spaceDown/spaceUp = spacebar PROXY: the heaviest pairs (loud + longest ring + lowest centroid) with their own releases; not confirmed spacebar hits.' },
 };
 for (const [name, roles] of Object.entries(presets)) {
   const used = [...new Set(Object.values(roles).flat().map((s) => s.src))];

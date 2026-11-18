@@ -15,7 +15,7 @@ for (const f of files.filter((f) => /\.(js|css|html|json|md|map)$/.test(f))) {
   for (const s of FORBIDDEN) if (t.includes(s)) problems.push(`${path.relative(dist, f)} contains "${s}"`);
 }
 // 2) no reference models / textures / audio outside the licensed sfx folders. The only models allowed are the two shipped on purpose
-//    (모닝빵 / 찹쌀떡, public/models/, owner's permission record in CREDITS.md + models.json — checked in 6)
+//    (모닝빵 / 찹쌀떡, public/models/, the owner's authorship record in models.json — checked in 6)
 const SHIPPED_MODELS = new Set(['models/bread.glb', 'models/peachmochi.glb']);
 for (const f of files) {
   const rel = path.relative(dist, f);
@@ -66,7 +66,7 @@ for (const id of ['box-jade', 'silent-peach-v3', 'mongdol-pl87w', 'jjigae-topre'
   if (!f) { problems.push(`cleared preset ${id} missing from dist/sfx/keyboard`); continue; }
   if (JSON.parse(fs.readFileSync(f, 'utf8')).clearance?.statedBy !== 'project owner') problems.push(`${id}.json has no clearance record`);
 }
-// 6) the shipped models: valid, small, and the owner's permission record travels with them
+// 6) the shipped models: valid, small, and the owner's authorship record travels with them
 for (const rel of SHIPPED_MODELS) {
   const f = path.join(dist, rel);
   if (!fs.existsSync(f)) { problems.push(`${rel} missing from dist`); continue; }

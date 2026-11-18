@@ -95,7 +95,7 @@ export async function referenceSounds(ctx: BaseAudioContext, id: string) {
 }
 /**
  * The two models that ship with the app (public/models/: 모닝빵 S02 and 찹쌀떡 S03, packed by scripts/fidgets/pack-reference-models.mjs;
- * the owner's permission record is public/models/CREDITS.md + models.json). Every build loads them; the dev reference folder still works the same way.
+ * made by the project owner, record in models.json). Every build loads them; the dev reference folder still works the same way.
  */
 export const SHIPPED_MODELS: Record<string, string> = { S02: "models/bread.glb", S03: "models/peachmochi.glb" };
 /** dev only (LOCAL_FIDGETS): the model listed in the local reference manifest */

@@ -7,7 +7,7 @@
 //
 // Usage: node scripts/kbsamples/build-creamy.mjs
 //
-// What is (and is not) done — see audio-src/sfx/keyboard/CREDITS.md:
+// What is (and is not) done:
 //   • each source clip is used whole as one key-DOWN sound (that is how the Mechvibes pack plays it);
 //     clips are NOT split into down/up halves and the pack's key mapping is NOT used (unverified by ear)
 //   • leading/trailing near-silence (below peak −45 / −50 dB) trimmed, 0.5 ms fade-in + 8 ms fade-out
@@ -120,7 +120,7 @@ const map = {
   notes:
     'Each source clip is used whole as a key-DOWN sound. Release (up/spaceUp) is intentionally empty (upMode "none": no release sound). ' +
     'spaceDown is empty (falls back to the down pool). The pack config.json key mapping was NOT used: its Space/Shift/Escape assignments look swapped ' +
-    'and could not be verified by listening. Each source clip shows two strong transients ~80–110 ms apart (possibly press + release); not confirmed by ear. See CREDITS.md.',
+    'and could not be verified by listening. Each source clip shows two strong transients ~80–110 ms apart (possibly press + release); not confirmed by ear.',
   sources: {
     'mechvibes:my-sound-pack-5': {
       title: 'My Sound Pack',

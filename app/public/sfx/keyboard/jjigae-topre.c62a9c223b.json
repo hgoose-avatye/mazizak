@@ -173,7 +173,7 @@
   "status": "permission to use in the public build obtained",
   "statedBy": "project owner",
   "statedOn": "2026-11-16",
-  "note": "The owner's statement; the permission terms are not stored in the repository. A required credit, if any, belongs in CREDITS.md (sfx/keyboard)."
+  "note": "The owner's statement; the permission terms are not stored in the repository."
  },
  "credit": {
   "label": "찌개",

@@ -1,6 +1,6 @@
 /**
  * Recordings taken from third-party packs / videos. Those the project owner obtained permission to use in the public build (owner's statement of
- * 2026-11-16, recorded in every sprite's JSON `clearance` and in audio-src/sfx/keyboard/CREDITS.md) ship like any other preset (scripts/kbsamples/ship-cleared-presets.mjs);
+ * 2026-11-16, recorded in every sprite's JSON `clearance`) ship like any other preset (scripts/kbsamples/ship-cleared-presets.mjs);
  * the rest stay out of the build and are served from outside the repository by the opt-in Vite dev server only.
  * ("local" is the historical name of this group: they are mapped and played like the kbsim presets, see isLocalKeyPreset in toy.ts.)
  */
