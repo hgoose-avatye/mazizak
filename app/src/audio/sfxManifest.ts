@@ -90,8 +90,8 @@ export const SFX_FIDGET_CHUNKS: Record<string, SfxFile> = {
     "audio": "sfx/fidgets/squish.L03.7c13c1d04f.flac"
   },
   "squish.S02": {
-    "json": "sfx/fidgets/squish.S02.2376be8253.json",
-    "audio": "sfx/fidgets/squish.S02.f41e4c1dea.flac"
+    "json": "sfx/fidgets/squish.S02.2131c309fe.json",
+    "audio": "sfx/fidgets/squish.S02.d5a7392f8c.flac"
   },
   "wax.W02": {
     "json": "sfx/fidgets/wax.W02.b9da8c224b.json",

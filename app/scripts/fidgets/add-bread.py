@@ -25,17 +25,23 @@ Re-run after build-clips.mjs (which rewrites squish.json without these pools): p
 import json, os, sys
 import numpy as np
 from scipy.io import wavfile
-from scipy.signal import stft, istft, find_peaks
+from scipy.signal import stft, istft, find_peaks, butter, sosfiltfilt
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
 OUT = os.path.join(ROOT, 'audio-src/sfx/fidgets')
 OWN = os.path.join(ROOT, 'scripts/fidgets/own')
 ASSET = 'bread/bread-2026-11-18.wav'
 START_S = 9.0
+HIGHPASS_HZ = 100
+# one consistent character (owner, 2026-11-18: clips felt uneven): the bread presses sit at 1.5–3.5 kHz; thumps (energy under 250 Hz)
+# and bright rubbing are left out, and so are rattly clips
+CENTROID_HZ = (1500, 3500)
+MAX_LOW = 0.3
+MAX_ROUGH = 0.6
 VARIANTS = {'light': (1.2, 0.15), 'medium': (2.0, 0.08), 'strong': (3.0, 0.04)}  # over-subtraction, magnitude floor
 SR = 48000
 POOLS = {'bread.tap': dict(event='tap', lenMs=340, n=6, note='short bread-squishy presses (~0.34 s)', loud='impact'),
-         'bread.hold': dict(event='hold', lenMs=700, n=6, note='bread-squishy pressing windows (~0.7 s, ≥ 2 presses)', loud='continuous')}
+         'bread.hold': dict(event='hold', lenMs=700, n=6, note='bread-squishy pressing windows (~0.7 s)', loud='continuous')}
 
 
 def denoise(x, variant):
@@ -44,9 +50,30 @@ def denoise(x, variant):
     mag = np.abs(Z)
     e = mag.sum(0)
     noise = mag[:, e <= np.percentile(e, 10)].mean(1, keepdims=True)
-    clean = np.maximum(mag - over * noise, fl * mag)
-    _, y = istft(clean * np.exp(1j * np.angle(Z)), SR, nperseg=1024, noverlap=768)
-    return y[: len(x)]
+    g = np.maximum(1 - over * noise / np.maximum(mag, 1e-12), fl)
+    # smooth the gain over time (fast attack, slow release): without it the gain flickers frame to frame and the
+    # leftover background "rattles" (the owner heard a 드르륵 on 2026-11-18)
+    s = np.empty_like(g); s[:, 0] = g[:, 0]
+    for i in range(1, g.shape[1]):
+        s[:, i] = np.where(g[:, i] > s[:, i - 1], g[:, i], 0.7 * s[:, i - 1] + 0.3 * g[:, i])
+    _, y = istft(Z * s, SR, nperseg=1024, noverlap=768)
+    # 100 Hz high-pass (4th order): the 94 Hz hum and the handling rumble sit below the bread sound
+    y = sosfiltfilt(butter(4, HIGHPASS_HZ, 'highpass', fs=SR, output='sos'), y[: len(x)])
+    return y
+
+
+def character(c):
+    """brightness (spectral centroid), share of energy under 250 Hz, and roughness (level wobble at 15–60 Hz vs 1–15 Hz: a 드르륵)"""
+    p = np.abs(np.fft.rfft(c * np.hanning(len(c)))) ** 2
+    f = np.fft.rfftfreq(len(c), 1 / SR)
+    P = p.sum() + 1e-20
+    hop = SR // 1000
+    n = len(c) // hop
+    e = np.sqrt((c[: n * hop].reshape(n, hop) ** 2).mean(1))
+    E = np.abs(np.fft.rfft((e - e.mean()) * np.hanning(n))) ** 2
+    fe = np.fft.rfftfreq(n, 1 / 1000)
+    rough = E[(fe >= 15) & (fe < 60)].sum() / (E[(fe >= 1) & (fe < 15)].sum() + 1e-20)
+    return float((f * p).sum() / P), float(p[f < 250].sum() / P), float(rough)
 
 
 def env_db(x, ms=10):
@@ -122,13 +149,18 @@ def main():
             if peak >= 0.98:
                 continue
             strikes = sum(1 for p in hits if a <= p < a + L)
-            if cfg['event'] == 'hold' and strikes < 2:
+            cen, low, rough = character(x[a:a + L])
+            if not (CENTROID_HZ[0] <= cen <= CENTROID_HZ[1]) or low > MAX_LOW or rough > MAX_ROUGH:
                 continue
-            cands.append(dict(a=a, peak=peak, strikes=strikes))
-        cands.sort(key=lambda c: -c['peak'])
+            cands.append(dict(a=a, peak=peak, strikes=strikes, cen=cen, rough=rough))
+        if not cands:
+            sys.exit(f'{name}: no clip of the bread character')
+        mid = np.median([np.log(c['cen']) for c in cands])
+        # closest to the typical brightness first (then the smoothest), spread over the recording (≥ 1 s apart)
+        cands.sort(key=lambda c: abs(np.log(c['cen']) - mid) + 0.5 * c['rough'])
         chosen = []
-        for c in cands:  # strongest first, spread over the recording (≥ 2 s apart)
-            if all(abs(o['a'] - c['a']) >= 2 * SR for o in chosen):
+        for c in cands:
+            if all(abs(o['a'] - c['a']) >= SR for o in chosen):
                 chosen.append(c)
             if len(chosen) == cfg['n']:
                 break
@@ -153,17 +185,17 @@ def main():
             cursor = start + len(pcm)
             entries.append({'start': int(start), 'length': int(len(pcm)), 'offset': round(start / SR, 6), 'duration': round(len(pcm) / SR, 6),
                             'gain': round(float(min(lv) / l), 4), 'src': src_id, 'srcStart': round(c['a'] / SR + START_S, 4), 'srcEnd': round((c['a'] + L) / SR + START_S, 4),
-                            'peakDbSource': round(float(20 * np.log10(c['peak'])), 1), 'centroidHz': round(centroid(y)), 'strikes': int(c['strikes']),
+                            'peakDbSource': round(float(20 * np.log10(c['peak'])), 1), 'centroidHz': round(centroid(y)), 'roughness': round(c['rough'], 2), 'strikes': int(c['strikes']),
                             'boostDb': round(float(boost), 1)})
         meta['pools'][name] = {'event': cfg['event'], 'loudnessClass': cfg['loud'], 'material': prov['material'], 'note': cfg['note'],
-                               'processing': f'hiss and background reduced (spectral subtraction, variant {args.variant}: noise profile = quietest 10 % of the asset from {START_S:g} s); appended by scripts/fidgets/add-bread.py',
+                               'processing': f'hiss and background reduced (spectral subtraction with time-smoothed gain, variant {args.variant}: noise profile = quietest 10 % of the asset from {START_S:g} s), {HIGHPASS_HZ} Hz high-pass; clips of one character only (centroid {CENTROID_HZ[0]}–{CENTROID_HZ[1]} Hz, ≤ {MAX_LOW:.0%} under 250 Hz, roughness ≤ {MAX_ROUGH}); appended by scripts/fidgets/add-bread.py',
                                'recordings': len(entries), 'variants': 0, 'entries': entries}
         if args.candidates:
             os.makedirs(args.candidates, exist_ok=True)
             gap = np.zeros(int(0.4 * SR))
             wavfile.write(os.path.join(args.candidates, f'bread-{args.variant}-{name.split(".")[1]}.wav'), SR,
                           np.round(np.clip(np.concatenate([np.concatenate([y * g, gap]) for (_, y, _), g in zip(clips, [min(lv) / l for l in lv])]), -1, 1) * 32767).astype(np.int16))
-        print(f"{name}: {len(entries)} clips " + ', '.join(f"@{e['srcStart']}s +{e['boostDb']}dB {e['centroidHz']}Hz x{e['strikes']}" for e in entries))
+        print(f"{name}: {len(entries)} clips of {len(cands)} " + ', '.join(f"@{e['srcStart']}s {e['centroidHz']}Hz r{e['roughness']}" for e in entries))
     if args.candidates:
         return
     meta['sources'][src_id] = {'title': prov['title'], 'author': 'project owner', 'url': 'own recording', 'license': prov.get('license', 'Own recording (project owner)'),
