@@ -2,8 +2,8 @@ import { describe, expect, it } from "vitest";
 import { FIDGETS } from "../src/toys/fidgets/catalog";
 import { SHIPPED_MODELS } from "../src/toys/fidgets/references";
 
-// 모닝빵 (S02) / 찹쌀떡 (S03) ship with a packed reference model (public/models/). These tests guard the files and the record of the owner's permission;
-// they cannot (and do not) verify the permission itself.
+// 모닝빵 (S02) / 찹쌀떡 (S03) ship with a packed reference model (public/models/). These tests guard the files and the record that the owner made them;
+// they cannot (and do not) verify it.
 // node:fs via a dynamic specifier so `tsc` needs no @types/node (same pattern as the other sample tests)
 const fsName = "node:fs";
 const { readFileSync, readdirSync } = (await import(/* @vite-ignore */ fsName)) as { readFileSync(p: URL): Uint8Array; readdirSync(p: URL): string[] };
@@ -39,7 +39,7 @@ describe("shipped 모닝빵 / 찹쌀떡 models", () => {
       expect(json.images[0].mimeType).toBe("image/jpeg");
       expect(json.materials[0].pbrMetallicRoughness.baseColorTexture).toBeDefined();
     });
-    it("is described in models.json with the owner's permission record", () => {
+    it("is described in models.json with the owner's authorship record", () => {
       const m = JSON.parse(new TextDecoder().decode(readFileSync(pub("models/models.json"))));
       expect(m.clearance).toMatchObject({ statedBy: "project owner", statedOn: "2026-11-16" });
       const e = m.models.find((x: { file: string }) => rel.endsWith(x.file));
