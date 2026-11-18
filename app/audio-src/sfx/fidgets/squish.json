@@ -4,11 +4,11 @@
  "sampleRate": 48000,
  "channels": 1,
  "bitDepth": 16,
- "totalSamples": 1803421,
+ "totalSamples": 2113021,
  "note": "Clips were picked automatically from the waveform and have NOT been listened to. `recordings` = distinct passages extracted from the source files; `variants` = derived copies (none here — runtime speed/pitch jitter is not counted). Sprite clips are peak-normalised to −1 dBFS; `gain` (≤1) equalises RMS within a pool; relative loudness between event classes is set by the player.",
  "counts": {
-  "sourceFiles": 11,
-  "extractedClips": 55,
+  "sourceFiles": 12,
+  "extractedClips": 66,
   "derivedVariants": 0
  },
  "qualityGates": {
@@ -343,6 +343,17 @@
    "usage": "L03 hold",
    "materialMatch": "similar material only (not a recording of the toy)",
    "originalFile": "bench-out/fidget-src/fs_849247.mp3"
+  },
+  "own:bread/bread-2026-11-18.wav": {
+   "title": "빵말랑이.m4a (S02 모닝빵 — the project owner's own recording; 47.6 s, 44.1 kHz stereo AAC, converted with afconvert)",
+   "author": "project owner",
+   "url": "own recording",
+   "license": "Own recording (project owner)",
+   "licenseUrl": "",
+   "retrieved": "2026-11-18",
+   "usage": "S02 tap, S02 hold",
+   "materialMatch": "the project owner's own recording for S02 모닝빵, per the project owner",
+   "originalFile": "scripts/fidgets/own/bread/bread-2026-11-18.wav"
   }
  },
  "pools": {
@@ -1226,6 +1237,193 @@
      "centroidHz": 4789,
      "strikes": 9,
      "boostDb": 3.1
+    }
+   ]
+  },
+  "bread.tap": {
+   "event": "tap",
+   "loudnessClass": "impact",
+   "material": "the project owner's own recording for S02 모닝빵, per the project owner",
+   "note": "short bread-squishy presses (~0.34 s)",
+   "processing": "hiss and background reduced (spectral subtraction with time-smoothed gain, variant medium: noise profile = quietest 10 % of the asset from 9 s), 100 Hz high-pass; clips of one character only (centroid 1500–3500 Hz, ≤ 30% under 250 Hz, roughness ≤ 0.6); appended by scripts/fidgets/add-bread.py",
+   "recordings": 5,
+   "variants": 0,
+   "entries": [
+    {
+     "start": 1805821,
+     "length": 16320,
+     "offset": 37.621271,
+     "duration": 0.34,
+     "gain": 0.5982,
+     "src": "own:bread/bread-2026-11-18.wav",
+     "srcStart": 11.035,
+     "srcEnd": 11.375,
+     "peakDbSource": -22.8,
+     "centroidHz": 2574,
+     "roughness": 0.23,
+     "strikes": 0,
+     "boostDb": 23.3
+    },
+    {
+     "start": 1824541,
+     "length": 16320,
+     "offset": 38.011271,
+     "duration": 0.34,
+     "gain": 0.3023,
+     "src": "own:bread/bread-2026-11-18.wav",
+     "srcStart": 15.395,
+     "srcEnd": 15.735,
+     "peakDbSource": -22.3,
+     "centroidHz": 2577,
+     "roughness": 0.34,
+     "strikes": 0,
+     "boostDb": 22.2
+    },
+    {
+     "start": 1843261,
+     "length": 16320,
+     "offset": 38.401271,
+     "duration": 0.34,
+     "gain": 0.774,
+     "src": "own:bread/bread-2026-11-18.wav",
+     "srcStart": 19.565,
+     "srcEnd": 19.905,
+     "peakDbSource": -2.4,
+     "centroidHz": 2898,
+     "roughness": 0.44,
+     "strikes": 1,
+     "boostDb": 1.6
+    },
+    {
+     "start": 1861981,
+     "length": 16320,
+     "offset": 38.791271,
+     "duration": 0.34,
+     "gain": 1.0,
+     "src": "own:bread/bread-2026-11-18.wav",
+     "srcStart": 20.77,
+     "srcEnd": 21.11,
+     "peakDbSource": -5.3,
+     "centroidHz": 2752,
+     "roughness": 0.07,
+     "strikes": 1,
+     "boostDb": 4.5
+    },
+    {
+     "start": 1880701,
+     "length": 16320,
+     "offset": 39.181271,
+     "duration": 0.34,
+     "gain": 0.564,
+     "src": "own:bread/bread-2026-11-18.wav",
+     "srcStart": 32.155,
+     "srcEnd": 32.495,
+     "peakDbSource": -3.4,
+     "centroidHz": 2985,
+     "roughness": 0.33,
+     "strikes": 1,
+     "boostDb": 2.6
+    }
+   ]
+  },
+  "bread.hold": {
+   "event": "hold",
+   "loudnessClass": "continuous",
+   "material": "the project owner's own recording for S02 모닝빵, per the project owner",
+   "note": "bread-squishy pressing windows (~0.7 s)",
+   "processing": "hiss and background reduced (spectral subtraction with time-smoothed gain, variant medium: noise profile = quietest 10 % of the asset from 9 s), 100 Hz high-pass; clips of one character only (centroid 1500–3500 Hz, ≤ 30% under 250 Hz, roughness ≤ 0.6); appended by scripts/fidgets/add-bread.py",
+   "recordings": 6,
+   "variants": 0,
+   "entries": [
+    {
+     "start": 1899421,
+     "length": 33600,
+     "offset": 39.571271,
+     "duration": 0.7,
+     "gain": 0.6535,
+     "src": "own:bread/bread-2026-11-18.wav",
+     "srcStart": 17.755,
+     "srcEnd": 18.455,
+     "peakDbSource": -9.7,
+     "centroidHz": 2468,
+     "roughness": 0.15,
+     "strikes": 1,
+     "boostDb": 8.9
+    },
+    {
+     "start": 1935421,
+     "length": 33600,
+     "offset": 40.321271,
+     "duration": 0.7,
+     "gain": 0.5156,
+     "src": "own:bread/bread-2026-11-18.wav",
+     "srcStart": 19.565,
+     "srcEnd": 20.265,
+     "peakDbSource": -2.4,
+     "centroidHz": 2960,
+     "roughness": 0.2,
+     "strikes": 2,
+     "boostDb": 1.6
+    },
+    {
+     "start": 1971421,
+     "length": 33600,
+     "offset": 41.071271,
+     "duration": 0.7,
+     "gain": 1.0,
+     "src": "own:bread/bread-2026-11-18.wav",
+     "srcStart": 20.77,
+     "srcEnd": 21.47,
+     "peakDbSource": -5.3,
+     "centroidHz": 3092,
+     "roughness": 0.19,
+     "strikes": 1,
+     "boostDb": 4.5
+    },
+    {
+     "start": 2007421,
+     "length": 33600,
+     "offset": 41.821271,
+     "duration": 0.7,
+     "gain": 0.1606,
+     "src": "own:bread/bread-2026-11-18.wav",
+     "srcStart": 23.245,
+     "srcEnd": 23.945,
+     "peakDbSource": -10.8,
+     "centroidHz": 3077,
+     "roughness": 0.07,
+     "strikes": 1,
+     "boostDb": 19.4
+    },
+    {
+     "start": 2043421,
+     "length": 33600,
+     "offset": 42.571271,
+     "duration": 0.7,
+     "gain": 0.3923,
+     "src": "own:bread/bread-2026-11-18.wav",
+     "srcStart": 42.335,
+     "srcEnd": 43.035,
+     "peakDbSource": -2.4,
+     "centroidHz": 2321,
+     "roughness": 0.15,
+     "strikes": 1,
+     "boostDb": 2.3
+    },
+    {
+     "start": 2079421,
+     "length": 33600,
+     "offset": 43.321271,
+     "duration": 0.7,
+     "gain": 0.1733,
+     "src": "own:bread/bread-2026-11-18.wav",
+     "srcStart": 45.215,
+     "srcEnd": 45.915,
+     "peakDbSource": -11.8,
+     "centroidHz": 2785,
+     "roughness": 0.27,
+     "strikes": 1,
+     "boostDb": 11.0
     }
    ]
   }

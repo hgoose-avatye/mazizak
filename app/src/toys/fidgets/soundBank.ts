@@ -101,9 +101,9 @@ export const FIDGET_SOUND: Record<string, ToySound> = {
   // S01 슬랑이 and L02 망고 (owner, 2026-11-17): a blend of the 찹쌀떡 (S03 dough) and 치즈 (L01 slime) sounds — every press plays a
   // dough clip with a slime clip layered under it (cut to the dough clip's length)
   S01: { init: NONE, tap: sqz("mochi.tap", "proxy", "찹쌀떡 dough press + 치즈 slime squish (blend)", { layer: { source: "squish", pool: "slime.hold", trimDb: -3 }, trimDb: -1.5 }), hold: sqz("mochi.hold", "proxy", "찹쌀떡 dough kneading + 치즈 slime squishing (blend)", { layer: { source: "squish", pool: "slime.hold", trimDb: -2 }, trimDb: -1.5 }), release: NONE, stretch: NONE, fold: NONE, crack: NONE, crunch: NONE },
-  // S02 모닝빵: back on the memory-foam / sponge presses — the owner's recording of 2026-11-17 had music under it all along
+  // S02 모닝빵: the project owner's own recording (2026-11-18, from 9 s; scripts/fidgets/add-bread.py)
   // (7–12 dB below the presses), so it was taken out again; a recording without music will replace this
-  S02: { init: NONE, tap: NONE, hold: sqz("foam.hold", "recording", "memory-foam / sponge slow presses", { rate: jitter(0.025) }), release: NONE, stretch: NONE, fold: NONE, crack: NONE, crunch: NONE },
+  S02: { init: NONE, tap: sqz("bread.tap", "recording", "soft bread-squishy presses (the owner's own recording)"), hold: sqz("bread.hold", "recording", "bread-squishy pressing (the owner's own recording)", { rate: jitter(0.025) }), release: NONE, stretch: NONE, fold: NONE, crack: NONE, crunch: NONE },
   S03: { init: NONE, tap: sqz("mochi.tap", "proxy", "short soft-dough presses (dough stands in for mochi)"), hold: sqz("mochi.hold", "proxy", "dough kneading / rolling (stands in for mochi)"), release: NONE, stretch: NONE, fold: NONE, crack: NONE, crunch: NONE },
   L01: { init: NONE, tap: NONE, hold: sqz("slime.hold", "recording", "slime squishing"), release: NONE, stretch: sqz("slime.stretch", "recording", "slime stretching passages"), fold: sqz("slime.fold", "recording", "slime slaps / folds"), crack: NONE, crunch: NONE },
   // L02: modelled on the reference app's rainbow-sharbet clips (bright, continuous fine crackle; short ≈0.7 s, long ≈1.2 s)
