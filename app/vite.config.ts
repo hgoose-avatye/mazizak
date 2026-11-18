@@ -1,3 +1,4 @@
+/// <reference types="vitest/config" />
 import { defineConfig } from "vite";
 import { fileURLToPath } from "node:url";
 import { readFile } from "node:fs/promises";
@@ -243,8 +244,14 @@ export default defineConfig(({ command, isPreview }) => {
     // one copy of three.js in dev: when the dependency optimizer ran twice at once (two dev servers on this folder) GLTFLoader's meshes came
     // from a second copy, `instanceof THREE.Mesh` failed and the reference models of 모닝빵 / 찹쌀떡 / 망고 were "empty"
     resolve: { dedupe: ["three"] },
+    // the material / soft-body tests step thousands of physics frames; with every test file running at once on a busy
+    // machine a single test can take 10+ s, so the 5 s default timed out at random (they pass in ~1 s each when run alone)
+    test: { testTimeout: 30_000 },
     optimizeDeps: { include: ["three", "three/addons/loaders/GLTFLoader.js", "three/addons/utils/BufferGeometryUtils.js"] },
     build: {
+      // three.js alone is ~600 kB minified (151 kB gzip) and is already its own lazily loaded chunk (opened with the first toy),
+      // so the default 500 kB warning fired on every build without anything to act on
+      chunkSizeWarningLimit: 650,
       rollupOptions: {
         // the public build is the app only: audio-test.html / lab-sound.html / keyboard-compare.html (and the other lab pages)
         // stay available on the dev server, which serves every html file in this folder (scripts/check-dist.mjs enforces this)

@@ -13,12 +13,13 @@
 import type { FidgetEvent } from "./soundBank";
 
 export const ORIGINAL_SOUNDS = import.meta.env.VITE_ORIGINAL_SOUNDS === "1";
+/**
+ * Toys that show the 원본 소리 / 공개 소리 chips. Since 2026-11-17 only S02 모닝빵 (owner: "모닝빵만 원본소리 공개소리 보여주세요"),
+ * against the 뿌왁 app's bread squish; the earlier W01 wak/butter · W02 wak/cake · C01 crunch/soda · C02 crunch/clover ·
+ * S01 crunch/guma comparisons are switched off (their PHASES stay, so one line brings a comparison back).
+ */
 export const ORIGINAL_FOLDER: Record<string, string> = {
-  W01: "wak/butter",
-  W02: "wak/cake",
-  C01: "crunch/soda",
-  C02: "crunch/clover",
-  S01: "crunch/guma",
+  S02: "wakppu:bread",
 };
 /** original phase → MANZIZAK events (short = tap, long = knead/hold, init = first break) */
 const PHASES: Record<string, Partial<Record<FidgetEvent, "init" | "short" | "long">>> = {
@@ -27,12 +28,14 @@ const PHASES: Record<string, Partial<Record<FidgetEvent, "init" | "short" | "lon
   C01: { tap: "short", crunch: "short", hold: "long" },
   C02: { tap: "short", crunch: "short", hold: "long" },
   S01: { tap: "short", hold: "long" },
+  // 뿌왁 bread squish: both files are its whole press sound
+  S02: { tap: "long", hold: "long" },
 };
 
 /** wax balls: the installed app's "completed" (wax mixed into the core) sounds — short = a touch, long = kneading */
 const MIX_TOYS = new Set(["W01", "W02"]);
 export async function loadOriginalMix(ctx: BaseAudioContext, id: string): Promise<Partial<Record<"tap" | "hold", { buffer: AudioBuffer; label: string }[]>> | null> {
-  if (!ORIGINAL_SOUNDS || !MIX_TOYS.has(id)) return null;
+  if (!ORIGINAL_SOUNDS || !MIX_TOYS.has(id) || !ORIGINAL_FOLDER[id]) return null; // only toys that are compared at all
   const files = (await originalIndex())["wak/common"] ?? [];
   const out: Partial<Record<"tap" | "hold", { buffer: AudioBuffer; label: string }[]>> = {};
   for (const [ev, re] of [["tap", /^completed_short/], ["hold", /^completed_long/]] as const) {
