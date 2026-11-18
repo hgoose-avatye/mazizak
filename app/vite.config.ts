@@ -249,6 +249,9 @@ export default defineConfig(({ command, isPreview }) => {
     test: { testTimeout: 30_000 },
     optimizeDeps: { include: ["three", "three/addons/loaders/GLTFLoader.js", "three/addons/utils/BufferGeometryUtils.js"] },
     build: {
+      // three.js alone is ~600 kB minified (151 kB gzip) and is already its own lazily loaded chunk (opened with the first toy),
+      // so the default 500 kB warning fired on every build without anything to act on
+      chunkSizeWarningLimit: 650,
       rollupOptions: {
         // the public build is the app only: audio-test.html / lab-sound.html / keyboard-compare.html (and the other lab pages)
         // stay available on the dev server, which serves every html file in this folder (scripts/check-dist.mjs enforces this)
