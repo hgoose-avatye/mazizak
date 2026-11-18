@@ -21,8 +21,8 @@ node scripts/make-thumbs.mjs   # 메뉴 썸네일 다시 만들기 (장난감 �
 
 - `#/` 홈: 장난감 선택 카드(실제 3D 렌더 썸네일 — `public/thumbs/menu/<ID>.jpg`, `kb-<프리셋>.jpg`; 이미지가 없으면 CSS로 그린 모양이 대신 보임)
 - `#/squishy` 말랑이(슬로우 라이징 폼): 누르면 즉시 들어가고, 놓으면 자국이 잠시 남았다가 1.4~3초에 걸쳐 천천히 복원(반동 없음) · 끌기 · 두 손가락 늘리기 · 색상 4종 · 초기화
-- `#/keyboard` 키캡: 9키+스페이스, 동시 입력, 누른 위치에 따른 미세 기울기, 프리셋 11종(조약돌·얼음·크림·마시멜로·민트·타자기 + 몽돌·찌개·도자기·복숭아·옥구슬), 물리 키보드(QWE/ASD/ZXC/Space). 소리 출처·허락 기록: `audio-src/sfx/keyboard/CREDITS.md`
-- 모닝빵(S02)·찹쌀떡(S03)은 참고 3D 모델(`public/models/`, 0.5MB로 재포장: `scripts/fidgets/pack-reference-models.mjs`)을 공개 빌드에서도 쓴다. 허락 기록·출처: `public/models/CREDITS.md`. 불러오지 못하면 `visuals.ts`가 칠한 대체 모양이 보인다
+- `#/keyboard` 키캡: 9키+스페이스, 동시 입력, 누른 위치에 따른 미세 기울기, 프리셋 11종(조약돌·얼음·크림·마시멜로·민트·타자기 + 몽돌·찌개·도자기·복숭아·옥구슬), 물리 키보드(QWE/ASD/ZXC/Space).
+- 모닝빵(S02)·찹쌀떡(S03)은 참고 3D 모델(`public/models/`, 0.5MB로 재포장: `scripts/fidgets/pack-reference-models.mjs`)을 공개 빌드에서도 쓴다.. 불러오지 못하면 `visuals.ts`가 칠한 대체 모양이 보인다
 - 설정 시트: 소리·볼륨·진동(Android)·화질(자동/고화질/절약)·움직임 줄이기·성능 정보
 - `audio-test.html`: 모바일 오디오 활성화(pointerdown/pointerup/touchstart) 실기기 검증 도구
 
@@ -46,12 +46,12 @@ scripts/                 shots.mjs(화면·조작 스모크), assets.mjs(썸네�
 ## 배포 시 캐시·압축 (호스트 미정 — 2026-11-16 기준 배포 환경 없음)
 
 - 내용 해시가 붙은 파일은 바뀌면 이름이 바뀝니다: `assets/*-<hash>.js|css`, `sfx/**/<이름>.<10자리 hash>.flac|json` → `Cache-Control: public, max-age=31536000, immutable`
-- 그 밖(`index.html`, `manifest.webmanifest`, `thumbs/`, `icons/`, `sfx/**/CREDITS.md` 등) → `Cache-Control: no-cache` (ETag로 304 재검증)
+- 그 밖(`index.html`, `manifest.webmanifest`, `thumbs/`, `icons/` 등) → `Cache-Control: no-cache` (ETag로 304 재검증)
 - gzip/brotli: HTML·JS·CSS·JSON·MD에 켜기. FLAC은 이미 압축돼 있어 압축하지 않아도 됨
 - `scripts/bench-load.mjs`의 로컬 서버가 이 정책 그대로 응답합니다(측정 기준).
 
 ## 에셋 출처
 
 - 3D 형상·텍스처: 코드로 직접 생성 (썸네일·아이콘은 앱의 실제 3D 렌더 캡처)
-- 효과음: Freesound CC0 1.0 실제 녹음을 가공 — 상세 출처·가공 내역은 `audio-src/sfx/keyboard/CREDITS.md`, `audio-src/sfx/squishy/CREDITS.md`(배포본에도 같은 파일이 복사됨), 각 JSON의 `sources`/슬라이스별 `src`
+- 효과음: Freesound CC0 1.0 실제 녹음을 가공 — 상세 출처·가공 내역은 각 JSON의 `sources`/슬라이스별 `src`
 - 개발용 A/B 비교: `lab-sound.html` (합성 A vs 녹음 B, 블라인드 투표) · 앱에서 `?sfx=synth` 로 합성음 강제

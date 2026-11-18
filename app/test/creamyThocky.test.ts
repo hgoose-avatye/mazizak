@@ -93,11 +93,6 @@ describe('creamy-thocky sprite', () => {
     expect(KEYBOARD_SAMPLE_CREDITS).toContain('Chevy');
     expect(KEYBOARD_SAMPLE_CREDITS).toContain('CC BY 4.0');
   });
-
-  it('CREDITS.md credits Chevy, the Mechvibes URL, the CC BY 4.0 link and the changes made', () => {
-    const t = new TextDecoder().decode(file('CREDITS.md'));
-    for (const needle of ['My Sound Pack', 'Chevy', 'https://mechvibes.com/sound-packs/my-sound-pack-5', 'https://creativecommons.org/licenses/by/4.0/', 'normalis']) expect(t).toContain(needle);
-  });
 });
 
 describe('preset registry helpers', () => {

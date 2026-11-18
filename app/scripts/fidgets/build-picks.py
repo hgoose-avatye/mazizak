@@ -191,7 +191,6 @@ def main():
             used.setdefault(m["src"], set()).add(name)
     for k, s in sources.items():
         lines.append(f"| {s['url']} | {s['title'].replace('|', '/')} | {s['author']} | {s['license']} | {', '.join(sorted(used.get(k, [])))} |")
-    open(os.path.join(OUT, "PICKS-CREDITS.md"), "w").write("\n".join(lines) + "\n")
     print(f"picks: {len(clips)} clips in {len(pools)} pools from {len(sources)} sources, {len(pcm16) / SR:.1f} s")
 
 
