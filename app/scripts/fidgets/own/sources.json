@@ -1,5 +1,18 @@
 {
  "_doc": "Provenance of the project owner's own recordings in scripts/fidgets/own/<pool>/ — only what the owner stated. WAVs were converted from the owner's .m4a files (48 kHz mono AAC) with macOS afconvert to 48 kHz mono 16-bit PCM; no other processing.",
- "soap.crunch/rec28.wav": { "title": "새로운 녹음 28.m4a (C01 비누 크런치 — short crushing)", "added": "2026-11-13", "material": "recording of the actual toy (C01 soap crunch squishy), per the project owner" },
- "soap.hold/rec27.wav": { "title": "새로운 녹음 27.m4a (C01 비누 크런치 — continuous squeezing)", "added": "2026-11-13", "material": "recording of the actual toy (C01 soap crunch squishy), per the project owner" }
+ "soap.crunch/rec28.wav": {
+  "title": "새로운 녹음 28.m4a (C01 비누 크런치 — short crushing)",
+  "added": "2026-11-13",
+  "material": "recording of the actual toy (C01 soap crunch squishy), per the project owner"
+ },
+ "soap.hold/rec27.wav": {
+  "title": "새로운 녹음 27.m4a (C01 비누 크런치 — continuous squeezing)",
+  "added": "2026-11-13",
+  "material": "recording of the actual toy (C01 soap crunch squishy), per the project owner"
+ },
+ "bread/bread-2026-11-18.wav": {
+  "title": "빵말랑이.m4a (S02 모닝빵 — the project owner's own recording; 47.6 s, 44.1 kHz stereo AAC, converted with afconvert)",
+  "added": "2026-11-18",
+  "material": "the project owner's own recording for S02 모닝빵, per the project owner"
+ }
 }

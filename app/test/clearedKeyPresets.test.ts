@@ -38,11 +38,13 @@ describe.each([...CLEARED_KEY_PRESETS])("cleared preset %s", (id) => {
 
   it("carries the owner's permission record instead of the local-only marker, and no local path", () => {
     const text = JSON.stringify(map);
-    expect(map.clearance).toMatchObject({ statedBy: "project owner", statedOn: "2026-11-16" });
+    // 복숭아 is the owner's own recording since 2026-11-18 (scripts/kbsamples/build-own-peach.py); the others are third-party recordings the owner cleared
+    const own = id === "silent-peach-v3";
+    expect(map.clearance).toMatchObject({ statedBy: "project owner", statedOn: own ? "2026-11-18" : "2026-11-16" });
     expect(map.usage).toBeUndefined();
     expect(map.rights).toBeUndefined();
     expect(text).not.toMatch(/LOCAL_DEVELOPMENT_ONLY|NOT_FOR_PUBLIC_DISTRIBUTION|\/Users\/|\/private\//);
-    expect(map.credit.url).toMatch(/^https:\/\//);
+    if (!own) expect(map.credit.url).toMatch(/^https:\/\//);
   });
 
   it("is enabled in every build and loads from the shipped folder, never from the dev route", async () => {

@@ -35,8 +35,8 @@ export const SFX_KEYBOARD: Record<string, SfxFile> = {
     "audio": "sfx/keyboard/pebble.6525dd6a0a.flac"
   },
   "silent-peach-v3": {
-    "json": "sfx/keyboard/silent-peach-v3.65c4e2f6ba.json",
-    "audio": "sfx/keyboard/silent-peach-v3.e5acf960d0.flac"
+    "json": "sfx/keyboard/silent-peach-v3.0f5eada39b.json",
+    "audio": "sfx/keyboard/silent-peach-v3.5d0e7870b9.flac"
   },
   "topre": {
     "json": "sfx/keyboard/topre.59e43e563d.json",
@@ -86,12 +86,12 @@ export const SFX_FIDGET_CHUNKS: Record<string, SfxFile> = {
     "audio": "sfx/fidgets/squish.L02-S01-S03.aa987a5463.flac"
   },
   "squish.L03": {
-    "json": "sfx/fidgets/squish.L03.b8959cd7f5.json",
-    "audio": "sfx/fidgets/squish.L03.8802a813c9.flac"
+    "json": "sfx/fidgets/squish.L03.6a801c98b3.json",
+    "audio": "sfx/fidgets/squish.L03.7c13c1d04f.flac"
   },
   "squish.S02": {
-    "json": "sfx/fidgets/squish.S02.ce819561cd.json",
-    "audio": "sfx/fidgets/squish.S02.b7fc8f29ed.flac"
+    "json": "sfx/fidgets/squish.S02.2376be8253.json",
+    "audio": "sfx/fidgets/squish.S02.f41e4c1dea.flac"
   },
   "wax.W02": {
     "json": "sfx/fidgets/wax.W02.b9da8c224b.json",
