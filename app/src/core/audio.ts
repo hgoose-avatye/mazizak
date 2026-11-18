@@ -207,7 +207,7 @@ export class AudioEngine {
       return log;
     }
     if (!this.offline && this.ctx.state !== 'running') {
-      const entry = { log, run: () => this.attach(log, this.start(bag, opts)) };
+      const entry = { log, run: (laterSec: number) => this.attach(log, this.start(bag, { ...opts, delaySec: (opts.delaySec ?? 0) + laterSec })) };
       this.pending.push(entry);
       log.stop = () => {
         this.pending = this.pending.filter((x) => x !== entry);
@@ -220,16 +220,19 @@ export class AudioEngine {
     return log;
   }
 
-  private pending: { log: PlayLog; run: () => void }[] = [];
+  private pending: { log: PlayLog; run: (laterSec: number) => void }[] = [];
 
   private flushPending(): void {
     const now = performance.now();
+    // sounds still fresh enough keep the gaps they were requested with: a quick tap on a cold start queues a key-down and its
+    // key-up, and playing both at the moment of resume stacked them into one blurred click
+    const first = Math.min(...this.pending.filter((p) => now - p.log.t <= LATE_MS).map((p) => p.log.t));
     for (const p of this.pending) {
       const age = now - p.log.t;
       p.log.delayMs = age;
       if (age <= LATE_MS) {
         p.log.outcome = 'played-after-resume';
-        p.run();
+        p.run((p.log.t - first) / 1000);
       } else {
         p.log.outcome = 'dropped-late';
       }
