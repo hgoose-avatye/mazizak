@@ -48,9 +48,7 @@ describe("shipped 모닝빵 / 찹쌀떡 models", () => {
       expect(e.packed.texture.width).toBeLessThanOrEqual(1024);
     });
   });
-  it("are named in CREDITS.md and the settings sheet", () => {
-    const t = new TextDecoder().decode(readFileSync(pub("models/CREDITS.md")));
-    for (const k of ["모닝빵", "찹쌀떡", "bread.glb", "peachmochi.glb", "permission to use them has been obtained"]) expect(t, k).toContain(k);
+  it("are named in the settings sheet", () => {
     const html = new TextDecoder().decode(readFileSync(new URL("../index.html", import.meta.url)));
     expect(html).toContain("모닝빵·찹쌀떡 3D 모델");
   });

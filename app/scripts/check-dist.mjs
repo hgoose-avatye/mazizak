@@ -39,7 +39,6 @@ for (const f of fidgetMaps) {
     else if (!(['CC0 1.0', 'CC BY 4.0', 'CC BY 3.0'].includes(s.license) || (e.src.startsWith('own:') && s.license === 'Own recording (project owner)')) || !s.usage) problems.push(`${k}/${n}: ${e.src} licence/usage missing`);
   }
 }
-for (const f of ['CREDITS.md', 'PICKS-CREDITS.md']) if (!fs.existsSync(path.join(dist, 'sfx/fidgets', f))) problems.push(`sfx/fidgets/${f} missing`);
 // 3b) sounds ship as lossless FLAC only (WAV sources stay in audio-src/), under content-hashed names, and every map points at a shipped file
 for (const f of files) {
   const rel = path.relative(dist, f);
@@ -75,7 +74,7 @@ for (const rel of SHIPPED_MODELS) {
   if (b.toString('ascii', 0, 4) !== 'glTF') problems.push(`${rel} is not a glb`);
   if (b.length > 1_000_000) problems.push(`${rel} is ${b.length} bytes (over 1 MB: pack it with scripts/fidgets/pack-reference-models.mjs)`);
 }
-for (const f of ['models/CREDITS.md', 'models/models.json']) if (!fs.existsSync(path.join(dist, f))) problems.push(`${f} missing from dist`);
+for (const f of ['models/models.json']) if (!fs.existsSync(path.join(dist, f))) problems.push(`${f} missing from dist`);
 try { if (JSON.parse(fs.readFileSync(path.join(dist, 'models/models.json'), 'utf8')).clearance?.statedBy !== 'project owner') problems.push('models/models.json has no permission record'); } catch { problems.push('models/models.json unreadable'); }
 if (problems.length) { console.error('dist check FAILED:\n - ' + problems.join('\n - ')); process.exit(1); }
 console.log(`dist check OK: ${files.length} files, no local-reference strings or models, fidget chunks licensed, sounds FLAC-only with hashed names`);

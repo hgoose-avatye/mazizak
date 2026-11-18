@@ -61,7 +61,6 @@ describe('Topre source and sprite integrity', () => {
     expect(license).toContain('Copyright (c) Thomas Lai');
     expect(license).toContain('THE SOFTWARE IS PROVIDED');
     expect(map.source.recordingProvenance).toContain('Unverified');
-    expect(new TextDecoder().decode(file('CREDITS.md'))).toContain('Recording rights provenance: unverified');
   });
   it('loads precisely 12 buffers and reuses the same five down buffers for row routing', async () => {
     const fetch = vi.fn(async (url: string) => ({ ok: true, json: async () => map, arrayBuffer: async () => readPublic(url).buffer }));

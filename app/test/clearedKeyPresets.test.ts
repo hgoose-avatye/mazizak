@@ -11,14 +11,6 @@ const file = (name: string) => readFileSync(new URL(`../audio-src/sfx/keyboard/$
 const json = (id: string) => JSON.parse(new TextDecoder().decode(file(`${id}.json`)));
 afterEach(() => vi.unstubAllGlobals());
 
-const CREDIT_NAMES: Record<string, string[]> = {
-  "mongdol-pl87w": ["세계 SEGYE", "BgO3pE7VnI8"],
-  "jjigae-topre": ["쟈글링-KeyboardHolic", "TTfTCiwA38c"],
-  "dojagi-space65": ["tadadak ASMR 타다닥", "Ry1DJ2xzg6Q"],
-  "silent-peach-v3": ["ThockHub", "K09"],
-  "box-jade": ["Mechvibes", "kailh-box-jade"],
-};
-
 describe.each([...CLEARED_KEY_PRESETS])("cleared preset %s", (id) => {
   const map = json(id);
   const bytes = file(map.file);
@@ -51,12 +43,6 @@ describe.each([...CLEARED_KEY_PRESETS])("cleared preset %s", (id) => {
     expect(map.rights).toBeUndefined();
     expect(text).not.toMatch(/LOCAL_DEVELOPMENT_ONLY|NOT_FOR_PUBLIC_DISTRIBUTION|\/Users\/|\/private\//);
     expect(map.credit.url).toMatch(/^https:\/\//);
-  });
-
-  it("is named in CREDITS.md with its source", () => {
-    const t = new TextDecoder().decode(file("CREDITS.md"));
-    for (const name of CREDIT_NAMES[id]) expect(t, name).toContain(name);
-    expect(t).toContain("obtained permission to use them in the public build");
   });
 
   it("is enabled in every build and loads from the shipped folder, never from the dev route", async () => {

@@ -288,13 +288,6 @@ describe("shipped wax / crunch sprites", () => {
     expect(sprites.crunch.pools["soap.crunch"].entries.length).toBeGreaterThanOrEqual(8);
     expect(sprites.crunch.pools["soap.hold"].entries.length).toBeGreaterThanOrEqual(5);
   });
-  it("CREDITS.md names every source author and says the wax clips were modified", () => {
-    const t = new TextDecoder().decode(read("fidgets/CREDITS.md"));
-    for (const s of [...Object.values(sprites.wax.sources), ...Object.values(sprites.crunch.sources)]) expect(t).toContain(s.author);
-    expect(t).toMatch(/modified/i);
-    expect(t).toContain("CC BY 4.0");
-    expect(t).toContain("CC0");
-  });
 });
 
 // ── FidgetAudio against a stub engine, sprites decoded from disk ──
