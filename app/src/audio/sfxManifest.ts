@@ -23,8 +23,8 @@ export const SFX_KEYBOARD: Record<string, SfxFile> = {
     "audio": "sfx/keyboard/jjigae-topre.784ed78340.flac"
   },
   "mongdol-pl87w": {
-    "json": "sfx/keyboard/mongdol-pl87w.feb398cb05.json",
-    "audio": "sfx/keyboard/mongdol-pl87w.fad06ef531.flac"
+    "json": "sfx/keyboard/mongdol-pl87w.e7ad3894ea.json",
+    "audio": "sfx/keyboard/mongdol-pl87w.24af905e18.flac"
   },
   "pebble": {
     "json": "sfx/keyboard/pebble.cd9cab63c1.json",

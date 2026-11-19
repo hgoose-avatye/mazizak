@@ -41,7 +41,7 @@ export default defineConfig(({ command, isPreview }) => {
     command === "serve" && !isPreview
       ? devDir(process.env.MANZIZAK_CANDIDATES_DIR, path.join(MANZIZAK_HOME, "dev-reference/candidates"))
       : undefined;
-  // permanent home of the owner's YouTube keyboard presets (몽돌 / 찌개; 도자기 was replaced by the owner's own 두부 recording), outside the repository (dev server only)
+  // permanent home of the owner's YouTube keyboard presets (찌개; 몽돌 and 도자기→두부 are the owner's own recordings now), outside the repository (dev server only)
   const ytPresetDir = (() => {
     if (command !== "serve" || isPreview || process.env.VITEST) return undefined; // unit tests see the plain (disabled) state
     const d = path.join(process.env.MANZIZAK_DEV_KEYBOARD_DIR ?? path.join(homedir(), "Music/MANZIZAK/dev-keyboard-audio"), "presets");
@@ -215,7 +215,7 @@ export default defineConfig(({ command, isPreview }) => {
                     );
                   if (!match) return next();
                   try {
-                    // 몽돌 / 찌개 and Peach V3 (cleaned B) come from the permanent folder when it exists; Peach V3's previous
+                    // 찌개 and Peach V3 (cleaned B) come from the permanent folder when it exists; Peach V3's previous
                     // sprite (A, ".orig") only from its compare/ folder (A/B page; never the keyboard's default); the rest from MANZIZAK_LOCAL_AUDIO_DIR
                     const file = `${match[1]}.${match[2]}`;
                     const dir = match[1] === "silent-peach-v3.orig" && ytPresetDir ? path.join(ytPresetDir, "..", "compare") : ytPresetDir && existsSync(path.join(ytPresetDir, file)) ? ytPresetDir : localDir;

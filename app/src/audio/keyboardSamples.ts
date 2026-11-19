@@ -39,8 +39,7 @@ export const KEYBOARD_SAMPLE_CREDITS =
   '"My Sound Pack" by Chevy (mechvibes.com/sound-packs/my-sound-pack-5), CC BY 4.0 [creamy-thocky]; ' +
   "Topre, Turquoise Tealios and Buckling Spring from tplai/kbsim (github.com/tplai/kbsim), Copyright (c) Thomas Lai, MIT; original recording provenance unverified; " +
   "찌개: 【FAST ASMR】 RealForce R2 (30g) Lubed Topre EC by 쟈글링-KeyboardHolic (youtube.com/watch?v=TTfTCiwA38c), used in this app only with the channel's permission (2026-11-19), cut and level-matched; " +
-  "몽돌 (SPM PL87W 몽돌축 ASMR, 세계 SEGYE) from YouTube, " +
-  "a third-party recording used with permission obtained by the project owner (2026-11-16), cut and level-matched; 복숭아, 두부: the project owner's own recordings (2026-11-18, 2026-11-19).";
+  "복숭아, 몽돌, 두부: the project owner's own recordings (2026-11-18, 2026-11-19).";
 
 interface SpriteEntry {
   /** seconds into the sprite */

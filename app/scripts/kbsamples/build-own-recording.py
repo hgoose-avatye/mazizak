@@ -1,5 +1,6 @@
 """Key presets from the project owner's own recordings:
   복숭아 (silent-peach-v3) ← 피치축.m4a (2026-11-18, a coworker's keyboard)
+  몽돌 (mongdol-pl87w) ← 몽돌.m4a (2026-11-19; replaced the clips cut from a YouTube video)
   두부 (dojagi-space65; the id is kept from the 도자기 preset it replaced) ← 저소음 무접점.m4a (2026-11-19)
 
 Usage:
@@ -35,6 +36,8 @@ VARIANTS = {  # over-subtraction, gain floor (dB)
 PRESETS = {
     'silent-peach-v3': dict(recording='피치축.m4a', recordedOn='2026-11-18', keyboard="a coworker's keyboard (peach switches)",
                             credit={'label': '복숭아', 'title': '피치축 typing recording', 'by': 'project owner (own recording)'}),
+    'mongdol-pl87w': dict(recording='몽돌.m4a', recordedOn='2026-11-19', keyboard='keyboard with 몽돌 switches',
+                          credit={'label': '몽돌', 'title': '몽돌축 typing recording', 'by': 'project owner (own recording)'}),
     'dojagi-space65': dict(recording='저소음 무접점.m4a', recordedOn='2026-11-19', keyboard='silent Topre (electro-capacitive) keyboard',
                            credit={'label': '두부', 'title': '저소음 무접점 typing recording', 'by': 'project owner (own recording)'}),
 }

@@ -40,6 +40,7 @@ export const LOCAL_KEY_PRESETS = {
     classification: "Silent Linear",
   },
   // Recordings taken from YouTube typing videos chosen by the owner (permission obtained by the owner, 2026-11-16).
+  // own recording since 2026-11-19 (몽돌.m4a, scripts/kbsamples/build-own-recording.py); before that, clips cut from a YouTube video
   "mongdol-pl87w": {
     id: "K11",
     label: "몽돌",
@@ -47,7 +48,6 @@ export const LOCAL_KEY_PRESETS = {
     onomatopoeia: "달그락·톡톡",
     tags: ["pebble", "poppy", "smooth"],
     classification: "Linear (HMX 몽돌)",
-    sourceVideo: "https://www.youtube.com/shorts/BgO3pE7VnI8",
   },
   "jjigae-topre": {
     id: "K12",
