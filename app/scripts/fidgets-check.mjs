@@ -200,7 +200,7 @@ try {
   await p.goto(URL + "#/keyboard");
   await p.waitForTimeout(1700);
   ok(
-    "keyboard 11 presets (8 + 몽돌·찌개·도자기) and reserved assets preserved",
+    "keyboard 11 presets (8 + 몽돌·찌개·두부) and reserved assets preserved",
     (await p.locator("#toy-list .toy-item").count()) === 11,
   );
   await p.locator('.toy-item[data-key="topre"]').click(); // 마시멜로

@@ -15,5 +15,5 @@ export const KEY_PRESET_INFO: Record<KeyPresetId, { label: string; desc: string 
   'silent-peach-v3': { label: '복숭아', desc: '솜사탕처럼 폭신한 소리' },
   'mongdol-pl87w': { label: '몽돌', desc: '바둑알이 부딪히는 소리' },
   'jjigae-topre': { label: '찌개', desc: '보글보글 끓어오르는 소리' },
-  'dojagi-space65': { label: '도자기', desc: '도자기를 두드리는 맑은 소리' },
+  'dojagi-space65': { label: '두부', desc: '말랑하게 톡 눌리는 조용한 소리' },
 };

@@ -11,27 +11,27 @@ export const SFX_KEYBOARD: Record<string, SfxFile> = {
     "audio": "sfx/keyboard/creamy-thocky.af5c3d66e9.flac"
   },
   "dojagi-space65": {
-    "json": "sfx/keyboard/dojagi-space65.f64e89e66d.json",
-    "audio": "sfx/keyboard/dojagi-space65.ced19fda35.flac"
+    "json": "sfx/keyboard/dojagi-space65.4cee0ae86f.json",
+    "audio": "sfx/keyboard/dojagi-space65.fb5c79607c.flac"
   },
   "ibm-buckling-spring": {
     "json": "sfx/keyboard/ibm-buckling-spring.93a188f2eb.json",
     "audio": "sfx/keyboard/ibm-buckling-spring.b256bc80c3.flac"
   },
   "jjigae-topre": {
-    "json": "sfx/keyboard/jjigae-topre.c62a9c223b.json",
+    "json": "sfx/keyboard/jjigae-topre.5984c649b2.json",
     "audio": "sfx/keyboard/jjigae-topre.784ed78340.flac"
   },
   "mongdol-pl87w": {
-    "json": "sfx/keyboard/mongdol-pl87w.feb398cb05.json",
-    "audio": "sfx/keyboard/mongdol-pl87w.fad06ef531.flac"
+    "json": "sfx/keyboard/mongdol-pl87w.e7ad3894ea.json",
+    "audio": "sfx/keyboard/mongdol-pl87w.24af905e18.flac"
   },
   "pebble": {
     "json": "sfx/keyboard/pebble.cd9cab63c1.json",
     "audio": "sfx/keyboard/pebble.6525dd6a0a.flac"
   },
   "silent-peach-v3": {
-    "json": "sfx/keyboard/silent-peach-v3.0f5eada39b.json",
+    "json": "sfx/keyboard/silent-peach-v3.b02b87e288.json",
     "audio": "sfx/keyboard/silent-peach-v3.5d0e7870b9.flac"
   },
   "topre": {

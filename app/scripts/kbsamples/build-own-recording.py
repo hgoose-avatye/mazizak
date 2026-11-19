@@ -1,10 +1,13 @@
-"""복숭아 (silent-peach-v3) from the project owner's own recording (피치축.m4a, 2026-11-18, a coworker's keyboard).
+"""Key presets from the project owner's own recordings:
+  복숭아 (silent-peach-v3) ← 피치축.m4a (2026-11-18, a coworker's keyboard)
+  몽돌 (mongdol-pl87w) ← 몽돌.m4a (2026-11-19; replaced the clips cut from a YouTube video)
+  두부 (dojagi-space65; the id is kept from the 도자기 preset it replaced) ← 저소음 무접점.m4a (2026-11-19)
 
 Usage:
-  python3 scripts/kbsamples/build-own-peach.py --input ~/Downloads/피치축.m4a --variant medium
-      → audio-src/sfx/keyboard/silent-peach-v3.{wav,json}   (then: npm run pack:sfx)
-  python3 scripts/kbsamples/build-own-peach.py --input ~/Downloads/피치축.m4a --candidates DIR
-      → DIR/peach-{light,medium,strong}.wav: every picked press of each variant in a row (0.45 s apart), for listening
+  python3 scripts/kbsamples/build-own-recording.py --preset silent-peach-v3 --input ~/Downloads/피치축.m4a --variant medium
+      → audio-src/sfx/keyboard/<preset>.{wav,json}   (then: npm run pack:sfx)
+  python3 scripts/kbsamples/build-own-recording.py --preset ... --input ... --candidates DIR
+      → DIR/<preset>-{light,medium,strong}.wav: every picked press of each variant in a row (0.45 s apart), for listening
 
 Steps (needs numpy + scipy; m4a is decoded with macOS `afconvert`):
   1. noise   the recording's steady noise (hiss + the ~100–130 Hz hum) is measured on its quietest 20 % of frames and removed
@@ -29,6 +32,14 @@ VARIANTS = {  # over-subtraction, gain floor (dB)
     'light': (1.5, -12.0),
     'medium': (2.5, -20.0),
     'strong': (4.0, -30.0),
+}
+PRESETS = {
+    'silent-peach-v3': dict(recording='피치축.m4a', recordedOn='2026-11-18', keyboard="a coworker's keyboard (peach switches)",
+                            credit={'label': '복숭아', 'title': '피치축 typing recording', 'by': 'project owner (own recording)'}),
+    'mongdol-pl87w': dict(recording='몽돌.m4a', recordedOn='2026-11-19', keyboard='keyboard with 몽돌 switches',
+                          credit={'label': '몽돌', 'title': '몽돌축 typing recording', 'by': 'project owner (own recording)'}),
+    'dojagi-space65': dict(recording='저소음 무접점.m4a', recordedOn='2026-11-19', keyboard='silent Topre (electro-capacitive) keyboard',
+                           credit={'label': '두부', 'title': '저소음 무접점 typing recording', 'by': 'project owner (own recording)'}),
 }
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 db = lambda v: 20 * np.log10(np.maximum(v, 1e-12))
@@ -138,6 +149,7 @@ def build(raw, variant):
 
 def main():
     ap = argparse.ArgumentParser()
+    ap.add_argument('--preset', choices=PRESETS, required=True)
     ap.add_argument('--input', required=True)
     ap.add_argument('--variant', choices=VARIANTS, default='medium')
     ap.add_argument('--candidates')
@@ -150,39 +162,40 @@ def main():
             picked, floor_r, n_on = build(raw, v)
             gap = np.zeros(int(SR * 0.45))
             out = np.concatenate([np.concatenate([c['y'], gap]) for c in picked])
-            wavfile.write(os.path.join(a.candidates, f'peach-{v}.wav'), SR, to16(out))
+            wavfile.write(os.path.join(a.candidates, f'{a.preset}-{v}.wav'), SR, to16(out))
             print(f'{v:7s} {len(picked)} clips of {n_on} onsets, noise floor {floor_r:.1f} dBFS, SNR {min(c["snr"] for c in picked):.1f}–{max(c["snr"] for c in picked):.1f} dB')
         return
     picked, floor_r, n_on = build(raw, a.variant)
+    P, pid = PRESETS[a.preset], a.preset
     pcm, entries = [], []
     pos = 0
     for c in picked:
         y = to16(c['y'])
-        entries.append({'offset': pos / SR, 'duration': len(y) / SR, 'gain': 1, 'src': f'own:피치축.m4a@{c["at"]:.3f}s',
+        entries.append({'offset': pos / SR, 'duration': len(y) / SR, 'gain': 1, 'src': f'own:{P["recording"]}@{c["at"]:.3f}s',
                         'qc': {'snrDb': round(c['snr'], 1), 'lenMs': round(len(y) / SR * 1000), 'gainDb': round(c['gainDb'], 1)}})
         pcm += [y, np.zeros(480, '<i2')]
         pos += len(y) + 480
     data = np.concatenate(pcm)
     out = os.path.join(ROOT, 'audio-src/sfx/keyboard')
-    wavfile.write(os.path.join(out, 'silent-peach-v3.wav'), SR, data)
-    wav_sha = hashlib.sha256(open(os.path.join(out, 'silent-peach-v3.wav'), 'rb').read()).hexdigest()
+    wavfile.write(os.path.join(out, f'{pid}.wav'), SR, data)
+    wav_sha = hashlib.sha256(open(os.path.join(out, f'{pid}.wav'), 'rb').read()).hexdigest()
     meta = {
-        'version': 1, 'preset': 'silent-peach-v3', 'file': 'silent-peach-v3.wav', 'sampleRate': SR, 'upMode': 'none',
+        'version': 1, 'preset': pid, 'file': f'{pid}.wav', 'sampleRate': SR, 'upMode': 'none',
         'entries': {'down': entries, 'up': [], 'spaceDown': [], 'spaceUp': []},
-        'source': {'recording': '피치축.m4a', 'recordedBy': 'project owner', 'recordedOn': '2026-11-18',
-                   'keyboard': "a coworker's keyboard (peach switches)", 'sha256': src_sha},
-        'processing': {'script': 'scripts/kbsamples/build-own-peach.py', 'variant': a.variant,
+        'source': {'recording': P['recording'], 'recordedBy': 'project owner', 'recordedOn': P['recordedOn'],
+                   'keyboard': P['keyboard'], 'sha256': src_sha},
+        'processing': {'script': 'scripts/kbsamples/build-own-recording.py', 'variant': a.variant,
                        'oversubtraction': VARIANTS[a.variant][0], 'gainFloorDb': VARIANTS[a.variant][1],
                        'noiseFloorDbfs': round(floor_r, 1), 'onsetsFound': n_on, 'targetStrikeLoudnessDbfs': TARGET_DBFS,
                        'note': 'Hiss and hum removed by spectral subtraction (noise profile = quietest 20 % of the recording); single presses cut, 1 ms fade-in / 10 ms fade-out, loudness-matched.'},
-        'clearance': {'status': 'own recording', 'statedBy': 'project owner', 'statedOn': '2026-11-18',
+        'clearance': {'status': 'own recording', 'statedBy': 'project owner', 'statedOn': P['recordedOn'],
                       'note': "Recorded by the project owner; no third-party permission needed."},
-        'credit': {'label': '복숭아', 'title': '피치축 typing recording', 'by': 'project owner (own recording)'},
+        'credit': P['credit'],
         'wavSha256': wav_sha,
     }
-    with open(os.path.join(out, 'silent-peach-v3.json'), 'w') as fh:
+    with open(os.path.join(out, f'{pid}.json'), 'w') as fh:
         fh.write(json.dumps(meta, ensure_ascii=False) + '\n')
-    print(f'silent-peach-v3 ({a.variant}): {len(picked)} clips, {", ".join(str(round(len(c["y"]) / SR * 1000)) for c in picked)} ms')
+    print(f'{pid} ({a.variant}): {len(picked)} clips, {", ".join(str(round(len(c["y"]) / SR * 1000)) for c in picked)} ms')
 
 
 if __name__ == '__main__':

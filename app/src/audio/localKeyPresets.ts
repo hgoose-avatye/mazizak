@@ -40,6 +40,7 @@ export const LOCAL_KEY_PRESETS = {
     classification: "Silent Linear",
   },
   // Recordings taken from YouTube typing videos chosen by the owner (permission obtained by the owner, 2026-11-16).
+  // own recording since 2026-11-19 (몽돌.m4a, scripts/kbsamples/build-own-recording.py); before that, clips cut from a YouTube video
   "mongdol-pl87w": {
     id: "K11",
     label: "몽돌",
@@ -47,7 +48,6 @@ export const LOCAL_KEY_PRESETS = {
     onomatopoeia: "달그락·톡톡",
     tags: ["pebble", "poppy", "smooth"],
     classification: "Linear (HMX 몽돌)",
-    sourceVideo: "https://www.youtube.com/shorts/BgO3pE7VnI8",
   },
   "jjigae-topre": {
     id: "K12",
@@ -58,14 +58,15 @@ export const LOCAL_KEY_PRESETS = {
     classification: "Topre EC 30g (Krytox 105)",
     sourceVideo: "https://www.youtube.com/watch?v=TTfTCiwA38c",
   },
+  // 두부: the owner's own recording of a silent Topre keyboard (2026-11-19, scripts/kbsamples/build-own-recording.py). It took over the slot
+  // (and the id) of 도자기, which was cut from a YouTube video; the id is kept so saved settings and file names stay valid.
   "dojagi-space65": {
     id: "K13",
-    label: "도자기",
-    sensoryExpression: "도자기 두드리는 소리",
-    onomatopoeia: "또각·탁",
-    tags: ["ceramic", "clean", "clacky"],
-    classification: "Linear (BSUN RAW)",
-    sourceVideo: "https://www.youtube.com/watch?v=Ry1DJ2xzg6Q&t=10s",
+    label: "두부",
+    sensoryExpression: "말랑한 두부",
+    onomatopoeia: "톡·폭",
+    tags: ["silent", "soft", "topre"],
+    classification: "Silent Topre (electro-capacitive)",
   },
 } as const;
 export type LocalKeyPresetId = keyof typeof LOCAL_KEY_PRESETS;

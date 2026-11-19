@@ -53,7 +53,7 @@ try {
     });
     await p.waitForTimeout(1600);
     check(
-      `11 selectable presets (8 + 몽돌·찌개·도자기) mobile=${mobile}`,
+      `11 selectable presets (8 + 몽돌·찌개·두부) mobile=${mobile}`,
       (await p.getByRole("radio").count()) === 11,
     );
     check(

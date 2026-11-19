@@ -1,0 +1,197 @@
+{
+ "version": 1,
+ "preset": "dojagi-space65",
+ "file": "dojagi-space65.fb5c79607c.flac",
+ "sampleRate": 48000,
+ "upMode": "none",
+ "entries": {
+  "down": [
+   {
+    "offset": 0,
+    "duration": 0.108,
+    "gain": 1,
+    "src": "own:저소음 무접점.m4a@0.474s",
+    "qc": {
+     "snrDb": 42.1,
+     "lenMs": 108,
+     "gainDb": 11.5
+    }
+   },
+   {
+    "offset": 0.118,
+    "duration": 0.16,
+    "gain": 1,
+    "src": "own:저소음 무접점.m4a@0.592s",
+    "qc": {
+     "snrDb": 39.5,
+     "lenMs": 160,
+     "gainDb": 14.2
+    }
+   },
+   {
+    "offset": 0.288,
+    "duration": 0.126,
+    "gain": 1,
+    "src": "own:저소음 무접점.m4a@1.044s",
+    "qc": {
+     "snrDb": 38,
+     "lenMs": 126,
+     "gainDb": 13.8
+    }
+   },
+   {
+    "offset": 0.424,
+    "duration": 0.114,
+    "gain": 1,
+    "src": "own:저소음 무접점.m4a@1.442s",
+    "qc": {
+     "snrDb": 37.8,
+     "lenMs": 114,
+     "gainDb": 15.4
+    }
+   },
+   {
+    "offset": 0.548,
+    "duration": 0.142,
+    "gain": 1,
+    "src": "own:저소음 무접점.m4a@1.654s",
+    "qc": {
+     "snrDb": 34.8,
+     "lenMs": 142,
+     "gainDb": 18.9
+    }
+   },
+   {
+    "offset": 0.7,
+    "duration": 0.124,
+    "gain": 1,
+    "src": "own:저소음 무접점.m4a@2.476s",
+    "qc": {
+     "snrDb": 34.7,
+     "lenMs": 124,
+     "gainDb": 16.4
+    }
+   },
+   {
+    "offset": 0.834,
+    "duration": 0.16,
+    "gain": 1,
+    "src": "own:저소음 무접점.m4a@2.610s",
+    "qc": {
+     "snrDb": 34.9,
+     "lenMs": 160,
+     "gainDb": 16.2
+    }
+   },
+   {
+    "offset": 1.004,
+    "duration": 0.158,
+    "gain": 1,
+    "src": "own:저소음 무접점.m4a@3.890s",
+    "qc": {
+     "snrDb": 39.2,
+     "lenMs": 158,
+     "gainDb": 13.9
+    }
+   },
+   {
+    "offset": 1.172,
+    "duration": 0.076,
+    "gain": 1,
+    "src": "own:저소음 무접점.m4a@6.660s",
+    "qc": {
+     "snrDb": 38.9,
+     "lenMs": 76,
+     "gainDb": 14.2
+    }
+   },
+   {
+    "offset": 1.258,
+    "duration": 0.094,
+    "gain": 1,
+    "src": "own:저소음 무접점.m4a@7.954s",
+    "qc": {
+     "snrDb": 34.7,
+     "lenMs": 94,
+     "gainDb": 17
+    }
+   },
+   {
+    "offset": 1.362,
+    "duration": 0.132,
+    "gain": 1,
+    "src": "own:저소음 무접점.m4a@8.622s",
+    "qc": {
+     "snrDb": 35.5,
+     "lenMs": 132,
+     "gainDb": 17.4
+    }
+   },
+   {
+    "offset": 1.504,
+    "duration": 0.112,
+    "gain": 1,
+    "src": "own:저소음 무접점.m4a@8.766s",
+    "qc": {
+     "snrDb": 36.5,
+     "lenMs": 112,
+     "gainDb": 15
+    }
+   },
+   {
+    "offset": 1.626,
+    "duration": 0.14,
+    "gain": 1,
+    "src": "own:저소음 무접점.m4a@8.890s",
+    "qc": {
+     "snrDb": 41.4,
+     "lenMs": 140,
+     "gainDb": 11.8
+    }
+   },
+   {
+    "offset": 1.776,
+    "duration": 0.12,
+    "gain": 1,
+    "src": "own:저소음 무접점.m4a@17.680s",
+    "qc": {
+     "snrDb": 35.8,
+     "lenMs": 120,
+     "gainDb": 15.4
+    }
+   }
+  ],
+  "up": [],
+  "spaceDown": [],
+  "spaceUp": []
+ },
+ "source": {
+  "recording": "저소음 무접점.m4a",
+  "recordedBy": "project owner",
+  "recordedOn": "2026-11-19",
+  "keyboard": "silent Topre (electro-capacitive) keyboard",
+  "sha256": "1d07ef50a3ef7a3edf928f9ea50b73f02f0ffc4f81fabcddcb7ca16834cf37a7"
+ },
+ "processing": {
+  "script": "scripts/kbsamples/build-own-recording.py",
+  "variant": "medium",
+  "oversubtraction": 2.5,
+  "gainFloorDb": -20,
+  "noiseFloorDbfs": -77.4,
+  "onsetsFound": 143,
+  "targetStrikeLoudnessDbfs": -32.6,
+  "note": "Hiss and hum removed by spectral subtraction (noise profile = quietest 20 % of the recording); single presses cut, 1 ms fade-in / 10 ms fade-out, loudness-matched."
+ },
+ "clearance": {
+  "status": "own recording",
+  "statedBy": "project owner",
+  "statedOn": "2026-11-19",
+  "note": "Recorded by the project owner; no third-party permission needed."
+ },
+ "credit": {
+  "label": "두부",
+  "title": "저소음 무접점 typing recording",
+  "by": "project owner (own recording)"
+ },
+ "wavSha256": "b9941e3db7bf9a12b7a26d8b2253e4db434c0e3bae450cbb16276a3991f2f7c7"
+}

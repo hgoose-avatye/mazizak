@@ -183,7 +183,7 @@ try {
   await p.goto((process.env.FIDGET_URL ?? "http://127.0.0.1:4354/") + "#/keyboard");
   await p.waitForTimeout(1200);
   ok(
-    "eleven named keyboard choices (8 + 몽돌·찌개·도자기)",
+    "eleven named keyboard choices (8 + 몽돌·찌개·두부)",
     (await p.getByRole("radio").count()) === 11,
   );
   ok(
