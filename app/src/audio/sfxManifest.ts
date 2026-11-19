@@ -19,7 +19,7 @@ export const SFX_KEYBOARD: Record<string, SfxFile> = {
     "audio": "sfx/keyboard/ibm-buckling-spring.b256bc80c3.flac"
   },
   "jjigae-topre": {
-    "json": "sfx/keyboard/jjigae-topre.c62a9c223b.json",
+    "json": "sfx/keyboard/jjigae-topre.5984c649b2.json",
     "audio": "sfx/keyboard/jjigae-topre.784ed78340.flac"
   },
   "mongdol-pl87w": {

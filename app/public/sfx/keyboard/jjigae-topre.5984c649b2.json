@@ -170,10 +170,12 @@
   "note": "Typical isolated keystrokes (closest to the median peak) that pass the objective gates, picked automatically from the waveform and not listened to. Key-down only; no release sound claimed; the key identity (which key was struck) is unknown."
  },
  "clearance": {
-  "status": "permission to use in the public build obtained",
+  "status": "permission to use in this app granted by the channel",
   "statedBy": "project owner",
   "statedOn": "2026-11-16",
-  "note": "The owner's statement; the permission terms are not stored in the repository."
+  "grantedBy": "쟈글링-KeyboardHolic (YouTube channel owner), reply to the owner's request",
+  "grantedOn": "2026-11-19",
+  "terms": "Only the typing sounds the channel recorded itself in its video; only inside the agreed app (만지작); the credit must name the channel and link the video in the app's source/licence notice."
  },
  "credit": {
   "label": "찌개",

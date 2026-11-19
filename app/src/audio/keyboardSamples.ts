@@ -38,7 +38,8 @@ export const KEYBOARD_SAMPLE_CREDITS =
   '"Keyboard slow typing with Gateron Blue switches + low echo" by forfii (freesound.org/s/755222) [clack]; ' +
   '"My Sound Pack" by Chevy (mechvibes.com/sound-packs/my-sound-pack-5), CC BY 4.0 [creamy-thocky]; ' +
   "Topre, Turquoise Tealios and Buckling Spring from tplai/kbsim (github.com/tplai/kbsim), Copyright (c) Thomas Lai, MIT; original recording provenance unverified; " +
-  "몽돌 (SPM PL87W 몽돌축 ASMR, 세계 SEGYE), 찌개 (RealForce R2 Lubed Topre EC, 쟈글링-KeyboardHolic), 도자기 (SPACE65 BSUN, tadadak ASMR 타다닥) from YouTube, " +
+  "찌개: 【FAST ASMR】 RealForce R2 (30g) Lubed Topre EC by 쟈글링-KeyboardHolic (youtube.com/watch?v=TTfTCiwA38c), used in this app only with the channel's permission (2026-11-19), cut and level-matched; " +
+  "몽돌 (SPM PL87W 몽돌축 ASMR, 세계 SEGYE), 도자기 (SPACE65 BSUN, tadadak ASMR 타다닥) from YouTube, " +
   "third-party recordings used with permission obtained by the project owner (2026-11-16), cut and level-matched; 복숭아: the project owner's own recording (2026-11-18).";
 
 interface SpriteEntry {
