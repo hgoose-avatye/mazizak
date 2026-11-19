@@ -124,8 +124,8 @@ export function createKeyboard(ctx: ToyContext): Toy & { setPreset(p: KeyPresetI
     ctx.soundChanged();
     loadKeyboardSamples(ctx.audio.ctx, p).then(
       (s) => {
+        soundSource[p] = 'samples'; // before registerSet: it tells the page the sound changed, and the status chip reads this
         registerSet(p, s);
-        soundSource[p] = 'samples';
       },
       (err) => {
         if (ownRecordingOnly(p)) {
@@ -137,8 +137,8 @@ export function createKeyboard(ctx: ToyContext): Toy & { setPreset(p: KeyPresetI
           return;
         }
         console.warn(`[sfx] keyboard ${p}: samples failed → FALLBACK to the synthesized set`, err);
-        registerSet(p, buildKeyboardSounds(ctx.audio.ctx, SYNTH_BASE[p]));
         soundSource[p] = 'synth';
+        registerSet(p, buildKeyboardSounds(ctx.audio.ctx, SYNTH_BASE[p]));
       },
     );
   };
