@@ -607,5 +607,18 @@ if (import.meta.env.DEV) (window as unknown as { __MANZIZAK__: unknown }).__MANZ
   perf: () => rt && { interval: [rt.frameIntervals.percentile(50), rt.frameIntervals.percentile(95)], work: [rt.workTimes.percentile(50), rt.workTimes.percentile(95)], input: [rt.inputDelays.percentile(50), rt.inputDelays.percentile(95)], dpr: rt.renderer.getPixelRatio(), canvas: [rt.width, rt.height] },
   resetPerf: () => { if (rt) for (const r of [rt.frameIntervals, rt.workTimes, rt.inputDelays]) r.clear(); },
 };
+// ---------- Apps in Toss (`vite build --mode toss`, npm run build:ait) ----------
+if (import.meta.env.MODE === 'toss') void import('./core/tossShell').then((m) => m.installTossShell(() => {
+  // Android back: an open sheet closes first; otherwise (false) the mini app closes
+  if (!adSheet.hidden) { closeAdSheet(); return true; }
+  if (!sheet.hidden) { closeSheet(); return true; }
+  return false;
+}));
+// dev only: preview the Toss top band in a browser — ?platform=toss&aitTop=47 (a 47px status bar)
+if (import.meta.env.DEV) {
+  const q = new URLSearchParams(location.search);
+  if (q.get('platform') === 'toss') document.documentElement.dataset.platform = 'toss';
+  if (q.has('aitTop')) document.documentElement.style.setProperty('--ait-top', `${Math.max(0, Number(q.get('aitTop')) || 0)}px`);
+}
 applySettings(settings.get());
 void route();

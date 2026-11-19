@@ -32,6 +32,7 @@ node scripts/make-thumbs.mjs   # 메뉴 썸네일 다시 만들기 (장난감 �
 - 정책(toss/apps-in-toss-examples · in-app-ads): 광고는 사용자가 버튼을 누를 때만, 앱 진입·링크로 들어올 때는 광고 없이 열려 있는 종류를 보여 줌. 광고가 없으면(재고 없음·오프라인) 그냥 열어 줌 — 광고 때문에 막히는 화면 없음
 - 광고 SDK(`@apps-in-toss/web-framework`)는 첫 장난감이 뜬 뒤에 받고, 광고도 미리 불러 둠. 토스 앱 밖(일반 브라우저)에서는 광고가 지원되지 않아 잠금 없이 모두 열림
 - 브라우저 확인: `?ads=mock`(가짜 동영상 광고: 캔버스 애니메이션 15초, 5초 뒤 건너뛰기 = 보상 없음, 끝까지 = 보상 · 짧게: `&adsec=3&adskip=1`) · `?ads=mock-fail`(광고 없음) · `BASE=http://127.0.0.1:<port> node scripts/ad-gate-check.mjs`
+- 토스 상단: 토스는 페이지 오른쪽 위에 캡슐(⋯ ✕)을 겹쳐 그림 → 토스 빌드(`vite build --mode toss`, `<html data-platform="toss">`)에서만 `--safe-t` = 상태바(`SafeArea.get().top`, `src/core/tossShell.ts`) + **62px**. 웹 빌드는 그대로(0). 56px은 가로 화면에서 서랍 '접기' 버튼이 캡슐(✕)과 2px까지 붙어서 쓰지 않음(style.css 주석). Android 뒤로가기: 열린 시트 닫기 → 없으면 미니앱 닫기. 브라우저 미리보기: `?platform=toss&aitTop=47`, 검사: `QUERY='?platform=toss&aitTop=47' BASE=… node scripts/responsive-check.mjs`
 - 빌드: `npm run build:ait` → `manzizak.ait` (설정: `apps-in-toss.config.ts`, `appName`은 콘솔 등록 이름으로 바꿔야 함). **실제 광고 그룹 ID는 `VITE_AIT_REWARDED_AD_ID=<콘솔에서 받은 ID> npm run build:ait`** — 없으면 토스 테스트 ID(`ait-ad-test-rewarded-id`)가 들어가므로 출시 빌드에 쓰면 안 됨
 
 ## 화면 크기·방향 대응

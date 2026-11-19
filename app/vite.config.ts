@@ -16,7 +16,7 @@ const devDir = (env: string | undefined, fallback: string) => {
   return d && existsSync(d) ? d : undefined;
 };
 
-export default defineConfig(({ command, isPreview }) => {
+export default defineConfig(({ command, isPreview, mode }) => {
   const fidgetDir =
     command === "serve" && !isPreview
       ? devDir(process.env.MANZIZAK_LOCAL_FIDGET_DIR, path.join(MANZIZAK_HOME, "dev-reference/fidgets"))
@@ -65,6 +65,11 @@ export default defineConfig(({ command, isPreview }) => {
       ),
     },
     plugins: [
+      // Apps in Toss build (`vite build --mode toss`, npm run build:ait): mark the page so style.css keeps the 62px band under
+      // Toss's capsule. Decided by the build mode, never guessed from the screen or the user agent. The web build stays as it was.
+      ...(mode === "toss"
+        ? [{ name: "manzizak-toss-platform", transformIndexHtml: (html: string) => html.replace('<html lang="ko">', '<html lang="ko" data-platform="toss">') }]
+        : []),
       // dev only, loopback only: lab-compare.html posts the listener's verdicts here so they land in a git-ignored file
       ...(command === "serve" && !isPreview
         ? [

@@ -15,7 +15,7 @@
     "pack:sfx": "node --experimental-transform-types --no-warnings scripts/audio/pack-sfx.mjs",
     "check:sfx": "node --experimental-transform-types --no-warnings scripts/audio/pack-sfx.mjs --check",
     "check:play": "node scripts/play-all.mjs",
-    "build:ait": "npm run build && ait build",
+    "build:ait": "npm run check:sfx && tsc --noEmit && vite build --mode toss && ait build",
     "deploy:ait": "ait deploy"
   },
   "dependencies": {

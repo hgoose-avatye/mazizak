@@ -29,7 +29,13 @@
   --line: rgba(42, 67, 52, .11);
   --glass: rgba(251, 250, 246, .94);
   --accent: #315b46;
-  --safe-t: env(safe-area-inset-top, 0px);
+  /* top: the status bar (the browser's safe area, or in Apps in Toss the SDK's value: --ait-top, src/core/tossShell.ts) plus
+     --ait-band, the room for Toss's floating capsule (⋯ ✕) that it draws over the page's top right. 0 on the web; 62px in the
+     Toss build (html[data-platform="toss"]): the capsule sits at status bar + 5 (iOS) / + 10 (Android) and is ~44–48px tall,
+     so 56px would leave 2px or overlap on Android — our sound / settings buttons are right under it, and a tap on ✕ closes the app.
+     62px = the shared GfSDK's own band (gfac-puzzle-game, pimple-asmr). Not measured in the Toss app yet. */
+  --ait-band: 0px;
+  --safe-t: calc(max(env(safe-area-inset-top, 0px), var(--ait-top, 0px)) + var(--ait-band));
   --safe-b: env(safe-area-inset-bottom, 0px);
   --safe-l: env(safe-area-inset-left, 0px);
   --safe-r: env(safe-area-inset-right, 0px);
@@ -42,6 +48,10 @@
   --name-lh: 1.15;
   --actions-w: 168px; /* room kept right of the name for the reset / sound / settings icons */
 }
+html[data-platform='toss'] { --ait-band: 62px; }
+/* a tall sheet must stop below the capsule too (its own close button is at its top right) */
+html[data-platform='toss'] .sheet-panel { max-height: calc(100dvh - var(--safe-t) - 8px); }
+@media (min-width: 700px) { html[data-platform='toss'] .sheet-panel { max-height: calc(100dvh - var(--safe-t) - 26px); } } /* floats 18px above the bottom there (ui.css) */
 * { box-sizing: border-box; }
 html, body {
   margin: 0;
