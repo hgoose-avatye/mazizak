@@ -260,9 +260,6 @@ html.dock-folded .dock-body { display: none; }
 }
 
 /* ---------- ad gate (main.ts · src/ads) ---------- */
-.item-lock { position: absolute; top: 5px; right: 5px; z-index: 3; display: none; padding: 1px 4px; border-radius: 6px; background: #eef0e7; border: 1px solid #d6dccd; color: #7a8574; font: 700 8px/12px var(--font-meta); letter-spacing: .3px; }
-.toy-item[data-locked='true'] .item-lock { display: block; }
-.toy-item[data-locked='true'] .thumb { opacity: .62; }
 .ad-sheet .sheet-panel { text-align: center; }
 .ad-thumb { display: grid; place-items: center; min-height: 8px; }
 .ad-thumb .thumb { width: 84px; height: 84px; border-radius: 18px; margin: 4px auto 10px; }

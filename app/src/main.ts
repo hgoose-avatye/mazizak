@@ -238,7 +238,8 @@ function buildVariants(id: string): void {
 }
 
 // ---------- ad gate (src/ads/gate.ts) ----------
-// Each day the first GATE_CONFIG.freePerDay kinds are free; another kind opens after a rewarded ad the user chose to watch.
+// The toy the app opens on is free; after it, each pick of another kind uses one of today's GATE_CONFIG.freePerDay free picks
+// (a notice shows how many are left). With none left, a pick opens after a rewarded ad the user chose to watch.
 // Off where ads are not supported (a plain browser): everything opens. `?ads=mock` turns it on with a stand-in ad.
 const GATE_STORE = 'mzk-ad-gate-v1';
 let gate: GateState = (() => {
@@ -274,7 +275,7 @@ let adFor: { kind: string; open: () => void; opener: HTMLElement | null } | null
 function openAdSheet(kind: string, open: () => void): void {
   adFor = { kind, open, opener: document.activeElement as HTMLElement | null };
   $('#ad-title').textContent = `${kindName(kind)} 열기`;
-  $('#ad-text').textContent = `오늘 무료로 고를 수 있는 ${GATE_CONFIG.freePerDay}가지를 다 골랐어요. 짧은 광고를 끝까지 보면 바로 열려요.`;
+  $('#ad-text').textContent = `오늘 무료 ${GATE_CONFIG.freePerDay}회를 다 썼어요. 짧은 광고를 끝까지 보면 바로 열려요.`;
   $('#ad-status').textContent = '';
   const thumb = toyList.querySelector(`.toy-item[data-key="${CSS.escape(kind.replace(/^kb:/, ''))}"] .thumb`);
   $('#ad-thumb').replaceChildren(...(thumb ? [thumb.cloneNode(true)] : []));
@@ -323,6 +324,7 @@ let currentId = '';
 let category: Category = settings.get().lastCategory;
 
 let routeSeq = 0;
+let routedOnce = false;
 async function route(): Promise<void> {
   const seq = ++routeSeq; // a later switch makes an earlier, still-loading one a no-op
   let [id, presetId] = location.hash.replace(/^#\/?/, '').split('/');
@@ -332,13 +334,22 @@ async function route(): Promise<void> {
   }
   const validPreset = !!presetId && Object.hasOwn(KEY_PRESET_INFO, presetId) && isKeyPresetEnabled(presetId);
   const kind = kindOf(id, validPreset ? presetId : undefined);
-  if (gateOn && kind && access(gateNow(), kind) === 'locked') {
+  const launch = !routedOnce; // the toy the app opens on: free, not counted
+  if (!launch && gateOn && kind && access(gateNow(), kind) === 'locked') {
     // reached without the dock (a link, a stale hash): never an ad here (policy: no full-screen ad the user did not ask for),
     // show the toy that is open instead
-    const back = gateNow().current || gateNow().free.at(-1);
+    const back = gateNow().current;
     if (back && back !== kind) { history.replaceState(null, '', hashOfKind(back)); return route(); }
   }
-  if (kind) saveGate(enter(gateNow(), kind));
+  if (kind) {
+    routedOnce = true;
+    const r = enter(gateNow(), kind, { launch });
+    saveGate(r.state);
+    if (r.usedFree && gateOn) {
+      const left = freeLeft(r.state), n = GATE_CONFIG.freePerDay;
+      showNotice(left > 0 ? `남은 무료 ${left}/${n}회` : `오늘 무료 ${n}회를 다 썼어요 · 다음부터는 광고를 보고 열 수 있어요`);
+    }
+  }
   if (id === 'keyboard' && validPreset) {
     settings.set('keyPreset', presetId as KeyPresetId); toys.keyboard?.setPreset?.(presetId as KeyPresetId);
   }
@@ -412,6 +423,7 @@ document.addEventListener('click', (e) => {
 });
 
 function showNotice(text: string): void {
+  document.querySelectorAll('.notice').forEach((x) => x.remove()); // one at a time: quick picks would stack them
   const n = document.createElement('div');
   n.className = 'notice';
   n.textContent = text;
@@ -471,8 +483,7 @@ function dockItem(key: string, name: string, thumb: HTMLElement, onPick: (b: HTM
   const label = document.createElement('span'); label.className = 'name'; label.textContent = name;
   const number = document.createElement('span'); number.className = 'item-number'; number.textContent = String(toyList.children.length + 1).padStart(2, '0'); number.setAttribute('aria-hidden', 'true');
   const selected = document.createElement('span'); selected.className = 'item-selected'; selected.setAttribute('aria-hidden', 'true'); selected.innerHTML = '<svg width="10" height="10" viewBox="0 0 12 12"><path d="m2.5 6 2.2 2.2 4.8-4.8" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-  const lock = document.createElement('span'); lock.className = 'item-lock'; lock.textContent = 'AD'; lock.setAttribute('aria-hidden', 'true');
-  b.append(number, thumb, label, selected, lock);
+  b.append(number, thumb, label, selected);
   b.onclick = () => onPick(b);
   return b;
 }
@@ -536,7 +547,7 @@ function syncDock(scroll: boolean): void {
     if (locked) b.setAttribute('aria-description', '광고 보고 열기'); else b.removeAttribute('aria-description');
     b.dataset.locked = String(locked);
   });
-  const count = `${toyList.children.length}가지` + (gateOn && freeLeft(g) > 0 ? ` · 오늘 무료 ${freeLeft(g)}개` : '');
+  const count = `${toyList.children.length}가지` + (gateOn ? ` · 오늘 무료 ${freeLeft(g)}회` : '');
   if ($('#collection-count').textContent !== count) $('#collection-count').textContent = count;
   if (scroll && sel && settings.get().dockOpen) {
     // centre the selection in the list, whichever way it scrolls (a row under the stage, or the rail's grid on wide short screens)
