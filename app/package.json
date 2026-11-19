@@ -14,9 +14,12 @@
     "bench:load": "node scripts/bench-load.mjs",
     "pack:sfx": "node --experimental-transform-types --no-warnings scripts/audio/pack-sfx.mjs",
     "check:sfx": "node --experimental-transform-types --no-warnings scripts/audio/pack-sfx.mjs --check",
-    "check:play": "node scripts/play-all.mjs"
+    "check:play": "node scripts/play-all.mjs",
+    "build:ait": "npm run build && ait build",
+    "deploy:ait": "ait deploy"
   },
   "dependencies": {
+    "@apps-in-toss/web-framework": "3.0.4",
     "three": "^0.187.0"
   },
   "devDependencies": {

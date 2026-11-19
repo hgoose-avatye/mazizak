@@ -26,6 +26,14 @@ node scripts/make-thumbs.mjs   # 메뉴 썸네일 다시 만들기 (장난감 �
 - 설정 시트: 소리·볼륨·진동(Android)·화질(자동/고화질/절약)·움직임 줄이기·성능 정보
 - `audio-test.html`: 모바일 오디오 활성화(pointerdown/pointerup/touchstart) 실기기 검증 도구
 
+## 앱인토스 · 광고 (src/ads)
+
+- 하루에 처음 연 **3종(서랍 카드 하나 = 피짓 1개 또는 키보드 프리셋 1개)은 그날 무료**, 그 밖의 종류는 서랍에서 누르면 "광고 보고 열기" 시트 → 보상형 광고를 끝까지 보면(`userEarnedReward`) 그 방문만 열림. 다른 종류로 옮기면 다시 잠김. 숫자는 `src/ads/gate.ts`의 `GATE_CONFIG`(`freePerDay`, `unlockSwitches`)
+- 정책(toss/apps-in-toss-examples · in-app-ads): 광고는 사용자가 버튼을 누를 때만, 앱 진입·링크로 들어올 때는 광고 없이 열려 있는 종류를 보여 줌. 광고가 없으면(재고 없음·오프라인) 그냥 열어 줌 — 광고 때문에 막히는 화면 없음
+- 광고 SDK(`@apps-in-toss/web-framework`)는 첫 장난감이 뜬 뒤에 받고, 광고도 미리 불러 둠. 토스 앱 밖(일반 브라우저)에서는 광고가 지원되지 않아 잠금 없이 모두 열림
+- 브라우저 확인: `?ads=mock`(3초 뒤 보상되는 가짜 광고) · `?ads=mock-fail`(광고 없음) · `BASE=http://127.0.0.1:<port> node scripts/ad-gate-check.mjs`
+- 빌드: `npm run build:ait` → `manzizak.ait` (설정: `apps-in-toss.config.ts`, `appName`은 콘솔 등록 이름으로 바꿔야 함). **실제 광고 그룹 ID는 `VITE_AIT_REWARDED_AD_ID=<콘솔에서 받은 ID> npm run build:ait`** — 없으면 토스 테스트 ID(`ait-ad-test-rewarded-id`)가 들어가므로 출시 빌드에 쓰면 안 됨
+
 ## 화면 크기·방향 대응
 
 - 기기 이름이 아니라 남은 공간의 모양으로 배치를 정함: 보통은 장난감 서랍이 아래, **3:2보다 넓고 높이 640px 이하, 또는 5:4보다 넓고 520px 이하**(가로 폰·낮은 창·분할 화면)이면 서랍이 오른쪽 레일이 되어 장난감이 화면 높이를 다 씀. 화면이 접힌 기기가 Viewport Segments를 알려 주면 장난감은 접힌 선 한쪽에만 놓임(지원 안 하는 브라우저는 무시)
