@@ -10,6 +10,8 @@ import { mkdirSync, writeFileSync } from 'node:fs';
 
 const arg = (k, d) => { const i = process.argv.indexOf(k); return i > 0 ? process.argv[i + 1] : d; };
 const BASE = process.env.BASE ?? 'http://127.0.0.1:4362';
+// QUERY='?platform=toss&aitTop=47': the same checks under the Apps in Toss top band (dev server only)
+const Q = process.env.QUERY ?? '';
 const SEED = Number(arg('--seed', Date.now() % 100000));
 const RANDOM = Number(arg('--random', 24));
 const QUICK = process.argv.includes('--quick');
@@ -50,7 +52,7 @@ async function open(w, h, dpr, inset) {
   // Chrome cannot emulate env(safe-area-inset-*): every layout rule reads them through --safe-*, so those are overridden
   await p.addInitScript((i) => document.addEventListener('DOMContentLoaded', () => {
     const s = document.createElement('style');
-    s.textContent = `:root{--safe-t:${i.t}px!important;--safe-r:${i.r}px!important;--safe-b:${i.b}px!important;--safe-l:${i.l}px!important}`;
+    s.textContent = `:root{--safe-t:calc(max(${i.t}px, var(--ait-top, 0px)) + var(--ait-band, 0px))!important;--safe-r:${i.r}px!important;--safe-b:${i.b}px!important;--safe-l:${i.l}px!important}`;
     document.head.append(s);
   }), inset);
   const cdp = await ctx.newCDPSession(p);
@@ -163,7 +165,7 @@ async function runViewport([label, w, h, dpr, inset], deep) {
   const o = await open(w, h, dpr, inset);
   const res = { label, w, h, dpr, inset, problems: [] };
   try {
-    await o.p.goto(`${BASE}/#/S01`);
+    await o.p.goto(`${BASE}/${Q}#/S01`);
     await o.p.waitForFunction(() => window.__MANZIZAK__?.report()?.id === 'S01', null, { timeout: 30000 });
     for (const [hash, id, kind] of [['#/S01', 'S01', 'fidget'], ['#/keyboard/pebble', 'keyboard', 'keyboard']]) {
       await go(o.p, hash, id);
@@ -215,7 +217,7 @@ async function dynamicChecks() {
   const o = await open(390, 844, 3, notch);
   const { p, touch } = o, res = { label: 'dynamic', problems: [] }, bad = (m) => res.problems.push(m);
   try {
-    await p.goto(`${BASE}/#/W01`);
+    await p.goto(`${BASE}/${Q}#/W01`);
     await p.waitForFunction(() => window.__MANZIZAK__?.report()?.id === 'W01', null, { timeout: 30000 });
     await sleep(300);
     const centre = async () => { const r = await report(p), st = await p.locator('#stage').boundingBox(); return [st.x + (r.screenBox.x0 + r.screenBox.x1) / 2, st.y + (r.screenBox.y0 + r.screenBox.y1) / 2]; };
@@ -297,7 +299,7 @@ async function foldChecks() {
       const offset = (orientation === 'vertical' ? w : h) / 2 - 3;
       try { await o.cdp.send('Emulation.setDisplayFeaturesOverride', { features: [{ orientation, offset, maskLength: 6 }] }); }
       catch (e) { res.notes.push(`display-feature emulation unavailable: ${String(e).split('\n')[0]}`); continue; }
-      await o.p.goto(`${BASE}/#/keyboard/pebble`);
+      await o.p.goto(`${BASE}/${Q}#/keyboard/pebble`);
       await o.p.waitForFunction(() => window.__MANZIZAK__?.report()?.keyRectsPx?.length, null, { timeout: 30000 }); await sleep(300);
       const seg = await o.p.evaluate(() => ({ h: matchMedia('(horizontal-viewport-segments: 2)').matches, v: matchMedia('(vertical-viewport-segments: 2)').matches }));
       if (!seg.h && !seg.v) { res.notes.push(`${orientation} fold: segments media query not reported by this Chrome`); continue; }
@@ -319,7 +321,7 @@ async function perfChecks() {
   for (const [w, h, id] of [[390, 844, 'S01'], [844, 390, 'S01'], [390, 844, 'keyboard'], [1440, 900, 'S02']]) {
     const o = await open(w, h, 3, none);
     try {
-      await o.p.goto(`${BASE}/#/${id}`);
+      await o.p.goto(`${BASE}/${Q}#/${id}`);
       await o.p.waitForFunction((i) => { const r = window.__MANZIZAK__?.report(); return r && (i === 'keyboard' ? r.keyRectsPx?.length : r.id === i); }, id, { timeout: 30000 });
       await sleep(400);
       const heap0 = await o.p.evaluate(() => performance.memory?.usedJSHeapSize ?? 0);

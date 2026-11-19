@@ -18,6 +18,8 @@ import { FIDGETS, findFidget } from './toys/fidgets/catalog';
 import { ORIGINAL_SOUNDS, ORIGINAL_FOLDER } from './toys/fidgets/originalMap';
 import { loadChunk, chunksOf } from './toys/fidgets/fidgetSprites';
 import { KEYBOARD_COLORS } from './toys/keyboard/colors';
+import { access, enter, freeLeft, freshState, grant, localDay, normalize, GATE_CONFIG, type GateState } from './ads/gate';
+import { adsSupported, preloadAd, showRewardedAd } from './ads/rewarded';
 
 const $ = <T extends HTMLElement>(sel: string) => document.querySelector(sel) as T;
 
@@ -148,7 +150,7 @@ const closeSheet = () => {
   sheetOpener = null;
 };
 window.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape') closeSheet();
+  if (e.key === 'Escape') { closeSheet(); closeAdSheet(); }
 });
 
 // ---------- toys ----------
@@ -235,6 +237,74 @@ function buildVariants(id: string): void {
   // keyboard presets and the other fidgets are chosen in the dock
 }
 
+// ---------- ad gate (src/ads/gate.ts) ----------
+// Each day the first GATE_CONFIG.freePerDay kinds are free; another kind opens after a rewarded ad the user chose to watch.
+// Off where ads are not supported (a plain browser): everything opens. `?ads=mock` turns it on with a stand-in ad.
+const GATE_STORE = 'mzk-ad-gate-v1';
+let gate: GateState = (() => {
+  try { return normalize(JSON.parse(localStorage.getItem(GATE_STORE) ?? 'null'), localDay()); } catch { return freshState(localDay()); }
+})();
+const gateNow = (): GateState => (gate.day === localDay() ? gate : (gate = freshState(localDay())));
+function saveGate(s: GateState): void {
+  gate = s;
+  try { localStorage.setItem(GATE_STORE, JSON.stringify(s)); } catch { /* storage unavailable: the gate still works for this visit */ }
+}
+let gateOn = false;
+let adsChecked = false;
+/** after the first toy is on screen (the SDK chunk must not compete with it): turn the gate on where ads work, load the first ad */
+function startAds(): void {
+  if (adsChecked) return;
+  adsChecked = true;
+  void adsSupported().then((on) => { gateOn = on; if (on) { syncDock(false); void preloadAd(); } });
+}
+/** the gate's name for a dock card: a fidget id, or `kb:<preset>`; null for toys outside the dock (the old 말랑이 link) */
+const kindOf = (id: string, preset?: string): string | null => (findFidget(id) ? id : id === 'keyboard' ? 'kb:' + (preset ?? settings.get().keyPreset) : null);
+const kindOfHash = (hash: string) => { const [id, p] = hash.replace(/^#\/?/, '').split('/'); return kindOf(id, p); };
+const hashOfKind = (k: string) => (k.startsWith('kb:') ? `#/keyboard/${k.slice(3)}` : `#/${k}`);
+const kindName = (k: string) => (k.startsWith('kb:') ? KEY_PRESET_INFO[k.slice(3) as KeyPresetId]?.label ?? '키보드' : TOY_TITLES[k] ?? '');
+/** A dock choice: open it now, or offer the ad first when today's free kinds are used up. */
+function request(hash: string, open: () => void = () => go(hash)): void {
+  const k = kindOfHash(hash);
+  if (!gateOn || !k || access(gateNow(), k) !== 'locked') return open();
+  openAdSheet(k, open);
+}
+
+const adSheet = $('#ad-sheet');
+let adFor: { kind: string; open: () => void; opener: HTMLElement | null } | null = null;
+function openAdSheet(kind: string, open: () => void): void {
+  adFor = { kind, open, opener: document.activeElement as HTMLElement | null };
+  $('#ad-title').textContent = `${kindName(kind)} 열기`;
+  $('#ad-text').textContent = `오늘 무료로 고를 수 있는 ${GATE_CONFIG.freePerDay}가지를 다 골랐어요. 짧은 광고를 끝까지 보면 바로 열려요.`;
+  $('#ad-status').textContent = '';
+  const thumb = toyList.querySelector(`.toy-item[data-key="${CSS.escape(kind.replace(/^kb:/, ''))}"] .thumb`);
+  $('#ad-thumb').replaceChildren(...(thumb ? [thumb.cloneNode(true)] : []));
+  $<HTMLButtonElement>('#ad-watch').disabled = false;
+  adSheet.hidden = false;
+  for (const el of shellParts()) el.inert = true;
+  $('#ad-watch').focus({ preventScroll: true });
+}
+function closeAdSheet(): void {
+  if (adSheet.hidden) return;
+  adSheet.hidden = true;
+  for (const el of shellParts()) el.inert = false;
+  adFor?.opener?.focus({ preventScroll: true });
+  adFor = null;
+}
+async function watchAd(): Promise<void> {
+  const req = adFor;
+  if (!req) return;
+  const btn = $<HTMLButtonElement>('#ad-watch');
+  btn.disabled = true;
+  const result = await showRewardedAd();
+  if (adFor !== req) return; // closed meanwhile
+  if (result === 'closed') { btn.disabled = false; $('#ad-status').textContent = '광고를 끝까지 보면 열려요'; return; }
+  // 'earned', or no ad to show (no fill, offline): open it anyway — the user is never stuck behind an ad that cannot come
+  // either way it opens for this visit only (an unavailable ad is a one-time pass, not a free slot)
+  saveGate(grant(gateNow(), req.kind));
+  closeAdSheet();
+  req.open();
+}
+
 // ---------- routing ----------
 // There is no home screen: the app opens on a toy (the last one used, else 슬랑이) and the dock below switches toys in place.
 // The hash still names the toy (#/S01, #/keyboard/<preset>, #/squishy) so links keep working; switching uses replaceState,
@@ -260,10 +330,20 @@ async function route(): Promise<void> {
     history.replaceState(null, '', launchHash());
     [id, presetId] = location.hash.replace(/^#\/?/, '').split('/');
   }
-  if (id === 'keyboard' && presetId && Object.hasOwn(KEY_PRESET_INFO, presetId) && isKeyPresetEnabled(presetId)) {
+  const validPreset = !!presetId && Object.hasOwn(KEY_PRESET_INFO, presetId) && isKeyPresetEnabled(presetId);
+  const kind = kindOf(id, validPreset ? presetId : undefined);
+  if (gateOn && kind && access(gateNow(), kind) === 'locked') {
+    // reached without the dock (a link, a stale hash): never an ad here (policy: no full-screen ad the user did not ask for),
+    // show the toy that is open instead
+    const back = gateNow().current || gateNow().free.at(-1);
+    if (back && back !== kind) { history.replaceState(null, '', hashOfKind(back)); return route(); }
+  }
+  if (kind) saveGate(enter(gateNow(), kind));
+  if (id === 'keyboard' && validPreset) {
     settings.set('keyPreset', presetId as KeyPresetId); toys.keyboard?.setPreset?.(presetId as KeyPresetId);
   }
   closeSheet();
+  closeAdSheet();
   // remember it for the next launch (the old 말랑이 toy is reachable by link only and is not remembered)
   if (findFidget(id)) { settings.set('lastFidget', id); settings.set('lastCategory', 'fidget'); }
   else if (id === 'keyboard') settings.set('lastCategory', 'keyboard');
@@ -297,6 +377,8 @@ async function route(): Promise<void> {
   rt.setToy(toy);
   syncSoundStatus();
   warmWhenReady();
+  if (gateOn) void preloadAd(); // the next 광고 보고 열기 never waits (no-op while one is ready)
+  else startAds();
   // the page around the stage takes the toy's backdrop colour, so the header and dock do not frame the canvas as a box
   const bg = toy.scene.background as { getHexString?: () => string } | null;
   if (bg?.getHexString) {
@@ -319,12 +401,14 @@ document.addEventListener('click', (e) => {
   const a = el?.dataset.action;
   if (a === 'settings') openSheet();
   if (a === 'close-sheet') closeSheet();
+  if (a === 'close-ad') closeAdSheet();
+  if (a === 'watch-ad') void watchAd();
   if (a === 'sound') settings.set('sound', !settings.get().sound);
   if (a === 'reset') rt?.toy?.reset();
   // the keyboard toy ignores key presses while a button has focus: after a pointer click (header, dock), hand the physical keys back.
   // Keyboard-driven clicks (detail 0) keep focus for keyboard navigation.
   const btn = target.closest<HTMLButtonElement>('button');
-  if (btn && e.detail > 0 && a !== 'settings' && !btn.closest('#sheet')) btn.blur();
+  if (btn && e.detail > 0 && a !== 'settings' && !btn.closest('#sheet, #ad-sheet')) btn.blur();
 });
 
 function showNotice(text: string): void {
@@ -387,7 +471,8 @@ function dockItem(key: string, name: string, thumb: HTMLElement, onPick: (b: HTM
   const label = document.createElement('span'); label.className = 'name'; label.textContent = name;
   const number = document.createElement('span'); number.className = 'item-number'; number.textContent = String(toyList.children.length + 1).padStart(2, '0'); number.setAttribute('aria-hidden', 'true');
   const selected = document.createElement('span'); selected.className = 'item-selected'; selected.setAttribute('aria-hidden', 'true'); selected.innerHTML = '<svg width="10" height="10" viewBox="0 0 12 12"><path d="m2.5 6 2.2 2.2 4.8-4.8" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-  b.append(number, thumb, label, selected);
+  const lock = document.createElement('span'); lock.className = 'item-lock'; lock.textContent = 'AD'; lock.setAttribute('aria-hidden', 'true');
+  b.append(number, thumb, label, selected, lock);
   b.onclick = () => onPick(b);
   return b;
 }
@@ -411,12 +496,15 @@ function buildList(c: Category): void {
       const shape = document.createElement('i'); thumb.append(shape, thumbImage(thumbSrc(f.id)));
       // dev only: the reference app's thumbnails (not for the cheese nor the chocolate, see git history of the home cards)
       if (LOCAL_FIDGETS && f.shape !== 'cheese' && f.shape !== 'chocolate') { const image = document.createElement('img'); image.src = '/__local-fidgets/thumbs/' + f.id + '.png'; image.alt = ''; image.onload = () => shape.hidden = true; image.onerror = () => image.remove(); thumb.append(image); }
-      toyList.append(dockItem(f.id, f.name, thumb, () => go('#/' + f.id)));
+      toyList.append(dockItem(f.id, f.name, thumb, () => request('#/' + f.id)));
     }
   }
 }
 function pickPreset(b: HTMLButtonElement): void {
   const p = b.dataset.key as KeyPresetId;
+  request(`#/keyboard/${p}`, () => applyPreset(b, p));
+}
+function applyPreset(b: HTMLButtonElement, p: KeyPresetId): void {
   settings.set('keyPreset', p);
   toys.keyboard?.setPreset?.(p);
   if (isLocalKeyPreset(p) || p === 'turquoise-tealios' || p === 'ibm-buckling-spring') {
@@ -442,7 +530,14 @@ function syncDock(scroll: boolean): void {
   $('#now-category').classList.toggle('blank', currentId !== 'keyboard');
   // only the 왁뿌볼 (shells that crack open) and plastic slime (stays stretched) need a way back; the others settle on their own
   $('[data-action="reset"]').hidden = !(findFidget(currentId)?.category === '왁뿌볼' || findFidget(currentId)?.plastic);
-  if ($('#collection-count').textContent !== `${toyList.children.length}가지`) $('#collection-count').textContent = `${toyList.children.length}가지`;
+  const g = gateNow();
+  toyList.querySelectorAll<HTMLButtonElement>('.toy-item').forEach((b) => {
+    const locked = gateOn && access(g, category === 'keyboard' ? 'kb:' + b.dataset.key : b.dataset.key!) === 'locked';
+    if (locked) b.setAttribute('aria-description', '광고 보고 열기'); else b.removeAttribute('aria-description');
+    b.dataset.locked = String(locked);
+  });
+  const count = `${toyList.children.length}가지` + (gateOn && freeLeft(g) > 0 ? ` · 오늘 무료 ${freeLeft(g)}개` : '');
+  if ($('#collection-count').textContent !== count) $('#collection-count').textContent = count;
   if (scroll && sel && settings.get().dockOpen) {
     // centre the selection in the list, whichever way it scrolls (a row under the stage, or the rail's grid on wide short screens)
     const s = (sel as HTMLButtonElement).getBoundingClientRect(), l = toyList.getBoundingClientRect();
@@ -461,8 +556,8 @@ function syncDock(scroll: boolean): void {
 }
 // category switch opens that category's last toy at once
 dock.querySelectorAll<HTMLButtonElement>('[data-category]').forEach((b) => b.addEventListener('click', () => {
-  if (b.dataset.category === 'keyboard') go(`#/keyboard/${settings.get().keyPreset}`);
-  else go('#/' + fidgetChoice());
+  if (b.dataset.category === 'keyboard') request(`#/keyboard/${settings.get().keyPreset}`);
+  else request('#/' + fidgetChoice());
 }));
 // arrow keys move within the radio groups (one tab stop each)
 for (const group of [toyList, dock.querySelector<HTMLElement>('.cat-seg')!]) {
@@ -512,5 +607,18 @@ if (import.meta.env.DEV) (window as unknown as { __MANZIZAK__: unknown }).__MANZ
   perf: () => rt && { interval: [rt.frameIntervals.percentile(50), rt.frameIntervals.percentile(95)], work: [rt.workTimes.percentile(50), rt.workTimes.percentile(95)], input: [rt.inputDelays.percentile(50), rt.inputDelays.percentile(95)], dpr: rt.renderer.getPixelRatio(), canvas: [rt.width, rt.height] },
   resetPerf: () => { if (rt) for (const r of [rt.frameIntervals, rt.workTimes, rt.inputDelays]) r.clear(); },
 };
+// ---------- Apps in Toss (`vite build --mode toss`, npm run build:ait) ----------
+if (import.meta.env.MODE === 'toss') void import('./core/tossShell').then((m) => m.installTossShell(() => {
+  // Android back: an open sheet closes first; otherwise (false) the mini app closes
+  if (!adSheet.hidden) { closeAdSheet(); return true; }
+  if (!sheet.hidden) { closeSheet(); return true; }
+  return false;
+}));
+// dev only: preview the Toss top band in a browser — ?platform=toss&aitTop=47 (a 47px status bar)
+if (import.meta.env.DEV) {
+  const q = new URLSearchParams(location.search);
+  if (q.get('platform') === 'toss') document.documentElement.dataset.platform = 'toss';
+  if (q.has('aitTop')) document.documentElement.style.setProperty('--ait-top', `${Math.max(0, Number(q.get('aitTop')) || 0)}px`);
+}
 applySettings(settings.get());
 void route();

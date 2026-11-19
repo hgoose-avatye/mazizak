@@ -98,6 +98,20 @@
       </section>
     </div>
 
+    <!-- AD SHEET: a locked toy (today's free kinds used up) opens after a rewarded ad the user chooses here (src/ads) -->
+    <div id="ad-sheet" class="sheet ad-sheet" hidden>
+      <div class="sheet-backdrop" data-action="close-ad"></div>
+      <section class="sheet-panel" role="dialog" aria-modal="true" aria-labelledby="ad-title" aria-describedby="ad-text">
+        <div class="sheet-grip"></div>
+        <div class="ad-thumb" id="ad-thumb" aria-hidden="true"></div>
+        <h2 id="ad-title"></h2>
+        <p class="ad-text" id="ad-text"></p>
+        <p class="ad-status" id="ad-status" role="status" aria-live="polite"></p>
+        <button class="primary" id="ad-watch" data-action="watch-ad">광고 보고 열기</button>
+        <button class="ad-later" data-action="close-ad">다음에 할게요</button>
+      </section>
+    </div>
+
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>
