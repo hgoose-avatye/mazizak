@@ -22,7 +22,7 @@ const hash = (page) => page.evaluate(() => location.hash);
 const gateReady = (page) => page.waitForFunction(() => document.querySelector('.toy-item[data-locked]'), null, { timeout: 15000 });
 
 {
-  const { ctx, page } = await open('?ads=mock');
+  const { ctx, page } = await open('?ads=mock&adsec=3&adskip=1');
   await gateReady(page);
   ok((await page.locator('#collection-count').textContent()).includes('오늘 무료 2개'), 'launch toy takes the first free slot');
   await pick(page, 'S02');
@@ -43,16 +43,20 @@ const gateReady = (page) => page.waitForFunction(() => document.querySelector('.
   await pick(page, 'W01');
   await page.locator('#ad-watch').click();
   await page.waitForSelector('.mock-ad');
-  await page.locator('.mock-ad-close').click(); // early: no reward
+  ok(await page.locator('.mock-ad-skip').isDisabled(), 'skip is not offered at once');
+  ok((await page.locator('.mock-ad-badge').textContent()) === '광고', '광고 badge');
+  await page.waitForSelector('.mock-ad-skip:not([disabled])', { timeout: 6000 });
+  await page.locator('.mock-ad-skip').click(); // skipped: no reward
   await page.waitForTimeout(200);
-  ok(await sheetOpen(page), 'closing the ad early keeps the sheet');
+  ok(await sheetOpen(page), 'skipping the ad keeps the sheet');
   ok((await page.locator('#ad-status').textContent()).includes('끝까지'), '… with a hint');
   ok((await hash(page)) === '#/S01', '… and no unlock');
 
   await page.waitForTimeout(400); // next ad loads (300 ms in the mock)
   await page.locator('#ad-watch').click();
   await page.waitForSelector('.mock-ad');
-  await page.waitForTimeout(3300);
+  await page.waitForSelector('.mock-ad-close', { timeout: 6000 });
+  ok(Number(await page.locator('.mock-ad-bar').getAttribute('aria-valuenow')) === 100, 'progress bar reaches the end');
   await page.locator('.mock-ad-close').click();
   await page.waitForTimeout(400);
   ok(!(await sheetOpen(page)) && (await hash(page)) === '#/W01', 'watched to the end → opens the kind');
@@ -70,7 +74,7 @@ const gateReady = (page) => page.waitForFunction(() => document.querySelector('.
   ok(!(await sheetOpen(page)), 'Escape closes the ad sheet');
 
   // persisted: a reload keeps today's counts; a link to a locked kind shows the open toy instead of an ad
-  await page.goto(`${BASE}/?ads=mock#/W02`);
+  await page.goto(`${BASE}/?ads=mock&adsec=3&adskip=1#/W02`);
   await page.reload();
   await page.waitForSelector('#splash', { state: 'detached', timeout: 20000 });
   ok((await hash(page)) !== '#/W02' && !(await sheetOpen(page)), 'link to a locked kind at launch: no ad, opens an open toy');

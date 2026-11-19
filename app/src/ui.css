@@ -271,7 +271,3 @@ html.dock-folded .dock-body { display: none; }
 .ad-status { min-height: 20px; margin: 0 0 10px; color: #a0614c; font-size: 13px; font-weight: 650; }
 .ad-later { width: 100%; height: 44px; margin-top: 6px; border: 0; background: none; color: #7a8574; font-size: 14px; font-weight: 600; cursor: pointer; }
 #ad-watch:disabled { opacity: .55; }
-.mock-ad { position: fixed; inset: 0; z-index: 100; display: grid; place-content: center; gap: 14px; justify-items: center; background: #1d2620; color: #fff; font-family: var(--font-meta); }
-.mock-ad-label { padding: 3px 8px; border: 1px solid #ffffff60; border-radius: 6px; font-size: 12px; }
-.mock-ad-count { margin: 0; font-size: 15px; }
-.mock-ad-close { padding: 10px 22px; border: 0; border-radius: 12px; background: #fff; color: #1d2620; font-weight: 700; cursor: pointer; }

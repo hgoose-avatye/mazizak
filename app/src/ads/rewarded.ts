@@ -9,8 +9,8 @@
  * The SDK is imported on first use, so the app's first screen does not carry it. Outside the Toss app (a plain browser,
  * the sandbox app) `isSupported()` is false and the gate is off: every toy opens.
  *
- * Testing in a browser: `?ads=mock` shows a stand-in ad (3 s, then 닫기 = rewarded; closing early = no reward),
- * `?ads=mock-fail` an ad that never loads (the toy then opens anyway).
+ * Testing in a browser: `?ads=mock` shows a stand-in video ad (mockAd.ts: 15 s, 건너뛰기 after 5 s = no reward,
+ * watched to the end = rewarded), `?ads=mock-fail` an ad that never loads (the toy then opens anyway).
  *
  * Ad group id: VITE_AIT_REWARDED_AD_ID at build time; the default is Toss's test id, which must not ship (see README).
  */
@@ -32,7 +32,7 @@ const mockMode = (() => {
 
 type Sdk = Pick<typeof import('@apps-in-toss/web-framework'), 'loadFullScreenAd' | 'showFullScreenAd'>;
 let sdkPromise: Promise<Sdk | null> | null = null;
-const getSdk = (): Promise<Sdk | null> => (sdkPromise ??= mockMode ? Promise.resolve(mockSdk(mockMode)) : import('@apps-in-toss/web-framework').then(
+const getSdk = (): Promise<Sdk | null> => (sdkPromise ??= mockMode ? import('./mockAd').then((m) => m.mockSdk(mockMode), () => null) : import('@apps-in-toss/web-framework').then(
   (m) => {
     // outside the Toss app isSupported() throws (no native bridge) instead of returning false
     try { return m.loadFullScreenAd.isSupported() && m.showFullScreenAd.isSupported() ? m : null; } catch { return null; }
@@ -93,37 +93,4 @@ export function showRewardedAd(waitMs = 3000): Promise<AdResult> {
     void preloadAd();
     return result;
   })().finally(() => { showing = null; }));
-}
-
-/** Browser stand-in with the SDK's event order (loaded → show → impression → userEarnedReward → dismissed). */
-function mockSdk(mode: 'mock' | 'mock-fail'): Sdk {
-  const loadFullScreenAd = Object.assign(
-    ((p) => {
-      const t = setTimeout(() => (mode === 'mock' ? p.onEvent({ type: 'loaded' }) : p.onError(new Error('No fill'))), 300);
-      return () => clearTimeout(t);
-    }) as Sdk['loadFullScreenAd'],
-    { isSupported: () => true },
-  );
-  const showFullScreenAd = Object.assign(
-    ((p) => {
-      const el = document.createElement('div');
-      el.className = 'mock-ad';
-      el.setAttribute('role', 'dialog');
-      el.setAttribute('aria-label', '테스트 광고');
-      el.innerHTML = '<span class="mock-ad-label">Ad · 테스트 광고</span><p class="mock-ad-count"></p><button type="button" class="mock-ad-close">닫기</button>';
-      document.body.append(el);
-      p.onEvent({ type: 'requested' });
-      p.onEvent({ type: 'show' });
-      p.onEvent({ type: 'impression' });
-      let left = 3;
-      const count = el.querySelector<HTMLElement>('.mock-ad-count')!;
-      const tick = () => { count.textContent = left > 0 ? `${left}초 뒤 보상` : '보상 받음 · 닫아도 돼요'; };
-      tick();
-      const timer = setInterval(() => { left--; tick(); if (left === 0) { clearInterval(timer); p.onEvent({ type: 'userEarnedReward', data: { unitType: 'toy', unitAmount: 1 } }); } }, 1000);
-      el.querySelector('button')!.onclick = () => { clearInterval(timer); el.remove(); p.onEvent({ type: 'dismissed' }); };
-      return () => { clearInterval(timer); el.remove(); };
-    }) as Sdk['showFullScreenAd'],
-    { isSupported: () => true },
-  );
-  return { loadFullScreenAd, showFullScreenAd };
 }
