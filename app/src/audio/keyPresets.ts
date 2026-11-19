@@ -11,7 +11,7 @@ export type KeyPresetId = KeySwitchPreset | 'creamy-thocky' | 'topre' | 'turquoi
 
 /** Synthesized preset used as the fallback sound (and as base of the `?sfx=synth` A/B mode). */
 export const SYNTH_BASE: Record<KeyPresetId, KeySwitchPreset> = {
-  'mongdol-pl87w': 'pebble', 'jjigae-topre': 'pebble', 'dojagi-space65': 'clack', 'oil-king': 'pebble', 'turquoise-tealios': 'clack', 'boba-u4t': 'pebble', 'box-jade': 'clack', 'silent-peach-v3': 'pebble', 'ibm-buckling-spring': 'clack',
+  'mongdol-pl87w': 'pebble', 'jjigae-topre': 'pebble', 'dojagi-space65': 'pebble', 'oil-king': 'pebble', 'turquoise-tealios': 'clack', 'boba-u4t': 'pebble', 'box-jade': 'clack', 'silent-peach-v3': 'pebble', 'ibm-buckling-spring': 'clack',
   topre: 'pebble',
   pebble: 'pebble',
   clack: 'clack',

@@ -24,5 +24,5 @@ export const KEYBOARD_COLORS: Record<KeyPresetId, Colorway> = {
   'silent-peach-v3': { name: 'Peach fuzz', keys: [0xf6e4d8,0xfaf3ec,0xe9bfa6,0xfaf3ec,0xf6e4d8,0xfaf3ec,0xe9bfa6,0xfaf3ec,0xf6e4d8,0xe9bfa6], tray: 0xefd2bf, metalness: 0, caseRoughness: 0.88, roughness: 0.85, clearcoat: 0 },
   'mongdol-pl87w': { name: 'Sea stone', keys: [0x3f4244,0x4c4f51,0x8a8d8e,0x4c4f51,0x3f4244,0x4c4f51,0xa5a7a6,0x4c4f51,0x3f4244,0x8a8d8e], tray: 0x2b2d2e, metalness: 0, caseRoughness: 0.97, roughness: 0.95, clearcoat: 0 },
   'jjigae-topre': { name: 'Cocoa stew', keys: [0xefe0c4,0xe3d0ae,0x6b4532,0xe3d0ae,0xefe0c4,0xe3d0ae,0x6b4532,0xe3d0ae,0xefe0c4,0x6b4532], tray: 0x3a3331, metalness: 0, caseRoughness: 0.74, roughness: 0.7, clearcoat: 0 },
-  'dojagi-space65': { name: 'Celadon glaze', keys: [0xcfe3d7,0xdcebe0,0xbcd6c8,0xdcebe0,0xcfe3d7,0xdcebe0,0xbcd6c8,0xdcebe0,0xcfe3d7,0xbcd6c8], tray: 0xc3dccf, metalness: 0, caseRoughness: 0.3, roughness: 0.28, clearcoat: 0.45 },
+  'dojagi-space65': { name: 'Tofu & soy', keys: [0xfaf8f1,0xf1ede2,0xfaf8f1,0xf1ede2,0xfaf8f1,0xe6dfcf,0xf1ede2,0xfaf8f1,0xf1ede2,0x8a6448], tray: 0x4a3a2e, metalness: 0, caseRoughness: 0.9, roughness: 0.92, clearcoat: 0 },
 };

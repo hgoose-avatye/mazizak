@@ -58,14 +58,15 @@ export const LOCAL_KEY_PRESETS = {
     classification: "Topre EC 30g (Krytox 105)",
     sourceVideo: "https://www.youtube.com/watch?v=TTfTCiwA38c",
   },
+  // 두부: the owner's own recording of a silent Topre keyboard (2026-11-19, scripts/kbsamples/build-own-recording.py). It took over the slot
+  // (and the id) of 도자기, which was cut from a YouTube video; the id is kept so saved settings and file names stay valid.
   "dojagi-space65": {
     id: "K13",
-    label: "도자기",
-    sensoryExpression: "도자기 두드리는 소리",
-    onomatopoeia: "또각·탁",
-    tags: ["ceramic", "clean", "clacky"],
-    classification: "Linear (BSUN RAW)",
-    sourceVideo: "https://www.youtube.com/watch?v=Ry1DJ2xzg6Q&t=10s",
+    label: "두부",
+    sensoryExpression: "말랑한 두부",
+    onomatopoeia: "톡·폭",
+    tags: ["silent", "soft", "topre"],
+    classification: "Silent Topre (electro-capacitive)",
   },
 } as const;
 export type LocalKeyPresetId = keyof typeof LOCAL_KEY_PRESETS;

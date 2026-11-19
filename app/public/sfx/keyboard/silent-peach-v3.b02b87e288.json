@@ -129,7 +129,7 @@
   "sha256": "c28a1dca305e8d07facef8a6c85e778b4f85309b980fa184aeaa6ec2eef01460"
  },
  "processing": {
-  "script": "scripts/kbsamples/build-own-peach.py",
+  "script": "scripts/kbsamples/build-own-recording.py",
   "variant": "medium",
   "oversubtraction": 2.5,
   "gainFloorDb": -20,

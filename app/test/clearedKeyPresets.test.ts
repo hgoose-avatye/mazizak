@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { loadKeyboardSamples } from "../src/audio/keyboardSamples";
 import { CLEARED_KEY_PRESETS, isKeyPresetEnabled } from "../src/audio/localKeyPresets";
 
-// 몽돌 · 찌개 · 도자기: third-party recordings the project owner obtained permission to use in the public build (2026-11-16); 복숭아: the owner's own recording.
+// 몽돌 · 찌개: third-party recordings the project owner obtained permission to use in the public build (2026-11-16); 복숭아 · 두부: the owner's own recordings.
 // These tests guard the shipped files and the record of that permission; they cannot (and do not) verify the permission itself.
 // node:fs via a dynamic specifier so `tsc` needs no @types/node (same pattern as the other sample tests)
 const fsName = "node:fs";
@@ -38,9 +38,10 @@ describe.each([...CLEARED_KEY_PRESETS])("cleared preset %s", (id) => {
 
   it("carries the owner's permission record instead of the local-only marker, and no local path", () => {
     const text = JSON.stringify(map);
-    // 복숭아 is the owner's own recording since 2026-11-18 (scripts/kbsamples/build-own-peach.py); the others are third-party recordings the owner cleared
-    const own = id === "silent-peach-v3";
-    expect(map.clearance).toMatchObject({ statedBy: "project owner", statedOn: own ? "2026-11-18" : "2026-11-16" });
+    // 복숭아 (2026-11-18) and 두부 (2026-11-19, in the former 도자기 slot) are the owner's own recordings (scripts/kbsamples/build-own-recording.py);
+    // the others are third-party recordings the owner cleared
+    const own = { "silent-peach-v3": "2026-11-18", "dojagi-space65": "2026-11-19" }[id];
+    expect(map.clearance).toMatchObject(own ? { status: "own recording", statedBy: "project owner", statedOn: own } : { statedBy: "project owner", statedOn: "2026-11-16" });
     expect(map.usage).toBeUndefined();
     expect(map.rights).toBeUndefined();
     expect(text).not.toMatch(/LOCAL_DEVELOPMENT_ONLY|NOT_FOR_PUBLIC_DISTRIBUTION|\/Users\/|\/private\//);
