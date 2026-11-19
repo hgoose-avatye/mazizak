@@ -9,7 +9,7 @@
  * The SDK is imported on first use, so the app's first screen does not carry it. Outside the Toss app (a plain browser,
  * the sandbox app) `isSupported()` is false and the gate is off: every toy opens.
  *
- * Testing in a browser: `?ads=mock` shows a stand-in video ad (mockAd.ts: 15 s, 건너뛰기 after 5 s = no reward,
+ * Testing in a browser: on the dev server it is on by default (`?ads=off` turns it off); `?ads=mock` shows a stand-in video ad (mockAd.ts: 15 s, 건너뛰기 after 5 s = no reward,
  * watched to the end = rewarded), `?ads=mock-fail` an ad that never loads (the toy then opens anyway).
  *
  * Ad group id: VITE_AIT_REWARDED_AD_ID at build time; the default is Toss's test id, which must not ship (see README).
@@ -24,7 +24,10 @@ export const usingTestAdId = AD_GROUP_ID === TEST_REWARDED_ID;
 const mockMode = (() => {
   try {
     const m = new URLSearchParams(location.search).get('ads');
-    return m === 'mock' || m === 'mock-fail' ? m : null;
+    if (m === 'mock' || m === 'mock-fail') return m;
+    // dev server opened by a person: the stand-in ad is on by default (`?ads=off` turns it off). Automated checks
+    // (navigator.webdriver) keep it off unless they ask, so they can switch toys freely.
+    return import.meta.env.DEV && m !== 'off' && !navigator.webdriver ? 'mock' : null;
   } catch {
     return null;
   }
