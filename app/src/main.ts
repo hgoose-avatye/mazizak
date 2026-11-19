@@ -33,7 +33,8 @@ if (!Object.hasOwn(KEY_PRESET_INFO, settings.get().keyPreset) || !isKeyPresetEna
 const audio = new AudioEngine(24);
 
 // The home screen needs none of three.js, the toys or their sounds: the renderer, the toy modules and the audio files of a toy
-// are fetched when that toy is opened (route() below) and nothing is preloaded at boot.
+// are fetched when that toy is opened (route() below) and nothing is preloaded at boot. Once the first toy is up, warmAll() fetches
+// the rest in the background so switching toys or keyboard presets never waits.
 let rt: Runtime | null = null;
 let stats: StatsOverlay | null = null;
 let stageReady: Promise<ToyContext> | null = null;
@@ -51,7 +52,7 @@ const ensureStage = (): Promise<ToyContext> => (stageReady ??= (async () => {
     requestFrame: () => r.requestFrame(),
     size: () => ({ w: r.width, h: r.height }),
     haptic,
-    soundChanged: () => syncSoundStatus(),
+    soundChanged: () => { syncSoundStatus(); warmWhenReady(); },
   };
 })().catch((e) => { stageReady = null; throw e; })); // a failed load can be retried by opening the toy again
 
@@ -177,6 +178,29 @@ function warmAudio(id: string): void {
   else for (const c of chunksOf(id)) void loadChunk(audio.ctx, c).catch(() => {});
 }
 
+/**
+ * No waiting on a switch (owner, 2026-11-19: "사용자 입장에서 로딩이 되어선 안돼"): once the first toy is up and the browser is idle,
+ * fetch and decode every other toy's sounds and code in the background, one at a time, the current category first
+ * (keyboard presets ≈0.6 MB, 말랑이 chunks ≈4.6 MB of FLAC). The loaders cache by URL, so a later open joins the same result.
+ * Skipped when the browser asks to save data; then each toy still loads on open as before.
+ */
+let warmedAll = false;
+/** starts once the opened toy can sound, so the warm-up never competes with it (and never starts while the network is down) */
+const warmWhenReady = () => { if (!warmedAll && rt?.toy && (rt.toy.soundStatus?.().state ?? 'ready') === 'ready') warmAll(); };
+function warmAll(): void {
+  if (warmedAll || new URLSearchParams(location.search).get('sfx') === 'synth') return;
+  warmedAll = true;
+  if ((navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData) return;
+  const keyboard = [() => import('./toys/keyboard/toy'), ...enabledPresets().map((p) => () => loadKeyboardSamples(audio.ctx, p))];
+  const fidgets = [() => import('./toys/fidgets/toy'), ...FIDGETS.map((f) => () => Promise.all(chunksOf(f.id).map((c) => loadChunk(audio.ctx, c))))];
+  const jobs = category === 'keyboard' ? [...keyboard, ...fidgets] : [...fidgets, ...keyboard];
+  const ric = (window as Window & { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number }).requestIdleCallback;
+  const idle = (cb: () => void) => (ric ? ric(cb, { timeout: 1000 }) : setTimeout(cb, 50));
+  // the first failure (offline, flaky network) ends the warm-up: the toys then load on open as before, with their own retry
+  const next = () => { const job = jobs.shift(); if (job) idle(() => void job().then(next, () => {})); };
+  next();
+}
+
 const variants = $('#variants');
 function buildVariants(id: string): void {
   variants.innerHTML = '';
@@ -272,6 +296,7 @@ async function route(): Promise<void> {
   rt.canvas.setAttribute('role', 'img');
   rt.setToy(toy);
   syncSoundStatus();
+  warmWhenReady();
   // the page around the stage takes the toy's backdrop colour, so the header and dock do not frame the canvas as a box
   const bg = toy.scene.background as { getHexString?: () => string } | null;
   if (bg?.getHexString) {

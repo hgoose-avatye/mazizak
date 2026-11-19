@@ -34,44 +34,55 @@ const tapEl = async (s, sel) => { const [x, y] = await center(s, sel); await tap
 const toyUp = (s) => s.page.evaluate(() => document.getElementById('stage').classList.contains('active'));
 const waitUp = async (s, ms = 60000) => { const t0 = Date.now(); while (!(await toyUp(s)) && Date.now() - t0 < ms) await sleep(50); return Date.now() - t0; };
 const waitTitle = async (s, prefix, ms = 60000) => { const t0 = Date.now(); while (!((await toyUp(s)) && (await s.page.evaluate(() => document.title)).startsWith(prefix)) && Date.now() - t0 < ms) await sleep(100); };
+// sound chunks are shared by several toys and named after them (squish.L01-L02-S01.<hash>.flac): a chunk "of" a toy is one whose name lists it
+const chunkOf = (id, ext = '(json|flac)') => new RegExp(`/sfx/fidgets/squish\\.(?:[A-Z]\\d\\d-)*${id}(?:-[A-Z]\\d\\d)*\\.[0-9a-f]{10}\\.${ext}$`);
+// S01's sounds sit in this many shared chunks; the failure checks below count requests per chunk
+const S01_CHUNKS = 2;
 const item = (key) => `.toy-item[data-key="${key}"]`;
 const chip = (s) => s.page.evaluate(() => { const e = document.getElementById('sound-status'); return e && !e.hidden ? { text: e.textContent, retry: !!e.querySelector('button') } : null; });
 const sounds = (s) => s.page.evaluate(() => window.__sounds.length);
+// the background warm-up (main.ts warmAll) is done when no new sound request has started for 1.5 s
+const waitWarm = async (s, ms = 30000) => { const t0 = Date.now(); let n = -1, since = Date.now(); while (Date.now() - t0 < ms) { const m = s.sfx().length; if (m !== n) { n = m; since = Date.now(); } else if (Date.now() - since > 1500) break; await sleep(200); } };
 const dupes = (list) => list.filter((u, i) => list.indexOf(u) !== i);
 // a spot on the toy itself (the stage sits between the header and the dock)
 const stageXY = (s) => s.page.evaluate(() => { const r = document.getElementById('stage').getBoundingClientRect(); return [r.left + r.width / 2, r.top + r.height * 0.5]; });
 
-// 1) launch: no home screen — 슬랑이 opens at once and only its own chunk is requested (no other toy's audio, no WAV)
-{ const s = await open(); await waitUp(s); await sleep(2000);
-  const sfx = s.sfx();
+// 1) launch: no home screen — 슬랑이 opens at once and its own chunks are requested first (no other toy's audio, no WAV);
+//    everything else is fetched in the background afterwards, so a dock switch then fetches nothing and never waits
+{ const s = await open(); await waitUp(s);
+  const sfx = s.sfx().slice(0, 2 * S01_CHUNKS);
   check('launch opens 슬랑이 (S01) without a home screen', (await toyUp(s)) && (await s.page.evaluate(() => location.hash)) === '#/S01' && !(await s.page.evaluate(() => !!document.getElementById('home'))));
-  check('launch requests only S01\'s chunk (map + FLAC, hashed names)', sfx.length === 2 && sfx.every((u) => /\/sfx\/fidgets\/squish\.S01\.[0-9a-f]{10}\.(json|flac)$/.test(u)), sfx.join(','));
-  check('no audio of other toys / no WAV at launch (dock thumbnails fetch no sound)', !sfx.some((u) => /\.wav$|keyboard|squishy\/|picks|crunch|wax/.test(u)), sfx.join(','));
+  check('launch requests S01\'s chunks first (map + FLAC, hashed names)', sfx.length === 2 * S01_CHUNKS && sfx.every((u) => chunkOf('S01').test(u)), s.sfx().join(','));
+  await waitWarm(s);
+  check('background warm-up: every 말랑이 chunk and keyboard preset fetched once, no WAV', !s.sfx().some((u) => /\.wav$/.test(u)) && s.sfx().some((u) => /keyboard\/silent-peach-v3\./.test(u)) && s.sfx().some((u) => chunkOf('S02').test(u)) && dupes(s.sfx()).length === 0, `${s.sfx().length} requests`);
   const three = s.reqs.find((r) => /three/.test(r.url)), flac = s.reqs.find((r) => r.url.endsWith('.flac'));
   check('three.js and the sound are requested in parallel', !!three && !!flac && flac.t <= (s.done[three.url] ?? Infinity), `flac ${flac && three ? flac.t - three.t : '?'} ms after the three.js request; three.js took ${three && s.done[three.url] ? s.done[three.url] - three.t : '?'} ms`);
   check('splash is gone once the toy is up', !(await s.page.evaluate(() => !!document.getElementById('splash'))));
   const [x, y] = await stageXY(s); const n0 = await sounds(s); await tapXY(s, x, y); await sleep(400);
   check('S01 first touch sounds', (await sounds(s)) > n0);
-  // dock: S02 then back to S01 — S02 fetches only its own chunk, returning fetches nothing
-  await tapEl(s, item('S02')); await waitTitle(s, '모닝빵'); await sleep(2000);
-  await tapEl(s, item('S01')); await waitTitle(s, '슬랑이'); await sleep(1500);
-  const after = s.sfx().slice(2);
-  check('dock S01→S02→S01: only S02\'s chunk is added, nothing on return', after.length === 2 && after.every((u) => /squish\.S02\./.test(u)), after.join(','));
+  // dock: S02 then back to S01 — both already warm: nothing is fetched, and S02 sounds on its first touch
+  const nWarm = s.sfx().length;
+  await tapEl(s, item('S02')); await waitTitle(s, '모닝빵');
+  const n2 = await sounds(s); await tapXY(s, x, y); await sleep(150);
+  check('dock → S02: first touch sounds at once, no loading chip', (await sounds(s)) > n2 && (await chip(s)) === null, JSON.stringify(await chip(s)));
+  await tapEl(s, item('S01')); await waitTitle(s, '슬랑이'); await sleep(500);
+  check('dock S01→S02→S01: nothing fetched after the warm-up', s.sfx().length === nWarm, s.sfx().slice(nWarm).join(','));
   const n1 = await sounds(s); await tapXY(s, x, y); await sleep(400);
   check('S01 still sounds after the round trip (memory cache)', (await sounds(s)) > n1);
   check('no duplicate audio requests', dupes(s.sfx()).length === 0, dupes(s.sfx()).join(','));
   check('no page errors (launch / dock)', s.errors.length === 0, s.errors.join('|')); await s.ctx.close(); }
 
-// 2) the keyboard requests only the chosen preset; switching preset loads only that one
-{ const s = await open(); await waitUp(s); await sleep(1500); const n = s.sfx().length;
-  await tapEl(s, '[data-category="keyboard"]'); await waitTitle(s, '키보드'); await sleep(2000);
-  const kb = () => s.sfx().slice(n);
+// 2) keyboard after the warm-up: opening it and switching presets fetch nothing, and every preset sounds on its first key press with no chip
+{ const s = await open(); await waitUp(s); await waitWarm(s); const n = s.sfx().length;
+  await tapEl(s, '[data-category="keyboard"]'); await waitTitle(s, '키보드'); await sleep(300);
   check('keyboard opens from the dock', (await toyUp(s)) && (await s.page.evaluate(() => location.hash)) === '#/keyboard/pebble');
-  check('keyboard requests only the chosen preset (map + FLAC)', kb().length === 2 && kb().every((u) => /\/sfx\/keyboard\/pebble\.[0-9a-f]{10}\.(json|flac)$/.test(u)), kb().join(','));
-  const n0 = await sounds(s); await s.page.keyboard.press('KeyA'); await sleep(300);
+  const n0 = await sounds(s); await s.page.keyboard.press('KeyA'); await sleep(150);
   check('keyboard first key press sounds', (await sounds(s)) > n0);
-  await tapEl(s, item('clack')); await sleep(1500);
-  check('preset switch loads just that preset', kb().length === 4 && kb().slice(2).every((u) => /keyboard\/clack\./.test(u)), kb().join(','));
+  for (const p of ['clack', 'silent-peach-v3', 'mongdol-pl87w', 'jjigae-topre', 'dojagi-space65', 'turquoise-tealios']) {
+    await tapEl(s, item(p)); const k = await sounds(s); await s.page.keyboard.press('KeyA'); await sleep(120);
+    check(`preset ${p}: sounds on the first press, no loading chip`, (await sounds(s)) > k && (await chip(s)) === null, JSON.stringify(await chip(s)));
+  }
+  check('preset switches fetch nothing after the warm-up', s.sfx().length === n, s.sfx().slice(n).join(','));
   check('no page errors (keyboard)', s.errors.length === 0, s.errors.join('|')); await s.ctx.close(); }
 
 // 3) first input while the sounds load (slow network): no chip before a touch; the chip from the first touch when the sound is not ready
@@ -111,13 +122,13 @@ if (CDP) {
 
 // 5) network failure → error chip with 다시 시도 after the touch → retry works (the network stays down until then)
 { let attempts = 0, allow = false;
-  const s = await open({ before: (ctx) => ctx.route(/\/sfx\/fidgets\/squish\.S01\.[0-9a-f]+\.flac$/, (r) => { attempts++; return allow ? r.continue() : r.abort(); }) });
+  const s = await open({ before: (ctx) => ctx.route(chunkOf('S01', 'flac'), (r) => { attempts++; return allow ? r.continue() : r.abort(); }) });
   await waitUp(s); await sleep(1500);
   const [x, y] = await stageXY(s); await tapXY(s, x, y); await sleep(300);
   const c = await chip(s);
   check('network failure: toy works, error chip with 다시 시도 after the touch', (await toyUp(s)) && !!c && c.retry && s.errors.length === 0, JSON.stringify(c));
   const failedAttempts = attempts; allow = true;
-  check('network failure: bounded attempts before the user retries', failedAttempts <= 2, `${failedAttempts} attempts`);
+  check('network failure: bounded attempts before the user retries', failedAttempts <= 2 * S01_CHUNKS, `${failedAttempts} attempts`);
   if (c?.retry) await s.page.click('#sound-status button');
   await sleep(2500);
   check('retry: loads, chip gone', !(await chip(s)) && attempts > failedAttempts, `attempts=${attempts}`);
@@ -126,13 +137,13 @@ if (CDP) {
 
 // 6) a file the browser cannot decode → error chip without retry, never fetched again
 { let served = 0;
-  const s = await open({ before: (ctx) => ctx.route(/\/sfx\/fidgets\/squish\.S01\.[0-9a-f]+\.flac$/, (r) => { served++; r.fulfill({ status: 200, contentType: 'audio/flac', body: Buffer.from('fLaC this is not a flac stream at all') }); }) });
+  const s = await open({ before: (ctx) => ctx.route(chunkOf('S01', 'flac'), (r) => { served++; r.fulfill({ status: 200, contentType: 'audio/flac', body: Buffer.from('fLaC this is not a flac stream at all') }); }) });
   await waitUp(s); await sleep(1500);
   const [x, y] = await stageXY(s); await tapXY(s, x, y); await sleep(300);
   const c = await chip(s);
   check('decode failure: error chip, no retry button', !!c && !c.retry && /재생할 수 없어요/.test(c.text), JSON.stringify(c));
   for (let i = 0; i < 2; i++) { await tapEl(s, item('S02')); await waitTitle(s, '모닝빵'); await tapEl(s, item('S01')); await waitTitle(s, '슬랑이'); await sleep(600); }
-  check('decode failure: not fetched again on re-entry', served === 1, `served ${served}×`);
+  check('decode failure: not fetched again on re-entry', served === S01_CHUNKS, `served ${served}×`);
   check('decode failure: no page errors', s.errors.length === 0, s.errors.join('|')); await s.ctx.close(); }
 
 // 7) toy code failure → no stuck splash, a notice, the dock stays usable; retry without reload

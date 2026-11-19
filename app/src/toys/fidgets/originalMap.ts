@@ -14,13 +14,11 @@ import type { FidgetEvent } from "./soundBank";
 
 export const ORIGINAL_SOUNDS = import.meta.env.VITE_ORIGINAL_SOUNDS === "1";
 /**
- * Toys that show the 원본 소리 / 공개 소리 chips. Since 2026-11-17 only S02 모닝빵 (owner: "모닝빵만 원본소리 공개소리 보여주세요"),
- * against the 뿌왁 app's bread squish; the earlier W01 wak/butter · W02 wak/cake · C01 crunch/soda · C02 crunch/clover ·
- * S01 crunch/guma comparisons are switched off (their PHASES stay, so one line brings a comparison back).
+ * Toys that show the 원본 소리 / 공개 소리 chips. None since 2026-11-19: the owner settled S02 모닝빵 on its public sound (their own
+ * recording, 빵말랑이.m4a) and asked for the original not to play any more. The earlier comparisons (S02 wakppu:bread, W01 wak/butter ·
+ * W02 wak/cake · C01 crunch/soda · C02 crunch/clover · S01 crunch/guma) are switched off; their PHASES stay, so one line brings one back.
  */
-export const ORIGINAL_FOLDER: Record<string, string> = {
-  S02: "wakppu:bread",
-};
+export const ORIGINAL_FOLDER: Record<string, string> = {};
 /** original phase → MANZIZAK events (short = tap, long = knead/hold, init = first break) */
 const PHASES: Record<string, Partial<Record<FidgetEvent, "init" | "short" | "long">>> = {
   W01: { tap: "short", hold: "long", crack: "long" },
