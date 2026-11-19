@@ -90,7 +90,7 @@ function layoutProbe(inset) {
     const primary = !el.matches('#dock-toggle, .cat-seg button'); // drawer toggle / category tabs: secondary, WCAG 2.5.8 24 px
     const min = Math.min(r.width, r.height);
     if (primary) out.minTarget = Math.min(out.minTarget, min);
-    if (min < (primary ? 40 : 24)) bad(`small target "${name}" ${Math.round(r.width)}×${Math.round(r.height)}`);
+    if (min < (primary ? 44 : 24)) bad(`small target "${name}" ${Math.round(r.width)}×${Math.round(r.height)}`);
     if (r.left < inset.l - 0.5 || r.right > vw - inset.r + 0.5 || r.top < inset.t - 0.5 || r.bottom > vh - inset.b + 0.5) bad(`"${name}" outside safe area [${[r.left, r.top, r.right, r.bottom].map(Math.round)}]`);
     const hit = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
     if (!hit || !(el === hit || el.contains(hit))) bad(`"${name}" covered by ${hit?.id || hit?.className || hit?.tagName}`);
@@ -175,7 +175,9 @@ async function runViewport([label, w, h, dpr, inset], deep) {
     }
     // settings sheet: fully on screen (scrolls inside if it must), close button reachable
     await o.p.locator('[data-action=settings]').first().click();
-    await sleep(350);
+    // measure where the sheet comes to rest (its 0.28 s slide-up can still be moving at a fixed delay on a busy machine)
+    await o.p.waitForFunction(() => !document.querySelector('#sheet').hidden);
+    await o.p.evaluate(() => Promise.all(document.querySelector('.sheet-panel').getAnimations().map((a) => a.finished)));
     const sheet = await o.p.evaluate(() => {
       const pn = document.querySelector('.sheet-panel').getBoundingClientRect(), c = document.querySelector('.sheet-close').getBoundingClientRect();
       const hit = document.elementFromPoint(c.left + c.width / 2, c.top + c.height / 2);
