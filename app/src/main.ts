@@ -18,7 +18,7 @@ import { FIDGETS, findFidget } from './toys/fidgets/catalog';
 import { ORIGINAL_SOUNDS, ORIGINAL_FOLDER } from './toys/fidgets/originalMap';
 import { loadChunk, chunksOf } from './toys/fidgets/fidgetSprites';
 import { KEYBOARD_COLORS } from './toys/keyboard/colors';
-import { access, enter, freeLeft, freshState, grant, localDay, normalize, GATE_CONFIG, type GateState } from './ads/gate';
+import { access, enter, freeLeft, freshState, grant, groupOf, localDay, normalize, GATE_CONFIG, type GateState, type Group } from './ads/gate';
 import { adsSupported, preloadAd, showRewardedAd } from './ads/rewarded';
 
 const $ = <T extends HTMLElement>(sel: string) => document.querySelector(sel) as T;
@@ -239,6 +239,7 @@ function buildVariants(id: string): void {
 
 // ---------- ad gate (src/ads/gate.ts) ----------
 // The toy the app opens on is free; after it, each pick of another kind uses one of today's GATE_CONFIG.freePerDay free picks
+// of its group (말랑이 and 키보드 counted apart)
 // (a notice shows how many are left). With none left, a pick opens after a rewarded ad the user chose to watch.
 // Off where ads are not supported (a plain browser): everything opens. `?ads=mock` turns it on with a stand-in ad.
 const GATE_STORE = 'mzk-ad-gate-v1';
@@ -251,6 +252,7 @@ function saveGate(s: GateState): void {
   try { localStorage.setItem(GATE_STORE, JSON.stringify(s)); } catch { /* storage unavailable: the gate still works for this visit */ }
 }
 let gateOn = false;
+const GROUP_NAME: Record<Group, string> = { fidget: '말랑이', keyboard: '키보드' };
 let adsChecked = false;
 /** after the first toy is on screen (the SDK chunk must not compete with it): turn the gate on where ads work, load the first ad */
 function startAds(): void {
@@ -275,7 +277,7 @@ let adFor: { kind: string; open: () => void; opener: HTMLElement | null } | null
 function openAdSheet(kind: string, open: () => void): void {
   adFor = { kind, open, opener: document.activeElement as HTMLElement | null };
   $('#ad-title').textContent = `${kindName(kind)} 열기`;
-  $('#ad-text').textContent = `오늘 무료 ${GATE_CONFIG.freePerDay}회를 다 썼어요. 짧은 광고를 끝까지 보면 바로 열려요.`;
+  $('#ad-text').textContent = `오늘 ${GROUP_NAME[groupOf(kind)]} 무료 ${GATE_CONFIG.freePerDay}회를 다 썼어요. 짧은 광고를 끝까지 보면 바로 열려요.`;
   $('#ad-status').textContent = '';
   const thumb = toyList.querySelector(`.toy-item[data-key="${CSS.escape(kind.replace(/^kb:/, ''))}"] .thumb`);
   $('#ad-thumb').replaceChildren(...(thumb ? [thumb.cloneNode(true)] : []));
@@ -346,8 +348,8 @@ async function route(): Promise<void> {
     const r = enter(gateNow(), kind, { launch });
     saveGate(r.state);
     if (r.usedFree && gateOn) {
-      const left = freeLeft(r.state), n = GATE_CONFIG.freePerDay;
-      showNotice(left > 0 ? `남은 무료 ${left}/${n}회` : `오늘 무료 ${n}회를 다 썼어요 · 다음부터는 광고를 보고 열 수 있어요`);
+      const group = groupOf(kind), name = GROUP_NAME[group], left = freeLeft(r.state, group), n = GATE_CONFIG.freePerDay;
+      showNotice(left > 0 ? `${name} 남은 무료 ${left}/${n}회` : `오늘 ${name} 무료 ${n}회를 다 썼어요 · 다음부터는 광고를 보고 열 수 있어요`);
     }
   }
   if (id === 'keyboard' && validPreset) {
@@ -547,7 +549,7 @@ function syncDock(scroll: boolean): void {
     if (locked) b.setAttribute('aria-description', '광고 보고 열기'); else b.removeAttribute('aria-description');
     b.dataset.locked = String(locked);
   });
-  const count = `${toyList.children.length}가지` + (gateOn ? ` · 오늘 무료 ${freeLeft(g)}회` : '');
+  const count = `${toyList.children.length}가지` + (gateOn ? ` · 오늘 무료 ${freeLeft(g, category)}회` : ''); // the list on screen's group
   if ($('#collection-count').textContent !== count) $('#collection-count').textContent = count;
   if (scroll && sel && settings.get().dockOpen) {
     // centre the selection in the list, whichever way it scrolls (a row under the stage, or the rail's grid on wide short screens)
