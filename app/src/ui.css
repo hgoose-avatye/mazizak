@@ -271,3 +271,12 @@ html.dock-folded .dock-body { display: none; }
 .ad-status { min-height: 20px; margin: 0 0 10px; color: #a0614c; font-size: 13px; font-weight: 650; }
 .ad-later { width: 100%; height: 44px; margin-top: 6px; border: 0; background: none; color: #7a8574; font-size: 14px; font-weight: 600; cursor: pointer; }
 #ad-watch:disabled { opacity: .55; }
+
+/* ---------- 출처와 라이선스 (index.html .credits) ---------- */
+.credits-body { max-height: 320px; line-height: 1.6; }
+.credits-body p { margin: 0 0 4px; }
+.credits-body h3 { margin: 14px 0 4px; font: 750 12px/1.4 var(--font-meta); color: #3f5538; }
+.credits-body ul { margin: 0; padding: 0; list-style: none; }
+.credits-body li { padding: 6px 0; border-top: 1px solid #ebeee4; }
+.credits-body li b { display: block; color: #3f5538; font-weight: 700; }
+.credits-ver { margin-top: 12px !important; color: #9ba991; }
