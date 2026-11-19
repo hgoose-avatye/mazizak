@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { toNdc, screenBox } from "../../core/viewport";
 import type { Toy, ToyContext } from "../../core/toy";
 import type { InputEvt } from "../../core/runtime";
 import { radialShadowTexture, studioEnvironment } from "../../core/studio";
@@ -228,10 +229,7 @@ if (uMix > 0.0) {
     anchors = new Map<number, THREE.Vector3>(),
     tmp = new THREE.Vector3(),
     p0 = new THREE.Vector3();
-  const ndc = (x: number, y: number) => {
-    const { w, h } = ctx.size();
-    return new THREE.Vector2((x / w) * 2 - 1, 1 - (y / h) * 2);
-  };
+  const ndc = (x: number, y: number) => toNdc(x, y, ctx.size());
   let frames = 0,
     active = false,
     crunchClock = 0,
@@ -886,6 +884,7 @@ if (uMix > 0.0) {
     report() {
       return {
         id: spec.id,
+        screenBox: screenBox(shell ? [blob, shell] : [blob], camera, ctx.size()),
         family: spec.family,
         physics: "tetrahedral-dual-layer-cage",
         cageNodes: model.cage.position.length / 3,

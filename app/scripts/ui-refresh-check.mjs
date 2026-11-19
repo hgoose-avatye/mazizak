@@ -26,7 +26,7 @@ try{
   ok(label+' reset hidden on a toy that settles by itself',!await p.locator('[data-action=reset]').isVisible());
   await p.getByRole('button',{name:'소리 끄기',exact:true}).click();ok(label+' mute state visible',await p.locator('#sound-btn').getAttribute('aria-pressed')==='false');await p.getByRole('button',{name:'소리 켜기',exact:true}).click();
   await p.getByRole('button',{name:'장난감 목록 접기',exact:true}).click();ok(label+' drawer folds',await p.locator('#dock-toggle').getAttribute('aria-expanded')==='false'&&!await p.locator('#dock-body').isVisible());
-  await p.waitForFunction(h=>document.querySelector('#stage').getBoundingClientRect().height>h,stage.height);ok(label+' folding preserves free stage',(await p.locator('#stage').boundingBox()).height>stage.height);await p.getByRole('button',{name:'장난감 목록 펼치기',exact:true}).click();
+  await p.waitForFunction(a=>{const r=document.querySelector('#stage').getBoundingClientRect();return r.width*r.height>a;},stage.width*stage.height);ok(label+' folding preserves free stage',(s=>s.width*s.height)(await p.locator('#stage').boundingBox())>stage.width*stage.height);/* wide short screens: the drawer is a side rail, folding widens the stage */await p.getByRole('button',{name:'장난감 목록 펼치기',exact:true}).click();
   await p.locator('.toy-item[data-key=S02]').click();await p.waitForFunction(()=>window.__MANZIZAK__?.report()?.id==='S02');ok(label+' selection updates title',(await p.locator('#now-name').textContent())==='모닝빵');
   await p.locator('.toy-item[data-key=W01]').click();await p.waitForFunction(()=>window.__MANZIZAK__?.report()?.id==='W01');
   await p.mouse.move(stage.x+stage.width/2,stage.y+stage.height/2);await p.mouse.down();await p.waitForTimeout(250);await p.mouse.up();

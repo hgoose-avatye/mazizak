@@ -134,6 +134,10 @@ export class Runtime {
     }
     const key = `${w}x${h}@${this.renderer.getPixelRatio()}`;
     if (!force && key === this.fitted) return;
+    // the canvas changed size under a finger (rotation, fold / unfold, split-screen drag): the press was aimed at a picture that
+    // no longer exists, so it ends as a cancel (same as the OS's own pointercancel) instead of mapping onto the re-framed toy.
+    // The toy itself (shape, cracks, stretch, preset) is not reset: only the in-flight contacts end.
+    if (this.fitted && !this.fitted.startsWith(`${w}x${h}@`) && this.activePointers.size) this.releaseAll();
     this.fitted = key;
     this.renderer.setSize(w, h, true);
     this.toy?.resize(w, h);
@@ -240,8 +244,11 @@ export class Runtime {
   private bindInput(): void {
     const c = this.canvas;
     const toEvt = (kind: PointerKind, ev: PointerEvent): InputEvt => {
+      // canvas CSS px (the toys' frame: ctx.size() is clientWidth × clientHeight). Scaled by layout size / drawn size so a CSS
+      // transform on the canvas or an ancestor (scale, zoom animation) still lands where the finger is
       const r = c.getBoundingClientRect();
-      return { kind, id: ev.pointerId, x: ev.clientX - r.left, y: ev.clientY - r.top, t: ev.timeStamp, th: performance.now(), pointerType: ev.pointerType, pressure: ev.pressure };
+      const sx = r.width ? c.clientWidth / r.width : 1, sy = r.height ? c.clientHeight / r.height : 1;
+      return { kind, id: ev.pointerId, x: (ev.clientX - r.left) * sx, y: (ev.clientY - r.top) * sy, t: ev.timeStamp, th: performance.now(), pointerType: ev.pointerType, pressure: ev.pressure };
     };
     c.addEventListener('pointerdown', (ev) => {
       if (!this.toy) return;
@@ -273,6 +280,10 @@ export class Runtime {
     c.addEventListener('pointercancel', end('cancel'));
     c.addEventListener('lostpointercapture', end('cancel'));
     c.addEventListener('contextmenu', (ev) => ev.preventDefault());
+    // Chrome's touch adjustment moves a tap onto the nearest element that "responds to taps" when the touched one does not:
+    // a press on the toy a few px from the drawer toggle or a header icon became a click on it (the drawer folded, sound muted).
+    // A click listener makes the canvas such an element, so a tap on the toy stays on the toy. (Nothing to do on the click itself.)
+    c.addEventListener('click', () => {});
   }
 
   deviceInfo(): Record<string, unknown> {

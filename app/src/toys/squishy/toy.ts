@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { toNdc, screenBox } from '../../core/viewport';
 import { mergeVertices } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import type { InputEvt } from '../../core/runtime';
 import type { Toy, ToyContext } from '../../core/toy';
@@ -102,10 +103,7 @@ export function createSquishy(ctx: ToyContext): Toy & { setColor(id: string): vo
   const ray = new THREE.Raycaster();
   const invMat = new THREE.Matrix4();
   const unitSphere = new THREE.Sphere(new THREE.Vector3(), 1);
-  const ndc = (x: number, y: number) => {
-    const { w, h } = ctx.size();
-    return new THREE.Vector2((x / w) * 2 - 1, -(y / h) * 2 + 1);
-  };
+  const ndc = (x: number, y: number) => toNdc(x, y, ctx.size());
   function pick(x: number, y: number): { local: THREE.Vector3; normal: THREE.Vector3 } | null {
     ray.setFromCamera(ndc(x, y), camera);
     blob.updateMatrixWorld();
@@ -349,6 +347,7 @@ export function createSquishy(ctx: ToyContext): Toy & { setColor(id: string): vo
     },
     report() {
       return {
+        screenBox: screenBox([blob], camera, ctx.size()),
         soundSource,
         params: P,
         meshVertices: g.getAttribute('position').count,

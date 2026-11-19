@@ -164,9 +164,9 @@ html.dock-folded .dock-body { display: none; }
   .brand-symbol { width: 23px; height: 25px; }
   .brand .wordmark { font-size: 19px; }
   .brand .latin { font-size: 6px; }
-  .icon-btn.ghost { width: 36px; height: 36px; }
+  /* the round icons keep their 44 px touch size on short screens too */
   .now-playing { display: none; }
-  .app-head { top: var(--safe-t); height: var(--head-h); } /* no name on screen here: icons back at the top */
+  .app-head { top: calc(var(--safe-t) + 2px); height: var(--head-h); } /* no name on screen here: icons back at the top (44 px icons in the 42 px row: 2 px down so none pokes above the safe area) */
   .dock { height: calc(104px + var(--safe-b)); border-radius: 18px 18px 0 0; }
   .dock-toggle { height: 24px; }
   .dock-body { height: 79px; padding: 0 0 5px; gap: 8px; }
@@ -197,3 +197,64 @@ html.dock-folded .dock-body { display: none; }
 .sheet-note { color: #5c6e55; font-size: 12px; max-height: 240px; overflow-y: auto; overscroll-behavior: contain; }
 .sheet-top { position: sticky; top: -10px; z-index: 3; background: var(--paper); }
 :focus-visible { outline-color: #4e7857; }
+
+/* ---------- wide, short screens: the drawer becomes a rail on the right ----------
+   Landscape phones, short desktop windows, split screens and book-posture foldables: a bottom drawer would take a third of the
+   height there and the toy (the keyboard is limited by height) shrank to 18–26 px keys. Chosen by the free space's shape, never by
+   device: wider than 3:2 and at most 640 px tall (5:4 when at most 520 px tall), or a screen split by a vertical fold (Viewport Segments API; ignored where unsupported).
+   main.ts reads --rail and publishes the rail's width as --dock-w (and --dock-h: 0), so the stage and the floating UI make room for it. */
+:root { --dock-w: 0px; }
+.dock { --rail: 0; }
+#stage { right: var(--dock-w); }
+.app-head { right: max(var(--safe-r), var(--dock-w)); }
+.now-playing { right: calc(var(--actions-w) + max(var(--safe-r), var(--dock-w))); }
+.variants, .sound-status, .notice { left: calc((100% - var(--dock-w)) / 2); }
+@media (min-aspect-ratio: 3/2) and (max-height: 640px), (min-aspect-ratio: 5/4) and (max-height: 520px), (horizontal-viewport-segments: 2) {
+  :root { --rail-w: clamp(176px, 20vw, 262px); }
+  .dock {
+    --rail: 1;
+    left: auto; top: 0; bottom: 0;
+    width: calc(var(--rail-w) + var(--safe-r)); height: auto;
+    display: flex; flex-direction: column;
+    padding: calc(var(--safe-t) + 4px) var(--safe-r) 0 0;
+    border-top: 0; border-left: 1px solid rgba(255, 255, 255, .9);
+    border-radius: 24px 0 0 24px;
+    box-shadow: -8px 0 40px -22px rgba(41, 60, 41, .19), -1px 0 0 rgba(51, 73, 50, .035);
+  }
+  /* the head row only holds the round icons in the stage's top-right corner: the toy may use the full height */
+  #stage { top: var(--safe-t); bottom: 0; }
+  .variants, .notice { bottom: calc(var(--safe-b) + 10px); }
+  .dock-toggle { flex: none; height: 44px; max-width: none; padding: 0 10px 0 14px; }
+  .dock-toggle svg { transform: rotate(-90deg); }
+  .dock-label { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .dock-body { flex: 1; min-height: 0; height: auto; max-width: none; width: 100%; margin: 0; padding: 0; display: flex; flex-direction: column; align-items: stretch; gap: 0; }
+  .dock-toolbar { flex: none; height: auto; padding: 0 10px 8px; }
+  .collection-count { display: none; }
+  .cat-seg { flex: 1; flex-direction: row; }
+  .cat-seg button { flex: 1; min-width: 0; height: 40px; padding-inline: 6px; font-size: 12.5px; }
+  .toy-list {
+    flex: 1; min-height: 0; height: auto;
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(72px, 1fr)); grid-auto-rows: 80px; align-content: start;
+    gap: 6px; padding: 2px 10px calc(var(--safe-b) + 12px);
+    overflow-x: hidden; overflow-y: auto;
+    scroll-snap-type: y proximity; scroll-padding-block: 8px; touch-action: pan-y;
+  }
+  .toy-item { width: auto; height: auto; padding: 6px 3px 4px; gap: 2px; border-radius: 14px; }
+  .toy-item .thumb { width: 48px; height: 48px; border-radius: 11px; }
+  .toy-item .name { font-size: 12px; line-height: 16px; }
+  .item-number { display: none; }
+  .item-selected { width: 13px; height: 13px; top: 4px; right: 4px; }
+  /* folded: a slim strip holding only the open button (its name stays in aria-label) */
+  html.dock-folded .dock { width: calc(56px + var(--safe-r)); height: auto; border-radius: 20px 0 0 20px; }
+  html.dock-folded .dock-toggle { width: 100%; height: 56px; padding: 0; justify-content: center; }
+  html.dock-folded .dock-toggle svg { transform: rotate(90deg); width: 18px; height: 18px; }
+  html.dock-folded .dock-label, html.dock-folded .dock-current, html.dock-folded #dock-toggle-label { display: none; }
+}
+/* book posture (vertical fold): the toy in the left segment, the rail fills the right one so nothing sits on the hinge */
+@media (horizontal-viewport-segments: 2) {
+  :root { --rail-w: calc(100vw - env(viewport-segment-left 1 0, 50vw)); }
+}
+/* table-top posture (horizontal fold): the toy stays in the top segment; the drawer is in the bottom one */
+@media (vertical-viewport-segments: 2) {
+  #stage { bottom: max(var(--dock-h), calc(100vh - env(viewport-segment-bottom 0 0, 100vh))); }
+}
