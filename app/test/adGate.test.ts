@@ -9,18 +9,36 @@ const walk = (keys: string[]) => keys.slice(1).reduce((s, k) => go(s, k), go(fre
 describe('ad gate', () => {
   it('the launch toy is free and not counted', () => {
     const s = walk(['S01']);
-    expect(s.used).toBe(0);
-    expect(freeLeft(s, cfg)).toBe(3);
+    expect(s.used).toEqual({ fidget: 0, keyboard: 0 });
+    expect(freeLeft(s, 'fidget', cfg)).toBe(3);
     expect(enter(freshState('d'), 'S01', { launch: true }, cfg).usedFree).toBe(false);
   });
 
   it('every pick of a different kind uses one free pick, going back included', () => {
     let s = walk(['S01', 'S02']);
-    expect(freeLeft(s, cfg)).toBe(2);
+    expect(freeLeft(s, 'fidget', cfg)).toBe(2);
     expect(enter(s, 'S01', {}, cfg).usedFree).toBe(true); // back to the launch toy counts
     s = walk(['S01', 'S02', 'S01', 'S02']);
-    expect(s.used).toBe(3);
-    expect(freeLeft(s, cfg)).toBe(0);
+    expect(s.used.fidget).toBe(3);
+    expect(freeLeft(s, 'fidget', cfg)).toBe(0);
+  });
+
+  it('말랑이 and 키보드 have 3 free picks each', () => {
+    let s = walk(['S01', 'S02', 'S03', 'W01']); // 말랑이 used up
+    expect(access(s, 'L01', cfg)).toBe('locked');
+    expect(access(s, 'kb:pebble', cfg)).toBe('free');
+    s = walk(['S01', 'S02', 'S03', 'W01', 'kb:pebble', 'kb:clack']);
+    expect(s.used).toEqual({ fidget: 3, keyboard: 2 });
+    expect(freeLeft(s, 'keyboard', cfg)).toBe(1);
+    expect(access(s, 'kb:topre', cfg)).toBe('free');
+    expect(access(s, 'L01', cfg)).toBe('locked');
+    s = go(s, 'kb:topre');
+    expect(access(s, 'kb:pebble', cfg)).toBe('locked');
+  });
+
+  it('a keyboard launch is not counted either', () => {
+    const s = walk(['kb:pebble', 'kb:clack']);
+    expect(s.used).toEqual({ fidget: 0, keyboard: 1 });
   });
 
   it('re-tapping the toy on screen costs nothing', () => {
@@ -46,7 +64,7 @@ describe('ad gate', () => {
     const r = enter(s, 'L01', {}, cfg);
     expect(r.usedFree).toBe(false);
     s = r.state;
-    expect(s.used).toBe(3);
+    expect(s.used.fidget).toBe(3);
     s = grant(s, 'S01', cfg);
     s = go(s, 'S01');
     expect(access(s, 'L01', cfg)).toBe('locked'); // left it: the next visit is another ad
@@ -76,8 +94,9 @@ describe('ad gate', () => {
     expect(normalize(s, '2026-11-20')).toEqual(freshState('2026-11-20'));
     expect(normalize(null, 'd')).toEqual(freshState('d'));
     expect(normalize('x', 'd')).toEqual(freshState('d'));
-    expect(normalize({ day: 'd', free: ['S01'], used: -2, unlocks: { a: 'x', b: 3 }, switches: 1.7, current: 7 }, 'd'))
-      .toEqual({ day: 'd', used: 0, unlocks: { b: 3 }, switches: 1, current: '' });
+    expect(normalize({ day: 'd', used: 2, unlocks: { a: 'x', b: 3 }, switches: 1.7, current: 7 }, 'd')) // older single count
+      .toEqual({ day: 'd', used: { fidget: 0, keyboard: 0 }, unlocks: { b: 3 }, switches: 1, current: '' });
+    expect(normalize({ day: 'd', used: { fidget: 2, keyboard: -1 } }, 'd').used).toEqual({ fidget: 2, keyboard: 0 });
   });
 
   it('local day is YYYY-MM-DD', () => {

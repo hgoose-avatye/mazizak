@@ -1,5 +1,5 @@
-// Ad gate end to end in a real browser with the stand-in ad (?ads=mock): the launch toy is free, then 3 free picks a day
-// (a notice counts them down), then 광고 보고 열기. Needs a dev server: BASE=http://127.0.0.1:4371 node scripts/ad-gate-check.mjs
+// Ad gate end to end in a real browser with the stand-in ad (?ads=mock): the launch toy is free, then 3 free picks a day each for
+// 말랑이 and 키보드 (a notice counts them down), then 광고 보고 열기. Needs a dev server: BASE=http://127.0.0.1:4371 node scripts/ad-gate-check.mjs
 import { chromium } from 'playwright-core';
 
 const BASE = process.env.BASE ?? 'http://127.0.0.1:4371';
@@ -75,9 +75,21 @@ async function watchToEnd(page) {
   await page.keyboard.press('Escape');
   ok(!(await sheetOpen(page)), 'Escape closes the ad sheet');
 
+  // 키보드 has its own 3 free picks
   await page.locator('[data-category="keyboard"]').click();
+  await page.waitForTimeout(400);
+  ok(!(await sheetOpen(page)) && (await hash(page)).startsWith('#/keyboard/') && (await notice(page)).includes('키보드 남은 무료 2/3회'), 'keyboard: its own free picks (키보드 남은 무료 2/3회)');
+  ok((await count(page)).includes('오늘 무료 2회'), '… the dock shows the keyboard count');
+  await pick(page, 'clack');
+  ok((await notice(page)).includes('키보드 남은 무료 1/3회'), 'keyboard 2nd pick: 1/3회');
+  await pick(page, 'topre');
+  ok((await notice(page)).includes('키보드 무료 3회를 다 썼어요'), 'keyboard 3rd pick: 다 썼어요');
+  await pick(page, 'pebble');
+  ok(await sheetOpen(page) && (await page.locator('#ad-text').textContent()).includes('키보드 무료'), 'keyboard used up → ad sheet (키보드)');
+  await page.keyboard.press('Escape');
+  await page.locator('[data-category="fidget"]').click();
   await page.waitForTimeout(300);
-  ok(await sheetOpen(page), 'keyboard category switch counts as a pick → ad sheet');
+  ok(await sheetOpen(page) && (await page.locator('#ad-text').textContent()).includes('말랑이 무료'), 'back to 말랑이 (used up) → ad sheet (말랑이)');
   await page.keyboard.press('Escape');
 
   // a reload keeps today's count; the toy the app opens on is never charged, even from a link
