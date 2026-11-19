@@ -78,9 +78,18 @@ export function createKeyboard(ctx: ToyContext): Toy & { setPreset(p: KeyPresetI
     const avail = Math.max(0.45, (h - 24) / h);
     const distH = (vis.size.z * 0.62) / (Math.tan(vfov / 2) * 0.66 * Math.min(1, avail / 0.8));
     const dist = Math.max(distW, distH);
-    camera.position.copy(target).addScaledVector(new THREE.Vector3(0, 1.55, 1).normalize(), dist);
-    camera.lookAt(target);
-    computeRects();
+    const place = (d: number) => {
+      camera.position.copy(target).addScaledVector(new THREE.Vector3(0, 1.55, 1).normalize(), d);
+      camera.lookAt(target);
+      computeRects();
+    };
+    place(dist);
+    // wide, short stages (landscape phones, short windows): height-limited, the keys came out below a comfortable finger size.
+    // There the name and icons sit beside the keyboard, not above it, so the camera may come closer — only as far as the keys
+    // need (≈ MIN_KEY px), never past the width fit, and at most ~27 % closer. Roomy screens keep the tuned framing unchanged.
+    const MIN_KEY = 56;
+    const minKey = Math.min(...rects.map((r) => Math.min(r.x1 - r.x0, r.y1 - r.y0)));
+    if (camera.aspect >= 1.1 && minKey < MIN_KEY) place(Math.max(distW, dist * (0.66 / 0.9), (dist * minKey) / MIN_KEY));
   };
 
   // ----- sound -----
@@ -328,6 +337,8 @@ export function createKeyboard(ctx: ToyContext): Toy & { setPreset(p: KeyPresetI
         soundSource,
         keyRecords: model.records.slice(-50).map((r) => ({ ...r, downMs: r.downMs === null ? null : round(r.downMs, 1), upSettleMs: r.upSettleMs === null ? null : round(r.upSettleMs, 1) })),
         soundPlays: ctx.audio.playLogs.slice(-30),
+        held: model.downCount(),
+        screenBox: { x0: Math.round(Math.min(...rects.map((r) => r.x0))), y0: Math.round(Math.min(...rects.map((r) => r.y0))), x1: Math.round(Math.max(...rects.map((r) => r.x1))), y1: Math.round(Math.max(...rects.map((r) => r.y1))) },
         keyRectsPx: rects.map((r) => ({ id: r.id, w: round(r.x1 - r.x0, 0), h: round(r.y1 - r.y0, 0), cx: round((r.x0 + r.x1) / 2, 0), cy: round((r.y0 + r.y1) / 2, 0) })),
       };
     },

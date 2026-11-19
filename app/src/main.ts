@@ -444,8 +444,10 @@ function syncDock(scroll: boolean): void {
   $('[data-action="reset"]').hidden = !(findFidget(currentId)?.category === '왁뿌볼' || findFidget(currentId)?.plastic);
   if ($('#collection-count').textContent !== `${toyList.children.length}가지`) $('#collection-count').textContent = `${toyList.children.length}가지`;
   if (scroll && sel && settings.get().dockOpen) {
-    const s = sel as HTMLButtonElement;
-    toyList.scrollLeft = s.offsetLeft - (toyList.clientWidth - s.offsetWidth) / 2;
+    // centre the selection in the list, whichever way it scrolls (a row under the stage, or the rail's grid on wide short screens)
+    const s = (sel as HTMLButtonElement).getBoundingClientRect(), l = toyList.getBoundingClientRect();
+    toyList.scrollLeft += s.left - l.left - (l.width - s.width) / 2;
+    toyList.scrollTop += s.top - l.top - (l.height - s.height) / 2;
   }
 }
 // fetch the other category's thumbnails once the browser is idle (≈140 KB in all), so a category switch shows them at once
@@ -492,14 +494,23 @@ function setDockOpen(open: boolean): void {
   if (open) syncDock(true);
 }
 dockToggle.addEventListener('click', () => setDockOpen(!settings.get().dockOpen));
-// the stage ends where the dock begins, whatever the dock's height on this screen
-const syncDockHeight = () => document.documentElement.style.setProperty('--dock-h', `${dock.offsetHeight}px`);
-new ResizeObserver(syncDockHeight).observe(dock);
-syncDockHeight();
+// the stage ends where the dock begins, whatever the dock's size on this screen: below it (--dock-h), or beside it when ui.css
+// turns it into a rail on wide short screens (--rail: 1 → --dock-w). The observer also fires when the layout switches (rotation, fold).
+const syncDockBox = () => {
+  const rail = getComputedStyle(dock).getPropertyValue('--rail').trim() === '1';
+  const root = document.documentElement.style;
+  root.setProperty('--dock-h', rail ? '0px' : `${dock.offsetHeight}px`);
+  root.setProperty('--dock-w', rail ? `${dock.offsetWidth}px` : '0px');
+};
+new ResizeObserver(syncDockBox).observe(dock);
+syncDockBox();
 setDockOpen(settings.get().dockOpen);
 
 if (import.meta.env.DEV) (window as unknown as { __MANZIZAK__: unknown }).__MANZIZAK__ = {
   report: () => rt?.toy?.report?.(), audio: () => audio.playLogs.slice(-100), frames: () => rt?.framesRendered ?? 0,
+  // frame interval / main-thread work / input→frame delay (ms) over the last ≤600 frames — read by scripts/responsive-check.mjs
+  perf: () => rt && { interval: [rt.frameIntervals.percentile(50), rt.frameIntervals.percentile(95)], work: [rt.workTimes.percentile(50), rt.workTimes.percentile(95)], input: [rt.inputDelays.percentile(50), rt.inputDelays.percentile(95)], dpr: rt.renderer.getPixelRatio(), canvas: [rt.width, rt.height] },
+  resetPerf: () => { if (rt) for (const r of [rt.frameIntervals, rt.workTimes, rt.inputDelays]) r.clear(); },
 };
 applySettings(settings.get());
 void route();
