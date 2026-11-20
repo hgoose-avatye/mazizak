@@ -187,10 +187,23 @@ html.reduce-motion .ad-thumb .thumb, html.reduce-motion .sheet-panel { animation
 .dock { height: calc(176px + var(--safe-b)); padding-top: 12px; }
 .dock-toolbar { justify-content: center; margin-bottom: 10px; }
 @media (min-width: 900px) and (min-height: 700px) { .dock { height: calc(186px + var(--safe-b)); padding-top: 14px; } }
-@media (max-height: 520px) { .dock { height: calc(86px + var(--safe-b)); padding-top: 6px; } .dock-toolbar { margin-bottom: 0; } }
+@media (max-height: 520px) {
+  .dock { height: calc(92px + var(--safe-b)); padding-top: 4px; }
+  .dock-body { height: 86px; }
+  .dock-toolbar { margin-bottom: 0; height: 80px; }
+  /* the three tabs stack here (ui.css): 24 px each (the smallest touch target) so all three fit the 80 px toolbar
+     (QA 2026-11-20: 키보드 fell out of the drawer) */
+  .cat-seg { padding: 2px; gap: 1px; border-radius: 12px; }
+  .cat-seg button { height: 24px; min-width: 60px; padding-inline: 8px; font-size: 11.5px; box-shadow: 0 2px 0 rgba(35, 137, 107, 0); }
+  .cat-seg button[aria-checked='true'] { box-shadow: 0 2px 0 var(--jl-mint-lip); }
+}
 @media (min-aspect-ratio: 3/2) and (max-height: 640px), (min-aspect-ratio: 5/4) and (max-height: 520px), (horizontal-viewport-segments: 2) {
   .dock { height: auto; padding-top: calc(var(--safe-t) + 12px); }
-  .dock-toolbar { justify-content: stretch; margin-bottom: 6px; }
+  .dock-body { height: auto; }
+  .dock-toolbar { justify-content: stretch; margin-bottom: 6px; height: auto; }
+  /* the rail keeps its tabs side by side at full size, also on short screens (the stacked-tab rule above is for a bottom drawer) */
+  .cat-seg { padding: 4px; gap: 0; border-radius: 999px; }
+  .cat-seg button { height: 34px; min-width: 0; padding-inline: 4px; font-size: 13px; }
 }
 
 /* 초기화: a word on a jelly pill instead of the round arrow icon (owner, 2026-11-20) */
@@ -215,3 +228,12 @@ html.reduce-motion .ad-thumb .thumb, html.reduce-motion .sheet-panel { animation
 .free-timer-time { font-size: 15px; }
 .free-pips i { width: 11px; height: 11px; box-shadow: none; }
 .free-pips i.on { box-shadow: none; }
+
+/* toy cards stand out from the drawer (owner, 2026-11-20 "버튼들을 흰색으로, 뒷배경과 안 겹치게"): plain white cards on a deeper
+   cream tray */
+.dock { background: linear-gradient(180deg, #f8f0e1, #f2e7d2); }
+.toy-item { background: #ffffff; box-shadow: inset 0 -3px 0 rgba(226, 210, 180, 0.45), 0 4px 0 #ddcaa6, 0 8px 14px -8px rgba(46, 74, 63, 0.3); }
+@media (hover: hover) { .toy-item:hover { background: #ffffff; } }
+.cat-seg { background: #e9dcc3; }
+/* the free-pick label on solid white too (owner, 2026-11-20), still flat — no lip */
+.free-timer { background: #ffffff; -webkit-backdrop-filter: none; backdrop-filter: none; border-color: rgba(46, 74, 63, 0.07); }

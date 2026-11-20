@@ -1,7 +1,7 @@
 import type { KeyVisualStyle } from '../../audio/keyPresets';
 import * as THREE from 'three';
 import { ICON_PREFIX, KEYBOARD_COLORS } from './colors';
-import { createCaseGeometry, createKeycapGeometry, createLegendTexture } from './keycap';
+import { createCaseGeometry, createKeycapGeometry, createLegendTexture, createPlateTexture } from './keycap';
 
 /**
  * Keyboard visual: machined tray case, dark plate, switch housings, sculpted
@@ -80,6 +80,21 @@ export function buildKeyboardVisual(renderer: THREE.WebGLRenderer): KeyboardVisu
   root.add(sun);
 
   const caseMat = new THREE.MeshPhysicalMaterial({ color: 0xb9bcc1, metalness: 1, roughness: 0.42, clearcoat: 0.25, clearcoatRoughness: 0.4 });
+  // a patterned frame is mapped by face direction (top from above, the walls from the front / side) — the case's own top-down UVs
+  // stretched the pattern into vertical streaks down the walls (QA 2026-11-20)
+  caseMat.onBeforeCompile = (sh) => {
+    sh.vertexShader = sh.vertexShader
+      .replace('#include <common>', '#include <common>\nvarying vec3 vCasePos;\nvarying vec3 vCaseNrm;')
+      .replace('#include <begin_vertex>', '#include <begin_vertex>\nvCasePos = position;\nvCaseNrm = normal;');
+    sh.fragmentShader = sh.fragmentShader
+      .replace('#include <common>', '#include <common>\nvarying vec3 vCasePos;\nvarying vec3 vCaseNrm;')
+      .replace('#include <map_fragment>', `#ifdef USE_MAP
+  vec3 an = abs(normalize(vCaseNrm));
+  vec2 cuv = an.y > 0.6 ? vCasePos.xz : (an.x > an.z ? vCasePos.zy : vCasePos.xy);
+  diffuseColor *= texture2D(map, cuv * 0.22 + 0.5);
+#endif`);
+  };
+  caseMat.customProgramCacheKey = () => 'mzk-case-triplanar';
   const caseMesh = new THREE.Mesh(
     createCaseGeometry({ width: POCKET_W + 2 * WALL, depth: POCKET_D + 2 * WALL, height: CASE_H, radius: 0.3, wall: WALL, inset: INSET }),
     caseMat,
@@ -87,6 +102,8 @@ export function buildKeyboardVisual(renderer: THREE.WebGLRenderer): KeyboardVisu
   caseMesh.castShadow = caseMesh.receiveShadow = true;
   root.add(caseMesh);
   const plateMat = new THREE.MeshPhysicalMaterial({ color: 0x1c1d20, metalness: 0.2, roughness: 0.6 });
+  const plateTex: Partial<Record<string, THREE.Texture>> = {};
+  const caseTex: Partial<Record<string, THREE.Texture>> = {};
   const plate = new THREE.Mesh(new THREE.BoxGeometry(POCKET_W - 0.04, 0.03, POCKET_D - 0.04), plateMat);
   plate.position.y = PLATE_Y + 0.015;
   plate.receiveShadow = true;
@@ -149,7 +166,34 @@ export function buildKeyboardVisual(renderer: THREE.WebGLRenderer): KeyboardVisu
   const applyStyle = (p: StyleId) => {
     const s = STYLES[p];
     caseMat.setValues({ color: s.tray, metalness: s.metalness, roughness: s.caseRoughness, clearcoat: s.clearcoat, clearcoatRoughness: .4 });
-    plateMat.color.setHex(s.theme?.plate ?? 0x1c1d20);
+    // the frame wears the plate's pattern too, in the case colour (cached per design)
+    const cp = s.theme?.platePattern;
+    if (cp) {
+      if (!caseTex[p]) {
+        const t = createPlateTexture('#' + new THREE.Color(s.tray).getHexString(), cp, 1);
+        t.wrapS = t.wrapT = THREE.RepeatWrapping; // sampled by position (the shader above), so it tiles
+        caseTex[p] = t;
+      }
+      caseMat.map = caseTex[p]!;
+      caseMat.color.setHex(0xffffff);
+      if (cp.gloss) caseMat.setValues({ roughness: 0.04, metalness: 0.15, clearcoat: 1, clearcoatRoughness: 0.02 }); // sparkling ice
+    } else caseMat.map = null;
+    caseMat.needsUpdate = true;
+    const pp = s.theme?.platePattern;
+    if (pp) {
+      // a patterned plate: the texture carries the colour (plateTex cached per design)
+      plateTex[p] ??= createPlateTexture('#' + new THREE.Color(s.theme!.plate).getHexString(), pp, POCKET_W / POCKET_D);
+      plateMat.map = plateTex[p]!;
+      plateMat.color.setHex(0xffffff);
+      plateMat.roughness = pp.gloss ? 0.04 : 0.6;
+      plateMat.clearcoat = pp.gloss ? 1 : 0;
+    } else {
+      plateMat.map = null;
+      plateMat.color.setHex(s.theme?.plate ?? 0x1c1d20);
+      plateMat.roughness = 0.6;
+      plateMat.clearcoat = 0;
+    }
+    plateMat.needsUpdate = true;
     switchMat.color.setHex(s.theme?.switches ?? 0x2a2b2f);
     const tex = legendsFor(p);
     legendMats.forEach((l, i) => {

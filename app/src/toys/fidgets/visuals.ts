@@ -179,8 +179,9 @@ export function paintBody(g: THREE.BufferGeometry, s: FidgetSpec) {
       c.multiplyScalar(0.94 + 0.12 * (0.5 + 0.25 * Math.sin(x * 7 + z * 5) + 0.25 * Math.sin(y * 9 - x * 4 + 1.3))); // slight browning mottle
     } else if (s.shape === "tomato") {
       c.copy(tomatoRed).lerp(tomatoDeep, THREE.MathUtils.smoothstep(-y, 0.1, 1) * 0.35);
-      const top = Math.hypot(x, z), star = Math.abs(Math.cos(Math.atan2(z, x) * 2.5));
-      if (y > 0.55 && top < 0.12 + 0.2 * star * star) c.copy(leaf).multiplyScalar(0.85 + 0.15 * star);
+      const top = Math.hypot(x, z), star = Math.abs(Math.cos(Math.atan2(z, x) * 2.5)), edge = 0.12 + 0.2 * star * star;
+      // a soft-edged calyx (a hard cut showed steps once squashed)
+      if (y > 0.5) c.lerp(leaf.clone().multiplyScalar(0.85 + 0.15 * star), THREE.MathUtils.smoothstep(edge + 0.04 - top, 0, 0.08) * THREE.MathUtils.smoothstep(y, 0.5, 0.62));
     } else if (s.shape === "strawberry") {
       // red, a touch paler up under the leaves, deeper towards the tip
       c.copy(berryRed).lerp(berryDeep, THREE.MathUtils.smoothstep(-y, -0.2, 1) * 0.45).lerp(berryPale, THREE.MathUtils.smoothstep(y, 0.45, 0.85) * 0.35);
@@ -321,7 +322,9 @@ export function bodyGeometry(s: FidgetSpec) {
     return g;
   }
   // foam (모닝빵) and mochi (찹쌀떡) get a finer grid: the score lines / the filling window need the vertices
-  const g = new THREE.SphereGeometry(1, s.shape === "foam" ? 120 : s.shape === "mochi" ? 144 : 72, s.shape === "foam" ? 64 : s.shape === "mochi" ? 80 : 48),
+  // painted fruit (tomato calyx, strawberry seeds, pudding caramel) needs a finer grid too, or a big squash shows the paint in steps
+  const fine = ["tomato", "strawberry", "pudding"].includes(s.shape);
+  const g = new THREE.SphereGeometry(1, s.shape === "foam" ? 120 : s.shape === "mochi" ? 144 : fine ? 128 : 72, s.shape === "foam" ? 64 : s.shape === "mochi" ? 80 : fine ? 80 : 48),
     p = g.getAttribute("position");
   for (let i = 0; i < p.count; i++) {
     let x = p.getX(i),

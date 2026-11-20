@@ -306,11 +306,13 @@ export class MaterialCage {
           }
       off = next;
     }
-    const keep = KEEP_FRACTION[this.spec.family];
+    const keep = KEEP_FRACTION[this.spec.family], squash = this.spec.category === "뭉개기";
     for (let i = 0; i < off.length; i++) {
       let v = o[i] + off[i] * keep;
-      if (i % 3 === 1) v = Math.max(-this.spec.height, Math.min(v, Math.max(o[i], r[i] - (r[i] - o[i]) * 1))); // lifted parts come down
-      if (i % 3 === 1 && v > o[i]) v = o[i];
+      // lifted parts come down — except on a 뭉개기 toy, which keeps exactly the shape it was let go in (owner, 2026-11-20: no
+      // spring-back at all; QA caught whipped-cream peaks sinking 18 % after release)
+      if (i % 3 === 1) v = Math.max(-this.spec.height, squash ? v : Math.min(v, Math.max(o[i], r[i] - (r[i] - o[i]) * 1)));
+      if (!squash && i % 3 === 1 && v > o[i]) v = o[i];
       this.settleTo[i] = v;
     }
     this.settling = true;

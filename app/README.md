@@ -11,6 +11,7 @@ npm run dev            # http://localhost:4319 (vite --host → 같은 Wi-Fi 휴
 npm run build && npm run preview   # 프로덕션 빌드 확인 (빌드 전에 check:sfx가 public/sfx가 원본과 일치하는지 검사)
 npm run pack:sfx       # 효과음을 바꾼 뒤: audio-src/sfx(WAV 원본) → public/sfx(무손실 FLAC, 해시 파일명) + src/audio/sfxManifest.ts 다시 만들기
 npm run check:dist && npm run check:load   # 배포 검사 · 브라우저 로딩 회귀 검사 (빌드 후)
+BASE=http://127.0.0.1:4354 node scripts/qa-check.mjs   # 상세 QA: 장난감 26개 조작·모양 유지/회복·초기화·탭·무료/광고·SDK 모의·가로 화면 (플레인 dev 서버 필요, make-thumbs.mjs 머리말)
 npm test               # 단위 테스트 (스프링·모델·키캡 지오메트리·효과음)
 node scripts/make-thumbs.mjs   # 메뉴 썸네일 다시 만들기 (장난감 모양을 바꾼 뒤; 로컬 폴더 없는 dev 서버 필요 — 스크립트 머리말 참고)
 ```
@@ -25,7 +26,7 @@ node scripts/make-thumbs.mjs   # 메뉴 썸네일 다시 만들기 (장난감 �
 - 모닝빵(S02)·찹쌀떡(S03)은 직접 만든 3D 모델(`public/models/`, 0.5MB로 재포장: `scripts/fidgets/pack-reference-models.mjs`)을 공개 빌드에서도 쓴다.. 불러오지 못하면 `visuals.ts`가 칠한 대체 모양이 보인다
 - **모양·회복(2026-11-20)**: 말랑이 탭(슬랑이·모닝빵·찹쌀떡·망고·비누·레인보우)은 **메모리폼** — 눌린 채 0.4초 머물렀다 천천히 차오름(`catalog.ts` `plastic: MEMORY_FOAM`=2.5초). 왁뿌볼(청사과·초콜릿·마시멜로 — 마시멜로는 노릇하게 구운 바삭한 껍질 160조각 + 흰 속, 청사과 깨지는 소리를 빌려 씀)은 만진 모양·깨진 채 그대로(`KEEP_SHAPE`), 누르는 곳마다 다 부서지고(25% 한계·섬 없음, 청사과 220조각) 앞을 누르면 뒷면도 같이 깨짐, 깨진 만큼 속과 마블처럼 섞임. 껍질은 손가락을 따라 눌림
 - **뭉개기 탭(2026-11-20)**: 치즈·휘핑크림·토마토·딸기·푸딩·두부·버터 — 뭉갠 채 전혀 되돌아오지 않음(부피·겉면 힘 끔, `cage.ts` 뭉개기 프로필), 뭉개면 토마토·딸기·푸딩은 즙 방울만, 두부는 부스러기가 튀어 바닥에 남고(치즈·휘핑크림·버터는 튀는 것 없음), 문지르면 물감처럼 바닥에 펴 발림(`splatter.ts`). 초기화 버튼으로만 되돌림. 무료 3회는 따로(`gate.ts` 그룹 squash). 소리는 기존 장난감 것을 빌려 씀(`catalog.ts` `soundAs`)
-- **키보드 테마(2026-11-20)**: 프리셋마다 키캡 무늬·색, 가운데 줄은 GPT로 만든 아이콘(`public/keyboard-icons/<preset>-<n>.webp`, 256px WebP — 원본 1024px PNG는 git 밖 `.keyboard-icons-original/`, 프롬프트 `docs/keyboard-icon-prompts.md`), 스페이스바는 글자 없음
+- **키보드 테마(2026-11-20)**: 프리셋마다 키캡 무늬·색, 가운데 줄은 GPT로 만든 아이콘(`public/keyboard-icons/<preset>-<n>.webp`, 256px WebP — 원본 1024px PNG는 git 밖 `.keyboard-icons-original/`, 프롬프트 `docs/keyboard-icon-prompts.md`), 스페이스바는 글자 없음. 판·케이스에도 테마 무늬(`colors.ts` `platePattern`: 얼음·민트초코·몽돌·복숭아·조약돌, 두부는 노란 모판·찌개는 스텐 냄비 색)
 - **효과**: 비누 만지면 비눗방울, 모닝빵·마시멜로는 김(`puffs.ts`). 비누 앞면 SOAP·버터 앞면 BUTTER 각인(`visuals.ts` stampTextures)
 - 늘이는 범위는 `PLASTIC_BOUNDS`(가로 1.35배·위 2배·앞뒤 1.1배) 안이라 화면 밖으로 안 나감. 장난감별 화면 크기는 `viewScale`(레인보우·비누·청사과 작게)
 - 설정 시트: 소리·볼륨·진동(Android)·화질(자동/고화질/절약)·움직임 줄이기·성능 정보

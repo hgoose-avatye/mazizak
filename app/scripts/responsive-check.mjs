@@ -83,7 +83,8 @@ function layoutProbe(inset) {
   const list = document.querySelector('#toy-list'), lr = list.getBoundingClientRect();
   const lc = getComputedStyle(list), box = { l: lr.left + parseFloat(lc.paddingLeft), r: lr.right - parseFloat(lc.paddingRight), t: lr.top + parseFloat(lc.paddingTop), b: lr.bottom - parseFloat(lc.paddingBottom) };
   // "in view" = inside the list's content box; an item scrolled under the list's own end padding (home-indicator room) is mid-scroll
-  const items = [...list.querySelectorAll('.toy-item')].filter((e) => { const r = e.getBoundingClientRect(); return vis(e) && r.left >= box.l - 1 && r.right <= box.r + 1 && r.top >= box.t - 1 && r.bottom <= box.b + 1; });
+  // (4 px: the selected card is lifted 3 px into the list's padding — theme.css, 2026-11-20)
+  const items = [...list.querySelectorAll('.toy-item')].filter((e) => { const r = e.getBoundingClientRect(); return vis(e) && r.left >= box.l - 1 && r.right <= box.r + 1 && r.top >= box.t - 4 && r.bottom <= box.b + 1; });
   const sel = list.querySelector('[aria-checked=true]');
   if (document.querySelector('#dock-toggle').getAttribute('aria-expanded') === 'true' && !items.includes(sel)) bad('selected toy not scrolled into view');
   out.minTarget = Infinity;
@@ -190,7 +191,10 @@ async function runViewport([label, w, h, dpr, inset], deep) {
     if (deep) await o.p.screenshot({ path: `${OUT}${label}-settings.png` });
     await o.p.keyboard.press('Escape');
     await o.p.waitForFunction(() => document.querySelector('#sheet').hidden); await sleep(300);
-    // folding the drawer gives the toy more room and keeps its controls reachable
+    // folding the drawer gives the toy more room and keeps its controls reachable (the fold button went away on 2026-11-20:
+    // the drawer stays open — skipped then)
+    const foldable = await o.p.locator('#dock-toggle').isVisible();
+    if (foldable) {
     const before = await o.p.locator('#stage').boundingBox();
     await o.p.locator('#dock-toggle').click();
     const grew = await o.p.waitForFunction((a) => { const r = document.querySelector('#stage').getBoundingClientRect(); return r.width * r.height > a; }, before.width * before.height, { timeout: 2000 }).then(() => true, () => false);
@@ -200,6 +204,7 @@ async function runViewport([label, w, h, dpr, inset], deep) {
     res.problems.push(...lay.problems.map((m) => `folded: ${m}`));
     if (deep) await o.p.screenshot({ path: `${OUT}${label}-folded.png` });
     await o.p.locator('#dock-toggle').click(); await sleep(150);
+    }
     res.problems.push(...o.errors.map((e) => 'page error: ' + e));
   } catch (e) {
     res.problems.push('exception: ' + String(e).split('\n')[0]);

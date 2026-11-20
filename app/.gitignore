@@ -2,3 +2,4 @@ node_modules
 dist
 bench-out
 *.ait
+qa-shots/

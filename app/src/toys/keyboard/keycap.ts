@@ -449,11 +449,74 @@ function drawDeco(g: CanvasRenderingContext2D, size: number, d: CapDeco) {
         dot(x - r * 0.35 * sx, y - r * 0.35, r * 0.18);
       }
       break;
-    case 'grain': // tofu: fine curd pores
-      for (let i = 0; i < 200; i++) dot(rnd() * size, rnd() * size, 0.6 + rnd() * 1.4);
+    case 'peaches': { // little peaches scattered over a peach frame / plate (owner, 2026-11-20 "복숭아 패턴")
+      for (let i = 0; i < 4; i++) {
+        const x = 30 + rnd() * (size - 60), y = 30 + rnd() * (size - 60), r = 12 + rnd() * 6, tilt = (rnd() - 0.5) * 0.8;
+        g.save();
+        g.translate(x, y);
+        g.rotate(tilt);
+        const body = g.createRadialGradient(-r * 0.3, -r * 0.3, 1, 0, 0, r * 1.1);
+        body.addColorStop(0, '#ffd2c0');
+        body.addColorStop(0.6, '#ff9e94');
+        body.addColorStop(1, '#f27a7f');
+        g.fillStyle = body;
+        g.beginPath();
+        g.arc(0, 0, r, 0, Math.PI * 2);
+        g.fill();
+        g.strokeStyle = 'rgba(214,92,104,0.7)'; // the cleft
+        g.lineWidth = 2;
+        g.beginPath();
+        g.moveTo(0, -r * 0.85);
+        g.quadraticCurveTo(r * 0.35, 0, 0, r * 0.7);
+        g.stroke();
+        g.fillStyle = '#7cc46a'; // the leaf
+        g.beginPath();
+        g.ellipse(r * 0.45, -r * 0.95, r * 0.45, r * 0.2, -0.6, 0, Math.PI * 2);
+        g.fill();
+        g.restore();
+      }
       break;
+    }
+    case 'grain': { // tofu (owner, 2026-11-20 "두부 질감"): a soft mottle of curd, small pressed-in pores, a few pale flecks
+      for (let i = 0; i < 18; i++) {
+        const x = rnd() * size, y = rnd() * size, r = 18 + rnd() * 34;
+        const m = g.createRadialGradient(x, y, 0, x, y, r);
+        m.addColorStop(0, 'rgba(205,190,160,0.22)');
+        m.addColorStop(1, 'rgba(205,190,160,0)');
+        g.fillStyle = m;
+        g.fillRect(x - r, y - r, r * 2, r * 2);
+      }
+      for (let i = 0; i < 230; i++) {
+        const x = rnd() * size, y = rnd() * size, r = 1.2 + rnd() * 2.6;
+        dot(x, y, r, d.ink); // a pore
+        dot(x - r * 0.35, y - r * 0.35, r * 0.45, 'rgba(255,255,255,0.55)'); // its lit rim
+      }
+      break;
+    }
   }
   g.restore();
+}
+
+/** a plate (the floor between the caps) in a theme colour with its pattern tiled over it; `aspect` = plate width / depth */
+export function createPlateTexture(color: string, deco: { pattern: string; ink: string; tile?: number }, aspect: number): THREE.CanvasTexture {
+  const h = 512, w = Math.round(h * aspect), c = document.createElement('canvas');
+  c.width = w;
+  c.height = h;
+  const g = c.getContext('2d')!;
+  g.fillStyle = color;
+  g.fillRect(0, 0, w, h);
+  const tile = deco.tile ?? 170; // smaller tiles = a denser pattern (mint chips: owner, 2026-11-20 "초코칩 더 많이")
+  for (let y = 0, k = 0; y < h; y += tile) for (let x = 0; x < w; x += tile, k++) {
+    g.save();
+    g.translate(x, y);
+    g.scale(tile / 256, tile / 256);
+    drawDeco(g, 256, { pattern: deco.pattern, ink: deco.ink, seed: 50 + k, aspect: 1 });
+    g.restore();
+  }
+  const t = new THREE.CanvasTexture(c);
+  t.colorSpace = THREE.SRGBColorSpace;
+  t.anisotropy = 8;
+  return t;
 }
 
 /** called when an icon picture has loaded into its cap texture: the toy asks for a frame (the render loop sleeps while idle) */
