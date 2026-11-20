@@ -567,7 +567,8 @@ export function shellPatches(
 ): ShellPatches {
   if (spec.shape === "chocolate") return chocolateBarPatches(spec);
   // small pieces (owner, 2026-11-20 "자잘하게"): 220 plates on the apple (was 104)
-  const count = spec.shape === "apple" ? 220 : 42,
+  // (the toasted marshmallow: a crisp crust of 160 flakes, owner 2026-11-20)
+  const count = spec.shape === "apple" ? 220 : spec.shape === "marshmallow" ? 160 : 42,
     positions: number[] = [],
     normals: number[] = [],
     colors: number[] = [],
@@ -577,9 +578,16 @@ export function shellPatches(
     areas = new Array<number>(count).fill(0);
   const seeds = irregularShellSeeds(count);
   const outerColor = new THREE.Color(spec.color),
-    innerColor = new THREE.Color(spec.shape === "apple" ? 0xf0e9cc : 0x9d7660),
+    innerColor = new THREE.Color(spec.shape === "apple" ? 0xf0e9cc : spec.shape === "marshmallow" ? 0xfbf3e4 : 0x9d7660),
     rimColor = innerColor.clone().lerp(outerColor, 0.2),
-    thickness = spec.shape === "apple" ? 0.025 : 0.05;
+    thickness = spec.shape === "apple" ? 0.025 : spec.shape === "marshmallow" ? 0.03 : 0.05;
+  // marshmallow: each flake of the crust toasted a little differently, golden to scorched brown, darker towards the caps
+  const toastGold = new THREE.Color(0xf1cf98), toastBrown = new THREE.Color(0xb06f33);
+  const flakeColor = (seed: THREE.Vector3, patch: number) => {
+    if (spec.shape !== "marshmallow") return outerColor;
+    const r = Math.abs(Math.sin(patch * 12.9898) * 43758.5453) % 1;
+    return toastGold.clone().lerp(toastBrown, Math.min(1, 0.05 + 0.6 * Math.pow(Math.abs(seed.y), 1.6) + 0.18 * r));
+  };
   const shape = (unit: THREE.Vector3, inside = false) => {
     let x = unit.x,
       y = unit.y,
@@ -590,6 +598,11 @@ export function shellPatches(
       x *= ring;
       z *= ring;
       y -= 0.14 * Math.exp(-(x * x + z * z) / 0.09) * Math.max(0, y);
+    } else if (spec.shape === "marshmallow") {
+      // the same soft cylinder as the core (bodyGeometry)
+      y = Math.sign(y) * Math.pow(Math.abs(y), 0.4);
+      const rr = Math.hypot(x, z);
+      if (rr > 1e-6) { const k = Math.pow(rr, 0.55) / rr; x *= k; z *= k; }
     } else {
       const r = 1 - 0.018 * Math.pow(Math.sin(theta * 4 + y * 9), 12);
       x *= r;
@@ -643,6 +656,7 @@ export function shellPatches(
     ids.push(patch);
   };
   seeds.forEach((seed, patch) => {
+    const flake = flakeColor(seed, patch);
     const u = new THREE.Vector3()
         .crossVectors(
           seed,
@@ -709,9 +723,9 @@ export function shellPatches(
           omb = shape(mb),
           ima = shape(ma, true),
           imb = shape(mb, true);
-        emit(shape(seed), oma, omb, patch, outerColor, true);
-        emit(oma, oa, ob, patch, outerColor, true);
-        emit(oma, ob, omb, patch, outerColor, true);
+        emit(shape(seed), oma, omb, patch, flake, true);
+        emit(oma, oa, ob, patch, flake, true);
+        emit(oma, ob, omb, patch, flake, true);
         const tri = (a: THREE.Vector3, b: THREE.Vector3, c: THREE.Vector3) => new THREE.Vector3().subVectors(b, a).cross(new THREE.Vector3().subVectors(c, a)).length() / 2;
         areas[patch] += tri(shape(seed), oma, omb) + tri(oma, oa, ob) + tri(oma, ob, omb);
         emit(shape(seed, true), imb, ima, patch, innerColor, true, true);

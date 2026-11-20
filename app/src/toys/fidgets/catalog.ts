@@ -300,8 +300,9 @@ function squashToys(): FidgetSpec[] {
     { ...base, id: "M01", name: "토마토", shape: "tomato", color: 0xe53b2c, inner: 0xf26b4a, roughness: 0.22, width: 1, height: 0.86, depth: 1, sound: "mango", soundAs: "L02", hint: "꾹 눌러 뭉개보세요 · 뭉개진 채로 남아요" },
     { ...base, id: "M02", name: "딸기", shape: "strawberry", color: 0xe8333f, inner: 0xff8a8a, roughness: 0.3, width: 0.86, height: 1, depth: 0.86, sound: "mango", soundAs: "L02", hint: "꾹 눌러 뭉개보세요 · 뭉개진 채로 남아요" },
     { ...base, id: "M03", name: "푸딩", shape: "pudding", color: 0xf6d26b, inner: 0xfae29a, roughness: 0.18, width: 1, height: 0.82, depth: 1, sound: "gel", soundAs: "S01", hint: "탱글한 푸딩을 꾹 눌러 뭉개보세요" },
-    // 마시멜로 lives in the 말랑이 tab (owner, 2026-11-20): a memory-foam squishy, no squash, nothing thrown
-    { ...base, category: "말랑이", family: "elastic", plastic: MEMORY_FOAM, press: 0.5, id: "M04", name: "마시멜로", shape: "marshmallow", color: 0xfbf6f1, inner: 0xffffff, roughness: 0.85, width: 0.92, height: 0.78, depth: 0.92, sound: "foam", soundAs: "S02", hint: "폭신한 마시멜로를 꾹 눌러보세요 · 천천히 원래대로 차올라요" },
+    // 마시멜로 is a wax ball (owner, 2026-11-20 "겉이 바삭할 테니 왁뿌로"): a crisp toasted crust (the shell, golden to scorched flakes)
+    // that breaks wherever it is pressed over a soft white marshmallow core; it borrows the apple's crisp crack sounds
+    { ...base, category: "왁뿌볼", family: "wax", plastic: KEEP_SHAPE, press: 0.5, viewScale: 0.7, id: "M04", name: "마시멜로", shape: "marshmallow", color: 0xe0a45e, inner: 0xfbf6ef, roughness: 0.85, width: 0.92, height: 0.78, depth: 0.92, sound: "apple", soundAs: "W01", hint: "바삭하게 구운 겉을 꾹 눌러 깨보세요 · 속은 말랑해요" },
     { ...base, id: "M05", name: "두부", shape: "tofu", color: 0xf6f2e6, inner: 0xffffff, roughness: 0.55, width: 1.1, height: 0.72, depth: 0.9, sound: "mochi", soundAs: "S03", hint: "말랑한 두부를 꾹 눌러 뭉개보세요" },
     { ...base, id: "M06", name: "버터", shape: "butter", color: 0xf8df86, inner: 0xfbe9a8, roughness: 0.32, width: 1.2, height: 0.62, depth: 0.8, sound: "cheese", soundAs: "L01", hint: "버터를 꾹 눌러 뭉개보세요 · 뭉개진 채로 남아요" },
   ];

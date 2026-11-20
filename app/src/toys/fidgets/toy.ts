@@ -114,7 +114,7 @@ if (uMix > 0.0) {
   }
   if (spec.shape === "tofu") material.roughness = 0.85; // a matte curd, not a glossy block
   let geometry: THREE.BufferGeometry = bodyGeometry(spec);
-  if (["foam", "mochi", "mango", "tomato", "strawberry", "pudding", "marshmallow", "tofu", "butter"].includes(spec.shape)) {
+  if (["foam", "mochi", "mango", "tomato", "strawberry", "pudding", "tofu", "butter"].includes(spec.shape)) { // (marshmallow: a plain white core under its toasted crust)
     // 모닝빵 / 찹쌀떡 / 망고 look like the real thing: painted body (vertex colours multiply the material colour, so that stays white)
     paintBody(geometry, spec);
     material.vertexColors = true;
@@ -523,7 +523,7 @@ if (uMix > 0.0) {
         model.setSurfacePatch(e.id, faceToPatch[h.faceIndex ?? 0]);
       if (e.pointerType === "pen") model.setPressure(e.id, e.pressure);
       anchors.set(e.id, h.point.clone());
-      if (puffs) { puffs.emit(h.point, spec.shape === "soap" ? 10 : 6, normal.clone().normalize()); ctx.requestFrame(); }
+      if (puffs) { puffs.emit(h.point, spec.shape === "soap" ? 5 : 6, normal.clone().normalize()); ctx.requestFrame(); }
       if (splat) { splat.burst(h.point, 0.6); ctx.requestFrame(); } // (the squash itself sounds with the toy's own recorded squish)
       if (spec.family === "wax" && h.object === blob) {
         coreTouches++;
@@ -620,7 +620,7 @@ if (uMix > 0.0) {
     if (puffs) {
       // more while the finger rubs / keeps pressing: bubbles from a rubbed bar, steam from a squeezed roll
       if (anchors.size) {
-        const rate = spec.shape === "soap" ? (model.frameTravel > 0.0005 ? 20 : 5) : model.compression > 0.05 ? 12 : 5; // plenty of steam / bubbles (owner: "더 팡팡")
+        const rate = spec.shape === "soap" ? (model.frameTravel > 0.0005 ? 8 : 2) : model.compression > 0.05 ? 12 : 5; // (fewer bubbles: owner, 2026-11-20) // plenty of steam / bubbles (owner: "더 팡팡")
         puffClock += dt * rate;
         const points = [...anchors.values()];
         while (puffClock >= 1) {
