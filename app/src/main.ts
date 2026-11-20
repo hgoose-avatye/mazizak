@@ -371,6 +371,8 @@ let currentId = '';
 let category: Category = settings.get().lastCategory;
 
 let routeSeq = 0;
+/** the next route is a tab tap back to that tab's last toy (free) */
+let tabEntry = false;
 let routedOnce = false;
 async function route(): Promise<void> {
   const seq = ++routeSeq; // a later switch makes an earlier, still-loading one a no-op
@@ -381,7 +383,8 @@ async function route(): Promise<void> {
   }
   const validPreset = !!presetId && Object.hasOwn(KEY_PRESET_INFO, presetId) && isKeyPresetEnabled(presetId);
   const kind = kindOf(id, validPreset ? presetId : undefined);
-  const launch = !routedOnce; // the toy the app opens on: free, not counted
+  const launch = !routedOnce || tabEntry; // the toy the app opens on, or a tab's last toy: free, not counted
+  tabEntry = false;
   if (!launch && gateOn && kind && access(gateNow(), kind) === 'locked') {
     // reached without the dock (a link, a stale hash): never an ad here (policy: no full-screen ad the user did not ask for),
     // show the toy that is open instead
@@ -615,15 +618,16 @@ function syncDock(scroll: boolean): void {
   const ric = (window as Window & { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number }).requestIdleCallback;
   if (ric) ric(warm, { timeout: 3000 }); else setTimeout(warm, 1500);
 }
-// category switch opens that category's last toy at once — unless that toy needs an ad: then the tab only shows the other list
+// category switch opens that category's last toy at once: then the tab only shows the other list
 // (no ad popup for a tab tap; picking a card there asks as usual)
 dock.querySelectorAll<HTMLButtonElement>('[data-category]').forEach((b) => b.addEventListener('click', () => {
   const c = b.dataset.category as Category;
   // a tab opens the toy last used there (owner, 2026-11-20 — opening the tab's first toy was tried and dropped)
   const hash = c === 'keyboard' ? `#/keyboard/${settings.get().keyPreset}` : c === 'squash' ? '#/' + squashChoice() : '#/' + fidgetChoice();
-  const k = kindOfHash(hash);
-  if (gateOn && k && access(gateNow(), k) === 'locked') { if (category !== c) { category = c; syncDock(true); } return; }
-  request(hash);
+  // it was already opened and played there, so coming back to it is free (owner, 2026-11-20: each tab shows its last toy):
+  // no ad, no free pick used
+  tabEntry = true;
+  go(hash);
 }));
 // arrow keys move within the radio groups (one tab stop each)
 for (const group of [toyList, dock.querySelector<HTMLElement>('.cat-seg')!]) {

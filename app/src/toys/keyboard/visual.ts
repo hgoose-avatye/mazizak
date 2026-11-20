@@ -136,7 +136,7 @@ export function buildKeyboardVisual(renderer: THREE.WebGLRenderer): KeyboardVisu
       addKey(cap1u, (c - 1) * U, (r - 1.5) * U, LEGENDS[i], CAP / 2);
     }
   const spaceW = COLS * U - (U - CAP);
-  addKey(createKeycapGeometry({ width: spaceW, depth: CAP, height: CAP_H }), 0, 1.5 * U, '스페이스', spaceW / 2, spaceW / CAP);
+  addKey(createKeycapGeometry({ width: spaceW, depth: CAP, height: CAP_H }), 0, 1.5 * U, '', spaceW / 2, spaceW / CAP); // a blank space bar
 
   type StyleId = keyof typeof STYLES;
   let style: StyleId = 'pebble';

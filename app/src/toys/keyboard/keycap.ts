@@ -421,7 +421,8 @@ function drawDeco(g: CanvasRenderingContext2D, size: number, d: CapDeco) {
         g.fill();
       }
       break;
-    case 'ring': // typewriter key: a silver ring round the face
+    case 'ring': // typewriter key: a silver ring round the face (not on the long space bar — a typewriter's is a plain bar)
+      if (d.aspect > 1.5) break;
       g.strokeStyle = d.ink;
       g.lineWidth = 16;
       g.beginPath();
@@ -468,12 +469,21 @@ export function createLegendTexture(
   canvas.height = size;
   const g = canvas.getContext('2d')!;
   if (o.deco) {
-    // the pattern is drawn per square tile across the wide canvas (no squeeze needed: the canvas has the cap's proportions)
-    for (let t = 0; t < Math.ceil(wide); t++) {
+    if (['blush', 'swirl', 'ring'].includes(o.deco.pattern)) {
+      // one-per-cap patterns (a blush, a piped swirl, a typewriter ring) are drawn once across the whole wide cap — tiled they
+      // repeated three times on the space bar (owner, 2026-11-20)
       g.save();
-      g.translate(t * size, 0);
-      drawDeco(g, size, { ...o.deco, aspect: 1, seed: o.deco.seed + t * 17 });
+      g.scale(wide, 1);
+      drawDeco(g, size, { ...o.deco, aspect: wide });
       g.restore();
+    } else {
+      // scattered patterns are drawn per square tile across the wide canvas (the canvas has the cap's proportions)
+      for (let t = 0; t < Math.ceil(wide); t++) {
+        g.save();
+        g.translate(t * size, 0);
+        drawDeco(g, size, { ...o.deco, aspect: 1, seed: o.deco.seed + t * 17 });
+        g.restore();
+      }
     }
   }
   const px = Math.round(size * (o.sizeRatio ?? 0.42));

@@ -22,7 +22,8 @@ export interface KeyTheme {
   plate: number;
   switches: number;
 }
-const row = (icons: [string, string, string], space: string) => ['만', '지', '작', ...icons, '1', '2', '3', space];
+// the space bar is left blank (owner, 2026-11-20: "스페이스바 글씨 없는 게 낫겠다"); `space` is kept as the design's name
+const row = (icons: [string, string, string], _space: string) => ['만', '지', '작', ...icons, '1', '2', '3', ''];
 
 /** Individually composed keysets: placement, contrast, materials and case are designed together. */
 export const KEYBOARD_COLORS: Record<KeyPresetId, Colorway> = {
