@@ -44,9 +44,6 @@ button { font-weight: 650; }
 .now-category.blank { visibility: hidden; }
 .now-category::before { content: ''; display: inline-block; width: 5px; height: 5px; margin: 0 6px 2px 0; border-radius: 50%; background: #719775; }
 .now-playing h2 { margin: var(--name-gap) 0 0; font-family: var(--font-brand); font-size: var(--name-size); line-height: var(--name-lh); overflow-wrap: anywhere; font-weight: 850; letter-spacing: -.85px; }
-.splash-mark { gap: 12px; }
-.splash-mark .wordmark { font-size: 48px; letter-spacing: -2px; }
-.splash-mark .latin { letter-spacing: 4px; font-size: 9px; }
 
 /* Same 184 / 191 px dock envelope as before: the toy's viewport does not change. */
 .dock {
@@ -313,5 +310,5 @@ html.dock-folded .dock-body { display: none; }
   .app-head { top: calc(var(--safe-t) + 4px); }
 }
 
-/* Jua has one weight: no faux bold (font-weight values above stay for the SUITE fallback) */
+/* Jua has one weight: no faux bold (font-weight values above stay for the system fallback) */
 html { font-synthesis-weight: none; }

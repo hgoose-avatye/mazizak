@@ -3,7 +3,7 @@ import './ui.css';
 import './theme.css';
 import { AudioEngine } from './core/audio';
 import { settings, type Settings } from './core/settings';
-import { haptic, hapticsSupported } from './core/haptics';
+import { haptic, hapticsSupported, onHapticsSupportChange } from './core/haptics';
 import type { Runtime } from './core/runtime';
 import type { StatsOverlay } from './core/hud';
 import type { Toy, ToyContext } from './core/toy';
@@ -44,7 +44,9 @@ const audio = new AudioEngine(24);
 let rt: Runtime | null = null;
 let stats: StatsOverlay | null = null;
 let stageReady: Promise<ToyContext> | null = null;
-const wantStats = (s: Readonly<Settings>) => s.showStats || new URLSearchParams(location.search).get('stats') === '1';
+// the frame-stats overlay is a developer tool: its settings row exists only in dev builds (a release keeps ?stats=1 for support)
+const wantStats = (s: Readonly<Settings>) => (import.meta.env.DEV && s.showStats) || new URLSearchParams(location.search).get('stats') === '1';
+if (!import.meta.env.DEV) document.querySelector('input[data-setting="showStats"]')?.closest('label')?.remove();
 const ensureStage = (): Promise<ToyContext> => (stageReady ??= (async () => {
   const [{ Runtime }, { StatsOverlay }] = await Promise.all([import('./core/runtime'), import('./core/hud')]);
   const r = (rt = new Runtime($('#stage')));
@@ -141,11 +143,14 @@ sheet.querySelector('.seg')!.addEventListener('click', (e) => {
   const v = (e.target as HTMLElement).dataset.v;
   if (v) settings.set('quality', v as Settings['quality']);
 });
-if (!hapticsSupported) {
+// the Toss bridge arrives a moment after start (tossShell.ts), so the row is updated when it does
+const syncHapticsRow = () => {
   const h = sheet.querySelector<HTMLInputElement>('input[data-setting="haptics"]')!;
-  h.disabled = true;
-  $('#haptics-note').textContent = '이 기기의 브라우저는 지원하지 않음';
-}
+  h.disabled = !hapticsSupported();
+  $('#haptics-note').textContent = hapticsSupported() ? '' : '이 기기의 브라우저는 지원하지 않음';
+};
+syncHapticsRow();
+onHapticsSupportChange(syncHapticsRow);
 const shellParts = () => ['#app-head', '#dock', '#variants', '#stage', '#now-playing'].map((q) => $(q));
 let sheetOpener: HTMLElement | null = null;
 const openSheet = () => {
@@ -445,12 +450,15 @@ async function route(): Promise<void> {
   rt.canvas.setAttribute('aria-label', `${TOY_TITLES[id]} — ${TOY_HINTS[id]}`);
   rt.canvas.setAttribute('role', 'img');
   rt.setToy(toy);
+  if (changed && revealed) landToy(rt.canvas);
   syncSoundStatus();
   warmWhenReady();
   if (gateOn) void preloadAd(); // the next 광고 보고 열기 never waits (no-op while one is ready)
   else startAds();
   // the page around the stage takes the toy's backdrop colour, so the header and dock do not frame the canvas as a box
-  const bg = toy.scene.background as { getHexString?: () => string } | null;
+  // (a lit backdrop texture names its edge colour in scene.userData.stageBg — core/stage.ts)
+  const edge = toy.scene.userData.stageBg;
+  const bg = typeof edge === 'number' ? { getHexString: () => edge.toString(16).padStart(6, '0') } : toy.scene.background as { getHexString?: () => string } | null;
   if (bg?.getHexString) {
     const hex = '#' + bg.getHexString();
     document.documentElement.style.setProperty('--stage-bg', hex);
@@ -474,7 +482,7 @@ document.addEventListener('click', (e) => {
   if (a === 'close-ad') closeAdSheet();
   if (a === 'watch-ad') void watchAd();
   if (a === 'sound') settings.set('sound', !settings.get().sound);
-  if (a === 'reset') rt?.toy?.reset();
+  if (a === 'reset') { rt?.toy?.reset(); haptic('tap'); }
   // the keyboard toy ignores key presses while a button has focus: after a pointer click (header, dock), hand the physical keys back.
   // Keyboard-driven clicks (detail 0) keep focus for keyboard navigation.
   const btn = target.closest<HTMLButtonElement>('button');
@@ -487,7 +495,7 @@ function showNotice(text: string): void {
   n.className = 'notice';
   n.textContent = text;
   document.body.appendChild(n);
-  setTimeout(() => n.remove(), 3200);
+  setTimeout(() => { n.classList.add('out'); setTimeout(() => n.remove(), 220); }, 3000);
 }
 
 // one-time hint that web audio follows the iOS silent switch
@@ -509,15 +517,33 @@ audio.onStateChange = (s) => {
   showNotice('소리가 안 들리면 무음 모드·볼륨을 확인하세요');
 };
 
+// ---------- toy switch: the new toy drops onto its mat with a small squash (same feel as the intro), and lands with a tap ----------
+function landToy(canvas: HTMLCanvasElement): void {
+  if (settings.get().reduceMotion || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  canvas.style.transformOrigin = '50% 78%';
+  canvas.animate([
+    { transform: 'translateY(-6%) scale(.93, 1.07)', opacity: 0, easing: 'cubic-bezier(.45,0,.8,.6)' },
+    { transform: 'translateY(0) scale(1.06, .93)', opacity: 1, offset: 0.42, easing: 'ease-out' },
+    { transform: 'translateY(-1.2%) scale(.98, 1.02)', offset: 0.68, easing: 'ease-in-out' },
+    { transform: 'none', opacity: 1 },
+  ], { duration: 440 });
+  setTimeout(() => haptic('tap'), 180);
+}
+
 // ---------- brand splash ----------
 const splash = $('#splash');
 let revealed = false;
 /** Fade the brand out once the first toy is drawn (or failed). No minimum time: it leaves as soon as the app is ready. */
+/** The intro logo plays for ~1.6 s (style.css splash-drop / splash-pop); a toy that is ready sooner waits for it to finish. */
+const INTRO_MS = 1750; // plays in full even with reduced motion on
 function reveal(): void {
   if (revealed) return;
   revealed = true;
-  splash.classList.add('out');
-  setTimeout(() => splash.remove(), 400);
+  const wait = Math.max(0, INTRO_MS - performance.now());
+  setTimeout(() => {
+    splash.classList.add('out');
+    setTimeout(() => splash.remove(), 400);
+  }, wait);
 }
 // never a stuck splash: on a very slow first load the dock and header show while the toy is still arriving
 setTimeout(reveal, 4000);

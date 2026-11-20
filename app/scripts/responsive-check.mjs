@@ -60,10 +60,13 @@ async function open(w, h, dpr, inset) {
   return { ctx, p, cdp, touch, errors };
 }
 const report = (p) => p.evaluate(() => window.__MANZIZAK__.report());
+// the intro logo plays ~1.75 s before the app shows (main.ts reveal): measure only once it has gone
+const noSplash = (p) => p.waitForFunction(() => !document.getElementById('splash'), null, { timeout: 8000 }).catch(() => {});
 async function go(p, hash, id) {
   await p.evaluate((h) => { location.hash = h; }, hash);
   await p.waitForFunction((i) => { const r = window.__MANZIZAK__?.report(); return r && (i === 'keyboard' ? r.keyRectsPx?.length : r.id === i); }, id, { timeout: 20000 });
   await p.evaluate(() => document.fonts.ready);
+  await noSplash(p);
   await sleep(250);
 }
 
@@ -168,6 +171,7 @@ async function runViewport([label, w, h, dpr, inset], deep) {
   try {
     await o.p.goto(`${BASE}/${Q}#/S01`);
     await o.p.waitForFunction(() => window.__MANZIZAK__?.report()?.id === 'S01', null, { timeout: 30000 });
+    await noSplash(o.p);
     for (const [hash, id, kind] of [['#/S01', 'S01', 'fidget'], ['#/keyboard/pebble', 'keyboard', 'keyboard']]) {
       await go(o.p, hash, id);
       const lay = await o.p.evaluate(layoutProbe, inset);
@@ -224,6 +228,7 @@ async function dynamicChecks() {
   try {
     await p.goto(`${BASE}/${Q}#/W01`);
     await p.waitForFunction(() => window.__MANZIZAK__?.report()?.id === 'W01', null, { timeout: 30000 });
+    await noSplash(p);
     await sleep(300);
     const centre = async () => { const r = await report(p), st = await p.locator('#stage').boundingBox(); return [st.x + (r.screenBox.x0 + r.screenBox.x1) / 2, st.y + (r.screenBox.y0 + r.screenBox.y1) / 2]; };
     // crack the shell: firm presses until faces break (the state that must survive every resize below)
@@ -278,6 +283,7 @@ async function dynamicChecks() {
     await touch('touchEnd', []);
     await p.reload();
     await p.waitForFunction(() => window.__MANZIZAK__?.report()?.preset, null, { timeout: 20000 });
+    await noSplash(p);
     if ((await report(p)).preset !== 'turquoise-tealios') bad(`keyboard preset not restored after reload (${(await report(p)).preset})`);
     // multi-touch: two keys at once on the landscape layout
     await sleep(300);

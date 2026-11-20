@@ -15,7 +15,16 @@
   <body>
     <!-- BRAND SPLASH: shown until the first toy is on screen (main.ts reveal()), never longer than a few seconds -->
     <div id="splash" aria-hidden="true">
-      <div class="splash-mark"><span class="wordmark">만지작</span><span class="latin">MANZIZAK</span></div>
+      <!-- intro logo (public/brand, from .brand-original/*.png): the mascot drops in and squashes, then 만 · 지 · 작 pop one by one -->
+      <div class="splash-mark">
+        <img class="splash-char" src="./brand/intro-character.webp" alt="" width="560" height="560" decoding="async" />
+        <div class="splash-word">
+          <img src="./brand/intro-man.webp" alt="" style="--i:0;--ox:20%" />
+          <img src="./brand/intro-ji.webp" alt="" style="--i:1;--ox:49%" />
+          <img src="./brand/intro-jak.webp" alt="" style="--i:2;--ox:81%" />
+          <img class="latin" src="./brand/intro-latin.webp" alt="" />
+        </div>
+      </div>
     </div>
 
     <div id="stage"></div>
@@ -121,7 +130,7 @@
           <h3>그림과 글꼴</h3>
           <ul>
             <li><b>모닝빵·찹쌀떡 3D 모델</b>직접 제작(실물 사진으로 만듦), 텍스처를 줄여 재포장함</li>
-            <li><b>글꼴</b><a href="https://github.com/sun-typeface/SUITE">SUITE</a> · <a href="https://github.com/sun-typeface/SUIT">SUIT</a> © SUNN · SIL OFL 1.1 (<a href="./fonts/OFL-SUITE.txt">SUITE 라이선스</a> · <a href="./fonts/OFL-SUIT.txt">SUIT 라이선스</a>) · 원본 그대로 사용</li>
+            <li><b>글꼴</b>주아체(Jua) © 우아한형제들 · SIL OFL 1.1 (<a href="./fonts/OFL-Jua.txt">라이선스</a>)</li>
           </ul>
           <p class="credits-ver">v0.1 MVP</p>
         </div></details>

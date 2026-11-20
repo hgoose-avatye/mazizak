@@ -3,6 +3,7 @@ import { toNdc, screenBox } from "../../core/viewport";
 import type { Toy, ToyContext } from "../../core/toy";
 import type { InputEvt } from "../../core/runtime";
 import { radialShadowTexture, studioEnvironment } from "../../core/studio";
+import { stageBackdrop, stageMat } from "../../core/stage";
 import type { FidgetSpec } from "./catalog";
 import { FidgetModel, FractureModel, GrainModel } from "./model";
 import { isStretchy } from "./cage";
@@ -29,7 +30,9 @@ export interface FidgetToy extends Toy {
 }
 export function createFidget(ctx: ToyContext, spec: FidgetSpec): FidgetToy {
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color(STAGES[spec.id]);
+  // a lit backdrop and a cushion mat under the toy (core/stage.ts); main.ts gives the page around the canvas stageBg
+  scene.background = stageBackdrop(STAGES[spec.id]);
+  scene.userData.stageBg = STAGES[spec.id];
   scene.environment = studioEnvironment(ctx.renderer);
   scene.environmentIntensity = 0.48;
   const camera = new THREE.PerspectiveCamera(34, 1, 0.1, 100),
@@ -168,6 +171,22 @@ if (uMix > 0.0) {
   blob.position.y = spec.height * 0.94;
   blob.frustumCulled = false;
   scene.add(blob);
+  // the stage mat (core/stage.ts) sits under the toy's real foot: its lowest point (some, like 슬랑이, dip below y = 0, and a mat
+  // at 0 was drawn in front of them) and the width where it touches down (its bottom 6%; with the widest part or even the bottom
+  // fifth, a round toy like 슬랑이 got a plate as wide as itself whose front edge covered its lower half)
+  const foot = (() => {
+    let minY = Infinity, maxY = -Infinity;
+    for (let i = 1; i < base.length; i += 3) { minY = Math.min(minY, base[i]); maxY = Math.max(maxY, base[i]); }
+    const cut = minY + (maxY - minY) * 0.06;
+    let r = 0;
+    for (let i = 0; i < base.length; i += 3) if (base[i + 1] <= cut) r = Math.max(r, Math.hypot(base[i], base[i + 2]));
+    return { y: blob.position.y + minY, r };
+  })();
+  const floorY = Math.min(0, foot.y);
+  const mat = stageMat(STAGES[spec.id], Math.max(foot.r * 1.15, spec.width * 0.42));
+  mat.position.y = floorY - 0.004;
+  scene.add(mat);
+  if (import.meta.env.DEV) console.debug(`[stage] ${spec.id} foot y ${foot.y.toFixed(3)} r ${foot.r.toFixed(3)} width ${spec.width}`);
   // W02: solid → fracturing → kneaded state machine with runtime Voronoi shards (chocolate.ts)
   const choco = spec.shape === "chocolate" ? new ChocolateBar(scene, blob.position, spec) : null;
   // 비누 blows soap bubbles, 모닝빵 and 마시멜로 steam where they are touched (owner, 2026-11-20 — puffs.ts)
@@ -259,12 +278,12 @@ if (uMix > 0.0) {
     new THREE.MeshBasicMaterial({
       map: radialShadowTexture(0.7, 0.4),
       transparent: true,
-      opacity: 0.3,
+      opacity: 0.42, // on the lighter stage mat (core/stage.ts) the old 0.3 hardly showed
       depthWrite: false,
     }),
   );
   shadow.rotation.x = -Math.PI / 2;
-  shadow.position.y = 0.002;
+  shadow.position.y = floorY + 0.002; // on the mat (below 0 for toys whose foot dips under it)
   scene.add(shadow);
   const gestureCamera = camera.clone();
   const ray = new THREE.Raycaster(),
@@ -533,14 +552,14 @@ if (uMix > 0.0) {
           const area = choco.split(local, new THREE.Vector2(1, 0));
           if (area > 0) {
             sound.play("crack", 0.6, 0, false, { rate: THREE.MathUtils.clamp(1.12 - area * 1.2, 0.92, 1.12) });
-            ctx.haptic(10);
+            ctx.haptic('tickMedium');
             ctx.requestFrame();
           }
         }
       }
       strokeReady = true;
       dragBudget = 0;
-      ctx.haptic(7);
+      ctx.haptic(spec.category === "뭉개기" ? 'softMedium' : 'tickWeak'); // squash: a soft, heavier press
       idleGesture = 0;
       // answer every finger contact at once (not only after the compression has built up over a few frames),
       // so rapid repeated clicking keeps sounding: it replaces the sustained sound of the previous click
@@ -751,18 +770,18 @@ if (uMix > 0.0) {
           area /= snapped.length;
           // shatter layer: one sharp cue per snap; smaller shards → higher pitch
           crackSound(Math.min(1, 0.6 + snapped.length * 0.15), { rate: THREE.MathUtils.clamp(1.12 - area * 1.2, 0.92, 1.12) });
-          ctx.haptic(14);
+          ctx.haptic('basicMedium');
         }
       } else if (fracture.crazeEvents > crazeBefore) {
         // the whole shell crazes: the "first break" sound (long, loud)
         crackSound(0.85);
         crackClock = 0.45;
-        ctx.haptic(12);
+        ctx.haptic('basicMedium');
       } else if (broken.length && crackClock <= 0) {
         // shards falling away: one grouped long cue every ~0.4 s, not one per patch
         crackSound(Math.min(1, 0.45 + broken.length * 0.08));
         crackClock = 0.4;
-        ctx.haptic(8);
+        ctx.haptic('tickWeak');
       } else if (fracture.crackEvents - before > 2 && crackClock <= 0) {
         crackSound(0.45);
         crackClock = 0.3;

@@ -237,3 +237,19 @@ html.reduce-motion .ad-thumb .thumb, html.reduce-motion .sheet-panel { animation
 .cat-seg { background: #e9dcc3; }
 /* the free-pick label on solid white too (owner, 2026-11-20), still flat — no lip */
 .free-timer { background: #ffffff; -webkit-backdrop-filter: none; backdrop-filter: none; border-color: rgba(46, 74, 63, 0.07); }
+
+/* notices (free picks left / used up, mission reward, sound hint): a slim white pill just under the toy's name that slides in,
+   instead of a dark box over the toy (quality pass, 2026-11-20). The side rail layout keeps it at the bottom. */
+.notice {
+  top: calc(var(--name-top) + var(--name-label-h) + var(--name-gap) + var(--name-size) * var(--name-lh) + 10px); bottom: auto;
+  max-width: calc(100vw - 32px); padding: 8px 16px; border: 0; border-radius: 999px;
+  background: #fff; color: var(--jl-ink); font-size: 14px; line-height: 1.35;
+  box-shadow: 0 3px 0 #e6dccb, 0 10px 20px -12px rgba(40, 50, 30, .45);
+  animation: notice-in .28s cubic-bezier(.34, 1.5, .5, 1) both;
+}
+.notice.out { animation: notice-out .2s ease-in both; }
+@keyframes notice-in { from { opacity: 0; transform: translate(-50%, -10px) scale(.96); } to { opacity: 1; transform: translate(-50%, 0); } }
+@keyframes notice-out { to { opacity: 0; transform: translate(-50%, -8px); } }
+@media (min-aspect-ratio: 3/2) and (max-height: 640px), (min-aspect-ratio: 5/4) and (max-height: 520px), (horizontal-viewport-segments: 2) {
+  .notice { top: auto; bottom: calc(var(--safe-b) + 10px); }
+}

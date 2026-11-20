@@ -1,0 +1,241 @@
+{
+ "version": 1,
+ "preset": "jjigae-topre",
+ "file": "jjigae-topre.ed906692db.flac",
+ "sampleRate": 48000,
+ "upMode": "none",
+ "source": {
+  "video": "https://www.youtube.com/watch?v=TTfTCiwA38c",
+  "file": "jjigae.wav",
+  "windowSeconds": [
+   30,
+   1735
+  ]
+ },
+ "clearance": {
+  "status": "permission to use in this app granted by the channel",
+  "statedBy": "project owner",
+  "statedOn": "2026-11-16",
+  "grantedBy": "쟈글링-KeyboardHolic (YouTube channel owner), reply to the owner's request",
+  "grantedOn": "2026-11-19",
+  "terms": "Only the typing sounds the channel recorded itself in its video; only inside the agreed app (만지작); the credit must name the channel and link the video in the app's source/licence notice."
+ },
+ "credit": {
+  "label": "찌개",
+  "title": "【FAST ASMR】 RealForce R2 (30g) Lubed Topre EC",
+  "by": "쟈글링-KeyboardHolic (YouTube)",
+  "url": "https://www.youtube.com/watch?v=TTfTCiwA38c"
+ },
+ "entries": {
+  "down": [
+   {
+    "offset": 0,
+    "duration": 0.098,
+    "gain": 1,
+    "src": "youtube:https://www.youtube.com/watch?v=TTfTCiwA38c@32.17s",
+    "qc": {
+     "candidate": "now-1-B",
+     "candidateSha256": "22e6e0642e8801d169f8a52e7edcfd177eff1d114e3b4505922a392e79bd7697",
+     "gainDb": 3.3,
+     "shippedBefore": true
+    }
+   },
+   {
+    "offset": 0.108,
+    "duration": 0.16,
+    "gain": 1,
+    "src": "youtube:https://www.youtube.com/watch?v=TTfTCiwA38c@309.19s",
+    "qc": {
+     "candidate": "c07-B",
+     "candidateSha256": "a5d93f03a40a7f731c0ffb38ea088c1ac6cb1118bb3486b0f4e0d451e1772343",
+     "gainDb": 3.09,
+     "shippedBefore": false
+    }
+   },
+   {
+    "offset": 0.278,
+    "duration": 0.082,
+    "gain": 1,
+    "src": "youtube:https://www.youtube.com/watch?v=TTfTCiwA38c@394.39s",
+    "qc": {
+     "candidate": "c09-B",
+     "candidateSha256": "e4888e705532155360660a7447835db2fafb38ead0f7caf36e3fa6f44692bb12",
+     "gainDb": 3.03,
+     "shippedBefore": false
+    }
+   },
+   {
+    "offset": 0.37,
+    "duration": 0.153,
+    "gain": 1,
+    "src": "youtube:https://www.youtube.com/watch?v=TTfTCiwA38c@610.14s",
+    "qc": {
+     "candidate": "now-5-B",
+     "candidateSha256": "7c2d5a8ba76e901a72977392f83f32dfafef4e19a1771f6412c7abe34ee58e99",
+     "gainDb": 3.04,
+     "shippedBefore": true
+    }
+   },
+   {
+    "offset": 0.533,
+    "duration": 0.168,
+    "gain": 1,
+    "src": "youtube:https://www.youtube.com/watch?v=TTfTCiwA38c@625.65s",
+    "qc": {
+     "candidate": "c12-B",
+     "candidateSha256": "3edd73f3325f1476dfd7fb7692b58e6c03570285abe413c29a82bad21e8cdd9d",
+     "gainDb": 3.1,
+     "shippedBefore": false
+    }
+   },
+   {
+    "offset": 0.711,
+    "duration": 0.22,
+    "gain": 1,
+    "src": "youtube:https://www.youtube.com/watch?v=TTfTCiwA38c@916.63s",
+    "qc": {
+     "candidate": "c17-B",
+     "candidateSha256": "03e37942c7212bb2b37724591fc41ac7b242970b59f349c28cb02434b1e40103",
+     "gainDb": 3.04,
+     "shippedBefore": false
+    }
+   },
+   {
+    "offset": 0.941,
+    "duration": 0.075,
+    "gain": 1,
+    "src": "youtube:https://www.youtube.com/watch?v=TTfTCiwA38c@949.48s",
+    "qc": {
+     "candidate": "now-6-B",
+     "candidateSha256": "7d16c1e711f732dafe240e1b7bb9ca37102812ce7fdfbdc8563a1ee7e685dbae",
+     "gainDb": 3.04,
+     "shippedBefore": true
+    }
+   },
+   {
+    "offset": 1.026,
+    "duration": 0.084,
+    "gain": 1,
+    "src": "youtube:https://www.youtube.com/watch?v=TTfTCiwA38c@1017.35s",
+    "qc": {
+     "candidate": "c19-B",
+     "candidateSha256": "590efe390ca31bd9852f96f6d511f5d62ee60f9ae3b11b50909c6b7dd6a2f965",
+     "gainDb": 3.03,
+     "shippedBefore": false
+    }
+   },
+   {
+    "offset": 1.12,
+    "duration": 0.16,
+    "gain": 1,
+    "src": "youtube:https://www.youtube.com/watch?v=TTfTCiwA38c@1248.61s",
+    "qc": {
+     "candidate": "c23-B",
+     "candidateSha256": "cda90f53e108f57d9612dec2a3377d21a8124ada9d1cd58074259c9db98b8a0a",
+     "gainDb": 3.08,
+     "shippedBefore": false
+    }
+   },
+   {
+    "offset": 1.29,
+    "duration": 0.082,
+    "gain": 1,
+    "src": "youtube:https://www.youtube.com/watch?v=TTfTCiwA38c@1333.81s",
+    "qc": {
+     "candidate": "c25-B",
+     "candidateSha256": "9936c8a98a03a871098aa13be16b1973ffafdc8089fd01228c652c53d3c3c0d1",
+     "gainDb": 3.03,
+     "shippedBefore": false
+    }
+   },
+   {
+    "offset": 1.382,
+    "duration": 0.092,
+    "gain": 1,
+    "src": "youtube:https://www.youtube.com/watch?v=TTfTCiwA38c@1601.38s",
+    "qc": {
+     "candidate": "c28-B",
+     "candidateSha256": "1051d290e465f062dd8579325ace2526a5f574635b145dfc5e3aeb7c1cd9ebd5",
+     "gainDb": 3.02,
+     "shippedBefore": false
+    }
+   },
+   {
+    "offset": 1.484,
+    "duration": 0.082,
+    "gain": 1,
+    "src": "youtube:https://www.youtube.com/watch?v=TTfTCiwA38c@1640.30s",
+    "qc": {
+     "candidate": "c29-B",
+     "candidateSha256": "25d53f9414ad2637085494fa73632c6778b4862b45f3c77c1a146c3bc3488085",
+     "gainDb": 3.03,
+     "shippedBefore": false
+    }
+   }
+  ],
+  "up": [],
+  "spaceDown": [],
+  "spaceUp": []
+ },
+ "processing": {
+  "script": "scripts/kbsamples/build-earphone-picks.py",
+  "pickedBy": "project owner, by ear on earphones (A/B/C listening page), 2026-11-20",
+  "pass": "B (earphone): 50 Hz high-pass; narrow cuts on the shared ringing tones after the strike; +3 dB at 3.5 kHz; tail fades a further 15 dB from 30 ms after the strike",
+  "ringCuts": {
+   "now": [
+    [
+     3064,
+     10
+    ],
+    [
+     3879,
+     10
+    ],
+    [
+     10734,
+     10
+    ]
+   ],
+   "new": [
+    [
+     3926,
+     8.7
+    ],
+    [
+     9785,
+     6.5
+    ],
+    [
+     6920,
+     6.3
+    ]
+   ]
+  },
+  "targetStrikeLoudnessDbfs": -21,
+  "previous": {
+   "gates": {
+    "minLenMs": 45,
+    "minDecayMs": 8,
+    "decayDb": -30,
+    "maxSecondDb": -15,
+    "maxLeadDb": -30,
+    "maxBoostDb": 20,
+    "denoise": true,
+    "minSnrDb": 38,
+    "maxTailDb": -24
+   },
+   "rejected": {
+    "NO-DECAY": 879,
+    "NOISY-LEAD": 9,
+    "STILL-SOUNDING": 91,
+    "SHORT": 247,
+    "HISS": 87,
+    "2ND-HIT": 132,
+    "BOOST": 5,
+    "DUPLICATE": 2
+   },
+   "note": "Typical isolated keystrokes (closest to the median peak) that pass the objective gates, picked automatically from the waveform and not listened to. Key-down only; no release sound claimed; the key identity (which key was struck) is unknown."
+  }
+ },
+ "wavSha256": "c4f1bc340eacb63fc3fd4710c06cd98c9a966f4543343a8999e6aaaa3377b57a"
+}

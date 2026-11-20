@@ -122,7 +122,7 @@ function text(g: CanvasRenderingContext2D, s: string, x: number, y: number, size
   g.fillStyle = '#1f3327';
   g.textAlign = 'center';
   g.textBaseline = 'middle';
-  g.font = `${weight} ${size}px SUITE, SUIT, system-ui, sans-serif`;
+  g.font = `${weight} ${size}px Jua, system-ui, sans-serif`;
   g.fillText(s, x, y + (1 - alpha) * 12);
   g.restore();
 }

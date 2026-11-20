@@ -19,12 +19,12 @@ export const SFX_KEYBOARD: Record<string, SfxFile> = {
     "audio": "sfx/keyboard/ibm-buckling-spring.b256bc80c3.flac"
   },
   "jjigae-topre": {
-    "json": "sfx/keyboard/jjigae-topre.5984c649b2.json",
-    "audio": "sfx/keyboard/jjigae-topre.784ed78340.flac"
+    "json": "sfx/keyboard/jjigae-topre.4ed36708af.json",
+    "audio": "sfx/keyboard/jjigae-topre.ed906692db.flac"
   },
   "mongdol-pl87w": {
-    "json": "sfx/keyboard/mongdol-pl87w.e7ad3894ea.json",
-    "audio": "sfx/keyboard/mongdol-pl87w.24af905e18.flac"
+    "json": "sfx/keyboard/mongdol-pl87w.abcfdd2522.json",
+    "audio": "sfx/keyboard/mongdol-pl87w.5bfd74e51c.flac"
   },
   "pebble": {
     "json": "sfx/keyboard/pebble.cd9cab63c1.json",

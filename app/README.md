@@ -29,7 +29,11 @@ node scripts/make-thumbs.mjs   # 메뉴 썸네일 다시 만들기 (장난감 �
 - **키보드 테마(2026-11-20)**: 프리셋마다 키캡 무늬·색, 가운데 줄은 GPT로 만든 아이콘(`public/keyboard-icons/<preset>-<n>.webp`, 256px WebP — 원본 1024px PNG는 git 밖 `.keyboard-icons-original/`, 프롬프트 `docs/keyboard-icon-prompts.md`), 스페이스바는 글자 없음. 판·케이스에도 테마 무늬(`colors.ts` `platePattern`: 얼음·민트초코·몽돌·복숭아·조약돌, 두부는 노란 모판·찌개는 스텐 냄비 색)
 - **효과**: 비누 만지면 비눗방울, 모닝빵·마시멜로는 김(`puffs.ts`). 비누 앞면 SOAP·버터 앞면 BUTTER 각인(`visuals.ts` stampTextures)
 - 늘이는 범위는 `PLASTIC_BOUNDS`(가로 1.35배·위 2배·앞뒤 1.1배) 안이라 화면 밖으로 안 나감. 장난감별 화면 크기는 `viewScale`(레인보우·비누·청사과 작게)
-- 설정 시트: 소리·볼륨·진동(Android)·화질(자동/고화질/절약)·움직임 줄이기·성능 정보
+- 설정 시트: 소리·볼륨·진동·화질(자동/고화질/절약)·움직임 줄이기 (성능 정보 표시는 개발 빌드에만, 출시 빌드는 `?stats=1`)
+- 진동(`src/core/haptics.ts`): 길이가 아니라 종류로 부름(`tickWeak`·`tap`·`softMedium`·`basicMedium`…). 토스 안에서는 `Device.triggerHaptic`으로 아이폰에서도 울리고(`tossShell.ts`가 연결), 웹에서는 진동 API로 대신함(iOS Safari는 없음)
+- 무대(`src/core/stage.ts`): 장난감 뒤 은은한 조명 배경 + 장난감 접촉면에 맞춘 받침과 접지 그림자. 배경 텍스처의 위·아래 끝은 페이지 색(`--stage-bg`)과 같아 헤더·독 모서리와 이음매가 없음
+- 장난감을 바꾸면 새 장난감이 받침 위로 떨어지며 살짝 눌렸다 펴짐(`main.ts` landToy, 움직임 줄이기면 생략). 키보드는 세로 화면에서 키가 너비의 약 72%가 되게 카메라를 당김
+- 안내 문구(무료 남은 횟수 등)는 이름 아래 흰 알약으로 미끄러져 나옴
 - `audio-test.html`: 모바일 오디오 활성화(pointerdown/pointerup/touchstart) 실기기 검증 도구
 
 ## 앱인토스 · 광고 (src/ads)

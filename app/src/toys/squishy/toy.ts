@@ -198,7 +198,7 @@ export function createSquishy(ctx: ToyContext): Toy & { setColor(id: string): vo
         // samples are fetched when the toy opens: a touch that lands before they are ready is sounded once they are (if still fresh)
         if (soundSource === 'loading') pendingTouch = { play: playTouch, at: performance.now() };
         else playTouch();
-        ctx.haptic(8);
+        ctx.haptic('tickWeak');
       }
       compressed.delete(e.id);
       screenPos.set(e.id, { x: e.x, y: e.y, t: e.t });
