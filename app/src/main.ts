@@ -22,6 +22,7 @@ import { loadChunk, chunksOf } from './toys/fidgets/fidgetSprites';
 import { KEYBOARD_COLORS } from './toys/keyboard/colors';
 import { access, addBonus, bonusLeft, enter, freeLeft, freshState, grant, groupOf, nextReset, normalize, resetLabel, resetPeriod, GATE_CONFIG, type GateState, type Group } from './ads/gate';
 import { adsSupported, preloadAd, showRewardedAd } from './ads/rewarded';
+import { synthSfx } from './audio/synthSfx';
 import { bootGfSdk, cover as gfCover, gfToyInput } from './sdk/gf';
 
 const $ = <T extends HTMLElement>(sel: string) => document.querySelector(sel) as T;
@@ -88,6 +89,13 @@ $('#stage').addEventListener('pointerdown', () => { noteToyInput(); gfToyInput()
 // a held drag / stretch keeps counting as play (SDK 판 clock, src/sdk/playClock.ts)
 $('#stage').addEventListener('pointermove', (e) => { if (e.buttons) gfToyInput(); }, { passive: true });
 window.addEventListener('keydown', (e) => { if (!e.repeat && !e.metaKey && !e.ctrlKey && !e.altKey && sheet.hidden) { noteToyInput(); gfToyInput(); } });
+
+// a soft "뽁" for every app button (owner, 2026-11-20): tabs, toy cards, sound / settings / 초기화, popup buttons, the SDK windows'
+// buttons. On pointerdown so it answers at once (after the capture-phase unlock below has woken the audio).
+document.addEventListener('pointerdown', (e) => {
+  const b = (e.target as HTMLElement | null)?.closest('button, [role="radio"], summary');
+  if (b && !(b as HTMLButtonElement).disabled) synthSfx(audio).click();
+});
 
 // Audio unlock: any user gesture anywhere (the first touch on the toy itself, or a tap in the dock).
 // Touch pointerdown may not count as activation on some browsers, so we also try on pointerup/touchend/click.

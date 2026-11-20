@@ -111,6 +111,9 @@ export class Splatter {
   private dir = new THREE.Vector3();
   private next: Record<Kind, number> = { drop: 0, puddle: 0, chunk: 0, seed: 0, smear: 0 };
   private lastSmear: THREE.Vector3 | null = null;
+  /** sound hooks (toy.ts → synthSfx): a drop or a chunk landing on the table, a smear stroke laid down */
+  onLand: ((what: "splat" | "tick") => void) | null = null;
+  onSmear: (() => void) | null = null;
 
   constructor(scene: THREE.Scene, private readonly recipe: SplatRecipe, private readonly floorY: number) {
     const juice = recipe.juice !== null
@@ -196,6 +199,7 @@ export class Splatter {
     b.rot.set(0, -Math.atan2(p.z - this.lastSmear.z, p.x - this.lastSmear.x), 0);
     b.color.setHex(this.recipe.smear).multiplyScalar(0.92 + Math.random() * 0.1);
     this.lastSmear.copy(p);
+    this.onSmear?.();
   }
   /** the finger lifted: the next rub starts a new stroke */
   endStroke() {
@@ -241,6 +245,7 @@ export class Splatter {
               if (kind === "drop") {
                 // a drop hits the table: a puddle, and a couple of tiny satellite drops round it
                 b.alive = false;
+                this.onLand?.("splat");
                 this.puddle(b.pos, b.size * 2.6, b.color);
                 for (let i = 0; i < 2; i++) {
                   const a = Math.random() * Math.PI * 2, d = b.size * (2.6 + Math.random() * 2.2);
@@ -249,6 +254,7 @@ export class Splatter {
                 continue;
               }
               if (!b.bounced && b.vel.y < -1) {
+                if (kind === "chunk") this.onLand?.("tick");
                 b.bounced = true; // a chunk bounces once and skids a little
                 b.vel.set(b.vel.x * 0.35, -b.vel.y * 0.28, b.vel.z * 0.35);
                 b.spin.multiplyScalar(0.4);

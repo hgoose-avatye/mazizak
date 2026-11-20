@@ -10,6 +10,7 @@ import { FidgetAudio } from "./audio";
 import { ChocolateBar } from "./chocolate";
 import { Puffs } from "./puffs";
 import { SPLAT_RECIPES, Splatter } from "./splatter";
+import { synthSfx } from "../../audio/synthSfx";
 import {
   STAGES,
   surfaceTexture,
@@ -173,8 +174,15 @@ if (uMix > 0.0) {
   const puffs = spec.shape === "soap" ? new Puffs(scene, "bubble") : spec.shape === "foam" || spec.shape === "marshmallow" ? new Puffs(scene, "steam") : null; // (the toasted 마시멜로 steams too)
   // 뭉개기: a squash throws juice drops, chunks and seeds out every way, and rubbing smears it on the table like paint (splatter.ts)
   const splat = SPLAT_RECIPES[spec.shape] ? new Splatter(scene, SPLAT_RECIPES[spec.shape]!, 0) : null;
+  // 뭉개기 sounds (owner, 2026-11-20): a soft rub for each smear (the squash itself is the toy's own recorded squish — a synthesized
+  // squelch on top sounded odd)
+  const sfx = splat ? synthSfx(ctx.audio) : null;
+  // (no sound for the bits landing — owner, 2026-11-20: "잔재 떨어지는 소리 없애줘"; splatter.onLand stays unhooked)
+  if (splat && sfx) splat.onSmear = () => sfx.smear();
   let splatDepth = 0;
   let puffClock = 0;
+  /** recompute the body normals on the next frame whatever its parity (초기화) */
+  let normalsDue = false;
   let frictionClock = 0;
   /** wax balls: the "nearly every piece broken" sound has played (once per reset) */
   let nearDoneFired = false;
@@ -516,7 +524,7 @@ if (uMix > 0.0) {
       if (e.pointerType === "pen") model.setPressure(e.id, e.pressure);
       anchors.set(e.id, h.point.clone());
       if (puffs) { puffs.emit(h.point, spec.shape === "soap" ? 10 : 6, normal.clone().normalize()); ctx.requestFrame(); }
-      if (splat) { splat.burst(h.point, 0.6); ctx.requestFrame(); }
+      if (splat) { splat.burst(h.point, 0.6); ctx.requestFrame(); } // (the squash itself sounds with the toy's own recorded squish)
       if (spec.family === "wax" && h.object === blob) {
         coreTouches++;
         corePointers.add(e.id);
@@ -572,6 +580,7 @@ if (uMix > 0.0) {
     }
   };
   const reset = () => {
+    normalsDue = true;
     puffs?.clear();
     splat?.clear();
     model.reset();
@@ -649,7 +658,9 @@ if (uMix > 0.0) {
       model.deform(softboxRest, tmp);
       softbox.position.copy(tmp).add(blob.position);
     }
-    if (frames % 2 === 0) geometry.computeVertexNormals();
+    // normals every other frame while moving, and always on a frame the loop may stop after (nothing moving any more) or right
+    // after 초기화 — otherwise the last frame could keep the squashed shape's normals: dark smudges on a restored toy (owner, 2026-11-20)
+    if (frames % 2 === 0 || !moving || normalsDue) { geometry.computeVertexNormals(); normalsDue = false; }
     geometry.computeBoundingSphere();
     dragBudget += model.frameTravel;
     if (

@@ -441,16 +441,17 @@ export class MaterialCage {
             ? c.anchor.clone().sub(midpoint!).normalize()
             : c.normal;
         const depth = c.depth.x * (paired && c.held ? 0.35 : 1);
-        const dragLength = c.drag.length(),
+        const baseRadius =
+          this.spec.shape === "mochi" ? 0.95 : this.spec.family === "viscous" ? 0.85 : 0.72;
+        // no spikes (owner, 2026-11-20 "뾰족한 느낌 없애줘"): a long pull takes a wider patch of the body along (a rounded
+        // mound, not a horn) and one point can be drawn out at most about 1.3 × that patch
+        const rawDrag = c.drag.length(),
+          radius = baseRadius * (1 + Math.min(0.9, rawDrag * 0.55)),
+          dragScale = rawDrag > radius * 1.3 ? (radius * 1.3) / rawDrag : 1,
+          drag = dragScale < 1 ? c.drag.clone().multiplyScalar(dragScale) : c.drag,
+          dragLength = rawDrag * dragScale,
           dragDirection =
-            dragLength > 0.001 ? c.drag.clone().divideScalar(dragLength) : null;
-        const radius =
-          this.spec.shape === "mochi"
-            ? 0.95
-            : this.spec.family === "viscous"
-              ? // plastic slime: a long pull draws out more of the body, so it thins into a strand instead of a spike
-                0.85 * (plastic ? 1 + Math.min(0.6, dragLength * 0.3) : 1)
-              : 0.72;
+            dragLength > 0.001 ? drag.clone().divideScalar(dragLength) : null;
         for (let i = 0; i < p.length; i += 3) {
           const dx = o[i] - c.anchor.x,
             dy = o[i + 1] - c.anchor.y,
@@ -460,12 +461,12 @@ export class MaterialCage {
           );
           if (w < 0.005) continue;
           // plastic slime lifted off the table: its underside stays stuck down, so an upward pull draws a strand from a base
-          if (plastic && c.held && c.drag.y > 0)
+          if (plastic && c.held && drag.y > 0)
             w *= 0.25 + 0.75 * ((o[i + 1] + this.spec.height) / (2 * this.spec.height));
           const grip = 0.5 * w,
-            tx = g[i] + c.drag.x * w - normal.x * depth * w,
-            ty = g[i + 1] + c.drag.y * w - normal.y * depth * w,
-            tz = g[i + 2] + c.drag.z * w - normal.z * depth * w;
+            tx = g[i] + drag.x * w - normal.x * depth * w,
+            ty = g[i + 1] + drag.y * w - normal.y * depth * w,
+            tz = g[i + 2] + drag.z * w - normal.z * depth * w;
           const ex = tx - p[i],
             ey = ty - p[i + 1],
             ez = tz - p[i + 2],
