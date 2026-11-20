@@ -16,6 +16,18 @@ import { round, summarize } from '../../core/metrics';
 import { hitTest, KeyboardModel, type KeyRect } from './model';
 import { buildKeyboardVisual, type KeyboardVisual } from './visual';
 import { iconLoaded } from './keycap';
+import { OLD_MIX } from '../../core/audio';
+
+/**
+ * Headroom per recorded preset (dB, on top of the +6 dB sample make-up), 2026-11-20: fast typing (keys 90–170 ms apart,
+ * rendered through the app's own output chain in Chrome) must stay under −1.5 dBFS so the limiter never pumps. Before, 크림,
+ * 조약돌, 찌개 and 몽돌 reached +3…+5 dBFS and the limiter swung 6 dB while typing. Quieter presets are left as they are
+ * (raising 두부 / 복숭아 / 마시멜로 would also raise their room noise — a level choice for the owner).
+ */
+const HEADROOM_DB: Partial<Record<KeyPresetId, number>> = {
+  'creamy-thocky': -10.9, pebble: -10.8, 'jjigae-topre': -9.3, 'mongdol-pl87w': -9.3, clack: -3.3, 'turquoise-tealios': -1.1,
+};
+const headroom = (p: KeyPresetId) => (OLD_MIX ? 0 : HEADROOM_DB[p] ?? 0);
 
 export { KEY_PRESET_INFO };
 
@@ -192,7 +204,7 @@ export function createKeyboard(ctx: ToyContext): Toy & { setPreset(p: KeyPresetI
     const sp = audible(preset);
     heldPreset.set(holdId, { preset: sp, code });
     const name = roleName(sp, code, 'Down');
-    const makeup = soundSource[sp] === 'samples' ? 6 : 0;
+    const makeup = soundSource[sp] === 'samples' ? 6 + headroom(sp) : 0;
     ctx.audio.play(name, { baseDetune: (isKbsimMappedPreset(sp) || isLocalKeyPreset(sp)) ? 0 : keyDetune[k], detuneCents: (isKbsimMappedPreset(sp) || isLocalKeyPreset(sp)) ? 0 : 12, gainJitterDb: 1.2, gainDb: makeup + (rapid ? -2 : 0), pan: vis.keys[k].rest.x * 0.22 }, evType);
     ctx.haptic('tickWeak');
   };
@@ -204,7 +216,7 @@ export function createKeyboard(ctx: ToyContext): Toy & { setPreset(p: KeyPresetI
     const pr = held?.preset ?? audible(preset);
     heldPreset.delete(holdId);
     const name = roleName(pr, held?.code ?? PHYS_KEYS[k], 'Up');
-    const makeup = soundSource[pr] === 'samples' ? 6 : 0;
+    const makeup = soundSource[pr] === 'samples' ? 6 + headroom(pr) : 0;
     ctx.audio.play(name, { baseDetune: (isKbsimMappedPreset(pr) || isLocalKeyPreset(pr)) ? 0 : keyDetune[k], detuneCents: (isKbsimMappedPreset(pr) || isLocalKeyPreset(pr)) ? 0 : 10, gainJitterDb: 1, gainDb: makeup, pan: vis.keys[k].rest.x * 0.22 }, evType);
   };
 
