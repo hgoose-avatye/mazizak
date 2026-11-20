@@ -198,3 +198,20 @@ html.reduce-motion .ad-thumb .thumb, html.reduce-motion .sheet-panel { animation
 
 /* the "• 키보드" label over a keycap preset's name is gone (owner, 2026-11-20): every toy shows just its name */
 .now-category { display: none; }
+
+/* the free-pick chip is information, not a button (owner, 2026-11-20): a flat, see-through label — no lip, no raised shadow */
+.free-timer {
+  height: 44px;
+  padding: 0 12px 0 11px;
+  border: 1px solid rgba(46, 74, 63, 0.08);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.5);
+  box-shadow: none;
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  pointer-events: none;
+}
+.free-timer-label { font-size: 11px; color: var(--jl-ink-2); }
+.free-timer-time { font-size: 15px; }
+.free-pips i { width: 11px; height: 11px; box-shadow: none; }
+.free-pips i.on { box-shadow: none; }
