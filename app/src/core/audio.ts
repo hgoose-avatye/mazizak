@@ -67,6 +67,17 @@ export interface PlayLog {
 /** A sound requested while suspended is only played if the context resumes within this window. */
 export const LATE_MS = 80;
 
+/** make-up the old limiter applied by itself (+4.56 dB) minus what the new one applies (+0.57 dB): output level unchanged */
+export const OUTPUT_TRIM_DB = 3.99;
+/** `?mix=old`: the output chain (and keyboard levels) before 2026-11-20, to compare by ear */
+export const OLD_MIX = (() => {
+  try {
+    return new URLSearchParams(location.search).get('mix') === 'old';
+  } catch {
+    return false;
+  }
+})();
+
 class Bag {
   private recent: number[] = [];
   constructor(
@@ -114,25 +125,32 @@ export class AudioEngine {
     this.ctx = offline ? (offline as unknown as AudioContext) : new Ctor({ latencyHint: 'interactive' });
     this.offline = !!offline;
     this.maxVoices = maxVoices;
+    // Output chain (2026-11-20, earphone pass). The old limiter (threshold −8 dB, ratio 20) caught most loud key strikes: on
+    // earphones the attack was squashed and the tail pumped back up 6 dB while typing, and the soft-clip (from −3 dBFS) rounded
+    // the peaks off. Now it only catches real overs (−1 dBFS) and the soft-clip starts at −0.7 dBFS. The browser's compressor
+    // adds an automatic make-up gain (Web Audio spec: (1 / gain at 0 dB)^0.6 — +4.6 dB at −8 / 20:1, +0.6 dB at −1 / 20:1),
+    // so `OUTPUT_TRIM_DB` keeps every sound exactly as loud as before. `?mix=old` restores the old chain for A/B listening.
     this.limiter = this.ctx.createDynamicsCompressor();
-    // approximate limiter (not brick-wall)
-    this.limiter.threshold.value = -8;
+    this.limiter.threshold.value = OLD_MIX ? -8 : -1;
     this.limiter.knee.value = 0;
     this.limiter.ratio.value = 20;
-    this.limiter.attack.value = 0.002;
-    this.limiter.release.value = 0.08;
+    this.limiter.attack.value = OLD_MIX ? 0.002 : 0.001;
+    this.limiter.release.value = OLD_MIX ? 0.08 : 0.05;
     this.master = this.ctx.createGain();
     this.master.gain.value = 0.9;
+    const trim = this.ctx.createGain();
+    trim.gain.value = OLD_MIX ? 1 : Math.pow(10, OUTPUT_TRIM_DB / 20);
     // final safety: gentle tanh soft-clip so stacked spiky transients never hard-clip
+    const knee = OLD_MIX ? 0.7 : 0.92;
     const shaper = this.ctx.createWaveShaper();
     const curve = new Float32Array(2048);
     for (let i = 0; i < curve.length; i++) {
       const x = (i / (curve.length - 1)) * 2 - 1;
-      curve[i] = Math.abs(x) < 0.7 ? x : Math.sign(x) * (0.7 + 0.29 * Math.tanh((Math.abs(x) - 0.7) / 0.29));
+      curve[i] = Math.abs(x) < knee ? x : Math.sign(x) * (knee + (0.99 - knee) * Math.tanh((Math.abs(x) - knee) / (0.99 - knee)));
     }
     shaper.curve = curve;
     shaper.oversample = '2x';
-    this.master.connect(this.limiter).connect(shaper).connect(this.ctx.destination);
+    this.master.connect(trim).connect(this.limiter).connect(shaper).connect(this.ctx.destination);
     this.ctx.addEventListener('statechange', () => {
       if (this.ctx.state === 'running') this.flushPending();
       this.onStateChange(this.ctx.state);
