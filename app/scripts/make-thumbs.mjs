@@ -64,4 +64,6 @@ for (const j of jobs.filter((j) => !ONLY || ONLY.includes(j.file))) {
   console.log(j.file.padEnd(26), `${(jpg.length / 1024).toFixed(1)} KB`);
 }
 console.log("errors:", errors.length ? errors : "none");
+// the file names never change, so the app adds this to their URLs — a browser that kept an old thumbnail fetches the new one
+writeFileSync(new URL("../src/thumbsVersion.ts", import.meta.url), `// written by scripts/make-thumbs.mjs on every run: cache-busts the menu thumbnails (main.ts thumbSrc)\nexport const THUMBS_VERSION = "${Date.now().toString(36)}";\n`);
 await b.close();

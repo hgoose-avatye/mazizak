@@ -86,10 +86,8 @@ export function buildKeyboardVisual(renderer: THREE.WebGLRenderer): KeyboardVisu
   );
   caseMesh.castShadow = caseMesh.receiveShadow = true;
   root.add(caseMesh);
-  const plate = new THREE.Mesh(
-    new THREE.BoxGeometry(POCKET_W - 0.04, 0.03, POCKET_D - 0.04),
-    new THREE.MeshPhysicalMaterial({ color: 0x1c1d20, metalness: 0.6, roughness: 0.5 }),
-  );
+  const plateMat = new THREE.MeshPhysicalMaterial({ color: 0x1c1d20, metalness: 0.2, roughness: 0.6 });
+  const plate = new THREE.Mesh(new THREE.BoxGeometry(POCKET_W - 0.04, 0.03, POCKET_D - 0.04), plateMat);
   plate.position.y = PLATE_Y + 0.015;
   plate.receiveShadow = true;
   root.add(plate);
@@ -102,16 +100,13 @@ export function buildKeyboardVisual(renderer: THREE.WebGLRenderer): KeyboardVisu
   const legendMats: { mat: THREE.MeshPhysicalMaterial; side: THREE.MeshPhysicalMaterial; text: string; aspect: number }[] = [];
   // Reuse the same two ink variants per legend across all ten designs.
   const legendCache = new Map<string, THREE.Texture>();
-  const makeLegend = (text: string, aspect: number, color: string) => {
-    const id = `${text}:${aspect}:${color}`;
+  const makeLegend = (text: string, aspect: number, color: string, deco?: { pattern: string; ink: string; seed: number }) => {
+    const id = `${text}:${aspect}:${color}:${deco ? deco.pattern + deco.seed : ''}`;
     const cached = legendCache.get(id);
     if (cached) return cached;
-    const tex = createLegendTexture(text, { color });
+    // a wide cap gets a canvas of its own proportions (its name fills the space bar), a 1u cap a square one
+    const tex = createLegendTexture(text, { color, deco: deco && { ...deco, aspect: 1 }, wide: aspect, sizeRatio: aspect > 1 ? 0.5 : undefined });
     tex.anisotropy = aniso;
-    if (aspect !== 1) {
-      tex.repeat.set(aspect, 1);
-      tex.offset.set(-(aspect - 1) / 2, 0);
-    }
     legendCache.set(id, tex);
     return tex;
   };
@@ -145,10 +140,16 @@ export function buildKeyboardVisual(renderer: THREE.WebGLRenderer): KeyboardVisu
 
   type StyleId = keyof typeof STYLES;
   let style: StyleId = 'pebble';
-  const legendsFor = (p: StyleId) => legendMats.map((l, i) => makeLegend(l.text, l.aspect, inkFor(STYLES[p].keys[i])));
+  // each design's theme: its legends (icons on the middle row, its name on the space bar) and the pattern on every cap top
+  const legendsFor = (p: StyleId) => {
+    const t = STYLES[p].theme;
+    return legendMats.map((l, i) => makeLegend(t?.legends[i] ?? l.text, l.aspect, inkFor(STYLES[p].keys[i]), t && { pattern: t.pattern, ink: t.ink, seed: i + 1 }));
+  };
   const applyStyle = (p: StyleId) => {
     const s = STYLES[p];
     caseMat.setValues({ color: s.tray, metalness: s.metalness, roughness: s.caseRoughness, clearcoat: s.clearcoat, clearcoatRoughness: .4 });
+    plateMat.color.setHex(s.theme?.plate ?? 0x1c1d20);
+    switchMat.color.setHex(s.theme?.switches ?? 0x2a2b2f);
     const tex = legendsFor(p);
     legendMats.forEach((l, i) => {
       const finish = { color: s.keys[i], roughness: s.roughness, clearcoat: s.clearcoat };

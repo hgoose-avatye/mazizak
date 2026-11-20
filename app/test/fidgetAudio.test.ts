@@ -67,10 +67,11 @@ const clipOf = (kind: "wax" | "crunch" | "squish" | "picks", e: Entry) => wavs[k
 describe("event → pool mapping", () => {
   it("every catalog toy has every event declared (a pool or an explicit null)", () => {
     for (const f of FIDGETS) {
-      expect(FIDGET_SOUND[f.id], f.id).toBeTruthy();
-      for (const e of EVENTS) expect(FIDGET_SOUND[f.id], `${f.id}.${e}`).toHaveProperty(e);
+      const id = f.soundAs ?? f.id; // the 뭉개기 toys borrow another toy's sounds
+      expect(FIDGET_SOUND[id], f.id).toBeTruthy();
+      for (const e of EVENTS) expect(FIDGET_SOUND[id], `${f.id}.${e}`).toHaveProperty(e);
     }
-    expect(Object.keys(FIDGET_SOUND).sort()).toEqual(FIDGETS.map((f) => f.id).sort());
+    expect(Object.keys(FIDGET_SOUND).sort()).toEqual(FIDGETS.filter((f) => !f.soundAs).map((f) => f.id).sort());
   });
 
   it("every pool a toy refers to exists in its sprite, or is listed as dropped by the clip audit", () => {

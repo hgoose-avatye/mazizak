@@ -152,7 +152,7 @@ export interface ResolvedToy {
 }
 /** Resolve every event of a toy to its decoded clips (single source of truth for the player and the listening lab). */
 export async function resolveToy(ctx: BaseAudioContext, spec: FidgetSpec): Promise<ResolvedToy> {
-  const map = FIDGET_SOUND[spec.id];
+  const map = FIDGET_SOUND[spec.soundAs ?? spec.id];
   if (!map) throw Error(`no sound map for ${spec.id}`);
   const mixMap = MIX_SOUND[spec.id] ?? {};
   const stageMap = WAX_STAGES[spec.id] ?? {};

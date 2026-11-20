@@ -1,5 +1,6 @@
 import './style.css';
 import './ui.css';
+import './theme.css';
 import { AudioEngine } from './core/audio';
 import { settings, type Settings } from './core/settings';
 import { haptic, hapticsSupported } from './core/haptics';
@@ -14,12 +15,14 @@ import { loadKeyboardSamples } from './audio/keyboardSamples';
 import { loadSquishySamples } from './audio/squishySamples';
 // dev only (see references.ts; kept out of the static graph because that module pulls in three.js)
 const LOCAL_FIDGETS = import.meta.env.VITE_LOCAL_FIDGETS === '1';
-import { FIDGETS, findFidget } from './toys/fidgets/catalog';
+import { FIDGETS, findFidget, isSquash } from './toys/fidgets/catalog';
+import { THUMBS_VERSION } from './thumbsVersion';
 import { ORIGINAL_SOUNDS, ORIGINAL_FOLDER } from './toys/fidgets/originalMap';
 import { loadChunk, chunksOf } from './toys/fidgets/fidgetSprites';
 import { KEYBOARD_COLORS } from './toys/keyboard/colors';
-import { access, enter, freeLeft, freshState, grant, groupOf, localDay, normalize, GATE_CONFIG, type GateState, type Group } from './ads/gate';
+import { access, addBonus, bonusLeft, enter, freeLeft, freshState, grant, groupOf, nextReset, normalize, resetLabel, resetPeriod, GATE_CONFIG, type GateState, type Group } from './ads/gate';
 import { adsSupported, preloadAd, showRewardedAd } from './ads/rewarded';
+import { bootGfSdk, cover as gfCover, gfToyInput } from './sdk/gf';
 
 const $ = <T extends HTMLElement>(sel: string) => document.querySelector(sel) as T;
 
@@ -81,8 +84,10 @@ function syncSoundStatus(): void {
   }
 }
 const noteToyInput = () => { if (soundTouched || !currentId) return; soundTouched = true; syncSoundStatus(); };
-$('#stage').addEventListener('pointerdown', noteToyInput);
-window.addEventListener('keydown', (e) => { if (!e.repeat && !e.metaKey && !e.ctrlKey && !e.altKey && sheet.hidden) noteToyInput(); });
+$('#stage').addEventListener('pointerdown', () => { noteToyInput(); gfToyInput(); });
+// a held drag / stretch keeps counting as play (SDK 판 clock, src/sdk/playClock.ts)
+$('#stage').addEventListener('pointermove', (e) => { if (e.buttons) gfToyInput(); }, { passive: true });
+window.addEventListener('keydown', (e) => { if (!e.repeat && !e.metaKey && !e.ctrlKey && !e.altKey && sheet.hidden) { noteToyInput(); gfToyInput(); } });
 
 // Audio unlock: any user gesture anywhere (the first touch on the toy itself, or a tap in the dock).
 // Touch pointerdown may not count as activation on some browsers, so we also try on pointerup/touchend/click.
@@ -139,12 +144,14 @@ const openSheet = () => {
   syncSheet(settings.get());
   sheetOpener = document.activeElement as HTMLElement | null;
   sheet.hidden = false;
+  gfCover('settings', true);
   for (const el of shellParts()) el.inert = true;
   sheet.querySelector<HTMLElement>('input, button')?.focus({ preventScroll: true });
 };
 const closeSheet = () => {
   if (sheet.hidden) return;
   sheet.hidden = true;
+  gfCover('settings', false);
   for (const el of shellParts()) el.inert = false;
   sheetOpener?.focus({ preventScroll: true });
   sheetOpener = null;
@@ -244,26 +251,57 @@ function buildVariants(id: string): void {
 // Off where ads are not supported (a plain browser): everything opens. `?ads=mock` turns it on with a stand-in ad.
 const GATE_STORE = 'mzk-ad-gate-v1';
 let gate: GateState = (() => {
-  try { return normalize(JSON.parse(localStorage.getItem(GATE_STORE) ?? 'null'), localDay()); } catch { return freshState(localDay()); }
+  try { return normalize(JSON.parse(localStorage.getItem(GATE_STORE) ?? 'null'), resetPeriod()); } catch { return freshState(resetPeriod()); }
 })();
-const gateNow = (): GateState => (gate.day === localDay() ? gate : (gate = freshState(localDay())));
+// a new window (06·14·22 KST) starts the counts over; the toy on screen stays the current one, so a re-tap is still free
+const gateNow = (): GateState => (gate.day === resetPeriod() ? gate : (gate = { ...freshState(resetPeriod()), current: gate.current, ...(gate.bonus ? { bonus: gate.bonus } : {}) }));
 function saveGate(s: GateState): void {
   gate = s;
   try { localStorage.setItem(GATE_STORE, JSON.stringify(s)); } catch { /* storage unavailable: the gate still works for this visit */ }
 }
 let gateOn = false;
-const GROUP_NAME: Record<Group, string> = { fidget: '말랑이', keyboard: '키보드' };
+const GROUP_NAME: Record<Group, string> = { fidget: '말랑이', keyboard: '키보드', squash: '뭉개기' };
 let adsChecked = false;
 /** after the first toy is on screen (the SDK chunk must not compete with it): turn the gate on where ads work, load the first ad */
 function startAds(): void {
   if (adsChecked) return;
   adsChecked = true;
-  void adsSupported().then((on) => { gateOn = on; if (on) { syncDock(false); void preloadAd(); } });
+  // GfSDK missions / attendance (off until the server registration fills GF_CONFIG.promotionCode; ?gfmock in dev)
+  bootGfSdk({ grantPicks: (n) => { if (n <= 0) return 0; saveGate(addBonus(gateNow(), n)); syncDock(false); showNotice(`미션 보상 · 무료 만지기 ${n}회를 받았어요`); return n; } });
+  void adsSupported().then((on) => { gateOn = on; if (on) { syncDock(false); if (!GATE_CONFIG.pretendAds) void preloadAd(); scheduleResetRefresh(); } });
+}
+/** top-left chip: free picks left in the group on screen (coins) and the time to the next refill, ticking each second */
+let freeTimerTick = 0;
+function syncFreeTimer(): void {
+  const el = $('#free-timer');
+  el.hidden = !gateOn;
+  clearTimeout(freeTimerTick);
+  if (!gateOn) return;
+  const left = freeLeft(gateNow(), category), n = GATE_CONFIG.freePerDay;
+  const ms = Math.max(0, nextReset().getTime() - Date.now()), t = Math.ceil(ms / 1000);
+  const hms = `${Math.floor(t / 3600)}:${String(Math.floor(t / 60) % 60).padStart(2, '0')}:${String(t % 60).padStart(2, '0')}`;
+  $('#free-timer-label').textContent = `무료 ${VERB[category].noun}`;
+  const pips = $('#free-pips');
+  if (pips.childElementCount !== n) pips.replaceChildren(...Array.from({ length: n }, () => document.createElement('i')));
+  pips.querySelectorAll('i').forEach((p, i) => p.classList.toggle('on', i < left));
+  $('#free-timer-time').textContent = hms;
+  const bonus = bonusLeft(gateNow());
+  $('#free-bonus').hidden = bonus === 0;
+  $('#free-bonus').textContent = `+${bonus}`;
+  el.classList.toggle('empty', left === 0);
+  el.setAttribute('aria-label', `무료 ${VERB[category].noun} ${left}회 남음${bonus ? `, 미션 보너스 ${bonus}회` : ''}, ${resetLabel(nextReset())}에 다시 ${n}회`);
+  freeTimerTick = window.setTimeout(syncFreeTimer, 1000 - (Date.now() % 1000) + 20);
+}
+/** at each reset (06·14·22 KST) redraw the dock so the counts and locks show the new window without a tap */
+function scheduleResetRefresh(): void {
+  setTimeout(() => { syncDock(false); scheduleResetRefresh(); }, Math.min(nextReset().getTime() - Date.now() + 1000, 2 ** 31 - 1));
 }
 /** the gate's name for a dock card: a fidget id, or `kb:<preset>`; null for toys outside the dock (the old 말랑이 link) */
 const kindOf = (id: string, preset?: string): string | null => (findFidget(id) ? id : id === 'keyboard' ? 'kb:' + (preset ?? settings.get().keyPreset) : null);
 const kindOfHash = (hash: string) => { const [id, p] = hash.replace(/^#\/?/, '').split('/'); return kindOf(id, p); };
 const hashOfKind = (k: string) => (k.startsWith('kb:') ? `#/keyboard/${k.slice(3)}` : `#/${k}`);
+/** the verb for a kind: 말랑이 are touched (만지기), keycaps pressed (누르기) */
+const VERB: Record<Group, { noun: string; can: string }> = { fidget: { noun: '만지기', can: '만질 수 있어요' }, keyboard: { noun: '누르기', can: '누를 수 있어요' }, squash: { noun: '뭉개기', can: '뭉갤 수 있어요' } };
 const kindName = (k: string) => (k.startsWith('kb:') ? KEY_PRESET_INFO[k.slice(3) as KeyPresetId]?.label ?? '키보드' : TOY_TITLES[k] ?? '');
 /** A dock choice: open it now, or offer the ad first when today's free kinds are used up. */
 function request(hash: string, open: () => void = () => go(hash)): void {
@@ -276,19 +314,23 @@ const adSheet = $('#ad-sheet');
 let adFor: { kind: string; open: () => void; opener: HTMLElement | null } | null = null;
 function openAdSheet(kind: string, open: () => void): void {
   adFor = { kind, open, opener: document.activeElement as HTMLElement | null };
-  $('#ad-title').textContent = `${kindName(kind)} 열기`;
-  $('#ad-text').textContent = `오늘 ${GROUP_NAME[groupOf(kind)]} 무료 ${GATE_CONFIG.freePerDay}회를 다 썼어요. 짧은 광고를 끝까지 보면 바로 열려요.`;
+  const verb = VERB[groupOf(kind)];
+  $('#ad-title').textContent = `${kindName(kind)} ${verb.noun}`;
+  $('#ad-watch').textContent = `광고 보고 ${verb.noun}`;
+  $('#ad-text').textContent = `${GROUP_NAME[groupOf(kind)]} 무료는 ${resetLabel(nextReset())}에 다시 생겨요\n광고를 보면 바로 ${verb.can}`; // two lines (.ad-text pre-line)
   $('#ad-status').textContent = '';
   const thumb = toyList.querySelector(`.toy-item[data-key="${CSS.escape(kind.replace(/^kb:/, ''))}"] .thumb`);
   $('#ad-thumb').replaceChildren(...(thumb ? [thumb.cloneNode(true)] : []));
   $<HTMLButtonElement>('#ad-watch').disabled = false;
   adSheet.hidden = false;
+  gfCover('ad-sheet', true);
   for (const el of shellParts()) el.inert = true;
   $('#ad-watch').focus({ preventScroll: true });
 }
 function closeAdSheet(): void {
   if (adSheet.hidden) return;
   adSheet.hidden = true;
+  gfCover('ad-sheet', false);
   for (const el of shellParts()) el.inert = false;
   adFor?.opener?.focus({ preventScroll: true });
   adFor = null;
@@ -298,11 +340,10 @@ async function watchAd(): Promise<void> {
   if (!req) return;
   const btn = $<HTMLButtonElement>('#ad-watch');
   btn.disabled = true;
-  const result = await showRewardedAd();
+  if (!GATE_CONFIG.pretendAds) await showRewardedAd(); // pretendAds: no ad, counted as watched (gate.ts)
   if (adFor !== req) return; // closed meanwhile
-  if (result === 'closed') { btn.disabled = false; $('#ad-status').textContent = '광고를 끝까지 보면 열려요'; return; }
-  // 'earned', or no ad to show (no fill, offline): open it anyway — the user is never stuck behind an ad that cannot come
-  // either way it opens for this visit only (an unavailable ad is a one-time pass, not a free slot)
+  // owner, 2026-11-20: an ad that was shown counts even when skipped or closed early ("건너뛰어도 봤다고 쳐야지") — and with no ad
+  // to show (no fill, offline) it opens anyway, so the user is never stuck. Either way it opens for this visit only.
   saveGate(grant(gateNow(), req.kind));
   closeAdSheet();
   req.open();
@@ -313,10 +354,14 @@ async function watchAd(): Promise<void> {
 // The hash still names the toy (#/S01, #/keyboard/<preset>, #/squishy) so links keep working; switching uses replaceState,
 // so Back leaves the app instead of stepping through every toy tried.
 const DEFAULT_FIDGET = 'S01';
-type Category = 'fidget' | 'keyboard';
+type Category = 'fidget' | 'keyboard' | 'squash';
 const enabledPresets = () => (Object.keys(KEY_PRESET_INFO) as KeyPresetId[]).filter((p) => isKeyPresetEnabled(p));
 const validFidget = (id: unknown): id is string => typeof id === 'string' && !!findFidget(id);
-const fidgetChoice = () => (validFidget(settings.get().lastFidget) ? settings.get().lastFidget : DEFAULT_FIDGET);
+const fidgetChoice = () => (validFidget(settings.get().lastFidget) && !isSquash(findFidget(settings.get().lastFidget)!) ? settings.get().lastFidget : DEFAULT_FIDGET);
+// 뭉개기 tab: the last squash toy (kept apart from the 말랑이 choice), else the first one
+const SQUASH_STORE = 'mzk-last-squash';
+const squashChoice = (): string => { try { const id = localStorage.getItem(SQUASH_STORE); if (id && findFidget(id) && isSquash(findFidget(id)!)) return id; } catch { /* storage unavailable */ } return FIDGETS.find(isSquash)!.id; };
+const categoryOf = (id: string): Category => (id === 'keyboard' ? 'keyboard' : findFidget(id) && isSquash(findFidget(id)!) ? 'squash' : 'fidget');
 const launchHash = () => (settings.get().lastCategory === 'keyboard' ? `#/keyboard/${settings.get().keyPreset}` : `#/${fidgetChoice()}`);
 // stored values from an older / hand-edited state fall back to 슬랑이
 if (settings.get().lastCategory !== 'keyboard' && settings.get().lastCategory !== 'fidget') settings.set('lastCategory', 'fidget');
@@ -349,7 +394,7 @@ async function route(): Promise<void> {
     saveGate(r.state);
     if (r.usedFree && gateOn) {
       const group = groupOf(kind), name = GROUP_NAME[group], left = freeLeft(r.state, group), n = GATE_CONFIG.freePerDay;
-      showNotice(left > 0 ? `${name} 남은 무료 ${left}/${n}회` : `오늘 ${name} 무료 ${n}회를 다 썼어요 · 다음부터는 광고를 보고 열 수 있어요`);
+      showNotice(left > 0 ? `${name} 남은 무료 ${left}/${n}회` : `${name} 무료 ${n}회를 다 썼어요 · ${resetLabel(nextReset())}에 다시 생겨요`);
     }
   }
   if (id === 'keyboard' && validPreset) {
@@ -358,13 +403,14 @@ async function route(): Promise<void> {
   closeSheet();
   closeAdSheet();
   // remember it for the next launch (the old 말랑이 toy is reachable by link only and is not remembered)
-  if (findFidget(id)) { settings.set('lastFidget', id); settings.set('lastCategory', 'fidget'); }
+  if (findFidget(id) && isSquash(findFidget(id)!)) { try { localStorage.setItem(SQUASH_STORE, id); } catch { /* storage unavailable */ } }
+  else if (findFidget(id)) { settings.set('lastFidget', id); settings.set('lastCategory', 'fidget'); }
   else if (id === 'keyboard') settings.set('lastCategory', 'keyboard');
   const changed = id !== currentId;
   currentId = id;
   if (changed) soundTouched = false; // the chip belongs to this visit of this toy
   syncSoundStatus();
-  if (id !== 'squishy') category = id === 'keyboard' ? 'keyboard' : 'fidget';
+  if (id !== 'squishy') category = categoryOf(id);
   syncDock(changed);
   document.title = `${TOY_TITLES[id]} · 만지작`;
   if (changed) buildVariants(id);
@@ -470,7 +516,7 @@ const dock = $('#dock');
 const toyList = $('#toy-list');
 const dockToggle = $('#dock-toggle');
 /** Real render of the toy (scripts/make-thumbs.mjs → public/thumbs/menu/<name>.jpg) over a CSS-drawn fallback shown while it loads. */
-const thumbSrc = (name: string) => `./thumbs/menu/${name}.jpg`;
+const thumbSrc = (name: string) => `./thumbs/menu/${name}.jpg?v=${THUMBS_VERSION}`; // (version: a re-rendered thumbnail is never served from an old cache)
 const thumbImage = (src: string) => {
   const img = document.createElement('img');
   img.className = 'shot'; img.alt = ''; img.width = img.height = 128; img.decoding = 'async'; img.draggable = false; img.src = src;
@@ -504,7 +550,7 @@ function buildList(c: Category): void {
       toyList.append(b);
     }
   } else {
-    for (const f of FIDGETS) {
+    for (const f of FIDGETS.filter((f) => isSquash(f) === (c === 'squash'))) {
       const thumb = document.createElement('div'); thumb.className = 'thumb preview-fidget ' + f.shape; thumb.style.setProperty('--toy-color', hexColor(f.color));
       const shape = document.createElement('i'); thumb.append(shape, thumbImage(thumbSrc(f.id)));
       // dev only: the reference app's thumbnails (not for the cheese nor the chocolate, see git history of the home cards)
@@ -542,15 +588,17 @@ function syncDock(scroll: boolean): void {
   $('#now-category').textContent = currentId === 'keyboard' ? '키보드' : '';
   $('#now-category').classList.toggle('blank', currentId !== 'keyboard');
   // only the 왁뿌볼 (shells that crack open) and plastic slime (stays stretched) need a way back; the others settle on their own
-  $('[data-action="reset"]').hidden = !(findFidget(currentId)?.category === '왁뿌볼' || findFidget(currentId)?.plastic);
+  // 초기화 only where a shape stays: the wax balls (everything else fills back in by itself, memory foam — catalog.ts)
+  $('[data-action="reset"]').hidden = !(findFidget(currentId)?.category === '왁뿌볼' || findFidget(currentId)?.category === '뭉개기');
   const g = gateNow();
   toyList.querySelectorAll<HTMLButtonElement>('.toy-item').forEach((b) => {
     const locked = gateOn && access(g, category === 'keyboard' ? 'kb:' + b.dataset.key : b.dataset.key!) === 'locked';
-    if (locked) b.setAttribute('aria-description', '광고 보고 열기'); else b.removeAttribute('aria-description');
+    if (locked) b.setAttribute('aria-description', `광고 보고 ${VERB[category].noun}`); else b.removeAttribute('aria-description');
     b.dataset.locked = String(locked);
   });
-  const count = `${toyList.children.length}가지` + (gateOn ? ` · 오늘 무료 ${freeLeft(g, category)}회` : ''); // the list on screen's group
+  const count = `${toyList.children.length}가지` + (gateOn ? (freeLeft(g, category) > 0 ? ` · 무료 ${freeLeft(g, category)}회` : ` · ${resetLabel(nextReset())}에 무료 ${GATE_CONFIG.freePerDay}회`) : ''); // the list on screen's group
   if ($('#collection-count').textContent !== count) $('#collection-count').textContent = count;
+  syncFreeTimer();
   if (scroll && sel && settings.get().dockOpen) {
     // centre the selection in the list, whichever way it scrolls (a row under the stage, or the rail's grid on wide short screens)
     const s = (sel as HTMLButtonElement).getBoundingClientRect(), l = toyList.getBoundingClientRect();
@@ -567,10 +615,15 @@ function syncDock(scroll: boolean): void {
   const ric = (window as Window & { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number }).requestIdleCallback;
   if (ric) ric(warm, { timeout: 3000 }); else setTimeout(warm, 1500);
 }
-// category switch opens that category's last toy at once
+// category switch opens that category's last toy at once — unless that toy needs an ad: then the tab only shows the other list
+// (no ad popup for a tab tap; picking a card there asks as usual)
 dock.querySelectorAll<HTMLButtonElement>('[data-category]').forEach((b) => b.addEventListener('click', () => {
-  if (b.dataset.category === 'keyboard') request(`#/keyboard/${settings.get().keyPreset}`);
-  else request('#/' + fidgetChoice());
+  const c = b.dataset.category as Category;
+  // a tab opens the toy last used there (owner, 2026-11-20 — opening the tab's first toy was tried and dropped)
+  const hash = c === 'keyboard' ? `#/keyboard/${settings.get().keyPreset}` : c === 'squash' ? '#/' + squashChoice() : '#/' + fidgetChoice();
+  const k = kindOfHash(hash);
+  if (gateOn && k && access(gateNow(), k) === 'locked') { if (category !== c) { category = c; syncDock(true); } return; }
+  request(hash);
 }));
 // arrow keys move within the radio groups (one tab stop each)
 for (const group of [toyList, dock.querySelector<HTMLElement>('.cat-seg')!]) {
@@ -612,7 +665,8 @@ const syncDockBox = () => {
 };
 new ResizeObserver(syncDockBox).observe(dock);
 syncDockBox();
-setDockOpen(settings.get().dockOpen);
+// the drawer has no fold button any more (owner, 2026-11-20: the head row 장난감 서랍 · 접기 went away): always open
+setDockOpen(true);
 
 if (import.meta.env.DEV) (window as unknown as { __MANZIZAK__: unknown }).__MANZIZAK__ = {
   report: () => rt?.toy?.report?.(), audio: () => audio.playLogs.slice(-100), frames: () => rt?.framesRendered ?? 0,
@@ -627,10 +681,11 @@ if (import.meta.env.MODE === 'toss') void import('./core/tossShell').then((m) =>
   if (!sheet.hidden) { closeSheet(); return true; }
   return false;
 }));
-// dev only: preview the Toss top band in a browser — ?platform=toss&aitTop=47 (a 47px status bar)
+// dev only: preview the Toss top band in a browser (on by default; ?platform=web turns it off) — &aitTop=47 adds a 47px status bar
 if (import.meta.env.DEV) {
   const q = new URLSearchParams(location.search);
-  if (q.get('platform') === 'toss') document.documentElement.dataset.platform = 'toss';
+  // the dev preview shows the Toss top band by default (the app ships in Toss); ?platform=web shows the plain web layout
+  if (q.get('platform') !== 'web') document.documentElement.dataset.platform = 'toss';
   if (q.has('aitTop')) document.documentElement.style.setProperty('--ait-top', `${Math.max(0, Number(q.get('aitTop')) || 0)}px`);
 }
 applySettings(settings.get());

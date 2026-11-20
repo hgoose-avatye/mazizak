@@ -1,0 +1,614 @@
+/*
+ * 만지작 SDK 화면 스킨 = Figma "Theme Dialog" · Ice(청록 #1fa6ae, 테두리 #0a3d48) — 타일팝 appintoss/ice-skin/ice-skin.css 복사(2026-11-20).
+ * 바꾼 것: 글꼴은 앱이 이미 싣는 주아(src/style.css @import fonts/jua) — 타일팝의 서브셋 @font-face 는 뺌,
+ * 물결 타일은 src/sdk/skin.ts 가 ice_tile.svg 주소로 채움, 맨 아래 "만지작 추가"(SDK 0.38 출석 카드 — 애니멀팝 normal-skin 규칙을 Ice 색으로).
+ * 배치 JS(sdk-skin.js)는 애니멀팝(SDK 0.38.18) 사본 그대로.
+ * 아래는 타일팝 원문.
+ */
+/*
+ * 타일팝 전용 — SDK 화면(랭킹 · 일일 미션 · 웰컴 기프트)의 Ice 테마(Figma "Theme Dialog" · Ice).
+ * 배치는 sdk-skin.js 가 SDK 카드를 받아 다시 짜고(.sk-*), 여기서는 모양을 Unity 팝업과 같은 Ice 틀로 맞춘다.
+ * 판·머리줄 = 물결 타일(Figma Ice Grain — inline 스크립트가 ice_tile.svg 를 data URI 로 채운다),
+ * 안쪽 패널·카드 = 물결 위 반투명 덮개. 글꼴은 게임 글꼴(배민 주아 — SDK 문구 + 완성형 2,350자 서브셋, 그 밖의 글자만 시스템 글꼴).
+ * SDK(0.34.7)는 자기 <style> 을 런타임에 넣고 '.gf-hub-card .gf-hub-x' 처럼 클래스를 여러 겹 쓰므로,
+ * 카드가 들어가는 포털(#__gf-portal) id 를 앞에 붙여 항상 이긴다.
+ * 원본: sachunpop/src/ui/styles.css 의 SDK 화면 절(Normal 테마) — 색·질감만 Ice 로.
+ */
+/* 게임 글꼴(배민 주아) — SDK 문구 + 완성형 한글 2,350자 서브셋(scripts/subset-ice-skin-font.mjs). inline 스크립트가 data URI 로 채운다 */
+/* 가운뎃점(U+00B7)은 배민 주아에 보이는 점이 없어 공백처럼 보였다("2/5 · 계속 반복") — 그 한 글자만 시스템 글꼴로 */
+.gf-hub-card, .gf-lb-card, .gf-wel-card, .gf-onb-card, .gf-rx-dialog, .gf-rx-badge, .gf-rx-toast {
+  --pp-edge: #0a3d48; --pp-lip: #052f38; --pp-line: #0a3d48; --pp-line-hi: rgba(169, 240, 236, .6);
+  --pp-well: rgba(0, 0, 0, .32); --pp-well-rim: rgba(5, 47, 56, .55); --pp-card: rgba(5, 47, 56, .35);
+  --pp-ink: #fff; --pp-ink-2: #e3fbf9; --pp-ink-3: rgba(227, 251, 249, .72); --pp-title-ol: #052f38;
+  --wood: url(__ASSET_SVG_ice_tile__) 0 0 / 38px 52px repeat, #1fa6ae;
+}
+.info-card { padding: 14px 12px 16px; border-radius: 14px; background: var(--pp-card); }
+/* 글꼴: SDK 화면 전부 사천팝 글꼴(SDK 는 font:false 로 구글 폰트를 받지 않는다) */
+/* SDK 는 .gf-modal.gf-*-card 에 --hub-font 를 다시 정의하므로 변수 대신 글꼴 이름을 직접, 같은 두 클래스 + body 로 */
+#__gf-portal .gf-modal.gf-hub-card, #__gf-portal .gf-modal.gf-lb-card, #__gf-portal .gf-modal.gf-wel-card, #__gf-portal .gf-modal.gf-onb-card, body .gf-hub-badge, body .gf-lb-badge, body .gf-toast, body .gf-ach, body .gf-ad {
+  --hub-font: 'Jua', 'Apple SD Gothic Neo', system-ui, sans-serif; font-family: 'Jua', 'Apple SD Gothic Neo', system-ui, sans-serif; font-weight: 400;
+}
+#__gf-portal .gf-hub-card *, #__gf-portal .gf-lb-card * { font-family: inherit; }
+#__gf-portal .gf-modal.gf-hub-card, #__gf-portal .gf-modal.gf-lb-card {
+  width: min(92vw, 400px); max-width: none; padding: 0 0 12px; border: 3px solid var(--pp-edge); border-radius: 22px;
+  background: var(--wood); color: var(--pp-ink);
+  box-shadow: inset 0 2px 0 rgba(255, 255, 255, .35), 0 6px 0 var(--pp-lip), 0 22px 60px rgba(0, 0, 0, .28);
+}
+#__gf-portal .gf-hub-head, #__gf-portal .gf-lb-head {
+  position: relative; top: auto; height: auto; min-height: 60px; box-sizing: border-box; display: flex; align-items: center; padding: 10px 62px 10px 18px;
+  text-align: left; background: transparent; border-bottom: 3px solid var(--pp-line); box-shadow: 0 1.5px 0 var(--pp-line-hi);
+}
+#__gf-portal .gf-hub-title, #__gf-portal .gf-lb-title {
+  margin: 0; font-size: 25px; line-height: 1.2; font-weight: 400; color: #fff; padding: 2px 3px; letter-spacing: 0; text-shadow: 0 2px 0 var(--pp-title-ol);
+  -webkit-text-stroke: 5px var(--pp-title-ol); paint-order: stroke fill;
+}
+#__gf-portal .gf-hub-x, #__gf-portal .gf-lb-x {
+  position: absolute; display: grid; place-items: center; box-sizing: border-box; padding: 0;
+  top: 50%; right: 12px; width: 40px; height: 40px; min-width: 40px; min-height: 40px; max-width: 40px; max-height: 40px; margin-top: -20px; border: 2.5px solid #8d2300; border-radius: 11px;
+  background: linear-gradient(#ff7e72, #e8453c); box-shadow: 0 2px 0 rgba(5, 47, 56, .3);
+  color: #fff; font-size: 19px; font-weight: 800; line-height: 1; text-shadow: 0 1.5px 0 #a8291f;
+}
+#__gf-portal .gf-hub-x svg, #__gf-portal .gf-lb-x svg { width: 22px; height: 22px; filter: drop-shadow(0 1.5px 0 #a8291f); }
+/* 안쪽 어두운 패널 */
+.sk-well {
+  margin: 12px 12px 0; padding: 12px; border-radius: 16px; background: var(--pp-well);
+  box-shadow: inset 0 3px 0 var(--pp-well-rim), inset 0 -1.5px 0 rgba(255, 255, 255, .18);
+}
+.sk-well > :first-child { margin-top: 0; }
+.sk-panel { margin-top: 10px; padding: 4px 12px; border-radius: 16px; background: var(--pp-card); }
+.sk-panel--empty { padding: 34px 16px; text-align: center; }
+.sk-panel--empty p { margin: 0; font-size: 16px; line-height: 1.5; color: var(--pp-ink-2); }
+.sk-panel--empty .sk-invite { margin-top: 16px; }
+/*
+ * ───── 공통 버튼(Figma Theme Dialog) ─────
+ * 둥근 사각(반지름 12) + 진한 테두리 2.5 + 위아래 그라데이션, 글자는 외곽선 없이 옅은 그림자.
+ * 주(초록, 흰 글자) · 보조(Ice 민트, 진청록 글자 — 테마색) · 꺼짐(회색). 팝업 안 캡슐과 SDK 화면 버튼을 모두 이 모양으로.
+ */
+#__gf-portal .sk-invite, #__gf-portal .gf-hub-cta, #__gf-portal .gf-wel-cta, #__gf-portal .sk-onb .gf-onb-cta,
+#__gf-portal .sk-lb--nick .gf-lb-nicksave, #__gf-portal .sk-lb--nick .gf-lb-nickcancel {
+  --h: 46px; --b1: #88d65a; --b2: #49ab31; --hi: #a9e886; --bd: #116b07; --lo: #2a8415; --ink: #fff; --ts: rgba(16, 80, 0, .45);
+  display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%; height: var(--h); margin: 10px 0 0; padding: 0 12px;
+  border: 2.5px solid var(--bd); border-radius: 12px; background: linear-gradient(var(--b1), var(--b2));
+  box-shadow: 0 2px 0 rgba(5, 47, 56, .25);
+  color: var(--ink); font-size: 18px; font-weight: 400; text-shadow: 0 1.5px 0 var(--ts); -webkit-text-stroke: 0; cursor: pointer;
+  transition: transform .08s, box-shadow .08s;
+}
+#__gf-portal .sk-invite, #__gf-portal .sk-lb--nick .gf-lb-nickcancel {
+  --h: 42px; --b1: #8eeae6; --b2: #3cc2c0; --hi: #c6f8f5; --bd: #0a3d48; --lo: #22a3a3; --ink: #052f38; --ts: rgba(230, 255, 253, .55);
+}
+#__gf-portal .sk-invite:active, #__gf-portal .gf-hub-cta:active, #__gf-portal .gf-wel-cta:active, #__gf-portal .sk-onb .gf-onb-cta:active,
+#__gf-portal .sk-lb--nick .gf-lb-nicksave:active, #__gf-portal .sk-lb--nick .gf-lb-nickcancel:active {
+  transform: translateY(2px); box-shadow: none;
+}
+#__gf-portal .gf-hub-cta:hover, #__gf-portal .gf-wel-cta:hover { background: linear-gradient(var(--b1), var(--b2)); }
+/* 버튼 안 아이콘은 디자인에 없다(글자만) */
+/* 나란히 놓인 두 버튼은 같은 높이 */
+.sk-two > button { --h: 46px; }
+.sk-two { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; }
+.sk-two > button { margin-top: 0 !important; }
+
+/* ── 랭킹(Figma P10 · P10-1 · P10-2 · P10-3) ── */
+#__gf-portal .sk-lb .gf-lb-tabs { display: flex; gap: 10px; margin: 0; padding: 0; background: none; box-shadow: none; }
+/* 전체/친구 = Figma Theme Tab · Ice — on: 민트 알약 + 진청록 테두리·그림자, off: 반투명 검정 + 흰 글자 70% */
+#__gf-portal .sk-lb .gf-lb-tab {
+  flex: 1; height: 40px; min-width: 72px; padding: 0 20px; border: 2px solid transparent; border-radius: 999px; font-size: 16px; font-weight: 400;
+  background: rgba(0, 0, 0, .25); color: rgba(255, 255, 255, .7); box-shadow: none; transform: none; text-shadow: none;
+}
+#__gf-portal .sk-lb .gf-lb-tab.active { background: #9be8e4; border-color: #0a3d48; color: #052f38; box-shadow: 0 3px 0 #0a3d48; }
+#__gf-portal .sk-lb .gf-lb-rankup { margin: 0 0 10px; background: var(--pp-card); border: 2px solid #ffc93a; }
+#__gf-portal .sk-lb .gf-lb-rankup-txt, #__gf-portal .sk-lb .gf-lb-rankup-txt b { color: var(--pp-ink) !important; }
+/* 시상대(Figma P10 · Group 15~17): 92×135 깃발 3개(간격 4) — 2 · 1 · 3. 값은 Figma CSS 그대로.
+   Rectangle 34 = 채움(세로 그라데이션 soft-light + 사선 줄무늬, 반경 16, 그림자) · Rectangle 35 = 안쪽 2px 테두리(::before)
+   Frame 32 = 위에서 24px, 폭 71.8 세로 칸(아바타 40 · 이름 · 점수 알약, 간격 4) · rank = 32px 왕관(아이콘팩)이 아바타 위로 16px 걸침 */
+.sk-podium { display: grid; grid-template-columns: repeat(3, 92px); justify-content: center; gap: 4px; margin-top: 18px; }
+.sk-pod {
+  --g1: linear-gradient(180deg, #CA343D 0%, #F1646B 100%);
+  --g2: linear-gradient(157.91deg, #F34858 0%, #EE727D 21.8%, #E54755 45.34%, #EE727D 68.89%, #DA4652 90.69%);
+  --line: #FF7D89;
+  /* 92×135 · 위 모서리 반경 16 · 아래 가운데가 살짝 뾰족하게 */
+  --flag: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 92 135' preserveAspectRatio='none'%3E%3Cpath d='M0 16Q0 0 16 0H76Q92 0 92 16V113Q92 119 86.5 121.5L50 133.6Q46 135 42 133.6L5.5 121.5Q0 119 0 113Z'/%3E%3C/svg%3E");
+  position: relative; display: flex; flex-direction: column; align-items: center; gap: 4px; box-sizing: border-box;
+  width: 92px; height: 135px; min-width: 0; padding: 24px 10.1px 0;
+}
+.sk-pod__shape { position: absolute; inset: 0; filter: drop-shadow(0 4px 8px rgba(0, 0, 0, .32)); pointer-events: none; }
+.sk-pod__fill, .sk-pod__line { position: absolute; inset: 0; }
+.sk-pod__fill {
+  background: var(--g1), var(--g2); background-blend-mode: soft-light, normal;
+  -webkit-mask: var(--flag) 0 0 / 100% 100% no-repeat; mask: var(--flag) 0 0 / 100% 100% no-repeat;
+}
+/* 안쪽 2px 테두리(Rectangle 35: 2px 안쪽) — 같은 깃발 모양 두 장을 겹쳐 빼서 고리만 남긴다 */
+.sk-pod__line {
+  inset: 2px 2.24px; padding: 2px; box-sizing: border-box; background: var(--line);
+  -webkit-mask: var(--flag) 0 0 / 100% 100% no-repeat content-box, var(--flag) 0 0 / 100% 100% no-repeat border-box;
+  -webkit-mask-composite: xor;
+  mask: var(--flag) 0 0 / 100% 100% no-repeat content-box exclude, var(--flag) 0 0 / 100% 100% no-repeat border-box;
+}
+.sk-pod > :not(.sk-pod__shape) { position: relative; }
+.sk-pod--2 {
+  --g1: linear-gradient(180deg, #7700FF 0%, #A658FF 100%);
+  --g2: linear-gradient(157.91deg, #AB61FF 0%, #7700FF 21.8%, #AB61FF 45.34%, #7700FF 68.89%, #AB61FF 90.69%);
+  --line: #BA7DFF; grid-column: 1;
+}
+.sk-pod--1 { grid-column: 2; }
+.sk-pod--3 {
+  --g1: linear-gradient(180deg, #187EC6 0%, #44B1EA 100%);
+  --g2: linear-gradient(157.91deg, #38C75D 0%, #1D8838 21.8%, #38C75D 45.34%, #1D8838 68.89%, #38C75D 90.69%);
+  --line: #4FDE73; grid-column: 3;
+}
+.sk-pod__face { position: relative; width: 40px; height: 40px; flex: none; }
+#__gf-portal .sk-pod .gf-lb-avatar {
+  display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; box-sizing: border-box; padding: 0;
+  background: #DFE3EA; border: 2.5px solid #FFFFFF; border-radius: 8px; box-shadow: none; overflow: hidden;
+}
+#__gf-portal .sk-pod .gf-lb-avatar img { width: 100%; height: 100%; object-fit: cover; }
+#__gf-portal .sk-pod .gf-lb-avatar i { font-size: 18px; font-weight: 400; font-style: normal; color: #5a8e92; }
+.sk-crown img { display: block; width: 100%; height: auto; }
+/* rank: 32×32, 칸 위 -16px · 가운데 — 아바타 윗부분에 걸친다 */
+.sk-crown--pod { position: absolute; left: 50%; top: -16px; width: 32px; height: 32px; translate: -50% 0; z-index: 3; }
+.sk-crown--pod img { width: 32px; height: 32px; object-fit: contain; }
+.sk-pod__name {
+  align-self: stretch; height: 15px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: center;
+  font-size: 12px; line-height: 15px; color: #FFFFFF; text-shadow: 0 1px 0 rgba(0, 0, 0, .35);
+}
+.sk-pod__you { margin-left: 2px; font-style: normal; color: #ffe08a; }
+.sk-pod__score {
+  display: flex; align-items: center; justify-content: center; align-self: stretch; box-sizing: border-box; height: 20px; padding: 3px 4px;
+  border-radius: 999px; background: rgba(0, 0, 0, .3); font-size: 11px; line-height: 14px; color: #FFFFFF; font-variant-numeric: tabular-nums;
+}
+.sk-pod--me .sk-pod__score { background: #ffc93a; color: #6b3a1c; }
+/* 목록 */
+#__gf-portal .sk-lb .gf-lb-list { display: flex; flex-direction: column; margin: 0; padding: 0; gap: 0; border: 0; border-radius: 0; background: none; box-shadow: none; }
+#__gf-portal .sk-lb .gf-lb-row {
+  display: flex; align-items: center; gap: 12px; min-height: 52px; padding: 0 4px; border: 0; border-radius: 12px; background: none; box-shadow: none !important;
+}
+#__gf-portal .sk-lb .gf-lb-row.me { background: rgba(0, 0, 0, .2); padding: 0 8px; }
+#__gf-portal .sk-lb .gf-lb-row { min-height: 52px; box-sizing: border-box; }
+#__gf-portal .sk-lb .gf-lb-up { margin-left: 4px; font-size: 11px; color: #b4ef6e; }
+.sk-rank { flex: none; display: grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; background: #0b5560; font-size: 16px; color: #fff; }
+.sk-crown--row { flex: none; width: 40px; filter: drop-shadow(0 1px 1px rgba(0, 0, 0, .3)); }
+#__gf-portal .sk-lb .gf-lb-score.sk-none { font-size: 13px; color: var(--pp-ink-3); }
+#__gf-portal .sk-lb .gf-lb-name { flex: 1; font-size: 17px; font-weight: 400; color: #fff; }
+#__gf-portal .sk-lb .gf-lb-you { display: inline; margin-left: 5px; padding: 0; border-radius: 0; background: none; font-size: 12px; color: #ffe08a; }
+#__gf-portal .sk-lb .gf-lb-score { font-size: 16px; font-weight: 400; color: #fff; font-variant-numeric: tabular-nums; }
+
+/* 내 순위 바 */
+.sk-mine { display: flex; align-items: center; gap: 10px; margin-top: 10px; padding: 10px 12px; border-radius: 14px; background: #0a4e58; }
+.sk-mine__rank { flex: none; min-width: 30px; text-align: center; font-size: 22px; font-weight: 400; }
+.sk-mine__who { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+.sk-mine__who small { font-size: 11px; color: var(--pp-ink-3); }
+.sk-mine__who span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 16px; }
+.sk-mine__score { flex: none; padding: 4px 10px; border-radius: 12px; background: rgba(0, 0, 0, .3); font-size: 14px; font-variant-numeric: tabular-nums; }
+/* 닉네임 변경(Figma P11) */
+.sk-nick__box { display: flex; align-items: center; gap: 8px; height: 50px; padding: 0 14px; border-radius: 14px; background: #fff; box-shadow: inset 0 2px 3px rgba(0, 0, 0, .12); }
+#__gf-portal .sk-lb--nick .gf-lb-nickinput { flex: 1; min-width: 0; height: 100%; padding: 0; border: 0; background: none; font-size: 17px; color: #052f38; outline: none; }
+.sk-nick__count { flex: none; font-size: 14px; color: #5a8e92; font-variant-numeric: tabular-nums; }
+.sk-nick__hint { margin: 10px 2px 0; font-size: 14px; color: var(--pp-ink-2); text-align: left; }
+
+/* ── 일일 미션(Figma P07-1) — SDK 0.34.7: 보너스 · 무한 반복 / 남은 미션 / 오늘 완료 묶음 ── */
+.sk-sum { padding: 12px 14px; border-radius: 14px; background: var(--pp-card); }
+#__gf-portal .sk-hub .gf-hub-summary-t { margin: 0; font-size: 17px; font-weight: 400; color: #fff; text-shadow: none; }
+#__gf-portal .sk-hub .gf-hub-bar {
+  position: relative; height: 12px; margin: 6px 0 0; border: 0; border-radius: 6px; overflow: hidden;
+  background: #052f38; box-shadow: inset 0 1px 2px rgba(0, 0, 0, .4);
+}
+#__gf-portal .sk-sum .gf-hub-bar { height: 14px; margin-top: 8px; }
+#__gf-portal .sk-hub .gf-hub-bar i { background: linear-gradient(#ffe27a, #ffc83d); box-shadow: none; border-radius: 6px; }
+#__gf-portal .sk-hub .gf-hub-row.done .gf-hub-bar i { background: linear-gradient(#b4ef6e, #74d43e); }
+.sk-sum__row { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 8px; }
+#__gf-portal .sk-hub .gf-hub-total { margin: 0; font-size: 13px; color: var(--pp-ink-2); text-shadow: none; }
+.sk-sum__prize { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--pp-ink-3); }
+.sk-sec { display: flex; align-items: baseline; justify-content: space-between; margin: 14px 2px 8px; }
+.sk-sec b { font-size: 16px; font-weight: 400; }
+.sk-sec span { font-size: 12px; color: var(--pp-ink-3); }
+.sk-sec--completed b { color: var(--pp-ink-2); }
+#__gf-portal .sk-hub .gf-hub-list { display: flex; flex-direction: column; margin: 0; padding: 0; gap: 8px; background: none; box-shadow: none; border-radius: 0; }
+#__gf-portal .sk-hub .gf-hub-row {
+  display: flex; align-items: center; gap: 10px; min-height: 0; padding: 10px 12px; border: 0; border-radius: 12px; background: var(--pp-card); box-shadow: none;
+}
+#__gf-portal .sk-hub .gf-hub-section.completed .gf-hub-row, #__gf-portal .sk-hub .gf-hub-row.done { background: rgba(5, 47, 56, .22); }
+#__gf-portal .sk-hub .gf-hub-row.now { box-shadow: inset 0 0 0 2.5px #ffc93a; }
+.sk-ms__body { flex: 1; min-width: 0; }
+.sk-ms__title { display: flex; align-items: center; gap: 6px; min-width: 0; }
+#__gf-portal .sk-hub .gf-hub-row .gf-hub-name {
+  min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 15px; line-height: 1.3; font-weight: 400; color: #fff; text-decoration: none; text-shadow: none;
+}
+#__gf-portal .sk-hub .gf-hub-row.done .gf-hub-name { color: var(--pp-ink-2); }
+/* 보상 칩: 작은 알약(아이콘 + 수량) — 포인트 · 코인 · 하트 */
+#__gf-portal .sk-hub .gf-hub-chip, #__gf-portal .sk-hub .gf-hub-section.completed .gf-hub-chip {
+  flex: none; display: inline-flex; flex-direction: row; align-items: center; gap: 3px; width: auto; min-width: 0; max-width: none; min-height: 0;
+  padding: 1px 7px 1px 4px; border: 0; border-radius: 9px; background: #ffd23f; box-shadow: none; color: #6b3a1c; font-size: 12px; font-weight: 400;
+}
+#__gf-portal .sk-hub .gf-hub-chip svg, #__gf-portal .sk-hub .gf-hub-section.completed .gf-hub-chip svg { flex: 0 0 15px; width: 15px; height: 15px; filter: none; background: none; box-shadow: none; }
+#__gf-portal .sk-hub .gf-hub-chip b { font-size: 12px; line-height: 18px; font-weight: 400; }
+#__gf-portal .sk-hub .gf-hub-chip.got { background: #b4ef6e; color: #2a6612; }
+#__gf-portal .sk-sum .gf-hub-chip { padding: 2px 9px 2px 5px; border-radius: 11px; font-size: 15px; }
+#__gf-portal .sk-sum .gf-hub-chip svg { flex-basis: 18px; width: 18px; height: 18px; }
+#__gf-portal .sk-sum .gf-hub-chip b { font-size: 15px; }
+#__gf-portal .sk-hub .gf-hub-recent { display: inline; margin-left: 4px; font-size: 11px; color: #b4ef6e; font-weight: 400; text-shadow: none; }
+.sk-ms__sub { margin-top: 4px; font-size: 11px; color: var(--pp-ink-3); }
+.sk-st {
+  flex: none; display: grid; place-items: center; min-width: 62px; height: 32px; padding: 0 8px; box-sizing: border-box;
+  border: 2px solid #0a3d48; border-radius: 9px; font-size: 14px; white-space: nowrap;
+}
+.sk-st--go { background: linear-gradient(#8eeae6, #3cc2c0); color: #052f38; border-color: #0a3d48; box-shadow: none; }
+.sk-st--wait { background: linear-gradient(#e6fcfa, #bfeeea); color: #0a4e58; border-color: #0a3d48; box-shadow: inset 0 2px 0 #f6fffe; }
+.sk-st--done { background: linear-gradient(#d6e8e8, #afcbcb); color: #4a6868; border-color: #4f7272; box-shadow: inset 0 2px 0 #eef8f8; }
+#__gf-portal .sk-hub .sk-st--act {
+  width: auto; height: 32px; margin: 0; background: linear-gradient(#88d65a, #49ab31); border: 2px solid #116b07; border-radius: 9px;
+  box-shadow: none; color: #fff; font-size: 14px; font-weight: 400; text-shadow: 0 1.5px 0 rgba(16, 80, 0, .45); cursor: pointer;
+}
+/* 아래: 안내 · 오늘 하루 그만보기 · 알림 받기 · 확인 */
+#__gf-portal .sk-hub .gf-hub-foot { margin: 12px 0 0; }
+#__gf-portal .sk-hub .gf-hub-foot .gf-desc { margin: 0 0 10px; font-size: 12px; line-height: 1.5; color: var(--pp-ink-3); text-align: center; }
+#__gf-portal .sk-hub .gf-hub-snooze { justify-content: center; margin: 0 0 4px; font-size: 13px; font-weight: 400; color: var(--pp-ink-2); }
+#__gf-portal .sk-hub .gf-hub-snooze input { accent-color: #49ab31; }
+#__gf-portal .sk-hub .gf-hub-notification {
+  --b1: #8eeae6; --b2: #3cc2c0; --hi: #c6f8f5; --bd: #0a3d48; --lo: #22a3a3; --ink: #052f38; --ts: rgba(230, 255, 253, .55);
+  background: linear-gradient(var(--b1), var(--b2)) !important; color: var(--ink) !important; border: 2.5px solid var(--bd) !important;
+}
+
+/* ── 웰컴 기프트 → 보상 받기(Figma P12) ── */
+#__gf-portal .gf-modal.gf-wel-card, #__gf-portal .gf-modal.gf-onb-card {
+  width: min(92vw, 400px); padding: 0 0 12px; border: 3px solid var(--pp-edge); border-radius: 22px; text-align: center;
+  background: var(--wood); color: var(--pp-ink);
+  box-shadow: inset 0 2px 0 rgba(255, 255, 255, .35), 0 6px 0 var(--pp-lip), 0 22px 60px rgba(0, 0, 0, .28);
+}
+.sk-wel-head {
+  position: relative; display: flex; align-items: center; min-height: 60px; box-sizing: border-box; padding: 10px 62px 10px 18px;
+  border-bottom: 3px solid var(--pp-line); box-shadow: 0 1.5px 0 var(--pp-line-hi);
+}
+.sk-wel-title {
+  margin: 0; padding: 2px 3px; font-size: 25px; font-weight: 400; color: #fff; text-shadow: 0 2px 0 var(--pp-title-ol);
+  -webkit-text-stroke: 5px var(--pp-title-ol); paint-order: stroke fill;
+}
+#__gf-portal .sk-wel .gf-wel-x, #__gf-portal .sk-onb .gf-onb-x {
+  top: 50%; right: 12px; width: 40px; height: 40px; margin-top: -20px; border: 2.5px solid #8d2300; border-radius: 11px;
+  background: linear-gradient(#ff7e72, #e8453c); box-shadow: 0 2px 0 rgba(5, 47, 56, .3);
+  color: #fff; font-size: 19px; font-weight: 800; line-height: 1; text-shadow: 0 1.5px 0 #a8291f;
+}
+#__gf-portal .sk-wel .gf-wel-gift img { display: block; width: 96px; height: 96px; margin: 0 auto; filter: drop-shadow(0 3px 2px rgba(5, 47, 56, .35)); }
+#__gf-portal .sk-wel .gf-wel-title { margin-top: 4px; font-size: 22px; font-weight: 400; color: #fff; }
+#__gf-portal .sk-wel .gf-wel-sub { font-size: 14px; color: var(--pp-ink-2); }
+#__gf-portal .sk-wel .gf-wel-chips { margin: 14px 0 0; gap: 8px; }
+#__gf-portal .sk-wel .gf-wel-chip { padding: 10px 12px; border: 0; border-radius: 12px; background: rgba(0, 0, 0, .2); box-shadow: none; }
+/* 아이콘 중 currentColor 를 쓰는 것(부스터 ▶)은 흰 글자색을 받으면 안 보인다 — 주황 바탕으로 */
+#__gf-portal .sk-wel .gf-wel-ico { color: #ff8a3d; }
+#__gf-portal .sk-wel .gf-wel-txt b { font-weight: 400; color: #fff; }
+#__gf-portal .sk-wel .gf-wel-txt i { color: var(--pp-ink-3); }
+#__gf-portal .sk-wel .gf-wel-cta { margin-top: 14px; }
+
+/* ── 첫 방문 온보딩(SDK 0.34) — 웰컴 기프트와 같은 보상 받기(P12) 틀, 마스코트 대신 선물상자 ── */
+#__gf-portal .gf-modal.gf-onb-card { overflow: hidden; }
+#__gf-portal .sk-onb .gf-onb-x { position: absolute; display: grid; place-items: center; padding: 0; }
+.sk-onb-art { display: block; width: 96px; height: 96px; margin: 0 auto 4px; object-fit: contain; filter: drop-shadow(0 3px 2px rgba(5, 47, 56, .35)); }
+#__gf-portal .sk-onb .gf-onb-title { margin-top: 2px; font-size: 20px; font-weight: 400; letter-spacing: 0; color: #fff; }
+#__gf-portal .sk-onb .gf-onb-sub { margin-top: 8px; font-size: 14px; line-height: 1.5; color: var(--pp-ink-2); }
+#__gf-portal .sk-onb .gf-onb-sub b { color: #ffd23f; font-weight: 400; }
+#__gf-portal .sk-onb .gf-onb-chips { margin: 14px 0 0; gap: 8px; }
+#__gf-portal .sk-onb .gf-onb-chip { padding: 10px 12px; border: 0; border-radius: 12px; background: rgba(0, 0, 0, .2); box-shadow: none; }
+#__gf-portal .sk-onb .gf-onb-chip b { font-size: 15px; font-weight: 400; color: #fff; }
+#__gf-portal .sk-onb .gf-onb-chip i { font-size: 12.5px; font-weight: 400; color: #b4ef6e; }
+#__gf-portal .sk-onb .gf-onb-chip.processing i, #__gf-portal .sk-onb .gf-onb-chip.soon i { color: #ffd23f; }
+#__gf-portal .sk-onb .gf-onb-chip.kept i { color: var(--pp-ink-3); }
+#__gf-portal .sk-onb .gf-onb-ico, #__gf-portal .sk-hub .gf-onb-ico { color: #ff8a3d; }
+#__gf-portal .sk-onb .gf-onb-spin { border-color: rgba(227, 251, 249, .3); border-top-color: #ffc83d; }
+/* 토스 로그인 버튼도 다른 주 버튼과 같은 초록(통일) */
+#__gf-portal .sk-onb .gf-onb-cta, #__gf-portal .sk-onb .gf-onb-cta.toss { margin-top: 14px; padding: 0 12px; }
+/* 미션 창 안 웰컴 기프트 줄(멤버) · 게스트 카드 */
+#__gf-portal .sk-hub .gf-onb-hubrow { padding: 10px 12px; border-radius: 12px; background: var(--pp-card); }
+#__gf-portal .sk-hub .gf-onb-hubart { width: 64px; height: 64px; object-fit: contain; }
+#__gf-portal .sk-hub .gf-onb-chips { margin: 0; gap: 6px; }
+#__gf-portal .sk-hub .gf-onb-chip { padding: 6px 10px; border: 0; border-radius: 10px; background: rgba(0, 0, 0, .2); box-shadow: none; }
+#__gf-portal .sk-hub .gf-onb-chip b { font-size: 13px; font-weight: 400; color: #fff; }
+#__gf-portal .sk-hub .gf-onb-row-cta { height: 38px; margin-top: 2px; }
+#__gf-portal .sk-hub > .sk-well > .gf-desc, #__gf-portal .sk-hub .sk-well > p.gf-desc { margin: 0; padding: 12px; border-radius: 12px; background: var(--pp-card); font-size: 13px; color: var(--pp-ink-2); text-align: center; }
+
+/* ── 글자 앞 아이콘(Figma 아이콘팩 그림 — 사천팝과 통일) ── */
+.sk-ic { display: inline-block; flex: none; width: 20px; height: 20px; object-fit: contain; vertical-align: middle; }
+#__gf-portal .gf-wel-ico .sk-ic, #__gf-portal .gf-onb-ico .sk-ic { width: 30px; height: 30px; }
+#__gf-portal .sk-hub .gf-onb-chip .gf-onb-ico .sk-ic { width: 22px; height: 22px; }
+#__gf-portal .sk-hub .gf-hub-chip .sk-ic { width: 16px; height: 16px; }
+#__gf-portal .sk-sum .gf-hub-chip .sk-ic { width: 20px; height: 20px; }
+.sk-sec b { display: inline-flex; align-items: center; gap: 5px; }
+.sk-ic--sec { width: 22px; height: 22px; }
+
+/* ── Theme Round Button(Figma 09 Theme Icon Package · Ice) ──
+   바깥 진한 테두리 + 위가 밝은 원판 그라데이션 + 안쪽 음각 동그라미 선 + 가운데 진한 아이콘(Phosphor 계열 글리프, 마스크) */
+.sk-rb {
+  --rb-edge: #0a3d48; --rb-1: #66dbd9; --rb-2: #168f99; --rb-ring: #14808a; --rb-hi: #b9f5f1; --rb-ink: #0f3d5a;
+  --rb-glyph: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z'/%3E%3C/svg%3E");
+  position: relative; flex: none; width: 36px; height: 36px; padding: 0; box-sizing: border-box; cursor: pointer;
+  border: 2.5px solid var(--rb-edge); border-radius: 50%; background: linear-gradient(var(--rb-1), var(--rb-2));
+  box-shadow: inset 0 -3px 0 rgba(12, 87, 98, .18), 0 2px 0 rgba(5, 47, 56, .3);
+  color: transparent; font-size: 0;
+}
+.sk-rb::before { content: ''; position: absolute; inset: 3px; border-radius: 50%; border: 1.5px solid var(--rb-ring); box-shadow: inset 0 1px 0 var(--rb-hi); pointer-events: none; }
+.sk-rb::after {
+  content: ''; position: absolute; inset: 26%; background: var(--rb-ink);
+  -webkit-mask: var(--rb-glyph) center / contain no-repeat; mask: var(--rb-glyph) center / contain no-repeat;
+}
+.sk-rb:active { transform: translateY(1px); }
+.sk-rb--edit { --rb-glyph: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z'/%3E%3C/svg%3E"); }
+.sk-rb--x { --rb-glyph: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 6l12 12M18 6L6 18' stroke='%23000' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E"); }
+.sk-rb--plus { --rb-glyph: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 5v14M5 12h14' stroke='%23000' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E"); }
+.sk-rb--s { width: 28px; height: 28px; border-width: 2px; }
+.sk-rb--s::before { inset: 2px; border-width: 1px; }
+#__gf-portal .sk-lb .gf-lb-card .gf-lb-remove.sk-rb, #__gf-portal .sk-lb .gf-lb-remove.sk-rb {
+  /* SDK 의 '.gf-lb-card .gf-lb-remove'(테두리 없음 · 투명 · 24px)를 이긴다 — Theme Round Button 원판 그대로 */
+  width: 28px; height: 28px; min-width: 0; margin: 0; padding: 0; line-height: 0; color: transparent; font-size: 0;
+  border: 2px solid var(--rb-edge); background: linear-gradient(var(--rb-1), var(--rb-2));
+  box-shadow: inset 0 -2px 0 rgba(12, 87, 98, .18), 0 2px 0 rgba(5, 47, 56, .3);
+}
+#__gf-portal .sk-hub .gf-hub-chip-sub .sk-ic { width: 13px; height: 13px; }
+#__gf-portal .sk-hub .gf-hub-chip-sub .capped .sk-ic { opacity: .55; }
+
+/* ── 진행 막대 = Figma 08 Theme Kit · Theme Progress Bar(Ice) ──
+   바깥 틀(테두리 2.5 · 반경 13 · 테마 바탕 · 아래 그림자 2 · 안쪽 위 하이라이트) + 홈(3.5 안쪽 · 검정 64% · 반경 7)
+   + 채움(위→아래 그라데이션 · 위 흰 하이라이트 3). 미션 줄은 높이만 20, 보너스 막대는 원래 26. */
+#__gf-portal .sk-hub .gf-hub-bar, #__gf-portal .sk-hub .gf-hub-row.done .gf-hub-bar {
+  position: relative; box-sizing: border-box; height: 20px; margin-top: 6px; overflow: visible;
+  border: 2.5px solid #0a3d48; border-radius: 13px; background: #1fa6ae;
+  box-shadow: 0 2px 0 rgba(5, 47, 56, .8), inset 0 2px 0 rgba(185, 245, 241, .5);
+}
+#__gf-portal .sk-hub .sk-sum .gf-hub-bar { height: 26px; margin-top: 8px; }
+#__gf-portal .sk-hub .gf-hub-bar::before { content: ''; position: absolute; inset: 1px; border-radius: 7px; background: rgba(0, 0, 0, .64); }
+#__gf-portal .sk-hub .gf-hub-bar i, #__gf-portal .sk-hub .gf-hub-row.done .gf-hub-bar i {
+  position: absolute; left: 1px; top: 1px; bottom: 1px; height: auto; max-width: calc(100% - 2px); border-radius: 7px;
+  background: linear-gradient(#7dd1f2, #2fa3d5); box-shadow: inset 0 3px 0 rgba(255, 255, 255, .45);
+}
+#__gf-portal .sk-hub .gf-hub-row.done .gf-hub-bar i { background: linear-gradient(#8ce65a, #34a322); }
+
+/* ── 게임 화면 상단 랭킹·미션 배지 = Figma "Theme Title Plank" · Ice(37:20417) — 높이 36 · 둥근 14 · 테두리 2 #0a3d48 ·
+   청록 그라데이션 + 물결 무늬 · 주아 14 진청록 글자. 순서는 랭킹 → 미션, 미션 진행 수는 빨간 작은 배지 ── */
+#__gf-portal .gf-hub-pill.sk-pill, #__gf-portal .gf-lb-pill.sk-pill {
+  position: relative; display: inline-flex; align-items: center; justify-content: center; box-sizing: border-box;
+  height: 36px; min-width: 64px; padding: 0 10px; border: 2px solid #0a3d48; border-radius: 14px;
+  background: url(__ASSET_SVG_ice_tile__) 0 -7px / 38px 52px repeat, linear-gradient(#66dbd9, #168f99);
+  color: #0a3d48; font-family: 'Jua', 'Apple SD Gothic Neo', system-ui, sans-serif; font-size: 14px; line-height: 1; font-weight: 400; white-space: nowrap; text-shadow: 0 1.5px 0 #b9f5f1;
+  box-shadow: 0 2px 0 rgba(5, 47, 56, .24); animation: none; overflow: visible;
+}
+#__gf-portal .sk-pill__n {
+  position: absolute; top: -9px; right: -9px; padding: 0 6px; height: 17px; line-height: 15px; box-sizing: border-box;
+  border: 1.5px solid #fff; border-radius: 999px; background: #ff4d42; color: #fff; font-size: 11px; text-shadow: none;
+}
+#__gf-portal .gf-hub-pill.sk-pill:active, #__gf-portal .gf-lb-pill.sk-pill:active { transform: translateY(2px); box-shadow: none; }
+/* 넓은 화면(폴드 펼침·태블릿·가로 데스크톱): Unity 맵·HUD 는 가운데 9:16 기둥(폭 = min(100vw, 100vh×9/16) — ScreenAdaptationService.ReferenceAspect)
+   안에 그려진다. 배지를 화면 맨 끝 대신 그 기둥 왼쪽 끝에 붙여 하트 HUD·게임 판과 벌어지지 않게 한다. 세로 폰(폭 ≤ 높이×9/16)은 0 → 기존 위치 그대로. */
+#__gf-portal { --sk-col-x: max(0px, calc((100vw - 100vh * 9 / 16) / 2)); }
+#__gf-portal .gf-lb-badge.top-left { left: calc(max(env(safe-area-inset-left, 0px), var(--sk-col-x)) + 12px) !important; }
+#__gf-portal .gf-hub-badge.top-left { left: calc(max(env(safe-area-inset-left, 0px), var(--sk-col-x)) + 12px + var(--sk-lb-w, -8px) + 8px) !important; }
+/* 보상 창 v2 미션 배지(.gf-rx-badge.left — uxVersion 2, 토스 기본)도 랭킹 오른쪽(랭킹 → 미션). top 은 SDK 기본 T+8 그대로(꼬리표 T+36~56).
+   랭킹이 없는 채널(티머니)은 --sk-lb-w 가 비어 왼쪽 12 에 선다. 랭킹 줄 T+8 은 v2 미션 기준 — 구형 v1 미션(.gf-hub-badge, SDK T+12)은
+   토스 셸이 reward.createView(0.35+) 로 v2 만 쓰므로 지원 범위 밖(v1 로 되돌리면 4px 어긋난다). */
+#__gf-portal .gf-rx-badge.left { left: calc(max(env(safe-area-inset-left, 0px), var(--sk-col-x)) + 12px + var(--sk-lb-w, -8px) + 8px) !important; right: auto !important; }
+#__gf-portal .gf-lb-badge { top: calc(max(env(safe-area-inset-top, 0px), var(--gf-ait-top, 0px)) + 8px) !important; }   /* 두 배지 같은 줄 — SDK v2 미션 배지(.gf-rx-badge) 기본 top T+8 */
+#__gf-portal .gf-guest-badge .gf-lb-pill { order: -1; }   /* 게스트 묶음 배지도 랭킹 → 미션 */
+/* 새 구간 알림: 파란 알약 대신 테마 그대로 두고 통통 튀기만 */
+#__gf-portal .gf-hub-badge.new-window .gf-hub-pill.sk-pill { animation: gf-hub-pulse 1.2s ease-out 3; }
+#__gf-portal .gf-hub-badge.landed .gf-hub-pill.sk-pill { animation: gf-hub-bump .4s ease-out 1; }
+
+/* The shared reward renderer uses the same Ice surface and game font. */
+body .gf-rx-dialog, body .gf-rx-badge, body .gf-rx-toast { font-family: 'Jua', 'Apple SD Gothic Neo', system-ui, sans-serif; font-weight:400; }
+body .gf-rx-dialog * { font-family:inherit; }
+
+/* Same approved Ice Theme Dialog/Button tokens as the Unity and legacy SDK panels. */
+body .gf-rx-dialog { width:min(92vw,400px); border:3px solid var(--pp-edge); border-radius:22px; background:var(--wood); color:var(--pp-ink); box-shadow:inset 0 2px 0 rgba(255,255,255,.35),0 6px 0 var(--pp-lip),0 22px 60px rgba(0,0,0,.28); }
+body .gf-rx-head { height:auto; min-height:60px; flex-basis:60px; justify-content:flex-start; padding:10px 62px 10px 18px; background:transparent; border-bottom:3px solid var(--pp-line); box-shadow:0 1.5px 0 var(--pp-line-hi); }
+body .gf-rx-head h2 { font-size:25px; font-weight:400; line-height:1.2; color:#fff; padding:2px 3px; text-shadow:0 2px 0 var(--pp-title-ol); -webkit-text-stroke:5px var(--pp-title-ol); paint-order:stroke fill; }
+body .gf-rx-x { top:50%; right:12px; width:40px; height:40px; margin-top:-20px; border:2.5px solid #8d2300; border-radius:11px; background:linear-gradient(#ff7e72,#e8453c); box-shadow: 0 2px 0 rgba(5,47,56,.3); color:#fff; text-shadow:0 1.5px 0 #a8291f; }
+body .gf-rx-gift { background:var(--pp-card); border:0; border-radius:14px; }
+body .gf-rx-body.missions { background:var(--pp-well); border-radius:16px; margin:12px 12px 0; box-shadow:inset 0 3px 0 var(--pp-well-rim); }
+body .gf-rx-btn { border:2.5px solid #116b07; border-radius:12px; background:linear-gradient(#88d65a,#49ab31); box-shadow: 0 2px 0 rgba(5,47,56,.25); color:#fff; text-shadow:0 1.5px 0 rgba(16,80,0,.45); font-weight:400; }
+body .gf-rx-btn.login { border-color:#8d2300; background:linear-gradient(#ff7e72,#e8453c); box-shadow: 0 2px 0 rgba(5,47,56,.25); }
+body .gf-rx-btn.blue { border-color:#164684; background:linear-gradient(#72b9ff,#3383e2); box-shadow: 0 2px 0 rgba(5,47,56,.25); }
+body .gf-rx-btn:disabled { border-color:#6d7c86; background:linear-gradient(#b2c0c8,#8b9ba7); box-shadow: 0 2px 0 rgba(5,47,56,.25); color:#e6edf1; }
+body .gf-rx-badge>button { background:#9be8e4; border:2px solid #0a3d48; color:#052f38; box-shadow:0 3px 0 #0a3d48; }
+/* 미션 배지 크기 = 랭킹 배지(.gf-lb-pill.sk-pill)와 같게(2026-11-05 — 젤리팝 normal-skin.css 와 같은 규칙). 색·그림자는 위 줄 그대로. */
+body .gf-rx-badge > button {
+  position: relative; display: inline-flex; align-items: center; justify-content: center; box-sizing: border-box;
+  height: 36px; min-width: 64px; padding: 0 10px; border-radius: 14px; font-size: 14px; line-height: 1; white-space: nowrap; overflow: visible;
+}
+/* 미션 진행 수 = 랭킹 배지의 빨간 작은 배지(.sk-pill__n)와 같은 모양 */
+body .gf-rx-badge .gf-rx-count {
+  position: absolute; top: -9px; right: -9px; padding: 0 6px; height: 17px; line-height: 15px; box-sizing: border-box;
+  border: 1.5px solid #fff; border-radius: 999px; background: #ff4d42; color: #fff; font-size: 11px; text-shadow: none;
+}
+
+
+/* ═════ UI/UX 수정안(2026-10-27) — Figma "Theme Dialog" Ice 원본 값(P07-1 1:1958 · P10-1 1:2826 · P10-2 1:2990 · P10-3 1:3179 · P12 1:3555) ═════
+   공통 틀: 폭 344 · 테두리 4 #0a3d48 · 반경 22 · 머리줄 h56(반투명 청록 · 아래 3px 선) 고정 · 안쪽 판(Content Slot) 바깥 16/16/20, 안 10.
+   높이는 상단 바·미션/랭킹 배지 아래 ~ 하단 안전 영역 사이(SDK .gf-rx-back/.gf-lb-back 여백)를 넘지 않고, 가운데만 스크롤. */
+/* 가운뎃점(U+00B7)은 배민 주아에 보이는 점이 없어 공백처럼 보였다("2/5 · 계속 반복") — 그 글자만 시스템 글꼴로 */
+#__gf-portal .gf-modal.gf-lb-card.sk-lb, body .gf-rx-dialog {
+  width: min(92vw, 344px); border: 4px solid #0a3d48; border-radius: 22px; padding: 0;
+  box-shadow: inset 0 -5px 0 rgba(12, 87, 98, .45), inset 0 3px 0 rgba(185, 245, 241, .55), 0 18px 48px rgba(0, 0, 0, .3);
+}
+#__gf-portal .sk-lb > .gf-lb-head, body .gf-rx-head {
+  flex: none; height: 56px; min-height: 56px; flex-basis: 56px; padding: 0 10px 0 18px; border-radius: 16px 16px 0 0;
+  background: rgba(23, 144, 154, .55); border-bottom: 3px solid #0a3d48; box-shadow: 0 1.5px 0 rgba(169, 240, 236, .6);
+}
+#__gf-portal .sk-lb .gf-lb-title, body .gf-rx-head h2 { font-size: 24px; }
+/* 닫기 = Theme Square Button · Red 40 */
+#__gf-portal .sk-lb .gf-lb-x, body .gf-rx-head > .gf-rx-x {
+  top: 50%; right: 10px; width: 40px; height: 40px; margin-top: -20px; border: 2.5px solid #8a1810; border-radius: 10px;
+  background: linear-gradient(#ff6a5a, #d9322a); box-shadow: none;
+}
+/* 안쪽 판(Content Slot) */
+#__gf-portal .sk-lb > .sk-well, body .gf-rx-body, body .gf-rx-body.missions, body .gf-rx-foot {
+  background: rgba(0, 0, 0, .32);
+}
+#__gf-portal .sk-lb > .sk-well {
+  margin: 16px 16px 20px; padding: 10px; border-radius: 14px;
+  box-shadow: 0 1.5px 0 rgba(169, 240, 236, .55), inset 0 -1.5px 0 rgba(169, 240, 236, .5), inset 0 4px 6px rgba(5, 47, 56, .55);
+}
+/* 보상 창은 가운데(스크롤 .gf-rx-body)와 아래(고정 .gf-rx-foot)가 한 판을 위아래로 나눠 쓴다 */
+body .gf-rx-body, body .gf-rx-body.missions {
+  margin: 16px 16px 0; padding: 10px 10px 0; gap: 12px; border-radius: 14px 14px 0 0;
+  box-shadow: inset 0 4px 6px rgba(5, 47, 56, .55); scrollbar-width: none;
+}
+body .gf-rx-body::-webkit-scrollbar { display: none; }
+body .gf-rx-body::after { content: ''; flex: none; height: 0; } /* 스크롤 끝 여백(아래 판의 그림자와 겹치지 않게) */
+body .gf-rx-foot {
+  position: relative; z-index: 1; margin: 0 16px 20px; padding: 12px 10px 10px; border-radius: 0 0 14px 14px;
+  box-shadow: 0 1.5px 0 rgba(169, 240, 236, .55), inset 0 -1.5px 0 rgba(169, 240, 236, .5);
+}
+body .sk-rx--nofoot .gf-rx-body { margin-bottom: 20px; padding-bottom: 10px; border-radius: 14px; }
+
+/* ── 랭킹(P10-1 시상대 · P10-2 친구 빈 상태 · P10-3 친구 목록) ── 창 높이 577 고정(탭 바뀌어도 같음) */
+#__gf-portal .gf-modal.gf-lb-card.sk-lb { display: flex; flex-direction: column; height: min(100%, 577px); overflow: hidden; }
+#__gf-portal .sk-lb > .sk-well { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; gap: 10px; }
+#__gf-portal .sk-lb > .sk-well > *, #__gf-portal .sk-lb .sk-scroll > * { flex: none; margin: 0; }
+#__gf-portal .sk-lb .gf-lb-tabs { gap: 8px; }
+#__gf-portal .sk-lb .gf-lb-tab { height: 40px; }
+#__gf-portal .sk-lb .sk-podium { display: flex; justify-content: space-between; margin: 0; padding-top: 0; }
+#__gf-portal .sk-lb .sk-pod { flex: 0 1 92px; width: auto; min-width: 0; }
+#__gf-portal .sk-lb > .sk-well > .sk-scroll {
+  flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; gap: 10px; overflow-y: auto; overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch; scrollbar-width: none;
+}
+.sk-scroll::-webkit-scrollbar { display: none; }
+/* 목록 카드 자체가 스크롤 창 — 둥근 카드 모양은 그대로 두고 안의 줄만 넘어간다 */
+#__gf-portal .sk-lb > .sk-well > .sk-scroll { border-radius: 16px; background: rgba(0, 0, 0, .22); }
+#__gf-portal .sk-lb .sk-scroll > .sk-panel {
+  flex: 1 0 auto; display: flex; flex-direction: column; margin: 0; padding: 4px 12px; border-radius: 16px; background: transparent;
+}
+.sk-panel__add { padding: 6px 0; }
+/* 친구 추가하기 = Theme Button · Base M42 */
+#__gf-portal .sk-lb .sk-invite {
+  height: 42px; margin: 0; border: 2.5px solid #0c5560; border-radius: 10px; background: linear-gradient(#78e2de, #1fa6ae);
+  box-shadow: 0 2px 0 rgba(5, 47, 56, .24);
+  color: #0a3d48; font-size: 18px; text-shadow: 0 1.2px 0 rgba(232, 255, 253, .24);
+}
+.sk-empty { flex: 1 0 auto; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 16px 0; text-align: center; }
+.sk-empty p { margin: 0; font-size: 14px; line-height: normal; color: #fff; opacity: .72; }
+/* 목록 줄: 번호 원 28 · 이름 15 · 점수 15(75%) · 친구 삭제 24 */
+#__gf-portal .sk-lb .gf-lb-list { gap: 0; }
+#__gf-portal .sk-lb .gf-lb-row { min-height: 0; gap: 10px; padding: 7px 0; border-radius: 10px; background: none; }
+#__gf-portal .sk-lb.sk-lb .gf-lb-row.me { padding: 7px 6px; background: rgba(0, 0, 0, .48); }
+.sk-lb [data-tab="friends"].active ~ * .gf-lb-row, #__gf-portal .sk-lb .gf-lb-row:has(.sk-del) { padding-left: 6px; padding-right: 6px; }
+#__gf-portal .sk-lb .sk-rank { width: 28px; height: 28px; background: rgba(0, 0, 0, .25); font-size: 14px; }
+#__gf-portal .sk-lb .gf-lb-name { font-size: 15px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+#__gf-portal .sk-lb .gf-lb-score { font-size: 15px; color: rgba(255, 255, 255, .75); }
+#__gf-portal .sk-lb .gf-lb-score.sk-none { font-size: 13px; color: rgba(255, 255, 255, .75); opacity: .6; }
+/* Figma 아이콘 버튼 그대로(Delete Friend 24 · Edit Nickname 36 — SVG 원본) */
+#__gf-portal .sk-lb .gf-lb-remove.sk-del, #__gf-portal .sk-lb .sk-edit {
+  position: static; flex: none; margin: 0; padding: 0; border: 0; border-radius: 50%; box-shadow: none; cursor: pointer;
+  color: transparent; font-size: 0; line-height: 0; background: center top / 100% auto no-repeat;
+}
+#__gf-portal .sk-lb .gf-lb-remove.sk-del { width: 24px; height: 25px; min-width: 24px; background-image: url("data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJub25lIiBvdmVyZmxvdz0idmlzaWJsZSIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI1IiB2aWV3Qm94PSIwIDAgMjQgMjUiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiPgo8ZyBpZD0iRGVsZXRlIEZyaWVuZCIgZmlsdGVyPSJ1cmwoI2ZpbHRlcjBfZGlfMF83ODMpIj4KPHJlY3Qgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiByeD0iMTIiIGZpbGw9InVybCgjcGFpbnQwX2xpbmVhcl8wXzc4MykiLz4KPHJlY3QgeD0iMC43NSIgeT0iMC43NSIgd2lkdGg9IjIyLjUiIGhlaWdodD0iMjIuNSIgcng9IjExLjI1IiBzdHJva2U9IiMwQTNENDgiIHN0cm9rZS13aWR0aD0iMS41Ii8+CjxjaXJjbGUgaWQ9IlJpbSIgY3g9IjEyIiBjeT0iMTIiIHI9IjguNSIgc3Ryb2tlPSIjMTQ4MDhBIiBzdHJva2Utb3BhY2l0eT0iMC43Ii8+CjxnIGlkPSJHcmFpbiI+CjwvZz4KPGcgaWQ9Ikljb24veC1ib2xkIiBmaWx0ZXI9InVybCgjZmlsdGVyMV9kXzBfNzgzKSI+CjxnIGlkPSJWZWN0b3IiPgo8dXNlIHhsaW5rOmhyZWY9IiNzdHJva2UwXzBfNzgzIiBmaWxsPSIjMEYzRDVBIi8+CjxtYXNrIGlkPSJzdHJva2UxXzBfNzgzIiBtYXNrVW5pdHM9InVzZXJTcGFjZU9uVXNlIiB4PSI2LjQwNDU2IiB5PSI2LjQwNDAyIiB3aWR0aD0iMTIiIGhlaWdodD0iMTIiIGZpbGw9ImJsYWNrIj4KPHJlY3QgZmlsbD0id2hpdGUiIHg9IjYuNDA0NTYiIHk9IjYuNDA0MDIiIHdpZHRoPSIxMiIgaGVpZ2h0PSIxMiIvPgo8dXNlIHhsaW5rOmhyZWY9IiNzdHJva2UwXzBfNzgzIi8+CjwvbWFzaz4KPHBhdGggZD0iTTE2LjQwMTggMTUuNDczMkMxNi41MjUxIDE1LjU5NjUgMTYuNTk0MyAxNS43NjM3IDE2LjU5NDMgMTUuOTM4QzE2LjU5NDMgMTYuMTEyNCAxNi41MjUxIDE2LjI3OTYgMTYuNDAxOCAxNi40MDI5QzE2LjI3ODUgMTYuNTI2MiAxNi4xMTEzIDE2LjU5NTQgMTUuOTM3IDE2LjU5NTRDMTUuNzYyNiAxNi41OTU0IDE1LjU5NTQgMTYuNTI2MiAxNS40NzIxIDE2LjQwMjlMMTIgMTIuOTI5N0w4LjUyNjggMTYuNDAxOEM4LjQwMzUxIDE2LjUyNTEgOC4yMzYzIDE2LjU5NDMgOC4wNjE5NSAxNi41OTQzQzcuODg3NiAxNi41OTQzIDcuNzIwMzkgMTYuNTI1MSA3LjU5NzExIDE2LjQwMThDNy40NzM4MyAxNi4yNzg1IDcuNDA0NTYgMTYuMTExMyA3LjQwNDU2IDE1LjkzN0M3LjQwNDU2IDE1Ljc2MjYgNy40NzM4MyAxNS41OTU0IDcuNTk3MTEgMTUuNDcyMUwxMS4wNzAzIDEyTDcuNTk4MiA4LjUyNjhDNy40NzQ5MiA4LjQwMzUxIDcuNDA1NjYgOC4yMzYzIDcuNDA1NjYgOC4wNjE5NUM3LjQwNTY2IDcuODg3NiA3LjQ3NDkyIDcuNzIwMzkgNy41OTgyIDcuNTk3MTFDNy43MjE0OSA3LjQ3MzgzIDcuODg4NyA3LjQwNDU3IDguMDYzMDUgNy40MDQ1N0M4LjIzNzQgNy40MDQ1NyA4LjQwNDYxIDcuNDczODMgOC41Mjc4OSA3LjU5NzExTDEyIDExLjA3MDNMMTUuNDczMiA3LjU5NjU2QzE1LjU5NjUgNy40NzMyOCAxNS43NjM3IDcuNDA0MDIgMTUuOTM4IDcuNDA0MDJDMTYuMTEyNCA3LjQwNDAyIDE2LjI3OTYgNy40NzMyOCAxNi40MDI5IDcuNTk2NTZDMTYuNTI2MiA3LjcxOTg1IDE2LjU5NTQgNy44ODcwNiAxNi41OTU0IDguMDYxNDFDMTYuNTk1NCA4LjIzNTc2IDE2LjUyNjIgOC40MDI5NyAxNi40MDI5IDguNTI2MjVMMTIuOTI5NyAxMkwxNi40MDE4IDE1LjQ3MzJaIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZT0iIzBGM0Q1QSIgbWFzaz0idXJsKCNzdHJva2UxXzBfNzgzKSIvPgo8L2c+CjwvZz4KPC9nPgo8ZGVmcz4KPGZpbHRlciBpZD0iZmlsdGVyMF9kaV8wXzc4MyIgeD0iMCIgeT0iMCIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI1IiBmaWx0ZXJVbml0cz0idXNlclNwYWNlT25Vc2UiIGNvbG9yLWludGVycG9sYXRpb24tZmlsdGVycz0ic1JHQiI+CjxmZUZsb29kIGZsb29kLW9wYWNpdHk9IjAiIHJlc3VsdD0iQmFja2dyb3VuZEltYWdlRml4Ii8+CjxmZUNvbG9yTWF0cml4IGluPSJTb3VyY2VBbHBoYSIgdHlwZT0ibWF0cml4IiB2YWx1ZXM9IjAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDEyNyAwIiByZXN1bHQ9ImhhcmRBbHBoYSIvPgo8ZmVPZmZzZXQgZHk9IjEiLz4KPGZlQ29sb3JNYXRyaXggdHlwZT0ibWF0cml4IiB2YWx1ZXM9IjAgMCAwIDAgMC4wMTk2MDc4IDAgMCAwIDAgMC4xODQzMTQgMCAwIDAgMCAwLjIxOTYwOCAwIDAgMCAwLjI0IDAiLz4KPGZlQmxlbmQgbW9kZT0ibm9ybWFsIiBpbjI9IkJhY2tncm91bmRJbWFnZUZpeCIgcmVzdWx0PSJlZmZlY3QxX2Ryb3BTaGFkb3dfMF83ODMiLz4KPGZlQmxlbmQgbW9kZT0ibm9ybWFsIiBpbj0iU291cmNlR3JhcGhpYyIgaW4yPSJlZmZlY3QxX2Ryb3BTaGFkb3dfMF83ODMiIHJlc3VsdD0ic2hhcGUiLz4KPGZlQ29sb3JNYXRyaXggaW49IlNvdXJjZUFscGhhIiB0eXBlPSJtYXRyaXgiIHZhbHVlcz0iMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMTI3IDAiIHJlc3VsdD0iaGFyZEFscGhhIi8+CjxmZU9mZnNldCBkeT0iLTIiLz4KPGZlQ29tcG9zaXRlIGluMj0iaGFyZEFscGhhIiBvcGVyYXRvcj0iYXJpdGhtZXRpYyIgazI9Ii0xIiBrMz0iMSIvPgo8ZmVDb2xvck1hdHJpeCB0eXBlPSJtYXRyaXgiIHZhbHVlcz0iMCAwIDAgMCAwLjA0NzA1ODggMCAwIDAgMCAwLjM0MTE3NiAwIDAgMCAwIDAuMzg0MzE0IDAgMCAwIDAuNDUgMCIvPgo8ZmVCbGVuZCBtb2RlPSJub3JtYWwiIGluMj0ic2hhcGUiIHJlc3VsdD0iZWZmZWN0Ml9pbm5lclNoYWRvd18wXzc4MyIvPgo8L2ZpbHRlcj4KPGZpbHRlciBpZD0iZmlsdGVyMV9kXzBfNzgzIiB4PSI1IiB5PSI1IiB3aWR0aD0iMTQiIGhlaWdodD0iMTUuMiIgZmlsdGVyVW5pdHM9InVzZXJTcGFjZU9uVXNlIiBjb2xvci1pbnRlcnBvbGF0aW9uLWZpbHRlcnM9InNSR0IiPgo8ZmVGbG9vZCBmbG9vZC1vcGFjaXR5PSIwIiByZXN1bHQ9IkJhY2tncm91bmRJbWFnZUZpeCIvPgo8ZmVDb2xvck1hdHJpeCBpbj0iU291cmNlQWxwaGEiIHR5cGU9Im1hdHJpeCIgdmFsdWVzPSIwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAxMjcgMCIgcmVzdWx0PSJoYXJkQWxwaGEiLz4KPGZlT2Zmc2V0IGR5PSIxLjIiLz4KPGZlQ29sb3JNYXRyaXggdHlwZT0ibWF0cml4IiB2YWx1ZXM9IjAgMCAwIDAgMC42NDM3OTMgMCAwIDAgMCAwLjg4MTgzMSAwIDAgMCAwIDAuOTY4MzcyIDAgMCAwIDAuMjQgMCIvPgo8ZmVCbGVuZCBtb2RlPSJub3JtYWwiIGluMj0iQmFja2dyb3VuZEltYWdlRml4IiByZXN1bHQ9ImVmZmVjdDFfZHJvcFNoYWRvd18wXzc4MyIvPgo8ZmVCbGVuZCBtb2RlPSJub3JtYWwiIGluPSJTb3VyY2VHcmFwaGljIiBpbjI9ImVmZmVjdDFfZHJvcFNoYWRvd18wXzc4MyIgcmVzdWx0PSJzaGFwZSIvPgo8L2ZpbHRlcj4KPGxpbmVhckdyYWRpZW50IGlkPSJwYWludDBfbGluZWFyXzBfNzgzIiB4MT0iMTIiIHkxPSIwIiB4Mj0iMTIiIHkyPSIyNCIgZ3JhZGllbnRVbml0cz0idXNlclNwYWNlT25Vc2UiPgo8c3RvcCBzdG9wLWNvbG9yPSIjNjZEQkQ5Ii8+CjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzE2OEY5OSIvPgo8L2xpbmVhckdyYWRpZW50Pgo8cGF0aCBpZD0ic3Ryb2tlMF8wXzc4MyIgZD0iTTE2LjQwMTggMTUuNDczMkMxNi41MjUxIDE1LjU5NjUgMTYuNTk0MyAxNS43NjM3IDE2LjU5NDMgMTUuOTM4QzE2LjU5NDMgMTYuMTEyNCAxNi41MjUxIDE2LjI3OTYgMTYuNDAxOCAxNi40MDI5QzE2LjI3ODUgMTYuNTI2MiAxNi4xMTEzIDE2LjU5NTQgMTUuOTM3IDE2LjU5NTRDMTUuNzYyNiAxNi41OTU0IDE1LjU5NTQgMTYuNTI2MiAxNS40NzIxIDE2LjQwMjlMMTIgMTIuOTI5N0w4LjUyNjggMTYuNDAxOEM4LjQwMzUxIDE2LjUyNTEgOC4yMzYzIDE2LjU5NDMgOC4wNjE5NSAxNi41OTQzQzcuODg3NiAxNi41OTQzIDcuNzIwMzkgMTYuNTI1MSA3LjU5NzExIDE2LjQwMThDNy40NzM4MyAxNi4yNzg1IDcuNDA0NTYgMTYuMTExMyA3LjQwNDU2IDE1LjkzN0M3LjQwNDU2IDE1Ljc2MjYgNy40NzM4MyAxNS41OTU0IDcuNTk3MTEgMTUuNDcyMUwxMS4wNzAzIDEyTDcuNTk4MiA4LjUyNjhDNy40NzQ5MiA4LjQwMzUxIDcuNDA1NjYgOC4yMzYzIDcuNDA1NjYgOC4wNjE5NUM3LjQwNTY2IDcuODg3NiA3LjQ3NDkyIDcuNzIwMzkgNy41OTgyIDcuNTk3MTFDNy43MjE0OSA3LjQ3MzgzIDcuODg4NyA3LjQwNDU3IDguMDYzMDUgNy40MDQ1N0M4LjIzNzQgNy40MDQ1NyA4LjQwNDYxIDcuNDczODMgOC41Mjc4OSA3LjU5NzExTDEyIDExLjA3MDNMMTUuNDczMiA3LjU5NjU2QzE1LjU5NjUgNy40NzMyOCAxNS43NjM3IDcuNDA0MDIgMTUuOTM4IDcuNDA0MDJDMTYuMTEyNCA3LjQwNDAyIDE2LjI3OTYgNy40NzMyOCAxNi40MDI5IDcuNTk2NTZDMTYuNTI2MiA3LjcxOTg1IDE2LjU5NTQgNy44ODcwNiAxNi41OTU0IDguMDYxNDFDMTYuNTk1NCA4LjIzNTc2IDE2LjUyNjIgOC40MDI5NyAxNi40MDI5IDguNTI2MjVMMTIuOTI5NyAxMkwxNi40MDE4IDE1LjQ3MzJaIi8+CjwvZGVmcz4KPC9zdmc+Cg=="); }
+#__gf-portal .sk-lb .sk-edit { width: 36px; height: 38px; margin-bottom: -2px; background-image: url("data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJub25lIiBvdmVyZmxvdz0idmlzaWJsZSIgd2lkdGg9IjM2IiBoZWlnaHQ9IjM4IiB2aWV3Qm94PSIwIDAgMzYgMzgiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxnIGlkPSJFZGl0IE5pY2tuYW1lIiBmaWx0ZXI9InVybCgjZmlsdGVyMF9kaV8wXzc3MikiPgo8cmVjdCB3aWR0aD0iMzYiIGhlaWdodD0iMzYiIHJ4PSIxOCIgZmlsbD0idXJsKCNwYWludDBfbGluZWFyXzBfNzcyKSIvPgo8cmVjdCB4PSIxIiB5PSIxIiB3aWR0aD0iMzQiIGhlaWdodD0iMzQiIHJ4PSIxNyIgc3Ryb2tlPSIjMEEzRDQ4IiBzdHJva2Utd2lkdGg9IjIiLz4KPGNpcmNsZSBpZD0iUmltIiBjeD0iMTgiIGN5PSIxOCIgcj0iMTMuMjUiIHN0cm9rZT0iIzE0ODA4QSIgc3Ryb2tlLW9wYWNpdHk9IjAuNyIgc3Ryb2tlLXdpZHRoPSIxLjUiLz4KPGcgaWQ9IkdyYWluIj4KPC9nPgo8ZyBpZD0iSWNvbi9lZGl0Ij4KPHBhdGggaWQ9IlZlY3RvciIgZD0iTTI0Ljk4MjcgMTQuMTU4OEwyMS44NDEyIDExLjAxNjZDMjEuNzM2NyAxMC45MTIxIDIxLjYxMjcgMTAuODI5MiAyMS40NzYyIDEwLjc3MjZDMjEuMzM5NyAxMC43MTYxIDIxLjE5MzMgMTAuNjg3IDIxLjA0NTYgMTAuNjg3QzIwLjg5NzggMTAuNjg3IDIwLjc1MTUgMTAuNzE2MSAyMC42MTUgMTAuNzcyNkMyMC40Nzg1IDEwLjgyOTIgMjAuMzU0NSAxMC45MTIxIDIwLjI1IDExLjAxNjZMMTEuNTc5OCAxOS42ODc1QzExLjQ3NDggMTkuNzkxNiAxMS4zOTE3IDE5LjkxNTUgMTEuMzM1IDIwLjA1MkMxMS4yNzg0IDIwLjE4ODUgMTEuMjQ5NSAyMC4zMzQ5IDExLjI1IDIwLjQ4MjdWMjMuNjI1QzExLjI1IDIzLjkyMzQgMTEuMzY4NSAyNC4yMDk1IDExLjU3OTUgMjQuNDIwNUMxMS43OTA1IDI0LjYzMTUgMTIuMDc2NiAyNC43NSAxMi4zNzUgMjQuNzVIMTUuNTE3M0MxNS42NjUxIDI0Ljc1MDUgMTUuODExNSAyNC43MjE2IDE1Ljk0OCAyNC42NjVDMTYuMDg0NSAyNC42MDgzIDE2LjIwODQgMjQuNTI1MiAxNi4zMTI1IDI0LjQyMDJMMjQuOTgyNyAxNS43NUMyNS4wODcyIDE1LjY0NTUgMjUuMTcwMSAxNS41MjE1IDI1LjIyNjcgMTUuMzg1QzI1LjI4MzIgMTUuMjQ4NSAyNS4zMTIzIDE1LjEwMjIgMjUuMzEyMyAxNC45NTQ0QzI1LjMxMjMgMTQuODA2NyAyNS4yODMyIDE0LjY2MDMgMjUuMjI2NyAxNC41MjM4QzI1LjE3MDEgMTQuMzg3MyAyNS4wODcyIDE0LjI2MzMgMjQuOTgyNyAxNC4xNTg4Wk0yMi41IDE2LjY0MTZMMTkuMzU3NyAxMy41TDIxLjA0NTIgMTEuODEyNUwyNC4xODc1IDE0Ljk1NDFMMjIuNSAxNi42NDE2WiIgZmlsbD0iIzBGM0Q1QSIvPgo8L2c+CjwvZz4KPGRlZnM+CjxmaWx0ZXIgaWQ9ImZpbHRlcjBfZGlfMF83NzIiIHg9IjAiIHk9IjAiIHdpZHRoPSIzNiIgaGVpZ2h0PSIzOCIgZmlsdGVyVW5pdHM9InVzZXJTcGFjZU9uVXNlIiBjb2xvci1pbnRlcnBvbGF0aW9uLWZpbHRlcnM9InNSR0IiPgo8ZmVGbG9vZCBmbG9vZC1vcGFjaXR5PSIwIiByZXN1bHQ9IkJhY2tncm91bmRJbWFnZUZpeCIvPgo8ZmVDb2xvck1hdHJpeCBpbj0iU291cmNlQWxwaGEiIHR5cGU9Im1hdHJpeCIgdmFsdWVzPSIwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAxMjcgMCIgcmVzdWx0PSJoYXJkQWxwaGEiLz4KPGZlT2Zmc2V0IGR5PSIyIi8+CjxmZUNvbG9yTWF0cml4IHR5cGU9Im1hdHJpeCIgdmFsdWVzPSIwIDAgMCAwIDAuMDE5NjA3OCAwIDAgMCAwIDAuMTg0MzE0IDAgMCAwIDAgMC4yMTk2MDggMCAwIDAgMC4yNCAwIi8+CjxmZUJsZW5kIG1vZGU9Im5vcm1hbCIgaW4yPSJCYWNrZ3JvdW5kSW1hZ2VGaXgiIHJlc3VsdD0iZWZmZWN0MV9kcm9wU2hhZG93XzBfNzcyIi8+CjxmZUJsZW5kIG1vZGU9Im5vcm1hbCIgaW49IlNvdXJjZUdyYXBoaWMiIGluMj0iZWZmZWN0MV9kcm9wU2hhZG93XzBfNzcyIiByZXN1bHQ9InNoYXBlIi8+CjxmZUNvbG9yTWF0cml4IGluPSJTb3VyY2VBbHBoYSIgdHlwZT0ibWF0cml4IiB2YWx1ZXM9IjAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDEyNyAwIiByZXN1bHQ9ImhhcmRBbHBoYSIvPgo8ZmVPZmZzZXQgZHk9Ii00Ii8+CjxmZUNvbXBvc2l0ZSBpbjI9ImhhcmRBbHBoYSIgb3BlcmF0b3I9ImFyaXRobWV0aWMiIGsyPSItMSIgazM9IjEiLz4KPGZlQ29sb3JNYXRyaXggdHlwZT0ibWF0cml4IiB2YWx1ZXM9IjAgMCAwIDAgMC4wNDcwNTg4IDAgMCAwIDAgMC4zNDExNzYgMCAwIDAgMCAwLjM4NDMxNCAwIDAgMCAwLjQ1IDAiLz4KPGZlQmxlbmQgbW9kZT0ibm9ybWFsIiBpbjI9InNoYXBlIiByZXN1bHQ9ImVmZmVjdDJfaW5uZXJTaGFkb3dfMF83NzIiLz4KPC9maWx0ZXI+CjxsaW5lYXJHcmFkaWVudCBpZD0icGFpbnQwX2xpbmVhcl8wXzc3MiIgeDE9IjE4IiB5MT0iMCIgeDI9IjE4IiB5Mj0iMzYiIGdyYWRpZW50VW5pdHM9InVzZXJTcGFjZU9uVXNlIj4KPHN0b3Agc3RvcC1jb2xvcj0iIzY2REJEOSIvPgo8c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiMxNjhGOTkiLz4KPC9saW5lYXJHcmFkaWVudD4KPC9kZWZzPgo8L3N2Zz4K"); }
+#__gf-portal .sk-lb .sk-del:active, #__gf-portal .sk-lb .sk-edit:active { transform: translateY(1px); }
+/* 내 순위(Me): 반투명 검정 48% · 반경 14 · 8/6 */
+#__gf-portal .sk-lb .sk-mine { gap: 8px; padding: 6px 8px; border-radius: 14px; background: rgba(0, 0, 0, .48); }
+#__gf-portal .sk-lb .sk-mine__rank { min-width: 28px; width: 28px; font-size: 18px; }
+#__gf-portal .sk-lb .sk-mine__who small { font-size: 11px; color: rgba(255, 255, 255, .7); }
+#__gf-portal .sk-lb .sk-mine__who span { font-size: 15px; }
+#__gf-portal .sk-lb .sk-mine__score { padding: 3px 10px; border-radius: 999px; background: rgba(0, 0, 0, .3); font-size: 14px; }
+.sk-lb-note { font-size: 14px; line-height: 1.25; text-align: center; color: rgba(255, 255, 255, .75); }
+@media (max-width: 350px) { .sk-lb-note { font-size: 12px; } }
+
+/* ── 오늘의 미션(P07-1) ── 줄 간격 6 · 줄 = 반투명 22% · 반경 12 · 12/8 */
+body .sk-rx--missions .gf-rx-body.missions { gap: 6px; }
+body .sk-rx--missions .gf-rx-foot { padding: 6px 10px 10px; box-shadow: 0 1.5px 0 rgba(169, 240, 236, .55), inset 0 -1.5px 0 rgba(169, 240, 236, .5); }
+/* 스크롤 끝 그늘(Figma "Scroll Fade · 아래에 더 있음") */
+body .sk-rx--missions .gf-rx-foot::before {
+  content: ''; position: absolute; left: 10px; right: 10px; top: -32px; height: 32px; pointer-events: none;
+  background: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, .45));
+}
+body .sk-rx--missions .gf-rx-foot .gf-rx-reset { margin: 0; font-size: 11px; line-height: normal; opacity: 1; color: rgba(255, 255, 255, .7); }
+body .sk-rx--missions .gf-rx-row { flex: none; min-height: 0; gap: 10px; padding: 8px 12px; border: 0; border-radius: 12px; background: rgba(0, 0, 0, .22); opacity: 1; }
+body .sk-rx--missions .gf-rx-row > .gf-rx-icon { display: none; }
+body .sk-rx--missions .gf-rx-copy { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; }
+body .sk-rx--missions .gf-rx-copy::before { content: ''; order: 2; flex: 0 0 100%; height: 0; margin: -3px 0; }
+body .sk-rx--missions .gf-rx-copy strong { display: block; min-width: 0; font-size: 15px; line-height: normal; font-weight: 400; color: #fff; }
+/* 완료 미션(Figma "완료 미션 상태"): 더 어두운 칸 · 흐린 제목 "○○ 미션완료!" · 아래 "미션은 0시 초기화돼요" */
+body .sk-rx--missions .gf-rx-row.done { background: rgba(0, 0, 0, .45); }
+body .sk-rx--missions .gf-rx-row.done .gf-rx-copy strong { color: rgba(255, 255, 255, .5); }
+body .sk-rx--missions .gf-rx-row.done .gf-rx-copy small { flex: 1 0 100%; white-space: normal; color: rgba(255, 255, 255, .5); }
+/* 보상 칩(Reward Badge): #ffd23a · 8/2 · 글자 #4a2208 12 */
+body .sk-rx--missions .gf-rx-copy .sk-rx-chip {
+  flex: none; display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 999px; background: #ffd23a; color: #4a2208;
+  font-size: 12px; line-height: normal; font-weight: 400; white-space: nowrap; box-shadow: none;
+}
+/* 진행 막대 40×8 · 홈 검정 40% · 채움 #ffd23a */
+body .sk-rx--missions .gf-rx-meter { order: 3; flex: 0 0 40px; height: 8px; margin: 0; border-radius: 4px; background: rgba(0, 0, 0, .4); box-shadow: none; }
+body .sk-rx--missions .gf-rx-meter i { border-radius: 4px; background: #ffd23a; box-shadow: none; }
+body .sk-rx--missions .gf-rx-copy small { order: 4; flex: 1 1 0; min-width: 0; margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; line-height: normal; color: rgba(255, 255, 255, .75); }
+.sk-rx-sec { display: flex; align-items: center; flex: none; padding: 0 4px; }
+.sk-rx-sec b { flex: 1; font-size: 13px; font-weight: 400; color: rgba(255, 255, 255, .9); }
+.sk-rx-sec span { font-size: 11px; color: rgba(255, 255, 255, .6); white-space: nowrap; }
+/* 카드형(출석 선물 · 오늘 달성 보너스): 세로 쌓기, 버튼 전체 폭 */
+body .sk-rx--missions .gf-rx-row.sk-rx-card { flex-direction: column; align-items: stretch; }
+body .sk-rx--missions .gf-rx-row.sk-rx-card .gf-rx-btn { width: 100%; }
+body .sk-rx--missions .gf-rx-row.sk-rx-card--gift { padding: 10px 12px; border: 2px solid rgba(255, 210, 58, .85); box-shadow: none; }
+body .sk-rx--missions .gf-rx-row.sk-rx-card--gift .gf-rx-copy::before { content: none; }
+body .sk-rx--missions .gf-rx-row.sk-rx-card--gift .gf-rx-copy { gap: 4px 8px; }
+body .sk-rx--missions .gf-rx-row.sk-rx-card--gift .gf-rx-copy strong { font-size: 16px; }
+body .sk-rx--missions .gf-rx-row.sk-rx-card--gift .sk-rx-chip { border: 1.5px solid #7a3b10; }
+body .sk-rx--missions .gf-rx-row.sk-rx-card--gift .gf-rx-copy small { order: 4; flex: 1 0 100%; white-space: normal; color: rgba(255, 255, 255, .8); }
+
+/* ── Theme Button(S32 · L52) 색 — Figma 값 그대로: 받기 Green · 진행 중 Base(민트) · 완료/N일차 Wood(황갈) · 로그인/만료 Red · 알림 Blue ── */
+body .gf-rx-dialog .gf-rx-btn {
+  --b1: #8cde5e; --b2: #3ea52a; --bd: #1f6512; --lo: rgba(31, 101, 18, .35); --ink: #fff; --ts: rgba(31, 101, 18, .24);
+  border: 2.5px solid var(--bd); border-radius: 12px; height: 52px; font-size: 20px; background: linear-gradient(var(--b1), var(--b2)); color: var(--ink);
+  box-shadow: 0 2px 0 rgba(5, 47, 56, .24); text-shadow: 0 1.6px 0 var(--ts);
+}
+body .gf-rx-dialog .gf-rx-btn.login { --b1: #ff7e6e; --b2: #d93a2e; --bd: #8a1810; --lo: rgba(138, 24, 16, .35); --ts: rgba(138, 24, 16, .24); }
+body .gf-rx-dialog .gf-rx-btn.blue { --b1: #78caff; --b2: #2e8fe0; --bd: #144f8a; --lo: rgba(20, 79, 138, .35); --ts: rgba(20, 79, 138, .24); }
+body .gf-rx-dialog .gf-rx-btn.plain { --b1: #78e2de; --b2: #1fa6ae; --bd: #0c5560; --lo: rgba(12, 85, 96, .35); --ink: #0a3d48; --ts: rgba(232, 255, 253, .24); }
+body .gf-rx-dialog .gf-rx-row .gf-rx-btn, body .sk-rx--missions .gf-rx-row .gf-rx-btn {
+  flex: none; width: 63px; min-width: 63px; height: 32px; min-height: 0; padding: 0 8px; border-width: 2px; border-radius: 8px; font-size: 14px; line-height: 1;
+}
+body .sk-rx--missions .gf-rx-row .gf-rx-btn[data-rx="progress"] { --b1: #78e2de; --b2: #1fa6ae; --bd: #0c5560; --lo: rgba(12, 85, 96, .35); --ink: #0a3d48; --ts: rgba(232, 255, 253, .24); }
+body .sk-rx--missions .gf-rx-row.done .gf-rx-btn { --b1: #cdbba2; --b2: #a8957a; --bd: #6e5e48; --lo: rgba(110, 94, 72, .35); --ink: #eafcfb; --ts: rgba(110, 94, 72, .24); }
+body .gf-rx-dialog .gf-rx-btn:disabled { opacity: 1; }
+body .gf-rx-dialog .gf-rx-btn:not([data-rx="progress"]):not(.done *):disabled { filter: saturate(.35) brightness(.92); }
+body .sk-rx--missions .gf-rx-row.done .gf-rx-btn:disabled, body .sk-rx--missions .gf-rx-btn[data-rx="progress"]:disabled { filter: none; }
+
+/* ── 출석 선물 / 보상 받기(P12) ── */
+body .gf-rx-gift { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 20px 12px; border: 0; border-radius: 16px; background: rgba(0, 0, 0, .22); box-shadow: none; }
+body .gf-rx-gift > .gf-rx-icon { width: 80px; height: 80px; margin: 0; }
+body .gf-rx-gift h3 { margin: 0; font-size: 24px; line-height: 1.25; font-weight: 400; color: #fff; }
+body .gf-rx-gift p { margin: 0; font-size: 14px; line-height: 1.25; color: rgba(255, 255, 255, .75); }
+body .gf-rx-calendar { gap: 4px; padding: 0; }
+body .gf-rx-day {
+  flex: 0 0 82px; width: 82px; height: auto; gap: 2px; padding: 8px; border: 2px solid rgba(0, 0, 0, .08); border-radius: 8px; background: rgba(0, 0, 0, .22); color: #fff; opacity: 1;
+}
+body .gf-rx-day.current, body .gf-rx-day.highlight { border-color: #ffd23a; box-shadow: none; animation: none; background: rgba(0, 0, 0, .22); color: #fff; }
+body .gf-rx-day > .gf-rx-icon { width: 32px; height: 32px; margin-bottom: 6px; }
+body .gf-rx-day b { font-size: 14px; line-height: 1.25; font-weight: 400; color: #fff; }
+body .gf-rx-day small { max-height: none; font-size: 12px; line-height: 1.25; color: #fff; }
+body .gf-rx-day.expired { color: #fff; }
+body .gf-rx-day .status, body .gf-rx-day.claimed .status {
+  --b1: #cdbba2; --b2: #a8957a; --bd: #6e5e48; --lo: rgba(110, 94, 72, .35); --ink: #eafcfb; --ts: rgba(110, 94, 72, .24);
+  width: 100%; height: 32px; margin-top: auto; border: 2px solid var(--bd); border-radius: 8px; background: linear-gradient(var(--b1), var(--b2)); color: var(--ink);
+  box-shadow: 0 2px 0 rgba(5, 47, 56, .24); text-shadow: 0 1.6px 0 var(--ts); font-size: 14px;
+}
+body .gf-rx-day.current .status { --b1: #8cde5e; --b2: #3ea52a; --bd: #1f6512; --lo: rgba(31, 101, 18, .35); --ink: #fff; --ts: rgba(31, 101, 18, .24); }
+body .gf-rx-day.expired .status { --b1: #ff7e6e; --b2: #d93a2e; --bd: #8a1810; --lo: rgba(138, 24, 16, .35); --ink: #fff; --ts: rgba(138, 24, 16, .24); }
+/* 알림 줄(Notify Row): 반투명 22% · 노란 1.5 테두리 · 종 28 · 오른쪽 Blue S32 */
+body .gf-rx-notify, body .gf-rx-notify.enabled {
+  width: 100%; min-height: 0; gap: 8px; padding: 10px 10px 10px 12px; border: 1.5px solid #ffd23a; border-radius: 12px; background: rgba(0, 0, 0, .22);
+  color: #fff; font-size: 14px; line-height: 1.25; animation: none; text-align: left;
+}
+body .gf-rx-notify::before { content: none; }
+body .gf-rx-notify .gf-rx-icon { width: 28px; height: 28px; }
+body .gf-rx-notify > span:not(.gf-rx-icon) { flex: 1; font-size: 14px; line-height: 1.25; }
+body .gf-rx-notify > b, body .gf-rx-notify.enabled > b {
+  flex: none; display: flex; align-items: center; height: 32px; min-width: 64px; justify-content: center; margin-left: 0; padding: 0 14px;
+  border: 2px solid #144f8a; border-radius: 8px; background: linear-gradient(#78caff, #2e8fe0); color: #fff; font-size: 14px; font-weight: 400;
+  box-shadow: 0 2px 0 rgba(5, 47, 56, .24); text-shadow: 0 1.6px 0 rgba(20, 79, 138, .24);
+}
+/* 4글자 상태("자동 지급")는 63 안에 줄바꿈하지 않고 늘어난다 · 날짜 칸 부가 문구는 낱말 단위로만 줄바꿈 */
+body .gf-rx-dialog .gf-rx-row .gf-rx-btn { width: auto; white-space: nowrap; }
+body .sk-rx--missions .gf-rx-row.sk-rx-card .gf-rx-btn { width: 100%; }
+body .gf-rx-day b, body .gf-rx-day small { word-break: keep-all; }
+body .gf-rx-gift h3, body .gf-rx-gift p { word-break: keep-all; }
+
+/* ── 만지작 추가: SDK 0.38 출석 카드(미션 창 맨 위 .sk-rx-card--att) — 애니멀팝 normal-skin 규칙, 색만 Ice ── */
+body .sk-rx--missions .gf-rx-row.sk-rx-card--att { padding: 10px 12px; border: 2px solid transparent; box-shadow: none; }
+body .sk-rx--missions .gf-rx-row.sk-rx-card--att .gf-rx-copy::before { content: none; }
+body .sk-rx--missions .gf-rx-row.sk-rx-card--att .gf-rx-copy { gap: 4px 8px; }
+body .sk-rx--missions .gf-rx-row.sk-rx-card--att .gf-rx-copy strong { font-size: 16px; }
+body .sk-rx--missions .gf-rx-row.sk-rx-card--att .sk-rx-chip { border: 1.5px solid #0a3d48; }
+body .sk-rx--missions .gf-rx-row.sk-rx-card--att .gf-rx-copy small { order: 4; flex: 1 0 100%; white-space: normal; color: rgba(227, 251, 249, .85); }

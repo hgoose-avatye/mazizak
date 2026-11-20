@@ -22,10 +22,13 @@
 
     <header id="app-head" class="app-head">
       <h1 class="sr-only">만지작</h1>
+      <!-- free picks left in the group on screen and the time to the next refill (main.ts syncFreeTimer); hidden where ads are off -->
+      <div class="free-timer" id="free-timer" role="status" aria-live="off" hidden>
+        <span class="free-timer-label" id="free-timer-label">무료 만지기</span>
+        <span class="free-timer-row"><span class="free-pips" id="free-pips" aria-hidden="true"></span><span class="free-bonus" id="free-bonus" aria-hidden="true" hidden></span><span class="free-timer-time" id="free-timer-time"></span></span>
+      </div>
       <div class="head-actions">
-        <button class="icon-btn ghost" data-action="reset" hidden aria-label="처음 상태로">
-          <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M4.5 12a7.5 7.5 0 1 0 2.2-5.3M4.5 4.5v3.8h3.8" /></svg>
-        </button>
+        <button class="icon-btn ghost text-btn" data-action="reset" hidden>초기화</button>
         <button class="icon-btn ghost" data-action="sound" id="sound-btn" aria-label="소리 끄기" aria-pressed="true"></button>
         <button class="icon-btn ghost" data-action="settings" aria-label="설정">
           <svg viewBox="0 0 24 24" width="21" height="21" aria-hidden="true"><path fill="currentColor" d="M12 8.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7Zm8.9 4.6-.1-1.2 2-1.6-2-3.4-2.4.8c-.6-.5-1.3-.9-2-1.2L16 3h-4l-.4 2.5c-.7.3-1.4.7-2 1.2l-2.4-.8-2 3.4 2 1.6a7 7 0 0 0 0 2.4l-2 1.6 2 3.4 2.4-.8c.6.5 1.3.9 2 1.2L12 21h4l.4-2.5c.7-.3 1.4-.7 2-1.2l2.4.8 2-3.4-2-1.6c.1-.4.1-.8.1-1.2Z" transform="translate(-2 0)"/></svg>
@@ -54,7 +57,7 @@
       <div class="dock-body" id="dock-body">
         <div class="dock-toolbar">
         <div class="cat-seg" role="radiogroup" aria-label="카테고리">
-          <button role="radio" data-category="fidget" aria-checked="true">말랑이</button><button role="radio" data-category="keyboard" aria-checked="false">키보드</button>
+          <button role="radio" data-category="fidget" aria-checked="true">말랑이</button><button role="radio" data-category="squash" aria-checked="false">뭉개기</button><button role="radio" data-category="keyboard" aria-checked="false">키보드</button>
         </div>
         <span class="collection-count" id="collection-count" aria-live="polite"></span>
         </div>
@@ -69,10 +72,13 @@
         <div class="sheet-grip"></div>
         <div class="sheet-top"><div><span class="eyebrow">MAKE IT YOURS</span><h2>설정</h2></div><button class="sheet-close icon-btn" data-action="close-sheet" aria-label="설정 닫기"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button></div>
         <p class="setting-group">사운드와 터치</p>
+        <div class="set-card">
         <label class="row"><span>소리</span><input type="checkbox" role="switch" data-setting="sound" /></label>
         <label class="row"><span>볼륨</span><span class="range-wrap"><input id="volume-control" type="range" min="0" max="1" step="0.01" data-setting="volume" /><output id="volume-value" for="volume-control">90%</output></span></label>
         <label class="row" id="row-haptics"><span>진동 <small id="haptics-note"></small></span><input type="checkbox" role="switch" data-setting="haptics" /></label>
+        </div>
         <p class="setting-group">화면과 움직임</p>
+        <div class="set-card">
         <div class="row">
           <span>화질</span>
           <div class="seg" data-setting="quality">
@@ -81,6 +87,7 @@
         </div>
         <label class="row"><span>움직임 줄이기</span><input type="checkbox" role="switch" data-setting="reduceMotion" /></label>
         <label class="row"><span>성능 정보 표시</span><input type="checkbox" role="switch" data-setting="showStats" /></label>
+        </div>
         <details class="credits"><summary>출처와 라이선스<span aria-hidden="true">＋</span></summary><div class="sheet-note credits-body">
           <p>무음 모드에서는 소리가 나지 않아요. 아래 소리는 모두 잘라내기·잡음 제거·음량 보정·형식 변환을 거쳐 사용해요.</p>
 
@@ -131,7 +138,7 @@
         <h2 id="ad-title"></h2>
         <p class="ad-text" id="ad-text"></p>
         <p class="ad-status" id="ad-status" role="status" aria-live="polite"></p>
-        <button class="primary" id="ad-watch" data-action="watch-ad">광고 보고 열기</button>
+        <button class="primary" id="ad-watch" data-action="watch-ad">광고 보고 만지기</button>
         <button class="ad-later" data-action="close-ad">다음에 할게요</button>
       </section>
     </div>

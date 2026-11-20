@@ -9,8 +9,8 @@
  * The SDK is imported on first use, so the app's first screen does not carry it. Outside the Toss app (a plain browser,
  * the sandbox app) `isSupported()` is false and the gate is off: every toy opens.
  *
- * Testing in a browser: on the dev server it is on by default (`?ads=off` turns it off); `?ads=mock` shows a stand-in video ad (mockAd.ts: 15 s, 건너뛰기 after 5 s = no reward,
- * watched to the end = rewarded), `?ads=mock-fail` an ad that never loads (the toy then opens anyway).
+ * Testing in a browser: on the dev server it is on by default (`?ads=off` turns it off); `?ads=mock` shows a stand-in video ad (mockAd.ts: 15 s, 건너뛰기 after 5 s,
+ * watched to the end = rewarded — main.ts opens the toy either way since 2026-11-20), `?ads=mock-fail` an ad that never loads (the toy then opens anyway).
  *
  * Ad group id: VITE_AIT_REWARDED_AD_ID at build time; the default is Toss's test id, which must not ship (see README).
  */

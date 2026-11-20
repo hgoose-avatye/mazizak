@@ -1,0 +1,200 @@
+/* ==========================================================================================================
+   Game look (owner, 2026-11-20: "SDK만 공용 UI, 나머지는 게임과 어울리게"): soft "jelly toy" UI for everything the app draws —
+   the header buttons and free-pick chip, the toy's name, the drawer, the settings and ad popups. Puffy rounded shapes, a
+   light top and a coloured "lip" underneath (like a pressed squishy), pastel mint / butter / pink on cream.
+   The SDK screens alone use the shared Figma UI (Theme Dialog · Ice, src/sdk/skin/ice-skin.css).
+   Loaded after style.css / ui.css and only restyles.
+   ========================================================================================================== */
+:root {
+  --jl-cream: #fffaf1;
+  --jl-cream-2: #f6ecd9;
+  --jl-cream-lip: #e2d2b4;
+  --jl-ink: #2e4a3f;             /* deep green-brown words */
+  --jl-ink-2: #6f8277;
+  --jl-mint-1: #8ce8c8; --jl-mint-2: #3fbf98; --jl-mint-lip: #23896b;   /* go / on */
+  --jl-butter-1: #ffe9a6; --jl-butter-2: #ffcf4d; --jl-butter-lip: #d69a17;
+  --jl-pink-1: #ffb3c7; --jl-pink-2: #ff7fa1; --jl-pink-lip: #d4507a;
+  --jl-shadow: 0 10px 22px -10px rgba(46, 74, 63, .35);
+}
+
+/* ---------- the toy's name: a puffy sticker ---------- */
+.now-playing h2 {
+  color: #fff; letter-spacing: 0;
+  -webkit-text-stroke: 9px var(--jl-ink); paint-order: stroke fill;
+  text-shadow: 0 5px 0 var(--jl-ink), 0 12px 20px rgba(46, 74, 63, .22);
+}
+.now-category { color: var(--jl-ink); font-size: 14px; }
+.now-category::before { background: var(--jl-mint-2); }
+
+/* ---------- header buttons: round jelly drops ---------- */
+.icon-btn.ghost {
+  width: 48px; height: 48px; border-radius: 50%; color: var(--jl-ink); border: 0;
+  background: linear-gradient(180deg, #fffdf8, var(--jl-cream-2));
+  box-shadow: inset 0 -4px 0 rgba(226, 210, 180, .9), 0 5px 0 var(--jl-cream-lip), var(--jl-shadow);
+  transition: transform .12s ease, box-shadow .12s ease;
+}
+.icon-btn.ghost svg { width: 22px; height: 22px; position: relative; z-index: 1; top: -2px; } /* the 4px lip at the bottom makes the face's middle 2px higher */
+#sound-btn[aria-pressed='true'] { color: #fff; background: linear-gradient(180deg, #6fdcb8, var(--jl-mint-2)); box-shadow: inset 0 -4px 0 rgba(35, 137, 107, .45), 0 5px 0 var(--jl-mint-lip), var(--jl-shadow); }
+#sound-btn[aria-pressed='false'] { color: var(--jl-ink-2); background: linear-gradient(180deg, #fbf9f4, #e9e5dc); box-shadow: inset 0 -4px 0 rgba(200, 192, 176, .9), 0 5px 0 #cfc6b4, var(--jl-shadow); }
+.icon-btn.ghost:active, #sound-btn:active { transform: translateY(4px) scale(1.04, .94); box-shadow: inset 0 -2px 0 rgba(0, 0, 0, .08), 0 1px 0 var(--jl-cream-lip); }
+@media (hover: hover) { .icon-btn.ghost:hover { filter: brightness(1.03); background: linear-gradient(180deg, #fffdf8, var(--jl-cream-2)); } }
+
+/* ---------- free-pick chip: a butter jelly plate with coin pips ---------- */
+.free-timer {
+  border: 0; border-radius: 20px; padding: 0 16px 0 14px;
+  background: linear-gradient(180deg, #fff, var(--jl-cream));
+  box-shadow: inset 0 -4px 0 rgba(226, 210, 180, .8), 0 5px 0 var(--jl-cream-lip), var(--jl-shadow);
+  -webkit-backdrop-filter: none; backdrop-filter: none;
+}
+.free-timer-label { color: var(--jl-ink-2); font-size: 11.5px; font-weight: 400; position: relative; z-index: 1; }
+.free-timer-row { position: relative; z-index: 1; }
+.free-timer-time { color: var(--jl-ink); font-family: var(--font-ui); font-size: 16px; font-weight: 400; letter-spacing: .3px; }
+.free-timer.empty .free-timer-time { color: var(--jl-pink-lip); }
+.free-pips { gap: 4px; }
+.free-pips i { width: 13px; height: 13px; background: #ece4d4; box-shadow: inset 0 2px 0 rgba(0, 0, 0, .1); }
+.free-pips i.on { background: radial-gradient(circle at 35% 30%, #fff6c7 0 22%, var(--jl-butter-2) 58%, #e9a91f 100%); box-shadow: 0 2px 0 var(--jl-butter-lip); }
+.free-bonus { background: var(--jl-pink-2); color: #fff; box-shadow: 0 2px 0 var(--jl-pink-lip); }
+
+/* ---------- the drawer: a soft cream tray, toys on puffy pillows ---------- */
+.dock {
+  border-top: 0; border-radius: 30px 30px 0 0;
+  background: linear-gradient(180deg, #fffdf8, var(--jl-cream));
+  box-shadow: inset 0 3px 0 #fff, 0 -4px 0 rgba(226, 210, 180, .55), 0 -14px 30px -14px rgba(46, 74, 63, .3);
+}
+.dock-label { color: var(--jl-ink); font-weight: 400; font-size: 14px; }
+.collection-dot { width: 8px; height: 8px; background: var(--jl-pink-2); box-shadow: 0 1.5px 0 var(--jl-pink-lip); }
+.dock-toggle, .dock-toggle-meta, .dock-current { color: var(--jl-ink-2); font-family: var(--font-ui); }
+/* 말랑이 / 키보드: a pill track with a mint jelly knob */
+.cat-seg { padding: 4px; border-radius: 999px; background: #efe5d2; box-shadow: inset 0 3px 0 rgba(160, 130, 80, .14); }
+.cat-seg button { position: relative; height: 34px; border-radius: 999px; color: var(--jl-ink-2); font-weight: 400; font-size: 15px; }
+.cat-seg button[aria-checked='true'] { color: #fff; background: linear-gradient(180deg, var(--jl-mint-1), var(--jl-mint-2)); text-shadow: 0 1.5px 0 rgba(35, 137, 107, .5); box-shadow: 0 3px 0 var(--jl-mint-lip); }
+.collection-count { color: var(--jl-ink-2); font-family: var(--font-ui); font-size: 13px; }
+.toy-item {
+  border: 0; border-radius: 22px;
+  background: linear-gradient(180deg, #fff, #fbf5ea);
+  box-shadow: inset 0 -4px 0 rgba(226, 210, 180, .6), 0 4px 0 var(--jl-cream-lip), 0 8px 14px -8px rgba(46, 74, 63, .25);
+  transition: transform .15s cubic-bezier(.3, 1.6, .5, 1), box-shadow .15s ease;
+}
+.toy-item .thumb { border-radius: 16px; }
+.toy-item .name { color: var(--jl-ink); font-weight: 400; font-size: 13px; }
+.item-number { color: #c4b496; font-family: var(--font-ui); }
+.toy-item[aria-checked='true'] {
+  background: linear-gradient(180deg, #f2fff9, #d7f6ea); transform: translateY(-3px);
+  box-shadow: inset 0 0 0 3px var(--jl-mint-2), inset 0 -4px 0 rgba(63, 191, 152, .3), 0 4px 0 var(--jl-mint-lip), 0 10px 16px -8px rgba(35, 137, 107, .45);
+}
+.toy-item[aria-checked='true'] .name { color: #1f6b54; font-weight: 400; }
+.toy-item[aria-checked='true'] .item-number { color: var(--jl-mint-lip); }
+.item-selected { width: 18px; height: 18px; background: var(--jl-mint-2); box-shadow: 0 2px 0 var(--jl-mint-lip); }
+.toy-item:active { transform: translateY(3px) scale(1.03, .95); box-shadow: inset 0 -2px 0 rgba(226, 210, 180, .6), 0 1px 0 var(--jl-cream-lip); }
+@media (hover: hover) {
+  .toy-item:hover { background: linear-gradient(180deg, #fff, #fffaf0); }
+  .toy-item[aria-checked='true']:hover { background: linear-gradient(180deg, #f2fff9, #d7f6ea); border-color: transparent; }
+}
+/* a card that needs an ad: a little pink AD tag */
+.toy-item[data-locked='true']::after {
+  content: 'AD'; position: absolute; right: 6px; bottom: 26px; z-index: 3; padding: 1px 6px; border-radius: 999px;
+  background: var(--jl-pink-2); color: #fff; font: 400 10px/14px var(--font-ui); box-shadow: 0 2px 0 var(--jl-pink-lip);
+}
+
+/* ---------- popups: a cream jelly bubble in the middle ---------- */
+.sheet-backdrop { background: rgba(46, 74, 63, .38); backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px); }
+.sheet-panel, .ad-sheet .sheet-panel {
+  top: 50%; bottom: auto; left: 50%; right: auto; transform: translate(-50%, -50%);
+  width: min(92vw, 360px); max-width: none; max-height: calc(100dvh - var(--safe-t) - var(--safe-b) - 32px);
+  padding: 0 16px 20px; border-radius: 30px;
+  background: linear-gradient(180deg, #fffdf8, var(--jl-cream)); color: var(--jl-ink);
+  box-shadow: inset 0 3px 0 #fff, inset 0 -6px 0 rgba(226, 210, 180, .7), 0 8px 0 var(--jl-cream-lip), 0 26px 60px rgba(30, 50, 42, .4);
+  animation: jl-pop .32s cubic-bezier(.2, 1.5, .4, 1);
+}
+@keyframes jl-pop { from { transform: translate(-50%, -50%) scale(.8); opacity: 0; } 60% { transform: translate(-50%, -50%) scale(1.03); } to { transform: translate(-50%, -50%) scale(1); opacity: 1; } }
+@media (min-width: 700px) { .sheet-panel { bottom: auto; border-radius: 30px; } }
+.sheet-grip { display: none; }
+.sheet-top { position: sticky; top: 0; z-index: 3; margin: 0 -16px 2px; padding: 16px 14px 8px 20px; background: linear-gradient(#fffdf8 75%, rgba(255, 253, 248, 0)); }
+.sheet-top .eyebrow { display: none; }
+.sheet h2, .ad-sheet h2 {
+  margin: 0; font-family: var(--font-brand); font-weight: 400; font-size: 26px; line-height: 1.2; letter-spacing: 0; color: #fff;
+  -webkit-text-stroke: 7px var(--jl-ink); paint-order: stroke fill; text-shadow: 0 4px 0 var(--jl-ink);
+}
+/* close: a pink jelly drop */
+.sheet-close, .sheet-close.icon-btn {
+  width: 42px; height: 42px; border: 0; border-radius: 50%; color: #fff;
+  background: linear-gradient(180deg, #ff9db7, var(--jl-pink-2));
+  box-shadow: inset 0 -3px 0 rgba(212, 80, 122, .45), 0 4px 0 var(--jl-pink-lip);
+}
+.sheet-close svg { width: 18px; height: 18px; stroke-width: 3; }
+.sheet-close svg path { stroke-width: 3; }
+.sheet-close:active { transform: translateY(3px); box-shadow: inset 0 -2px 0 rgba(212, 80, 122, .45), 0 1px 0 var(--jl-pink-lip); }
+.setting-group { margin: 12px 4px 6px; color: var(--jl-ink-2); font-size: 13px; font-weight: 400; letter-spacing: 0; }
+.set-card { padding: 2px 14px; border-radius: 20px; background: #fff; box-shadow: inset 0 -3px 0 rgba(226, 210, 180, .55), 0 3px 0 rgba(226, 210, 180, .8); }
+.row { min-height: 54px; font-size: 16px; font-weight: 400; color: var(--jl-ink); border-bottom: 1.5px dashed #efe4cf; }
+.set-card .row:last-child { border-bottom: 0; }
+.row small, .row small#haptics-note { color: var(--jl-ink-2); }
+.row .range-wrap input[type='range'], .row input[type='range'] { accent-color: var(--jl-mint-2); }
+#volume-value { color: var(--jl-ink-2); font-family: var(--font-ui); }
+/* jelly switch */
+.row input[type='checkbox'] {
+  width: 54px; height: 30px; border: 0; border-radius: 999px;
+  background: #e6dfd1; box-shadow: inset 0 3px 0 rgba(0, 0, 0, .08);
+}
+.row input[type='checkbox']:checked { background: linear-gradient(180deg, var(--jl-mint-1), var(--jl-mint-2)); box-shadow: inset 0 -2px 0 rgba(35, 137, 107, .35); }
+.row input[type='checkbox']::after { top: 3px; left: 3px; width: 24px; height: 24px; background: radial-gradient(circle at 50% 35%, #fff, #f3eee4); box-shadow: 0 2px 0 rgba(0, 0, 0, .15); }
+.row input[type='checkbox']:checked::after { transform: translateX(24px); }
+/* 화질: pill track, mint knob */
+.seg { padding: 3px; gap: 2px; border-radius: 999px; background: #efe5d2; box-shadow: inset 0 3px 0 rgba(160, 130, 80, .14); }
+.seg button { position: relative; min-height: 32px; padding: 6px 12px; border-radius: 999px; color: var(--jl-ink-2); font-family: var(--font-ui); font-size: 14px; font-weight: 400; }
+.seg button[aria-pressed='true'] { color: #fff; background: linear-gradient(180deg, var(--jl-mint-1), var(--jl-mint-2)); text-shadow: 0 1.5px 0 rgba(35, 137, 107, .5); box-shadow: 0 3px 0 var(--jl-mint-lip); }
+.credits { margin-top: 12px; border: 0; border-radius: 20px; background: #fff; box-shadow: 0 3px 0 rgba(226, 210, 180, .8); }
+.credits summary { color: var(--jl-ink-2); font-weight: 400; }
+
+/* ---------- buttons: mint jelly (go), cream jelly (quiet) ---------- */
+.primary, .sheet-panel > .primary {
+  display: flex; align-items: center; justify-content: center; width: 100%; height: 54px; margin-top: 18px;
+  border: 0; border-radius: 20px; color: #fff;
+  background: linear-gradient(180deg, var(--jl-mint-1), var(--jl-mint-2));
+  font-family: var(--font-ui); font-size: 20px; font-weight: 400; text-shadow: 0 2px 0 rgba(35, 137, 107, .55);
+  box-shadow: inset 0 -4px 0 rgba(35, 137, 107, .35), 0 6px 0 var(--jl-mint-lip), 0 12px 18px -8px rgba(35, 137, 107, .5);
+  transition: transform .1s ease, box-shadow .1s ease;
+}
+.primary:active { background: linear-gradient(180deg, var(--jl-mint-1), var(--jl-mint-2)); transform: translateY(5px) scale(1.01, .97); box-shadow: inset 0 -2px 0 rgba(35, 137, 107, .35), 0 1px 0 var(--jl-mint-lip); }
+.primary:disabled, #ad-watch:disabled { opacity: .6; transform: none; }
+.ad-later {
+  width: 100%; height: 46px; margin-top: 12px; border: 0; border-radius: 18px; color: var(--jl-ink-2);
+  background: linear-gradient(180deg, #fff, var(--jl-cream-2)); font-family: var(--font-ui); font-size: 16px; font-weight: 400;
+  box-shadow: inset 0 -3px 0 rgba(226, 210, 180, .8), 0 4px 0 var(--jl-cream-lip);
+}
+.ad-later:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--jl-cream-lip); }
+
+/* ---------- ad popup ---------- */
+.ad-sheet .sheet-panel { padding: 24px 18px 20px; text-align: center; }
+.ad-thumb .thumb { width: 96px; height: 96px; margin: 0 auto 12px; border-radius: 26px; background: #fff; box-shadow: inset 0 -4px 0 rgba(226, 210, 180, .6), 0 5px 0 var(--jl-cream-lip); animation: jl-wobble 2.4s ease-in-out infinite; }
+@keyframes jl-wobble { 0%, 100% { transform: scale(1, 1); } 45% { transform: scale(1.05, .95); } 60% { transform: scale(.97, 1.03); } }
+.ad-sheet h2 { margin: 0 0 10px; font-size: 27px; }
+.ad-text { margin: 0 auto 4px; color: var(--jl-ink); font-size: 16px; }
+.ad-status { color: var(--jl-pink-lip); font-weight: 400; }
+
+/* ---------- small floating bits ---------- */
+.notice { background: var(--jl-ink); border: 0; border-radius: 18px; color: #fff; font-size: 14px; box-shadow: 0 4px 0 #1b2f27, 0 10px 20px -8px rgba(0, 0, 0, .4); }
+.variants { border: 0; border-radius: 999px; background: linear-gradient(#fff, var(--jl-cream)); box-shadow: 0 4px 0 var(--jl-cream-lip), var(--jl-shadow); backdrop-filter: none; }
+.chip { color: var(--jl-ink-2); font-weight: 400; font-size: 13px; border-radius: 999px; }
+.chip[aria-checked='true'] { color: #fff; background: var(--jl-mint-2); box-shadow: 0 2px 0 var(--jl-mint-lip); }
+
+@media (prefers-reduced-motion: reduce) { .ad-thumb .thumb, .sheet-panel { animation: none; } }
+html.reduce-motion .ad-thumb .thumb, html.reduce-motion .sheet-panel { animation: none; }
+
+/* ---------- drawer without its head row (owner, 2026-11-20): no 장난감 서랍 · 접기, no "10가지 · 무료 N회" (the top-left chip
+   shows the free picks); the 말랑이 / 키보드 switch in the middle. The drawer is 32px lower (the head row's height), so the toy gets it ---------- */
+.dock-toggle, .collection-count { display: none; }
+.dock { height: calc(176px + var(--safe-b)); padding-top: 12px; }
+.dock-toolbar { justify-content: center; margin-bottom: 10px; }
+@media (min-width: 900px) and (min-height: 700px) { .dock { height: calc(186px + var(--safe-b)); padding-top: 14px; } }
+@media (max-height: 520px) { .dock { height: calc(86px + var(--safe-b)); padding-top: 6px; } .dock-toolbar { margin-bottom: 0; } }
+@media (min-aspect-ratio: 3/2) and (max-height: 640px), (min-aspect-ratio: 5/4) and (max-height: 520px), (horizontal-viewport-segments: 2) {
+  .dock { height: auto; padding-top: calc(var(--safe-t) + 12px); }
+  .dock-toolbar { justify-content: stretch; margin-bottom: 6px; }
+}
+
+/* 초기화: a word on a jelly pill instead of the round arrow icon (owner, 2026-11-20) */
+.icon-btn.ghost.text-btn { width: auto; min-width: 0; padding: 0 16px; border-radius: 999px; font-family: var(--font-ui); font-size: 16px; font-weight: 400; color: var(--jl-ink); }
+
+/* the "• 키보드" label over a keycap preset's name is gone (owner, 2026-11-20): every toy shows just its name */
+.now-category { display: none; }

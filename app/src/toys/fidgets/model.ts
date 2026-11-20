@@ -82,7 +82,8 @@ export class FidgetModel {
     const d = delta
       .clone()
       // elastic 말랑이 pull out a long way too (they spring back on release); crunch / wax keep their small give
-      .clampLength(0, this.spec.family === "viscous" ? 2.8 : this.spec.family === "elastic" ? 1.6 : 0.65);
+      // (the memory-foam slimes reach less far than they used to — heavy, not flung about; the 뭉개기 toys still spread wide)
+      .clampLength(0, this.spec.family === "viscous" ? (this.spec.category === "뭉개기" ? 2.8 : 1.8) : this.spec.family === "elastic" ? 1.6 : 0.65);
     if (isStretchy(this.spec)) {
       // the pulled point stays a little inside the slime's box, so the pulled end stays round instead of flattening on the edge
       const s = this.spec, a = c.anchor, m = 0.9;
@@ -242,6 +243,8 @@ export class FidgetModel {
   }
 }
 
+/** share of shell patches that never fall by pressing (islands) — 0: every pressed piece comes off */
+const SURVIVOR_SHARE = 0;
 /** Same shell engine, different topology, fracture threshold and propagation for thin wax vs thick chocolate. */
 export class FractureModel {
   readonly damage: Float32Array;
@@ -250,8 +253,8 @@ export class FractureModel {
   breakEvents = 0;
   /** number of break zones opened by a deep press (the first one is the "first break") */
   crazeEvents = 0;
-  /** share of the shell (by area) that can break by pressing; past it the rest holds (kneading the core then mixes it in, toy.ts) */
-  static readonly LIMIT = 0.25;
+  /** share of the shell (by area) that can break by pressing — all of it: it breaks wherever it is pressed (owner, 2026-11-20; was 0.25) */
+  static readonly LIMIT = 1;
   /** chocolate: every piece can be broken by pressing (all 6) */
   static readonly CHOCOLATE_LIMIT = 1;
   private weights: number[];
@@ -262,7 +265,7 @@ export class FractureModel {
    * Where the shell is breaking. A deep press opens a zone around the finger; it widens while the finger stays down (up to about
    * half the shell) and stops growing when it lifts. Pressing elsewhere opens another zone. The rest of the shell stays whole.
    */
-  private zones: { from: Vector3; reach: number; age: number; v: number }[] = [];
+  private zones: { from: Vector3; reach: number; age: number; v: number; mirror?: { reach: number } }[] = [];
   /** per patch, fixed for the shell: crack depth (0.45–0.9), a jagged-edge factor for the zone border, a fall delay, survivor */
   private crackDepth: Float32Array;
   private edge: Float32Array;
@@ -303,7 +306,8 @@ export class FractureModel {
     this.survivor.fill(0);
     if (n >= 20) {
       const order = Array.from({ length: n }, (_, i) => i).sort((a, b) => keep[b] - keep[a]);
-      for (let k = 0; k < Math.round(n * 0.12); k++) this.survivor[order[k]] = 1;
+      // none any more (owner, 2026-11-20: "누르는 대로 다 부서지도록"); was ≈12 % of the patches
+      for (let k = 0; k < Math.round(n * SURVIVOR_SHARE); k++) this.survivor[order[k]] = 1;
     }
   }
   /** smooth random field over the shell (three low-frequency waves with directions and phases from `v`), in about [-1, 1] */
@@ -376,16 +380,24 @@ export class FractureModel {
         if (!c.held || this.seen.has(c.id)) continue;
         this.seen.add(c.id);
         const zone = near(c.anchor);
-        if (zone) zone.reach = Math.min(1.1, zone.reach + 0.14); // another press there: the break spreads
-        else {
+        if (zone) {
+          zone.reach = Math.min(1.1, zone.reach + 0.14); // another press there: the break spreads
+          if (zone.mirror) zone.mirror.reach = Math.min(1.1, zone.mirror.reach + 0.12);
+        } else {
           this.crazeEvents++;
           this.crackEvents++;
-          this.zones.push({ from: c.anchor.clone(), reach: 0.22, age: 0, v: this.variation });
+          // the squeeze goes through the soft core: the shell bursts on the far side too (the back, which the fixed camera never
+          // lets a finger reach — owner, 2026-11-20 "뒷면 안 깨지니까 이상함"), a moment later
+          const back = { from: new Vector3(c.anchor.x, c.anchor.y, -c.anchor.z), reach: 0.2, age: -0.12, v: this.variation };
+          this.zones.push({ from: c.anchor.clone(), reach: 0.22, age: 0, v: this.variation, mirror: back }, back);
         }
       }
       // holding a deep press widens the break slowly too
       const held = anchor && deepest > 0.05 ? near(anchor) : undefined;
-      if (held) held.reach = Math.min(1.1, held.reach + dt * 0.3);
+      if (held) {
+        held.reach = Math.min(1.1, held.reach + dt * 0.3);
+        if (held.mirror) held.mirror.reach = Math.min(1.1, held.mirror.reach + dt * 0.25);
+      }
     }
     for (const id of this.seen) if (!contacts.some((c) => c.id === id && c.held)) this.seen.delete(id);
     for (let i = 0; i < this.centers.length; i++) {
@@ -410,7 +422,8 @@ export class FractureModel {
         // cracks run a little past the border, opening to each patch's own depth…
         if (inside > -0.25) target = Math.max(target, this.crackDepth[i] * Math.min(1, (inside + 0.25) / 0.25));
         // …and inside it the pieces fall away at their own time (islands stay)
-        if (inside > 0 && !done && !this.survivor[i] && z.age >= 0.15 + this.breakAt[i] * 0.6) target = 1;
+        // (pieces fall almost at once under the finger: 0.04–0.3 s, was 0.15–1 s)
+        if (inside > 0 && !done && !this.survivor[i] && z.age >= 0.04 + this.breakAt[i] * 0.18) target = 1;
       }
       // past the limit the wax only cracks, it no longer comes off (the core is then kneaded to mix it in)
       if (done) target = Math.min(target, 0.95);

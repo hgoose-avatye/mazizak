@@ -17,7 +17,14 @@ interface Profile {
  * Toys you can pull well out of shape: plastic slime (stays stretched) and the elastic 말랑이 (spring back). Both stretch inside
  * PLASTIC_BOUNDS, under a fixed camera that leaves room for it (toy.ts resize). Crunch / wax toys keep their small give.
  */
-export const isStretchy = (s: FidgetSpec) => !!s.plastic || s.family === "elastic";
+export const isStretchy = (s: FidgetSpec) => s.family === "viscous" || s.family === "elastic";
+/**
+ * KEEP_SHAPE, let go: how much of the squash / pull stays — all of it (owner, 2026-11-20: "살짝 돌아가는 느낌 없애줘"; a partial
+ * spring-back was tried first). Kept per material so it can be tuned again.
+ */
+const KEEP_FRACTION: Record<FidgetSpec["family"], number> = { elastic: 1, viscous: 1, wax: 1, particles: 1 };
+/** neighbour-averaging passes over the kept offset when let go (0 = the exact squashed shape; 1+ softened a dent, read as springing back) */
+const SETTLE_SMOOTHING = 0;
 /** How far a stretchy toy may reach, as multiples of its half width / height / depth (the view leaves room for ≈1.65× the width). */
 export const PLASTIC_BOUNDS = { x: 1.35, y: 2, z: 1.1 } as const;
 /** A shared tetrahedral material cage. Mesh UVs/textures stay intact; vertices sample
@@ -32,6 +39,11 @@ export class MaterialCage {
   /** Rest shape when the current grab began (plastic only): finger targets are measured from it, so the creep cannot run away. */
   private grabRest: Float64Array;
   private grabbing = false;
+  /** KEEP_SHAPE: the softened shape the rest settles into after a release, and whether it is still on its way */
+  private settleTo: Float64Array;
+  private settling = false;
+  /** memory foam (finite plastic): seconds since the last release — the dent holds a moment before it starts to fill in */
+  private releasedFor = 0;
   /** Plastic slime: largest offset of the rest shape from its origin (0 when fully home). */
   plasticOffset = 0;
   readonly position: Float64Array;
@@ -55,6 +67,7 @@ export class MaterialCage {
     this.rest = new Float64Array(count * 3);
     this.origin = new Float64Array(count * 3);
     this.grabRest = new Float64Array(count * 3);
+    this.settleTo = new Float64Array(count * 3);
     this.position = new Float64Array(count * 3);
     this.velocity = new Float64Array(count * 3);
     this.previous = new Float64Array(count * 3);
@@ -63,7 +76,7 @@ export class MaterialCage {
       gel = spec.shape === "ball";
     this.profile = {
       volumeCompliance: foam ? 2e-4 : fluid ? 1e-9 : 4e-9,
-      skin: foam ? 0.1 : fluid ? 0.09 : gel ? 0.3 : 0.16,
+      skin: foam ? 0.1 : fluid ? 0.09 : gel ? 0.18 : 0.16, // 슬랑이 softer (owner, 2026-11-20; was 0.3)
       returnHz: foam
         ? 1.3
         : fluid
@@ -73,7 +86,7 @@ export class MaterialCage {
               ? 0.55
               : 0.65
           : gel
-            ? 2.6
+            ? 1.6 // softer, slower wobble (was 2.6)
             : 1.4,
       damping: foam
         ? 18
@@ -84,9 +97,35 @@ export class MaterialCage {
               ? 4.5
               : 5
           : gel
-            ? 5
+            ? 7
             : 14,
     };
+    // KEEP_SHAPE toys feel like dough, not a balloon (owner, 2026-11-20 "풍선 같은 느낌 사라지게"): a press may lose a little volume
+    // instead of bulging the other side out, the skin pulls back less and the wobble dies fast
+    // 찹쌀떡 (mochi) is dough: it keeps its volume and skin, or a squash reads as a deflated balloon (owner, 2026-11-20) — only its
+    // wobble is cut
+    const mochi = spec.shape === "mochi";
+    if (!Number.isFinite(spec.plastic ?? 0) && !foam) {
+      if (!mochi) {
+        this.profile.volumeCompliance = fluid ? 4e-5 : 3e-4;
+        this.profile.skin *= fluid ? 0.7 : 0.4;
+      }
+      this.profile.damping = Math.max(this.profile.damping, fluid ? 10 : 16);
+    }
+    // 뭉개기: squash flat like dough under a palm, not a balloon bulging out round the finger (owner, 2026-11-20) — volume may go,
+    // almost no skin tension, no wobble
+    // 치즈 · 망고 · 휘핑크림 (memory-foam slime): heavy, not floaty — the slow wobble settles at once (owner, 2026-11-20 "묵직하게")
+    if (fluid && spec.category !== "뭉개기") {
+      this.profile.returnHz = 1;
+      this.profile.damping = 14;
+    }
+    if (spec.category === "뭉개기") {
+      // no volume pull at all (it pushed the sides out like a balloon and crept back), no skin pull, no wobble
+      // (owner, 2026-11-20 "복원 느낌 있으면 안 됨 · 풍선 느낌 더 빼")
+      this.profile.volumeCompliance = Infinity;
+      this.profile.skin = 0;
+      this.profile.damping = 26;
+    }
     const index = (x: number, y: number, z: number) => x + n * (y + n * z);
     for (let z = 0; z < n; z++)
       for (let y = 0; y < n; y++)
@@ -204,11 +243,33 @@ export class MaterialCage {
     const r = this.rest,
       p = this.position,
       o = this.origin;
+    const keep = !Number.isFinite(this.spec.plastic!); // KEEP_SHAPE: never flows all the way back
+    // let go: the shape at that instant is the kept one (the rest lagged the squash a hair; snapping it stops a tiny spring-back)
+    if (keep && !held && this.grabbing) { r.set(p); this.beginSettle(); }
     if (held && !this.grabbing) this.grabRest.set(r);
     this.grabbing = held;
-    const k = held ? 1 - Math.exp(-dt / 0.25) : 1 - Math.exp(-dt / this.spec.plastic!),
+    if (keep && !held) {
+      // let go: ease into the softened, partly sprung-back shape (≈0.3 s); what was lifted sags down over ≈1 s
+      if (!this.settling) { this.plasticOffset = 0; return; }
+      const k = 1 - Math.exp(-dt / 0.3), sag = 1 - Math.exp(-dt / 1);
+      let left = 0;
+      for (let i = 0; i < r.length; i++) {
+        const lifted = i % 3 === 1 && r[i] > this.settleTo[i];
+        r[i] += (this.settleTo[i] - r[i]) * (lifted ? sag : k);
+        left = Math.max(left, Math.abs(this.settleTo[i] - r[i]));
+      }
+      for (let i = 1; i < r.length; i += 3) r[i] = Math.max(-this.spec.height, r[i]);
+      if (left < 0.002) { r.set(this.settleTo); this.settling = false; }
+      this.plasticOffset = this.settling ? left : 0; // at rest once settled: no endless redraw
+      return;
+    }
+    // while held the rest follows the squash fast (0.08 s): even a quick tap leaves its mark, and on release there is no quick
+    // spring-back first — a kept shape stays, a memory-foam one (찹쌀떡) only fills back in slowly
+    this.releasedFor = held ? 0 : this.releasedFor + dt;
+    const hold = !held && this.releasedFor < 0.4; // memory foam: the dent stays ≈0.4 s, then slowly fills back in
+    const k = held ? 1 - Math.exp(-dt / 0.08) : hold ? 0 : 1 - Math.exp(-dt / this.spec.plastic!),
       // let go, what was lifted sags down first (≈1 s); spreading back to the original outline takes the full `plastic` time
-      sag = held ? k : 1 - Math.exp(-dt / Math.min(1, this.spec.plastic!));
+      sag = held ? k : hold ? 0 : 1 - Math.exp(-dt / Math.min(1, this.spec.plastic!));
     let offset = 0;
     for (let i = 0; i < r.length; i++) {
       const lifted = !held && i % 3 === 1 && r[i] > o[i];
@@ -219,6 +280,40 @@ export class MaterialCage {
     for (let i = 1; i < r.length; i += 3) r[i] = Math.max(-this.spec.height, r[i]);
     if (offset < 0.003 && !held) r.set(o);
     this.plasticOffset = offset < 0.003 && !held ? 0 : offset;
+  }
+  /**
+   * The shape a kept squash settles into: the rest's offset from the original (optionally smoothed over the lattice,
+   * SETTLE_SMOOTHING passes), scaled by the material's KEEP_FRACTION, nothing left hanging in the air (lifted parts come down).
+   */
+  private beginSettle() {
+    const n = this.n, r = this.rest, o = this.origin, count = n * n * n;
+    let off = new Float64Array(count * 3);
+    for (let i = 0; i < off.length; i++) off[i] = r[i] - o[i];
+    const at = (x: number, y: number, z: number) => (x + n * (y + n * z)) * 3;
+    for (let pass = 0; pass < SETTLE_SMOOTHING; pass++) {
+      const next = new Float64Array(off.length);
+      for (let z = 0; z < n; z++)
+        for (let y = 0; y < n; y++)
+          for (let x = 0; x < n; x++) {
+            const i = at(x, y, z);
+            const nb = [[x - 1, y, z], [x + 1, y, z], [x, y - 1, z], [x, y + 1, z], [x, y, z - 1], [x, y, z + 1]]
+              .filter(([a, b, c]) => a >= 0 && b >= 0 && c >= 0 && a < n && b < n && c < n);
+            for (let d = 0; d < 3; d++) {
+              let sum = 0;
+              for (const [a, b, c] of nb) sum += off[at(a, b, c) + d];
+              next[i + d] = 0.5 * off[i + d] + 0.5 * (sum / nb.length);
+            }
+          }
+      off = next;
+    }
+    const keep = KEEP_FRACTION[this.spec.family];
+    for (let i = 0; i < off.length; i++) {
+      let v = o[i] + off[i] * keep;
+      if (i % 3 === 1) v = Math.max(-this.spec.height, Math.min(v, Math.max(o[i], r[i] - (r[i] - o[i]) * 1))); // lifted parts come down
+      if (i % 3 === 1 && v > o[i]) v = o[i];
+      this.settleTo[i] = v;
+    }
+    this.settling = true;
   }
   private integrate(dt: number, contacts: CageContact[], fold: number) {
     const p = this.position,
@@ -251,9 +346,10 @@ export class MaterialCage {
       ? held[0].anchor.clone().add(held[1].anchor).multiplyScalar(0.5)
       : null;
     const alpha = profile.volumeCompliance / (dt * dt);
+    const volumeOn = Number.isFinite(profile.volumeCompliance); // 뭉개기: off
     for (let iteration = 0; iteration < 3; iteration++) {
       // Tetrahedral volume constraints move displaced filling into neighbouring regions.
-      for (let t = 0; t < this.volumes.length; t++) {
+      for (let t = 0; volumeOn && t < this.volumes.length; t++) {
         const k = t * 4,
           a = this.tets[k],
           b = this.tets[k + 1],
@@ -458,6 +554,7 @@ export class MaterialCage {
     this.rest.set(this.origin);
     this.grabRest.set(this.origin);
     this.grabbing = false;
+    this.settling = false;
     this.plasticOffset = 0;
     this.position.set(this.rest);
     this.velocity.fill(0);

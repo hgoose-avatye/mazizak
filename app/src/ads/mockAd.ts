@@ -41,9 +41,13 @@ export function mockSdk(mode: 'mock' | 'mock-fail'): Sdk {
   );
   const showFullScreenAd = Object.assign(
     ((p) => {
+      // `&adorder=late`: report the reward after `dismissed`, as the native SDK sometimes does
+      const late = new URLSearchParams(location.search).get('adorder') === 'late';
+      let earned = false;
+      const reward = () => p.onEvent({ type: 'userEarnedReward', data: { unitType: 'toy', unitAmount: 1 } });
       const stop = playAd(num('adsec', 15), num('adskip', 5), {
-        rewarded: () => p.onEvent({ type: 'userEarnedReward', data: { unitType: 'toy', unitAmount: 1 } }),
-        closed: () => p.onEvent({ type: 'dismissed' }),
+        rewarded: () => (late ? (earned = true) : reward()),
+        closed: () => { p.onEvent({ type: 'dismissed' }); if (late && earned) setTimeout(reward, 400); },
       });
       p.onEvent({ type: 'requested' });
       p.onEvent({ type: 'show' });

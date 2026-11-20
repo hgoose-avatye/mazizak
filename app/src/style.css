@@ -1,3 +1,5 @@
+/* Jua (주아체, Woowahan Brothers, SIL OFL 1.1 — fonts/jua/OFL.txt): the whole UI, same face as the SDK screens. Split by unicode-range, so only the glyphs on screen load. */
+@import './fonts/jua/jua.css';
 /* SUITE (brand, toy name, headings, category) + SUIT (all other UI): official variable WOFF2, unmodified — see src/fonts/README.md */
 @font-face {
   font-family: 'SUITE Variable';
@@ -14,9 +16,9 @@
   font-display: swap;
 }
 :root {
-  --font-ui: 'SUITE Variable', -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', sans-serif;
-  --font-meta: 'SUIT Variable', -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-brand: 'SUITE Variable', var(--font-ui);
+  --font-ui: 'Jua', 'SUITE Variable', -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', sans-serif;
+  --font-meta: 'Jua', 'SUIT Variable', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-brand: 'Jua', var(--font-ui);
   --bg: #e9e4dd;
   /* the current toy's backdrop colour (main.ts sets it from the toy's scene), so the page around the stage blends with it */
   --stage-bg: var(--bg);

@@ -264,7 +264,7 @@ html.dock-folded .dock-body { display: none; }
 .ad-thumb { display: grid; place-items: center; min-height: 8px; }
 .ad-thumb .thumb { width: 84px; height: 84px; border-radius: 18px; margin: 4px auto 10px; }
 .ad-sheet h2 { margin: 0 0 8px; }
-.ad-text { margin: 0 auto 6px; max-width: 320px; color: #5f6b5a; font-size: 14px; line-height: 1.6; }
+.ad-text { margin: 0 auto 6px; max-width: 320px; color: #5f6b5a; font-size: 15px; line-height: 1.6; white-space: pre-line; word-break: keep-all; }
 .ad-status { min-height: 20px; margin: 0 0 10px; color: #a0614c; font-size: 13px; font-weight: 650; }
 .ad-later { width: 100%; height: 44px; margin-top: 6px; border: 0; background: none; color: #7a8574; font-size: 14px; font-weight: 600; cursor: pointer; }
 #ad-watch:disabled { opacity: .55; }
@@ -277,3 +277,41 @@ html.dock-folded .dock-body { display: none; }
 .credits-body li { padding: 6px 0; border-top: 1px solid #ebeee4; }
 .credits-body li b { display: block; color: #3f5538; font-weight: 700; }
 .credits-ver { margin-top: 12px !important; color: #9ba991; }
+
+/* ---------- game-style header (2026-11-20): free-pick timer top left, icons top right, the toy's name big in the middle ---------- */
+:root { --name-top: calc(var(--safe-t) + 84px); --name-size: 34px; --name-lh: 1.1; }
+.app-head { top: calc(var(--safe-t) + 10px); height: 48px; padding: 0 12px 0 14px; }
+.now-playing { left: calc(var(--safe-l) + 16px); right: calc(max(var(--safe-r), var(--dock-w)) + 16px); text-align: center; }
+.now-category { font-size: 13px; }
+.now-playing h2 {
+  font-size: var(--name-size); letter-spacing: -1px; color: var(--ink);
+  text-shadow: 0 2px 0 rgba(255, 255, 255, .95), 0 8px 18px rgba(38, 63, 53, .16);
+}
+.free-timer {
+  pointer-events: auto;
+  display: inline-flex; flex-direction: column; justify-content: center; gap: 3px;
+  height: 48px; padding: 0 14px 0 12px;
+  border-radius: 16px;
+  background: rgba(251, 250, 246, .88);
+  border: 1px solid rgba(60, 83, 61, .12);
+  box-shadow: 0 3px 0 rgba(49, 91, 70, .12), 0 6px 16px -8px rgba(38, 63, 53, .3);
+  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+}
+.free-timer-label { font-size: 11px; font-weight: 800; line-height: 1; color: #536b57; letter-spacing: -.2px; }
+.free-timer-row { display: flex; align-items: center; gap: 7px; line-height: 1; }
+.free-pips { display: flex; gap: 3px; }
+.free-pips i { width: 11px; height: 11px; border-radius: 50%; background: #dfe4da; box-shadow: inset 0 -1.5px 0 rgba(0, 0, 0, .08); }
+.free-pips i.on { background: radial-gradient(circle at 35% 30%, #ffe48a 0 25%, #f4b93a 60%, #d9952a 100%); box-shadow: 0 1px 0 #b77a1f; }
+.free-timer-time { font-family: var(--font-meta, system-ui); font-size: 14px; font-weight: 800; color: var(--ink); font-variant-numeric: tabular-nums; letter-spacing: .2px; }
+.free-timer.empty .free-timer-time { color: #b5652c; }
+.free-bonus { margin-left: -3px; padding: 1px 5px; border-radius: 999px; background: #f4b93a; color: #5a3505; font-size: 11px; line-height: 13px; }
+@media (min-width: 900px) and (min-height: 700px) {
+  :root { --name-top: calc(var(--safe-t) + 96px); --name-size: 44px; }
+  .app-head { top: calc(var(--safe-t) + 14px); padding: 0 28px; }
+}
+@media (max-height: 520px) {
+  .app-head { top: calc(var(--safe-t) + 4px); }
+}
+
+/* Jua has one weight: no faux bold (font-weight values above stay for the SUITE fallback) */
+html { font-synthesis-weight: none; }

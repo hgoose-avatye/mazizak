@@ -34,7 +34,7 @@ describe("shipped sound files", () => {
   });
 
   it("each fidget toy loads exactly the chunks holding its pools, and every pool it plays is in them", () => {
-    for (const f of FIDGETS) {
+    for (const f of FIDGETS.filter((f) => !f.soundAs)) { // (the 뭉개기 toys borrow these: catalog soundAs)
       const names = SFX_FIDGET_TOYS[f.id] ?? [];
       expect(names.length, f.id).toBeGreaterThan(0);
       for (const n of names) expect(chunk(n).toys, n).toContain(f.id);

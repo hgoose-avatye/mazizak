@@ -8,21 +8,35 @@ interface Colorway {
   caseRoughness: number;
   roughness: number;
   clearcoat: number;
+  /** game-style theme (owner, 2026-11-20 "이름에 맞춰 게임처럼"): a pattern printed on every cap top, the 10 legends (the middle
+   *  row becomes the theme's icons, the space bar its name), and plate / switch colours */
+  theme?: KeyTheme;
 }
+
+export type DecoPattern = 'speckle' | 'frost' | 'swirl' | 'powder' | 'chips' | 'ring' | 'blush' | 'stone' | 'bubbles' | 'grain';
+export interface KeyTheme {
+  pattern: DecoPattern;
+  /** pattern colour (CSS) */
+  ink: string;
+  legends: readonly string[];
+  plate: number;
+  switches: number;
+}
+const row = (icons: [string, string, string], space: string) => ['만', '지', '작', ...icons, '1', '2', '3', space];
 
 /** Individually composed keysets: placement, contrast, materials and case are designed together. */
 export const KEYBOARD_COLORS: Record<KeyPresetId, Colorway> = {
-  pebble: { name: 'Gray ivory', keys: [0xd9d6cd,0xece8de,0xbdbab1,0xece8de,0xd9d6cd,0xece8de,0xc9c5bb,0xbdbab1,0xd9d6cd,0xbdbab1], tray: 0xcfcbc0, metalness: 0, caseRoughness: 0.82, roughness: 0.78, clearcoat: 0 },
-  clack: { name: 'Clear ice', keys: [0xeaf4f9,0xcfe3ee,0xf7fbfd,0xcfe3ee,0xeaf4f9,0xf7fbfd,0xf7fbfd,0xcfe3ee,0xeaf4f9,0xb9d6e6], tray: 0xdcebf3, metalness: 0, caseRoughness: 0.12, roughness: 0.14, clearcoat: 0.8 },
-  'creamy-thocky': { name: 'Butter cream', keys: [0xf3ead6,0xefe0bf,0xf8f1e2,0xefe0bf,0xf8f1e2,0xf3ead6,0xf8f1e2,0xefe0bf,0xf3ead6,0xe8d3a5], tray: 0xe9dcc0, metalness: 0, caseRoughness: 0.62, roughness: 0.58, clearcoat: 0.1 },
-  topre: { name: 'Marshmallow', keys: [0xf4eef6,0xe3d8ee,0xfbf7f3,0xe3d8ee,0xf4eef6,0xfbf7f3,0xfbf7f3,0xe3d8ee,0xf4eef6,0xd4c4e6], tray: 0xe8e0ee, metalness: 0, caseRoughness: 0.64, roughness: 0.6, clearcoat: 0.12 },
-  'turquoise-tealios': { name: 'Mint turquoise', keys: [0xf4f8f6,0x8fd6c6,0x2c9c98,0xf4f8f6,0x8fd6c6,0x2c9c98,0xf4f8f6,0xf4f8f6,0x8fd6c6,0x2c9c98], tray: 0x5fb8ad, metalness: 0, caseRoughness: 0.7, roughness: 0.66, clearcoat: 0 },
-  'ibm-buckling-spring': { name: 'Terminal', keys: [0xa65b4b,0xe5dfcc,0xe5dfcc, 0xe5dfcc,0xe5dfcc,0xa8aaa2, 0xa8aaa2,0xa8aaa2,0xa8aaa2, 0xe5dfcc], tray: 0xc9c3af, metalness: 0, caseRoughness: .8, roughness: .74, clearcoat: 0 },
+  pebble: { name: 'Gray ivory', keys: [0xd9d6cd,0xece8de,0xbdbab1,0xece8de,0xd9d6cd,0xece8de,0xc9c5bb,0xbdbab1,0xd9d6cd,0xbdbab1], tray: 0xcfcbc0, metalness: 0, caseRoughness: 0.82, roughness: 0.78, clearcoat: 0 , theme: { pattern: 'speckle', ink: 'rgba(70,66,60,0.55)', legends: row(['🪨', '🌿', '💧'], '조약돌'), plate: 0x5d5a55, switches: 0x8a857c } },
+  clack: { name: 'Clear ice', keys: [0xeaf4f9,0xcfe3ee,0xf7fbfd,0xcfe3ee,0xeaf4f9,0xf7fbfd,0xf7fbfd,0xcfe3ee,0xeaf4f9,0xb9d6e6], tray: 0xdcebf3, metalness: 0, caseRoughness: 0.12, roughness: 0.14, clearcoat: 0.8 , theme: { pattern: 'frost', ink: 'rgba(255,255,255,0.85)', legends: row(['❄️', '🧊', '💎'], '❄ 얼음 ❄'), plate: 0x9cc8e0, switches: 0xd6ecf6 } },
+  'creamy-thocky': { name: 'Butter cream', keys: [0xf3ead6,0xefe0bf,0xf8f1e2,0xefe0bf,0xf8f1e2,0xf3ead6,0xf8f1e2,0xefe0bf,0xf3ead6,0xe8d3a5], tray: 0xe9dcc0, metalness: 0, caseRoughness: 0.62, roughness: 0.58, clearcoat: 0.1 , theme: { pattern: 'swirl', ink: 'rgba(255,250,235,0.9)', legends: row(['🍰', '🧁', '🍦'], '크림'), plate: 0xc9a46e, switches: 0xf3e6c8 } },
+  topre: { name: 'Marshmallow', keys: [0xf4eef6,0xe3d8ee,0xfbf7f3,0xe3d8ee,0xf4eef6,0xfbf7f3,0xfbf7f3,0xe3d8ee,0xf4eef6,0xd4c4e6], tray: 0xe8e0ee, metalness: 0, caseRoughness: 0.64, roughness: 0.6, clearcoat: 0.12 , theme: { pattern: 'powder', ink: 'rgba(255,255,255,0.9)', legends: row(['☁️', '🍡', '💗'], '마시멜로'), plate: 0xc7b3dd, switches: 0xf5eefb } },
+  'turquoise-tealios': { name: 'Mint chocolate', keys: [0xa8e6cf,0x8fdcc2,0xa8e6cf,0x8fdcc2,0x6b4532,0x8fdcc2,0xa8e6cf,0x8fdcc2,0xa8e6cf,0x6b4532], tray: 0x5a3a2a, metalness: 0, caseRoughness: 0.7, roughness: 0.66, clearcoat: 0 , theme: { pattern: 'chips', ink: 'rgba(88,52,34,0.95)', legends: row(['🍃', '🍫', '🌱'], '민트초코'), plate: 0x4a2f22, switches: 0x6b4532 } },
+  'ibm-buckling-spring': { name: 'Typewriter', keys: [0x2b2b2d,0x2b2b2d,0x2b2b2d, 0x2b2b2d,0xa6392f,0x2b2b2d, 0x2b2b2d,0x2b2b2d,0x2b2b2d, 0x2b2b2d], tray: 0x9ea2a6, metalness: .9, caseRoughness: .32, roughness: .35, clearcoat: .5 , theme: { pattern: 'ring', ink: 'rgba(205,210,214,0.95)', legends: row(['✉️', '✒️', '📜'], '타자기'), plate: 0x2a2a2c, switches: 0x4a4a4e } },
   'oil-king': { name: 'Midnight brass', keys: [0x22272b,0x22272b,0x32383a, 0x32383a,0xc09b54,0x22272b, 0x22272b,0x32383a,0xe1d7bd, 0x22272b], tray: 0x191f23, metalness: .85, caseRoughness: .34, roughness: .48, clearcoat: .15 },
   'boba-u4t': { name: 'Espresso', keys: [0x805645,0xdbc8a5,0xeee1c9, 0xdbc8a5,0x805645,0xdbc8a5, 0xeee1c9,0xc47d45,0x805645, 0x805645], tray: 0xd5b991, metalness: 0, caseRoughness: .6, roughness: .42, clearcoat: .24 },
   'box-jade': { name: 'Clear jade', keys: [0x9fd8bf,0xdff2e8,0x3f9a7c,0xdff2e8,0x9fd8bf,0xdff2e8,0x3f9a7c,0xdff2e8,0x9fd8bf,0xc9ecdb], tray: 0x6fb89a, metalness: 0, caseRoughness: 0.3, roughness: 0.28, clearcoat: 0.45 },
-  'silent-peach-v3': { name: 'Peach fuzz', keys: [0xf6e4d8,0xfaf3ec,0xe9bfa6,0xfaf3ec,0xf6e4d8,0xfaf3ec,0xe9bfa6,0xfaf3ec,0xf6e4d8,0xe9bfa6], tray: 0xefd2bf, metalness: 0, caseRoughness: 0.88, roughness: 0.85, clearcoat: 0 },
-  'mongdol-pl87w': { name: 'Sea stone', keys: [0x3f4244,0x4c4f51,0x8a8d8e,0x4c4f51,0x3f4244,0x4c4f51,0xa5a7a6,0x4c4f51,0x3f4244,0x8a8d8e], tray: 0x2b2d2e, metalness: 0, caseRoughness: 0.97, roughness: 0.95, clearcoat: 0 },
-  'jjigae-topre': { name: 'Cocoa stew', keys: [0xefe0c4,0xe3d0ae,0x6b4532,0xe3d0ae,0xefe0c4,0xe3d0ae,0x6b4532,0xe3d0ae,0xefe0c4,0x6b4532], tray: 0x3a3331, metalness: 0, caseRoughness: 0.74, roughness: 0.7, clearcoat: 0 },
-  'dojagi-space65': { name: 'Tofu & soy', keys: [0xfaf8f1,0xf1ede2,0xfaf8f1,0xf1ede2,0xfaf8f1,0xe6dfcf,0xf1ede2,0xfaf8f1,0xf1ede2,0x8a6448], tray: 0x4a3a2e, metalness: 0, caseRoughness: 0.9, roughness: 0.92, clearcoat: 0 },
+  'silent-peach-v3': { name: 'Peach fuzz', keys: [0xf6e4d8,0xfaf3ec,0xe9bfa6,0xfaf3ec,0xf6e4d8,0xfaf3ec,0xe9bfa6,0xfaf3ec,0xf6e4d8,0xe9bfa6], tray: 0xefd2bf, metalness: 0, caseRoughness: 0.88, roughness: 0.85, clearcoat: 0 , theme: { pattern: 'blush', ink: 'rgba(255,140,150,0.45)', legends: row(['🍑', '🌸', '💕'], '복숭아'), plate: 0xe2a58c, switches: 0xf6d6c6 } },
+  'mongdol-pl87w': { name: 'Sea stone', keys: [0x3f4244,0x4c4f51,0x8a8d8e,0x4c4f51,0x3f4244,0x4c4f51,0xa5a7a6,0x4c4f51,0x3f4244,0x8a8d8e], tray: 0x2b2d2e, metalness: 0, caseRoughness: 0.97, roughness: 0.95, clearcoat: 0 , theme: { pattern: 'stone', ink: 'rgba(230,232,232,0.35)', legends: row(['🌊', '🐚', '⚫'], '몽돌'), plate: 0x1e2021, switches: 0x3a3d3f } },
+  'jjigae-topre': { name: 'Kimchi stew', keys: [0xe8553a,0xf07a3c,0xe8553a,0xf6efe2,0xe8553a,0xf6efe2,0xf07a3c,0xe8553a,0xf07a3c,0xd8432c], tray: 0x2e2422, metalness: 0, caseRoughness: 0.74, roughness: 0.7, clearcoat: 0 , theme: { pattern: 'bubbles', ink: 'rgba(255,255,255,0.75)', legends: row(['🔥', '🌶️', '🍲'], '보글보글 찌개'), plate: 0x2a2220, switches: 0x6b3a2a } },
+  'dojagi-space65': { name: 'Tofu & soy', keys: [0xfaf8f1,0xf1ede2,0xfaf8f1,0xf1ede2,0xfaf8f1,0xe6dfcf,0xf1ede2,0xfaf8f1,0xf1ede2,0x8a6448], tray: 0x4a3a2e, metalness: 0, caseRoughness: 0.9, roughness: 0.92, clearcoat: 0 , theme: { pattern: 'grain', ink: 'rgba(150,130,100,0.35)', legends: row(['🥢', '🫘', '🍚'], '두부'), plate: 0x3a2e24, switches: 0x8a6448 } },
 };

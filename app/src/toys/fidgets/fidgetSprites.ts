@@ -7,6 +7,7 @@
  */
 import { SFX_FIDGET_CHUNKS, SFX_FIDGET_TOYS } from "../../audio/sfxManifest";
 import { fetchSprite, forgetUnlessDecodeError } from "../../audio/fetchSprite";
+import { findFidget } from "./catalog";
 
 export interface SpriteEntry {
   start: number;
@@ -86,7 +87,8 @@ export function loadChunk(ctx: BaseAudioContext, name: string): Promise<LoadedSp
   return p;
 }
 /** the chunks a toy plays from */
-export const chunksOf = (toyId: string): string[] => SFX_FIDGET_TOYS[toyId] ?? [];
+// the 뭉개기 toys borrow another toy's sounds (catalog soundAs)
+export const chunksOf = (toyId: string): string[] => SFX_FIDGET_TOYS[findFidget(toyId)?.soundAs ?? toyId] ?? [];
 /** Everything a toy needs, by source sprite (pools of its chunks merged), fetched in parallel. */
 export async function loadToySprites(ctx: BaseAudioContext, toyId: string): Promise<Partial<Record<SpriteName, LoadedSprite>>> {
   const names = chunksOf(toyId);

@@ -13,8 +13,9 @@ const contact = {
   held: true,
 };
 it("fixed substeps produce consistent pressure deformation at 60 and 120 Hz", () => {
-  const a = new MaterialCage(spec("S01")),
-    b = new MaterialCage(spec("S01"));
+  // the integrator itself (S01 without KEEP_SHAPE: the plastic flow is a per-frame creep, not part of the fixed substeps)
+  const a = new MaterialCage({ ...spec("S01"), plastic: undefined }),
+    b = new MaterialCage({ ...spec("S01"), plastic: undefined });
   for (let i = 0; i < 60; i++) a.step(1 / 60, [contact], 0);
   for (let i = 0; i < 120; i++) b.step(1 / 120, [contact], 0);
   let error = 0;
@@ -58,22 +59,21 @@ it("opposed finger grips push filling into the free front surface rather than cr
   expect(cage.volumeRatio).toBeGreaterThan(0.85);
   expect(cage.volumeRatio).toBeLessThan(1.15);
 });
-it("plastic slime (치즈) stays stretched after release, flows back over time, and reset snaps it home", () => {
-  const cage = new MaterialCage(spec("L01"));
+it("망고 (memory foam) stays stretched a moment after release, then slowly flows home; reset snaps it home", () => {
+  const cage = new MaterialCage(spec("L02")); // (치즈 moved to 뭉개기: it keeps its shape)
   const tip = new Vector3(1.2, 0, 0);
   const pull = { anchor: tip.clone(), normal: new Vector3(1, 0, 0), drag: new Vector3(0.44, 0, 0), depth: { x: 0, v: 0 }, held: true };
-  // the largest pull the toy allows from here: model.drag keeps the pulled point at 0.9 of the bounds (1.35 × 1.35 × 0.9 ≈ 1.64)
   for (let i = 0; i < 240; i++) cage.step(1 / 120, [pull], 0); // 2 s pulled to the right
   const pulled = cage.deform(tip, new Vector3()).x - tip.x;
   expect(pulled).toBeGreaterThan(0.2); // drawn out…
   const box = cage.position; // …but never past its bounds (it stays in the fixed view)
-  for (let i = 0; i < box.length; i += 3) expect(Math.abs(box[i])).toBeLessThanOrEqual(1.35 * 1.35 + 1e-9);
+  for (let i = 0; i < box.length; i += 3) expect(Math.abs(box[i])).toBeLessThanOrEqual(1.35 * spec("L02").width + 1e-9);
   expect([...cage.position].every(Number.isFinite)).toBe(true);
-  expect(cage.volumeRatio).toBeGreaterThan(0.8); // it thins as it lengthens rather than gaining volume
+  expect(cage.volumeRatio).toBeGreaterThan(0.8);
   expect(cage.volumeRatio).toBeLessThan(1.2);
-  for (let i = 0; i < 120; i++) cage.step(1 / 120, [], 0); // 1 s after release
+  for (let i = 0; i < 60; i++) cage.step(1 / 120, [], 0); // 0.5 s after release
   expect(cage.deform(tip, new Vector3()).x - tip.x).toBeGreaterThan(pulled * 0.6); // still stretched
-  for (let i = 0; i < 120 * 40; i++) cage.step(1 / 120, [], 0); // 40 s later (time constant 8 s)
+  for (let i = 0; i < 120 * 20; i++) cage.step(1 / 120, [], 0); // 20 s later (memory foam, ≈2.5 s)
   expect(cage.deform(tip, new Vector3()).distanceTo(tip)).toBeLessThan(0.05);
   for (let i = 0; i < 240; i++) cage.step(1 / 120, [pull], 0);
   cage.reset();
@@ -81,3 +81,34 @@ it("plastic slime (치즈) stays stretched after release, flows back over time, 
   expect([...cage.position]).toEqual([...cage.origin]);
   expect(cage.plasticOffset).toBe(0);
 });
+
+it("슬랑이 (memory foam) holds a dent a moment, then fills back in; a wax ball keeps its dent (KEEP_SHAPE)", () => {
+  const dentAfter = (id: string, seconds: number[]) => {
+    const cage = new MaterialCage(spec(id)), s = spec(id), top = new Vector3(0, s.height, 0);
+    const press = { anchor: top.clone(), normal: new Vector3(0, 1, 0), drag: new Vector3(), depth: { x: s.press, v: 0 }, held: true };
+    for (let i = 0; i < 120; i++) cage.step(1 / 120, [press], 0);
+    const out = [top.y - cage.deform(top, new Vector3()).y];
+    let t = 0;
+    for (const until of seconds) {
+      while (t < until) { cage.step(1 / 120, [{ ...press, held: false, depth: { x: 0, v: 0 } }], 0); t += 1 / 120; }
+      out.push(top.y - cage.deform(top, new Vector3()).y);
+    }
+    return out;
+  };
+  const [held, early, late] = dentAfter("S01", [0.3, 15]);
+  expect(held).toBeGreaterThan(0.03);
+  expect(early).toBeGreaterThan(held * 0.6);
+  expect(late).toBeLessThan(held * 0.1);
+  const [waxHeld, waxLate] = dentAfter("W01", [10]);
+  expect(waxLate).toBeGreaterThan(waxHeld * 0.8);
+});
+
+it("뭉개기 (치즈) keeps a squash exactly: no spring-back at all and no volume pushing the sides out", () => {
+  const cage = new MaterialCage(spec("L01")), s = spec("L01"), top = new Vector3(0, s.height, 0);
+  const press = { anchor: top.clone(), normal: new Vector3(0, 1, 0), drag: new Vector3(), depth: { x: s.press, v: 0 }, held: true };
+  for (let i = 0; i < 120; i++) cage.step(1 / 120, [press], 0);
+  const held = top.y - cage.deform(top, new Vector3()).y;
+  for (let i = 0; i < 120 * 5; i++) cage.step(1 / 120, [{ ...press, held: false, depth: { x: 0, v: 0 } }], 0);
+  expect(top.y - cage.deform(top, new Vector3()).y).toBeGreaterThan(held * 0.97);
+});
+

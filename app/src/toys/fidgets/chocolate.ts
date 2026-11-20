@@ -46,7 +46,7 @@ function voronoiCells(poly: [number, number][], seeds: THREE.Vector2[]) {
   }).filter((c) => c.length >= 3);
 }
 /** most shards a bar breaks into: past it pressing a shard no longer breaks it smaller */
-export const MAX_SHARDS = 40;
+export const MAX_SHARDS = 90; // small pieces (owner, 2026-11-20 "자잘하게"; was 40)
 const rand = (n: number) => {
   const x = Math.sin(n * 91.345 + 7.13) * 43758.5453;
   return x - Math.floor(x);
@@ -81,7 +81,7 @@ export class ChocolateBar {
     const px = THREE.MathUtils.clamp(press.x, r.x0 + 0.02, r.x1 - 0.02),
       py = THREE.MathUtils.clamp(press.y, r.y0 + 0.02, r.y1 - 0.02);
     const d = dir.lengthSq() > 1e-6 ? dir.clone().normalize() : new THREE.Vector2(1, 0);
-    const n = 2 + Math.floor(rand(this.seed++) * 5); // 2–6 shards
+    const n = 4 + Math.floor(rand(this.seed++) * 6); // 4–9 shards (was 2–6)
     const seeds: THREE.Vector2[] = [new THREE.Vector2(px, py)];
     for (let k = 1; k < n; k++) {
       if (rand(this.seed++) < 0.5) {
