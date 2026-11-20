@@ -8,7 +8,7 @@ export interface ToyContext {
   requestFrame: () => void;
   /** canvas size in CSS px */
   size: () => { w: number; h: number };
-  haptic: (ms: number) => void;
+  haptic: (kind: import('./haptics').HapticKind) => void;
   /** a toy calls this when its soundStatus() changes (the app shows / hides the small sound-loading chip) */
   soundChanged: () => void;
 }

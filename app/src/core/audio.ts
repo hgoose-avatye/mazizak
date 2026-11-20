@@ -338,6 +338,11 @@ export class AudioEngine {
     this.voices = this.voices.filter((v) => !v.src.buffer || v.started + v.src.buffer.duration + 0.05 > now);
   }
 
+  /** the master bus (volume + mute + limiter): synthesized effects (src/audio/synthSfx.ts) play through it */
+  get bus(): AudioNode {
+    return this.master;
+  }
+
   setMuted(m: boolean): void {
     this.muted = m;
     this.master.gain.setTargetAtTime(m ? 0 : this.volume, this.ctx.currentTime, 0.01);

@@ -60,10 +60,13 @@ async function open(w, h, dpr, inset) {
   return { ctx, p, cdp, touch, errors };
 }
 const report = (p) => p.evaluate(() => window.__MANZIZAK__.report());
+// the intro logo plays ~1.75 s before the app shows (main.ts reveal): measure only once it has gone
+const noSplash = (p) => p.waitForFunction(() => !document.getElementById('splash'), null, { timeout: 8000 }).catch(() => {});
 async function go(p, hash, id) {
   await p.evaluate((h) => { location.hash = h; }, hash);
   await p.waitForFunction((i) => { const r = window.__MANZIZAK__?.report(); return r && (i === 'keyboard' ? r.keyRectsPx?.length : r.id === i); }, id, { timeout: 20000 });
   await p.evaluate(() => document.fonts.ready);
+  await noSplash(p);
   await sleep(250);
 }
 
@@ -83,7 +86,8 @@ function layoutProbe(inset) {
   const list = document.querySelector('#toy-list'), lr = list.getBoundingClientRect();
   const lc = getComputedStyle(list), box = { l: lr.left + parseFloat(lc.paddingLeft), r: lr.right - parseFloat(lc.paddingRight), t: lr.top + parseFloat(lc.paddingTop), b: lr.bottom - parseFloat(lc.paddingBottom) };
   // "in view" = inside the list's content box; an item scrolled under the list's own end padding (home-indicator room) is mid-scroll
-  const items = [...list.querySelectorAll('.toy-item')].filter((e) => { const r = e.getBoundingClientRect(); return vis(e) && r.left >= box.l - 1 && r.right <= box.r + 1 && r.top >= box.t - 1 && r.bottom <= box.b + 1; });
+  // (4 px: the selected card is lifted 3 px into the list's padding — theme.css, 2026-11-20)
+  const items = [...list.querySelectorAll('.toy-item')].filter((e) => { const r = e.getBoundingClientRect(); return vis(e) && r.left >= box.l - 1 && r.right <= box.r + 1 && r.top >= box.t - 4 && r.bottom <= box.b + 1; });
   const sel = list.querySelector('[aria-checked=true]');
   if (document.querySelector('#dock-toggle').getAttribute('aria-expanded') === 'true' && !items.includes(sel)) bad('selected toy not scrolled into view');
   out.minTarget = Infinity;
@@ -167,6 +171,7 @@ async function runViewport([label, w, h, dpr, inset], deep) {
   try {
     await o.p.goto(`${BASE}/${Q}#/S01`);
     await o.p.waitForFunction(() => window.__MANZIZAK__?.report()?.id === 'S01', null, { timeout: 30000 });
+    await noSplash(o.p);
     for (const [hash, id, kind] of [['#/S01', 'S01', 'fidget'], ['#/keyboard/pebble', 'keyboard', 'keyboard']]) {
       await go(o.p, hash, id);
       const lay = await o.p.evaluate(layoutProbe, inset);
@@ -190,7 +195,10 @@ async function runViewport([label, w, h, dpr, inset], deep) {
     if (deep) await o.p.screenshot({ path: `${OUT}${label}-settings.png` });
     await o.p.keyboard.press('Escape');
     await o.p.waitForFunction(() => document.querySelector('#sheet').hidden); await sleep(300);
-    // folding the drawer gives the toy more room and keeps its controls reachable
+    // folding the drawer gives the toy more room and keeps its controls reachable (the fold button went away on 2026-11-20:
+    // the drawer stays open — skipped then)
+    const foldable = await o.p.locator('#dock-toggle').isVisible();
+    if (foldable) {
     const before = await o.p.locator('#stage').boundingBox();
     await o.p.locator('#dock-toggle').click();
     const grew = await o.p.waitForFunction((a) => { const r = document.querySelector('#stage').getBoundingClientRect(); return r.width * r.height > a; }, before.width * before.height, { timeout: 2000 }).then(() => true, () => false);
@@ -200,6 +208,7 @@ async function runViewport([label, w, h, dpr, inset], deep) {
     res.problems.push(...lay.problems.map((m) => `folded: ${m}`));
     if (deep) await o.p.screenshot({ path: `${OUT}${label}-folded.png` });
     await o.p.locator('#dock-toggle').click(); await sleep(150);
+    }
     res.problems.push(...o.errors.map((e) => 'page error: ' + e));
   } catch (e) {
     res.problems.push('exception: ' + String(e).split('\n')[0]);
@@ -219,6 +228,7 @@ async function dynamicChecks() {
   try {
     await p.goto(`${BASE}/${Q}#/W01`);
     await p.waitForFunction(() => window.__MANZIZAK__?.report()?.id === 'W01', null, { timeout: 30000 });
+    await noSplash(p);
     await sleep(300);
     const centre = async () => { const r = await report(p), st = await p.locator('#stage').boundingBox(); return [st.x + (r.screenBox.x0 + r.screenBox.x1) / 2, st.y + (r.screenBox.y0 + r.screenBox.y1) / 2]; };
     // crack the shell: firm presses until faces break (the state that must survive every resize below)
@@ -273,6 +283,7 @@ async function dynamicChecks() {
     await touch('touchEnd', []);
     await p.reload();
     await p.waitForFunction(() => window.__MANZIZAK__?.report()?.preset, null, { timeout: 20000 });
+    await noSplash(p);
     if ((await report(p)).preset !== 'turquoise-tealios') bad(`keyboard preset not restored after reload (${(await report(p)).preset})`);
     // multi-touch: two keys at once on the landscape layout
     await sleep(300);

@@ -342,24 +342,244 @@ export function createKeycapGeometry(o: KeycapOptions): THREE.BufferGeometry {
  * alpha (texture.premultiplyAlpha = true) so mipmaps don't get dark fringes:
  * composite as `base * (1 - a) + texel.rgb`.
  */
+/** a theme pattern printed on a cap top under its legend (colors.ts KeyTheme) */
+export interface CapDeco { pattern: string; ink: string; seed: number; aspect: number }
+function drawDeco(g: CanvasRenderingContext2D, size: number, d: CapDeco) {
+  let seed = (d.seed * 2654435761) >>> 0 || 7;
+  const rnd = () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296);
+  // the texture is stretched `aspect`× across a wide cap (the space bar): keep dots round by squeezing them back
+  const sx = 1 / d.aspect;
+  const dot = (x: number, y: number, r: number, color = d.ink) => {
+    g.fillStyle = color;
+    g.beginPath();
+    g.ellipse(x, y, r * sx, r, 0, 0, Math.PI * 2);
+    g.fill();
+  };
+  g.save();
+  switch (d.pattern) {
+    case 'speckle': // granite pebble: fine dark and light flecks
+      for (let i = 0; i < 150; i++) dot(rnd() * size, rnd() * size, 1 + rnd() * 2.6, rnd() < 0.7 ? d.ink : 'rgba(255,255,255,0.5)');
+      break;
+    case 'stone': // a smooth sea stone: a few soft pale veins and flecks
+      g.strokeStyle = d.ink;
+      g.lineWidth = 3;
+      for (let i = 0; i < 3; i++) {
+        g.beginPath();
+        let x = rnd() * size, y = rnd() * size;
+        g.moveTo(x, y);
+        for (let k = 0; k < 4; k++) { x += (rnd() - 0.5) * 120 * sx; y += (rnd() - 0.3) * 90; g.lineTo(x, y); }
+        g.stroke();
+      }
+      for (let i = 0; i < 40; i++) dot(rnd() * size, rnd() * size, 1 + rnd() * 1.6);
+      break;
+    case 'frost': // ice: frosted streaks and sparkles in the corners
+      g.strokeStyle = d.ink;
+      for (let i = 0; i < 14; i++) {
+        const x = rnd() * size, y = rnd() * size, l = 18 + rnd() * 40, a = rnd() * Math.PI;
+        g.lineWidth = 1 + rnd() * 2;
+        g.beginPath();
+        g.moveTo(x - Math.cos(a) * l * sx, y - Math.sin(a) * l);
+        g.lineTo(x + Math.cos(a) * l * sx, y + Math.sin(a) * l);
+        g.stroke();
+      }
+      for (const [x, y] of [[0.16, 0.18], [0.84, 0.8], [0.8, 0.2]]) {
+        g.lineWidth = 2.5;
+        for (let k = 0; k < 4; k++) {
+          const a = (k * Math.PI) / 4, l = 14;
+          g.beginPath();
+          g.moveTo(x * size - Math.cos(a) * l * sx, y * size - Math.sin(a) * l);
+          g.lineTo(x * size + Math.cos(a) * l * sx, y * size + Math.sin(a) * l);
+          g.stroke();
+        }
+      }
+      break;
+    case 'swirl': // cream: a soft piped swirl
+      g.strokeStyle = d.ink;
+      g.lineWidth = 7;
+      g.lineCap = 'round';
+      g.beginPath();
+      for (let t = 0; t < 14; t += 0.1) {
+        const r = 10 + t * 7.5, x = size / 2 + Math.cos(t) * r * sx, y = size / 2 + Math.sin(t) * r * 0.8;
+        t ? g.lineTo(x, y) : g.moveTo(x, y);
+      }
+      g.globalAlpha = 0.55;
+      g.stroke();
+      break;
+    case 'powder': // marshmallow: a dusting of icing sugar
+      for (let i = 0; i < 260; i++) dot(rnd() * size, rnd() * size, 0.8 + rnd() * 1.8);
+      break;
+    case 'chips': // mint chocolate chips
+      for (let i = 0; i < 9; i++) {
+        const x = 20 + rnd() * (size - 40), y = 20 + rnd() * (size - 40), r = 6 + rnd() * 7;
+        g.fillStyle = d.ink;
+        g.beginPath();
+        for (let k = 0; k < 6; k++) {
+          const a = (k / 6) * Math.PI * 2 + rnd() * 0.5, rr = r * (0.7 + rnd() * 0.5);
+          k ? g.lineTo(x + Math.cos(a) * rr * sx, y + Math.sin(a) * rr) : g.moveTo(x + Math.cos(a) * rr * sx, y + Math.sin(a) * rr);
+        }
+        g.closePath();
+        g.fill();
+      }
+      break;
+    case 'ring': // typewriter key: a silver ring round the face (not on the long space bar — a typewriter's is a plain bar)
+      if (d.aspect > 1.5) break;
+      g.strokeStyle = d.ink;
+      g.lineWidth = 16;
+      g.beginPath();
+      g.ellipse(size / 2, size / 2, size * 0.42 * sx * (d.aspect > 1 ? d.aspect * 0.92 : 1), size * 0.42, 0, 0, Math.PI * 2);
+      g.stroke();
+      break;
+    case 'blush': { // peach: a rosy blush on one side
+      const gr = g.createRadialGradient(size * 0.32, size * 0.7, 4, size * 0.32, size * 0.7, size * 0.62);
+      gr.addColorStop(0, d.ink);
+      gr.addColorStop(1, 'rgba(255,140,150,0)');
+      g.fillStyle = gr;
+      g.fillRect(0, 0, size, size);
+      for (let i = 0; i < 120; i++) dot(rnd() * size, rnd() * size, 0.6 + rnd(), 'rgba(255,255,255,0.35)'); // fuzz
+      break;
+    }
+    case 'bubbles': // stew bubbling: rings of bubbles
+      g.strokeStyle = d.ink;
+      for (let i = 0; i < 9; i++) {
+        const x = rnd() * size, y = rnd() * size, r = 5 + rnd() * 13;
+        g.lineWidth = 2.5;
+        g.beginPath();
+        g.ellipse(x, y, r * sx, r, 0, 0, Math.PI * 2);
+        g.stroke();
+        dot(x - r * 0.35 * sx, y - r * 0.35, r * 0.18);
+      }
+      break;
+    case 'peaches': { // little peaches scattered over a peach frame / plate (owner, 2026-11-20 "복숭아 패턴")
+      for (let i = 0; i < 4; i++) {
+        const x = 30 + rnd() * (size - 60), y = 30 + rnd() * (size - 60), r = 12 + rnd() * 6, tilt = (rnd() - 0.5) * 0.8;
+        g.save();
+        g.translate(x, y);
+        g.rotate(tilt);
+        const body = g.createRadialGradient(-r * 0.3, -r * 0.3, 1, 0, 0, r * 1.1);
+        body.addColorStop(0, '#ffd2c0');
+        body.addColorStop(0.6, '#ff9e94');
+        body.addColorStop(1, '#f27a7f');
+        g.fillStyle = body;
+        g.beginPath();
+        g.arc(0, 0, r, 0, Math.PI * 2);
+        g.fill();
+        g.strokeStyle = 'rgba(214,92,104,0.7)'; // the cleft
+        g.lineWidth = 2;
+        g.beginPath();
+        g.moveTo(0, -r * 0.85);
+        g.quadraticCurveTo(r * 0.35, 0, 0, r * 0.7);
+        g.stroke();
+        g.fillStyle = '#7cc46a'; // the leaf
+        g.beginPath();
+        g.ellipse(r * 0.45, -r * 0.95, r * 0.45, r * 0.2, -0.6, 0, Math.PI * 2);
+        g.fill();
+        g.restore();
+      }
+      break;
+    }
+    case 'grain': { // tofu (owner, 2026-11-20 "두부 질감"): a soft mottle of curd, small pressed-in pores, a few pale flecks
+      for (let i = 0; i < 18; i++) {
+        const x = rnd() * size, y = rnd() * size, r = 18 + rnd() * 34;
+        const m = g.createRadialGradient(x, y, 0, x, y, r);
+        m.addColorStop(0, 'rgba(205,190,160,0.22)');
+        m.addColorStop(1, 'rgba(205,190,160,0)');
+        g.fillStyle = m;
+        g.fillRect(x - r, y - r, r * 2, r * 2);
+      }
+      for (let i = 0; i < 230; i++) {
+        const x = rnd() * size, y = rnd() * size, r = 1.2 + rnd() * 2.6;
+        dot(x, y, r, d.ink); // a pore
+        dot(x - r * 0.35, y - r * 0.35, r * 0.45, 'rgba(255,255,255,0.55)'); // its lit rim
+      }
+      break;
+    }
+  }
+  g.restore();
+}
+
+/** a plate (the floor between the caps) in a theme colour with its pattern tiled over it; `aspect` = plate width / depth */
+export function createPlateTexture(color: string, deco: { pattern: string; ink: string; tile?: number }, aspect: number): THREE.CanvasTexture {
+  const h = 512, w = Math.round(h * aspect), c = document.createElement('canvas');
+  c.width = w;
+  c.height = h;
+  const g = c.getContext('2d')!;
+  g.fillStyle = color;
+  g.fillRect(0, 0, w, h);
+  const tile = deco.tile ?? 170; // smaller tiles = a denser pattern (mint chips: owner, 2026-11-20 "초코칩 더 많이")
+  for (let y = 0, k = 0; y < h; y += tile) for (let x = 0; x < w; x += tile, k++) {
+    g.save();
+    g.translate(x, y);
+    g.scale(tile / 256, tile / 256);
+    drawDeco(g, 256, { pattern: deco.pattern, ink: deco.ink, seed: 50 + k, aspect: 1 });
+    g.restore();
+  }
+  const t = new THREE.CanvasTexture(c);
+  t.colorSpace = THREE.SRGBColorSpace;
+  t.anisotropy = 8;
+  return t;
+}
+
+/** called when an icon picture has loaded into its cap texture: the toy asks for a frame (the render loop sleeps while idle) */
+export const iconLoaded = new Set<() => void>();
+/** a picture legend (the theme icons): the cap's pattern, then the icon centred at ~70 % of the cap, drawn once it has loaded */
+function iconTexture(canvas: HTMLCanvasElement, g: CanvasRenderingContext2D, size: number, src: string, deco?: CapDeco): THREE.CanvasTexture {
+  if (deco) drawDeco(g, size, { ...deco, aspect: 1 });
+  const tex = finishLegend(canvas);
+  const img = new Image();
+  img.decoding = 'async';
+  img.onload = () => {
+    const s = size * 0.72;
+    g.drawImage(img, (size - s) / 2, (size - s) / 2 + size * 0.01, s, s);
+    tex.needsUpdate = true;
+    for (const f of iconLoaded) f();
+  };
+  img.src = src;
+  return tex;
+}
+
 export function createLegendTexture(
   text: string,
-  o: { color?: string; font?: string; sizeRatio?: number; size?: number } = {},
+  o: { color?: string; font?: string; sizeRatio?: number; size?: number; deco?: CapDeco; wide?: number; image?: string } = {},
 ): THREE.CanvasTexture {
   const size = o.size ?? 256;
+  // `wide`: a canvas that many times wider than tall, for a wide cap (the space bar) — its legend can then use the whole width
+  // instead of being squeezed into a square in the middle (owner, 2026-11-20: the space bar name was too small)
+  const wide = Math.max(1, o.wide ?? 1);
   const canvas = document.createElement('canvas');
-  canvas.width = canvas.height = size;
+  canvas.width = Math.round(size * wide);
+  canvas.height = size;
   const g = canvas.getContext('2d')!;
+  if (o.image) return iconTexture(canvas, g, size, o.image, o.deco);
+  if (o.deco) {
+    if (['blush', 'swirl', 'ring'].includes(o.deco.pattern)) {
+      // one-per-cap patterns (a blush, a piped swirl, a typewriter ring) are drawn once across the whole wide cap — tiled they
+      // repeated three times on the space bar (owner, 2026-11-20)
+      g.save();
+      g.scale(wide, 1);
+      drawDeco(g, size, { ...o.deco, aspect: wide });
+      g.restore();
+    } else {
+      // scattered patterns are drawn per square tile across the wide canvas (the canvas has the cap's proportions)
+      for (let t = 0; t < Math.ceil(wide); t++) {
+        g.save();
+        g.translate(t * size, 0);
+        drawDeco(g, size, { ...o.deco, aspect: 1, seed: o.deco.seed + t * 17 });
+        g.restore();
+      }
+    }
+  }
   const px = Math.round(size * (o.sizeRatio ?? 0.42));
-  g.font = o.font ?? `600 ${px}px -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", "Segoe UI Symbol", sans-serif`;
+  // (emoji faces too: the theme icons on the middle row)
+  g.font = o.font ?? `600 ${px}px -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", "Segoe UI Symbol", sans-serif`;
   g.fillStyle = o.color ?? '#3b362f';
   g.textAlign = 'center';
   g.textBaseline = 'alphabetic';
   let m = g.measureText(text);
   const inkW = (m.actualBoundingBoxLeft ?? 0) + (m.actualBoundingBoxRight ?? m.width);
-  if (!o.font && inkW > size * 0.86) {
+  const room = canvas.width * (wide > 1 ? 0.8 : 0.86);
+  if (!o.font && inkW > room) {
     // auto-fit long legends
-    g.font = g.font.replace(/\d+px/, `${Math.floor((px * size * 0.86) / inkW)}px`);
+    g.font = g.font.replace(/\d+px/, `${Math.floor((px * room) / inkW)}px`);
     m = g.measureText(text);
   }
   const asc = m.actualBoundingBoxAscent || px * 0.72;
@@ -367,9 +587,13 @@ export function createLegendTexture(
   const left = m.actualBoundingBoxLeft ?? m.width / 2;
   const right = m.actualBoundingBoxRight ?? m.width / 2;
   // centre the actual ink box
-  const x = size / 2 + (left - right) / 2;
+  const x = canvas.width / 2 + (left - right) / 2;
   const y = size / 2 + (asc - desc) / 2;
   g.fillText(text, x, y);
+  return finishLegend(canvas);
+}
+
+function finishLegend(canvas: HTMLCanvasElement): THREE.CanvasTexture {
   const tex = new THREE.CanvasTexture(canvas);
   tex.colorSpace = THREE.SRGBColorSpace;
   tex.premultiplyAlpha = true;

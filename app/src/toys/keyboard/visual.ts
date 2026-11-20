@@ -1,7 +1,7 @@
 import type { KeyVisualStyle } from '../../audio/keyPresets';
 import * as THREE from 'three';
-import { KEYBOARD_COLORS } from './colors';
-import { createCaseGeometry, createKeycapGeometry, createLegendTexture } from './keycap';
+import { ICON_PREFIX, KEYBOARD_COLORS } from './colors';
+import { createCaseGeometry, createKeycapGeometry, createLegendTexture, createPlateTexture } from './keycap';
 
 /**
  * Keyboard visual: machined tray case, dark plate, switch housings, sculpted
@@ -80,16 +80,31 @@ export function buildKeyboardVisual(renderer: THREE.WebGLRenderer): KeyboardVisu
   root.add(sun);
 
   const caseMat = new THREE.MeshPhysicalMaterial({ color: 0xb9bcc1, metalness: 1, roughness: 0.42, clearcoat: 0.25, clearcoatRoughness: 0.4 });
+  // a patterned frame is mapped by face direction (top from above, the walls from the front / side) — the case's own top-down UVs
+  // stretched the pattern into vertical streaks down the walls (QA 2026-11-20)
+  caseMat.onBeforeCompile = (sh) => {
+    sh.vertexShader = sh.vertexShader
+      .replace('#include <common>', '#include <common>\nvarying vec3 vCasePos;\nvarying vec3 vCaseNrm;')
+      .replace('#include <begin_vertex>', '#include <begin_vertex>\nvCasePos = position;\nvCaseNrm = normal;');
+    sh.fragmentShader = sh.fragmentShader
+      .replace('#include <common>', '#include <common>\nvarying vec3 vCasePos;\nvarying vec3 vCaseNrm;')
+      .replace('#include <map_fragment>', `#ifdef USE_MAP
+  vec3 an = abs(normalize(vCaseNrm));
+  vec2 cuv = an.y > 0.6 ? vCasePos.xz : (an.x > an.z ? vCasePos.zy : vCasePos.xy);
+  diffuseColor *= texture2D(map, cuv * 0.22 + 0.5);
+#endif`);
+  };
+  caseMat.customProgramCacheKey = () => 'mzk-case-triplanar';
   const caseMesh = new THREE.Mesh(
     createCaseGeometry({ width: POCKET_W + 2 * WALL, depth: POCKET_D + 2 * WALL, height: CASE_H, radius: 0.3, wall: WALL, inset: INSET }),
     caseMat,
   );
   caseMesh.castShadow = caseMesh.receiveShadow = true;
   root.add(caseMesh);
-  const plate = new THREE.Mesh(
-    new THREE.BoxGeometry(POCKET_W - 0.04, 0.03, POCKET_D - 0.04),
-    new THREE.MeshPhysicalMaterial({ color: 0x1c1d20, metalness: 0.6, roughness: 0.5 }),
-  );
+  const plateMat = new THREE.MeshPhysicalMaterial({ color: 0x1c1d20, metalness: 0.2, roughness: 0.6 });
+  const plateTex: Partial<Record<string, THREE.Texture>> = {};
+  const caseTex: Partial<Record<string, THREE.Texture>> = {};
+  const plate = new THREE.Mesh(new THREE.BoxGeometry(POCKET_W - 0.04, 0.03, POCKET_D - 0.04), plateMat);
   plate.position.y = PLATE_Y + 0.015;
   plate.receiveShadow = true;
   root.add(plate);
@@ -102,16 +117,14 @@ export function buildKeyboardVisual(renderer: THREE.WebGLRenderer): KeyboardVisu
   const legendMats: { mat: THREE.MeshPhysicalMaterial; side: THREE.MeshPhysicalMaterial; text: string; aspect: number }[] = [];
   // Reuse the same two ink variants per legend across all ten designs.
   const legendCache = new Map<string, THREE.Texture>();
-  const makeLegend = (text: string, aspect: number, color: string) => {
-    const id = `${text}:${aspect}:${color}`;
+  const makeLegend = (text: string, aspect: number, color: string, deco?: { pattern: string; ink: string; seed: number }) => {
+    const id = `${text}:${aspect}:${color}:${deco ? deco.pattern + deco.seed : ''}`;
     const cached = legendCache.get(id);
     if (cached) return cached;
-    const tex = createLegendTexture(text, { color });
+    // a wide cap gets a canvas of its own proportions (its name fills the space bar), a 1u cap a square one
+    const image = text.startsWith(ICON_PREFIX) ? text.slice(ICON_PREFIX.length) : undefined;
+    const tex = createLegendTexture(image ? '' : text, { color, deco: deco && { ...deco, aspect: 1 }, wide: aspect, sizeRatio: aspect > 1 ? 0.5 : undefined, image });
     tex.anisotropy = aniso;
-    if (aspect !== 1) {
-      tex.repeat.set(aspect, 1);
-      tex.offset.set(-(aspect - 1) / 2, 0);
-    }
     legendCache.set(id, tex);
     return tex;
   };
@@ -141,14 +154,47 @@ export function buildKeyboardVisual(renderer: THREE.WebGLRenderer): KeyboardVisu
       addKey(cap1u, (c - 1) * U, (r - 1.5) * U, LEGENDS[i], CAP / 2);
     }
   const spaceW = COLS * U - (U - CAP);
-  addKey(createKeycapGeometry({ width: spaceW, depth: CAP, height: CAP_H }), 0, 1.5 * U, '스페이스', spaceW / 2, spaceW / CAP);
+  addKey(createKeycapGeometry({ width: spaceW, depth: CAP, height: CAP_H }), 0, 1.5 * U, '', spaceW / 2, spaceW / CAP); // a blank space bar
 
   type StyleId = keyof typeof STYLES;
   let style: StyleId = 'pebble';
-  const legendsFor = (p: StyleId) => legendMats.map((l, i) => makeLegend(l.text, l.aspect, inkFor(STYLES[p].keys[i])));
+  // each design's theme: its legends (icons on the middle row, its name on the space bar) and the pattern on every cap top
+  const legendsFor = (p: StyleId) => {
+    const t = STYLES[p].theme;
+    return legendMats.map((l, i) => makeLegend(t?.legends[i] ?? l.text, l.aspect, inkFor(STYLES[p].keys[i]), t && { pattern: t.pattern, ink: t.ink, seed: i + 1 }));
+  };
   const applyStyle = (p: StyleId) => {
     const s = STYLES[p];
     caseMat.setValues({ color: s.tray, metalness: s.metalness, roughness: s.caseRoughness, clearcoat: s.clearcoat, clearcoatRoughness: .4 });
+    // the frame wears the plate's pattern too, in the case colour (cached per design)
+    const cp = s.theme?.platePattern;
+    if (cp) {
+      if (!caseTex[p]) {
+        const t = createPlateTexture('#' + new THREE.Color(s.tray).getHexString(), cp, 1);
+        t.wrapS = t.wrapT = THREE.RepeatWrapping; // sampled by position (the shader above), so it tiles
+        caseTex[p] = t;
+      }
+      caseMat.map = caseTex[p]!;
+      caseMat.color.setHex(0xffffff);
+      if (cp.gloss) caseMat.setValues({ roughness: 0.04, metalness: 0.15, clearcoat: 1, clearcoatRoughness: 0.02 }); // sparkling ice
+    } else caseMat.map = null;
+    caseMat.needsUpdate = true;
+    const pp = s.theme?.platePattern;
+    if (pp) {
+      // a patterned plate: the texture carries the colour (plateTex cached per design)
+      plateTex[p] ??= createPlateTexture('#' + new THREE.Color(s.theme!.plate).getHexString(), pp, POCKET_W / POCKET_D);
+      plateMat.map = plateTex[p]!;
+      plateMat.color.setHex(0xffffff);
+      plateMat.roughness = pp.gloss ? 0.04 : 0.6;
+      plateMat.clearcoat = pp.gloss ? 1 : 0;
+    } else {
+      plateMat.map = null;
+      plateMat.color.setHex(s.theme?.plate ?? 0x1c1d20);
+      plateMat.roughness = 0.6;
+      plateMat.clearcoat = 0;
+    }
+    plateMat.needsUpdate = true;
+    switchMat.color.setHex(s.theme?.switches ?? 0x2a2b2f);
     const tex = legendsFor(p);
     legendMats.forEach((l, i) => {
       const finish = { color: s.keys[i], roughness: s.roughness, clearcoat: s.clearcoat };

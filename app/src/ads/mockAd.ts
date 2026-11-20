@@ -41,9 +41,13 @@ export function mockSdk(mode: 'mock' | 'mock-fail'): Sdk {
   );
   const showFullScreenAd = Object.assign(
     ((p) => {
+      // `&adorder=late`: report the reward after `dismissed`, as the native SDK sometimes does
+      const late = new URLSearchParams(location.search).get('adorder') === 'late';
+      let earned = false;
+      const reward = () => p.onEvent({ type: 'userEarnedReward', data: { unitType: 'toy', unitAmount: 1 } });
       const stop = playAd(num('adsec', 15), num('adskip', 5), {
-        rewarded: () => p.onEvent({ type: 'userEarnedReward', data: { unitType: 'toy', unitAmount: 1 } }),
-        closed: () => p.onEvent({ type: 'dismissed' }),
+        rewarded: () => (late ? (earned = true) : reward()),
+        closed: () => { p.onEvent({ type: 'dismissed' }); if (late && earned) setTimeout(reward, 400); },
       });
       p.onEvent({ type: 'requested' });
       p.onEvent({ type: 'show' });
@@ -118,7 +122,7 @@ function text(g: CanvasRenderingContext2D, s: string, x: number, y: number, size
   g.fillStyle = '#1f3327';
   g.textAlign = 'center';
   g.textBaseline = 'middle';
-  g.font = `${weight} ${size}px SUITE, SUIT, system-ui, sans-serif`;
+  g.font = `${weight} ${size}px Jua, system-ui, sans-serif`;
   g.fillText(s, x, y + (1 - alpha) * 12);
   g.restore();
 }

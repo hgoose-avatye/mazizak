@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { stageBackdrop } from '../../core/stage';
 import type { InputEvt } from '../../core/runtime';
 import type { Toy, ToyContext } from '../../core/toy';
 import { buildKeyboardSounds } from '../../audio/sfx';
@@ -14,6 +15,7 @@ import { settings } from '../../core/settings';
 import { round, summarize } from '../../core/metrics';
 import { hitTest, KeyboardModel, type KeyRect } from './model';
 import { buildKeyboardVisual, type KeyboardVisual } from './visual';
+import { iconLoaded } from './keycap';
 
 export { KEY_PRESET_INFO };
 
@@ -21,11 +23,14 @@ const PHYS_KEYS = ['KeyQ', 'KeyW', 'KeyE', 'KeyA', 'KeyS', 'KeyD', 'KeyZ', 'KeyX
 
 export function createKeyboard(ctx: ToyContext): Toy & { setPreset(p: KeyPresetId): void } {
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color(0xe9e4dd);
+  scene.background = stageBackdrop(0xe9e4dd); // lit backdrop (core/stage.ts); its top row is the page colour
+  scene.userData.stageBg = 0xe9e4dd;
   scene.environment = studioEnvironment(ctx.renderer);
   scene.environmentIntensity = 0.45;
   const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 100);
 
+  // the theme icons arrive after the first frame: redraw when one lands
+  iconLoaded.add(() => ctx.requestFrame());
   const vis: KeyboardVisual = buildKeyboardVisual(ctx.renderer);
   scene.add(vis.root);
   const SPACE = vis.keys.length - 1;
@@ -84,6 +89,21 @@ export function createKeyboard(ctx: ToyContext): Toy & { setPreset(p: KeyPresetI
       computeRects();
     };
     place(dist);
+    // portrait (phones): the board came out ~60% of the width with keys smaller than a fingertip. Frame it closer, so the keys
+    // span ~78% of the width (the case then reaches ~88%), never taller than ~70% of the stage (quality pass, 2026-11-20)
+    if (camera.aspect < 1 && rects.length) {
+      // perspective makes size vs distance non-linear here (the camera looks down at the board): refine a few times
+      let d = dist;
+      const { w: sw, h: sh } = ctx.size(); // the units rects are measured in
+      for (let i = 0; i < 4; i++) {
+        const fw = (Math.max(...rects.map((r) => r.x1)) - Math.min(...rects.map((r) => r.x0))) / sw;
+        const fh = (Math.max(...rects.map((r) => r.y1)) - Math.min(...rects.map((r) => r.y0))) / sh;
+        const k = Math.min(0.72 / fw, 0.6 / fh); // > 1: may come closer
+        if (Math.abs(k - 1) < 0.01) break;
+        d = Math.min(dist, d / k);
+        place(d);
+      }
+    }
     // wide, short stages (landscape phones, short windows): height-limited, the keys came out below a comfortable finger size.
     // There the name and icons sit beside the keyboard, not above it, so the camera may come closer — only as far as the keys
     // need (≈ MIN_KEY px), never past the width fit, and at most ~27 % closer. Roomy screens keep the tuned framing unchanged.
@@ -174,7 +194,7 @@ export function createKeyboard(ctx: ToyContext): Toy & { setPreset(p: KeyPresetI
     const name = roleName(sp, code, 'Down');
     const makeup = soundSource[sp] === 'samples' ? 6 : 0;
     ctx.audio.play(name, { baseDetune: (isKbsimMappedPreset(sp) || isLocalKeyPreset(sp)) ? 0 : keyDetune[k], detuneCents: (isKbsimMappedPreset(sp) || isLocalKeyPreset(sp)) ? 0 : 12, gainJitterDb: 1.2, gainDb: makeup + (rapid ? -2 : 0), pan: vis.keys[k].rest.x * 0.22 }, evType);
-    ctx.haptic(6);
+    ctx.haptic('tickWeak');
   };
   const heldPreset = new Map<string, { preset: KeyPresetId; code: string }>();
   const heldPhysical = new Map<string, number>();

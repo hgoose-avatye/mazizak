@@ -3,11 +3,15 @@ import { toNdc, screenBox } from "../../core/viewport";
 import type { Toy, ToyContext } from "../../core/toy";
 import type { InputEvt } from "../../core/runtime";
 import { radialShadowTexture, studioEnvironment } from "../../core/studio";
+import { stageBackdrop, stageMat } from "../../core/stage";
 import type { FidgetSpec } from "./catalog";
 import { FidgetModel, FractureModel, GrainModel } from "./model";
 import { isStretchy } from "./cage";
 import { FidgetAudio } from "./audio";
 import { ChocolateBar } from "./chocolate";
+import { Puffs } from "./puffs";
+import { SPLAT_RECIPES, Splatter } from "./splatter";
+import { synthSfx } from "../../audio/synthSfx";
 import {
   STAGES,
   surfaceTexture,
@@ -16,6 +20,9 @@ import {
   shellPatches,
   sugarColor,
   sugarTexture,
+  soapStampTextures,
+  butterStampTextures,
+  soapStampUVs,
 } from "./visuals";
 import { LOCAL_FIDGETS, SHIPPED_MODELS, referenceMesh, shippedMesh } from "./references";
 export interface FidgetToy extends Toy {
@@ -23,7 +30,9 @@ export interface FidgetToy extends Toy {
 }
 export function createFidget(ctx: ToyContext, spec: FidgetSpec): FidgetToy {
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color(STAGES[spec.id]);
+  // a lit backdrop and a cushion mat under the toy (core/stage.ts); main.ts gives the page around the canvas stageBg
+  scene.background = stageBackdrop(STAGES[spec.id]);
+  scene.userData.stageBg = STAGES[spec.id];
   scene.environment = studioEnvironment(ctx.renderer);
   scene.environmentIntensity = 0.48;
   const camera = new THREE.PerspectiveCamera(34, 1, 0.1, 100),
@@ -48,8 +57,9 @@ export function createFidget(ctx: ToyContext, spec: FidgetSpec): FidgetToy {
     sheenRoughness: 0.8,
     side: THREE.DoubleSide,
   });
-  // wax balls: once every piece is broken, kneading mixes the wax into the core — flecks of the wax colour appear in the core
-  // and spread as `mix` goes 0 → 1 (3-D noise on the core surface, so it works on any core mesh)
+  // wax balls: kneading the opened core mixes the broken wax into it, as far as it has broken (owner, 2026-11-20 "자연스럽게 섞이도록")
+  // — soft marbled streaks of the wax colour swirl in and the whole core takes on its tint as `mix` goes 0 → 1
+  // (domain-warped 3-D noise on the core surface, so it works on any core mesh)
   const mixU = { value: 0 };
   let mix = 0;
   if (spec.family === "wax") {
@@ -80,10 +90,13 @@ float mxNoise(vec3 x) {
           "#include <color_fragment>",
           `#include <color_fragment>
 if (uMix > 0.0) {
-  float n = mxNoise(vMixPos * 9.0) * 0.6 + mxNoise(vMixPos * 21.0 + 3.7) * 0.4;
-  float edge = 1.0 - uMix * 0.48;
-  float fleck = smoothstep(edge, edge + 0.035, n);
-  diffuseColor.rgb = mix(diffuseColor.rgb, uWax, max(fleck * 0.9, uMix * 0.14));
+  // marbling: the noise is read through a warped position, so the wax runs in streaks instead of spots; soft edges
+  vec3 q = vMixPos * 3.2;
+  vec3 w = vec3(mxNoise(q + 1.3), mxNoise(q + 7.1), mxNoise(q + 4.6)) * 2.0 - 1.0;
+  float n = mxNoise(q * 1.7 + w * 1.6) * 0.65 + mxNoise(vMixPos * 14.0 + w * 0.8) * 0.35;
+  float edge = 1.0 - uMix * 0.62;
+  float streak = smoothstep(edge - 0.16, edge + 0.08, n);
+  diffuseColor.rgb = mix(diffuseColor.rgb, uWax, clamp(streak * (0.45 + 0.4 * uMix) + uMix * 0.22, 0.0, 0.88));
 }`,
         );
     };
@@ -98,16 +111,36 @@ if (uMix > 0.0) {
     material.attenuationColor = new THREE.Color(0x5da98f);
     material.attenuationDistance = 2;
   }
-  if (["foam", "cream", "mochi"].includes(spec.shape)) {
+  if (["foam", "cream", "mochi", "tofu"].includes(spec.shape)) {
     material.bumpMap = surfaceTexture(spec.shape);
-    material.bumpScale = spec.shape === "foam" ? 0.025 : 0.006;
+    material.bumpScale = spec.shape === "foam" ? 0.025 : spec.shape === "tofu" ? 0.07 : 0.006;
   }
+  if (spec.shape === "tofu") material.roughness = 0.85; // a matte curd, not a glossy block
   let geometry: THREE.BufferGeometry = bodyGeometry(spec);
-  if (spec.shape === "foam" || spec.shape === "mochi") {
-    // 모닝빵 / 찹쌀떡 look like the real thing: painted body (vertex colours multiply the material colour, so that stays white)
+  if (["foam", "mochi", "mango", "tomato", "strawberry", "pudding", "tofu", "butter"].includes(spec.shape)) { // (marshmallow: a plain white core under its toasted crust)
+    // 모닝빵 / 찹쌀떡 / 망고 look like the real thing: painted body (vertex colours multiply the material colour, so that stays white)
     paintBody(geometry, spec);
     material.vertexColors = true;
     material.color.set(0xffffff);
+  }
+  if (spec.shape === "mango") {
+    // an opaque, waxy fruit skin (the see-through jelly read as foie gras)
+    material.transparent = false;
+    material.opacity = 1;
+    material.depthWrite = true;
+    material.transmission = 0;
+    material.roughness = 0.38;
+    material.clearcoat = 0.35;
+    material.clearcoatRoughness = 0.35;
+    material.sheen = 0;
+  }
+  if (spec.shape === "soap" || spec.shape === "butter") {
+    // an oval pressed into the front: "SOAP" on the soap, "BUTTER" on the butter (visuals.ts stamp textures)
+    soapStampUVs(geometry, spec);
+    const stamp = spec.shape === "soap" ? soapStampTextures(spec) : butterStampTextures(spec);
+    material.bumpMap = stamp.bump;
+    material.bumpScale = 0.035;
+    material.map = stamp.color;
   }
   if (spec.shape === "beads") {
     const a = geometry.getAttribute("position"),
@@ -138,8 +171,37 @@ if (uMix > 0.0) {
   blob.position.y = spec.height * 0.94;
   blob.frustumCulled = false;
   scene.add(blob);
+  // the stage mat (core/stage.ts) sits under the toy's real foot: its lowest point (some, like 슬랑이, dip below y = 0, and a mat
+  // at 0 was drawn in front of them) and the width where it touches down (its bottom 6%; with the widest part or even the bottom
+  // fifth, a round toy like 슬랑이 got a plate as wide as itself whose front edge covered its lower half)
+  const foot = (() => {
+    let minY = Infinity, maxY = -Infinity;
+    for (let i = 1; i < base.length; i += 3) { minY = Math.min(minY, base[i]); maxY = Math.max(maxY, base[i]); }
+    const cut = minY + (maxY - minY) * 0.06;
+    let r = 0;
+    for (let i = 0; i < base.length; i += 3) if (base[i + 1] <= cut) r = Math.max(r, Math.hypot(base[i], base[i + 2]));
+    return { y: blob.position.y + minY, r };
+  })();
+  const floorY = Math.min(0, foot.y);
+  const mat = stageMat(STAGES[spec.id], Math.max(foot.r * 1.15, spec.width * 0.42));
+  mat.position.y = floorY - 0.004;
+  scene.add(mat);
+  if (import.meta.env.DEV) console.debug(`[stage] ${spec.id} foot y ${foot.y.toFixed(3)} r ${foot.r.toFixed(3)} width ${spec.width}`);
   // W02: solid → fracturing → kneaded state machine with runtime Voronoi shards (chocolate.ts)
   const choco = spec.shape === "chocolate" ? new ChocolateBar(scene, blob.position, spec) : null;
+  // 비누 blows soap bubbles, 모닝빵 and 마시멜로 steam where they are touched (owner, 2026-11-20 — puffs.ts)
+  const puffs = spec.shape === "soap" ? new Puffs(scene, "bubble") : spec.shape === "foam" || spec.shape === "marshmallow" ? new Puffs(scene, "steam") : null; // (the toasted 마시멜로 steams too)
+  // 뭉개기: a squash throws juice drops, chunks and seeds out every way, and rubbing smears it on the table like paint (splatter.ts)
+  const splat = SPLAT_RECIPES[spec.shape] ? new Splatter(scene, SPLAT_RECIPES[spec.shape]!, 0) : null;
+  // 뭉개기 sounds (owner, 2026-11-20): a soft rub for each smear (the squash itself is the toy's own recorded squish — a synthesized
+  // squelch on top sounded odd)
+  const sfx = splat ? synthSfx(ctx.audio) : null;
+  // (no sound for the bits landing — owner, 2026-11-20: "잔재 떨어지는 소리 없애줘"; splatter.onLand stays unhooked)
+  if (splat && sfx) splat.onSmear = () => sfx.smear();
+  let splatDepth = 0;
+  let puffClock = 0;
+  /** recompute the body normals on the next frame whatever its parity (초기화) */
+  let normalsDue = false;
   let frictionClock = 0;
   /** wax balls: the "nearly every piece broken" sound has played (once per reset) */
   let nearDoneFired = false;
@@ -216,12 +278,12 @@ if (uMix > 0.0) {
     new THREE.MeshBasicMaterial({
       map: radialShadowTexture(0.7, 0.4),
       transparent: true,
-      opacity: 0.3,
+      opacity: 0.42, // on the lighter stage mat (core/stage.ts) the old 0.3 hardly showed
       depthWrite: false,
     }),
   );
   shadow.rotation.x = -Math.PI / 2;
-  shadow.position.y = 0.002;
+  shadow.position.y = floorY + 0.002; // on the mat (below 0 for toys whose foot dips under it)
   scene.add(shadow);
   const gestureCamera = camera.clone();
   const ray = new THREE.Raycaster(),
@@ -305,27 +367,7 @@ if (uMix > 0.0) {
     if (spec.shape !== "chocolate") g.scale(1.035, 1.035, 1.035);
     buildShell(g);
     g.dispose();
-    if (spec.shape === "apple") {
-      // Rounded tied balloon neck, as observed in the installed wax-ball reference.
-      const neck = new THREE.Mesh(
-        new THREE.SphereGeometry(0.115, 24, 16),
-        new THREE.MeshPhysicalMaterial({
-          color: 0xf5f5dd,
-          roughness: 0.3,
-          clearcoat: 0.5,
-        }),
-      );
-      neck.scale.set(1, 0.8, 1);
-      neck.position.set(0, blob.position.y + spec.height + 0.015, 0);
-      scene.add(neck);
-      const cap = new THREE.Mesh(
-        new THREE.TorusGeometry(0.095, 0.032, 10, 24),
-        neck.material,
-      );
-      cap.rotation.x = Math.PI / 2;
-      cap.position.copy(neck.position).y += 0.07;
-      scene.add(cap);
-    }
+    // (the apple's tied balloon neck on top is gone — owner, 2026-11-20: "꼭지 없는 게 낫겠어")
   }
   // 모닝빵 / 찹쌀떡 ship with their model (public/models). Until it has loaded the painted stand-in is hidden (no flash of another shape);
   // it stays as the fallback when the file cannot be loaded. The dev reference folder (LOCAL_FIDGETS) works as before.
@@ -423,8 +465,8 @@ if (uMix > 0.0) {
     grainMesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
   }
   const bubbles: THREE.Mesh[] = [];
-  if (spec.shape === "ball" || spec.shape === "mango")
-    for (let i = 0; i < (spec.shape === "ball" ? 24 : 9); i++) {
+  if (spec.shape === "ball") // (the mango had a few inside too; gone with its see-through jelly)
+    for (let i = 0; i < 24; i++) {
       const b = new THREE.Mesh(
         new THREE.SphereGeometry(0.025 + (i % 4) * 0.018, 12, 8),
         new THREE.MeshPhysicalMaterial({
@@ -467,7 +509,7 @@ if (uMix > 0.0) {
         (Math.tan(THREE.MathUtils.degToRad(17)) * camera.aspect * 0.85),
     );
     // stretchy toys: a fixed view with room around them for their bounded stretch (cage.ts PLASTIC_BOUNDS)
-    fitDistance = dist * (isStretchy(spec) ? 1.25 : 1);
+    fitDistance = (dist * (isStretchy(spec) ? 1.25 : 1)) / (spec.viewScale ?? 1);
     positionCamera();
   };
   const hit = (x: number, y: number) => {
@@ -500,6 +542,8 @@ if (uMix > 0.0) {
         model.setSurfacePatch(e.id, faceToPatch[h.faceIndex ?? 0]);
       if (e.pointerType === "pen") model.setPressure(e.id, e.pressure);
       anchors.set(e.id, h.point.clone());
+      if (puffs) { puffs.emit(h.point, spec.shape === "soap" ? 5 : 6, normal.clone().normalize()); ctx.requestFrame(); }
+      if (splat) { splat.burst(h.point, 0.6); ctx.requestFrame(); } // (the squash itself sounds with the toy's own recorded squish)
       if (spec.family === "wax" && h.object === blob) {
         coreTouches++;
         corePointers.add(e.id);
@@ -508,14 +552,14 @@ if (uMix > 0.0) {
           const area = choco.split(local, new THREE.Vector2(1, 0));
           if (area > 0) {
             sound.play("crack", 0.6, 0, false, { rate: THREE.MathUtils.clamp(1.12 - area * 1.2, 0.92, 1.12) });
-            ctx.haptic(10);
+            ctx.haptic('tickMedium');
             ctx.requestFrame();
           }
         }
       }
       strokeReady = true;
       dragBudget = 0;
-      ctx.haptic(7);
+      ctx.haptic(spec.category === "뭉개기" ? 'softMedium' : 'tickWeak'); // squash: a soft, heavier press
       idleGesture = 0;
       // answer every finger contact at once (not only after the compression has built up over a few frames),
       // so rapid repeated clicking keeps sounding: it replaces the sustained sound of the previous click
@@ -555,6 +599,9 @@ if (uMix > 0.0) {
     }
   };
   const reset = () => {
+    normalsDue = true;
+    puffs?.clear();
+    splat?.clear();
     model.reset();
     fracture?.reset();
     choco?.reset();
@@ -589,6 +636,32 @@ if (uMix > 0.0) {
   const frame = (dt: number) => {
     frames++;
     let moving = model.step(dt);
+    if (puffs) {
+      // more while the finger rubs / keeps pressing: bubbles from a rubbed bar, steam from a squeezed roll
+      if (anchors.size) {
+        const rate = spec.shape === "soap" ? (model.frameTravel > 0.0005 ? 8 : 2) : model.compression > 0.05 ? 12 : 5; // (fewer bubbles: owner, 2026-11-20) // plenty of steam / bubbles (owner: "더 팡팡")
+        puffClock += dt * rate;
+        const points = [...anchors.values()];
+        while (puffClock >= 1) {
+          puffClock -= 1;
+          const at = points[Math.floor(Math.random() * points.length)];
+          puffs.emit(at, 1, tmp.copy(at).sub(blob.position).normalize());
+        }
+      } else puffClock = 0;
+      if (puffs.step(dt)) moving = true;
+    }
+    if (splat) {
+      // pressing deeper squashes out more: a burst each time the squash goes another step deeper
+      if (anchors.size && model.compression > splatDepth + 0.08) {
+        splatDepth = model.compression;
+        const points = [...anchors.values()];
+        splat.burst(points[Math.floor(Math.random() * points.length)], Math.min(1, model.compression * 1.5));
+      }
+      // rubbing: paint the table along the finger's path (the contact point moves with the drag)
+      for (const c of model.held) splat.smear(tmp.copy(c.anchor).add(c.drag).add(blob.position));
+      if (!anchors.size) { splatDepth = 0; splat.endStroke(); }
+      if (splat.step(dt)) moving = true;
+    }
     if (spec.family === "viscous") positionCamera();
 
     const held = model.held,
@@ -604,7 +677,9 @@ if (uMix > 0.0) {
       model.deform(softboxRest, tmp);
       softbox.position.copy(tmp).add(blob.position);
     }
-    if (frames % 2 === 0) geometry.computeVertexNormals();
+    // normals every other frame while moving, and always on a frame the loop may stop after (nothing moving any more) or right
+    // after 초기화 — otherwise the last frame could keep the squashed shape's normals: dark smudges on a restored toy (owner, 2026-11-20)
+    if (frames % 2 === 0 || !moving || normalsDue) { geometry.computeVertexNormals(); normalsDue = false; }
     geometry.computeBoundingSphere();
     dragBudget += model.frameTravel;
     if (
@@ -645,14 +720,12 @@ if (uMix > 0.0) {
       // as much broken as pressing can break (apple: FractureModel.LIMIT; chocolate: nearly every piece) — kneading the core mixes
       // the pieces in (about 5 s of kneading to fully mix); the shell still standing comes off as soon as mixing starts
       const allBroken = fracture.done;
-      if (allBroken && held.length && corePointers.size && model.frameTravel > 0.0004) {
-        // the pieces still standing come off as mixing starts (chocolate: as shards, like any snapped piece)
-        if (mix === 0)
-          for (let i = 0; i < centers.length; i++) if (fracture.forceBreak(i)) choco?.snap(i, centers[i], new THREE.Vector2(1, 0));
-        mix = Math.min(1, mix + dt * 0.2);
-      }
+      // kneading the core mixes in as much as has broken off: a few pieces tint it a little, all of them mix in fully
+      const mixCap = allBroken ? 1 : Math.min(0.85, fracture.brokenShare * 1.1);
+      if (mixCap > 0 && held.length && corePointers.size && model.frameTravel > 0.0004 && mix < mixCap)
+        mix = Math.min(mixCap, mix + dt * 0.25);
       mixU.value = mix;
-      sound.mixed = allBroken && mix > 0;
+      sound.mixed = mix > 0.3;
       sound.mixAmount = mix;
       sound.breakProgress = fracture.brokenCount / centers.length;
       if (held.length && mix > 0 && mix < 1) moving = true;
@@ -697,18 +770,18 @@ if (uMix > 0.0) {
           area /= snapped.length;
           // shatter layer: one sharp cue per snap; smaller shards → higher pitch
           crackSound(Math.min(1, 0.6 + snapped.length * 0.15), { rate: THREE.MathUtils.clamp(1.12 - area * 1.2, 0.92, 1.12) });
-          ctx.haptic(14);
+          ctx.haptic('basicMedium');
         }
       } else if (fracture.crazeEvents > crazeBefore) {
         // the whole shell crazes: the "first break" sound (long, loud)
         crackSound(0.85);
         crackClock = 0.45;
-        ctx.haptic(12);
+        ctx.haptic('basicMedium');
       } else if (broken.length && crackClock <= 0) {
         // shards falling away: one grouped long cue every ~0.4 s, not one per patch
         crackSound(Math.min(1, 0.45 + broken.length * 0.08));
         crackClock = 0.4;
-        ctx.haptic(8);
+        ctx.haptic('tickWeak');
       } else if (fracture.crackEvents - before > 2 && crackClock <= 0) {
         crackSound(0.45);
         crackClock = 0.3;
@@ -745,14 +818,15 @@ if (uMix > 0.0) {
           if (fracture.broken[i])
             p0.applyAxisAngle(spec.shape === "chocolate" ? tmp.set(0, 0, 1) : tmp.set(1, 0, 0), spec.shape === "chocolate" ? state.spin * 0.8 : state.spin);
           p0.add(c).add(state.offset);
-          if (fracture.broken[i] && mix > 0) {
-            // mixed-in crumbs ride the kneaded core
+          // the wax follows the finger into the soft core (owner, 2026-11-20: it felt fixed): the thin apple shell rides the core's
+          // deformation almost fully, a stuck-on crumb too; the chocolate bar is hard and gives about half as much
+          const follow = spec.shape === "chocolate" ? 0.5 : 0.9;
+          if (fracture.broken[i]) {
             model.deform(p0, tmp);
-            p0.lerp(tmp, mix);
-          }
-          if (!fracture.broken[i] && dam > 0.001) {
+            p0.lerp(tmp, Math.max(mix, spec.shape === "chocolate" ? 0 : follow * 0.9));
+          } else {
             model.deform(p0, tmp);
-            p0.lerp(tmp, Math.min(0.18, dam * 0.2));
+            p0.lerp(tmp, follow);
           }
           if (!fracture.broken[i] && dam > 0.1)
             p0.addScaledVector(
@@ -864,6 +938,8 @@ if (uMix > 0.0) {
       ctx.requestFrame();
     },
     leave() {
+      puffs?.clear();
+      splat?.clear();
       active = false;
       sound.leave();
       for (const c of model.held) model.release(c.id);

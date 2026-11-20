@@ -22,6 +22,15 @@ export async function installTossShell(onBack: () => boolean): Promise<void> {
   try { setTop(sdk.SafeArea.get()?.top); } catch { /* no bridge (browser, sandbox) */ }
   try { sdk.SafeArea.subscribe({ onEvent: (i) => setTop(i?.top) }); } catch { /* older host: the first value stays */ }
 
+  // haptics through the host app: real haptics on iPhone too (the Vibration API does nothing in the iOS web view)
+  try {
+    const trigger = sdk.Device?.triggerHaptic ?? sdk.generateHapticFeedback;
+    if (typeof trigger === 'function') {
+      const { setNativeHaptics } = await import('./haptics');
+      setNativeHaptics((type) => { void trigger({ type }).catch(() => {}); });
+    }
+  } catch { /* no bridge: the Vibration API stays */ }
+
   try {
     sdk.graniteEvent.addEventListener('backEvent', {
       onEvent: () => { if (!onBack()) void sdk.closeView().catch(() => {}); },
