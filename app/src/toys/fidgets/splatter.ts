@@ -28,13 +28,13 @@ export interface SplatRecipe {
 }
 
 export const SPLAT_RECIPES: Partial<Record<string, SplatRecipe>> = {
-  tomato: { juice: 0xff7a45, juiceOpacity: 0.78, chunks: [0xe8452f, 0xff8a63, 0xf5b46a], seeds: 0xf1d98a, counts: { drops: 14, chunks: 5, seeds: 6 }, smear: 0xf2603c },
-  strawberry: { juice: 0xff8ea6, juiceOpacity: 0.78, chunks: [0xec3b4c, 0xff9aa8, 0xffd0d4], seeds: 0xf6e27a, counts: { drops: 12, chunks: 5, seeds: 7 }, smear: 0xf2707f },
-  pudding: { juice: 0xf7d56e, juiceOpacity: 0.92, chunks: [0xf7d56e, 0xf2c75a, 0x9a5418], seeds: null, counts: { drops: 10, chunks: 7, seeds: 0 }, smear: 0xf3cf62 },
+  tomato: { juice: 0xff7a45, juiceOpacity: 0.78, chunks: [0xe8452f, 0xff8a63, 0xf5b46a], seeds: 0xf1d98a, counts: { drops: 14, chunks: 0, seeds: 0 }, smear: 0xf2603c }, // juice only (owner, 2026-11-20)
+  strawberry: { juice: 0xff8ea6, juiceOpacity: 0.78, chunks: [0xec3b4c, 0xff9aa8, 0xffd0d4], seeds: 0xf6e27a, counts: { drops: 12, chunks: 0, seeds: 0 }, smear: 0xf2707f }, // juice only
+  pudding: { juice: 0xf7d56e, juiceOpacity: 0.92, chunks: [0xf7d56e, 0xf2c75a, 0x9a5418], seeds: null, counts: { drops: 10, chunks: 0, seeds: 0 }, smear: 0xf3cf62 }, // custard drops only (owner, 2026-11-20)
   tofu: { juice: null, chunks: [0xf7f3e8, 0xefe9da, 0xfbf8f0], seeds: null, counts: { drops: 0, chunks: 12, seeds: 0 }, smear: 0xf1ece0 },
-  butter: { juice: null, chunks: [0xf8df86, 0xf3d26c, 0xfbe9a8], seeds: null, counts: { drops: 0, chunks: 11, seeds: 0 }, smear: 0xf5d871 },
-  cheese: { juice: null, chunks: [0xf7c948, 0xf2bb34, 0xfad673], seeds: null, counts: { drops: 0, chunks: 10, seeds: 0 }, smear: 0xf5cf5a },
-  cream: { juice: null, chunks: [0xfffdf8, 0xfbf6ec, 0xffffff], seeds: null, counts: { drops: 0, chunks: 12, seeds: 0 }, smear: 0xfbf7ef },
+  butter: { juice: null, chunks: [0xf8df86, 0xf3d26c, 0xfbe9a8], seeds: null, counts: { drops: 0, chunks: 0, seeds: 0 }, smear: 0xf5d871 }, // nothing thrown, it only smears (owner, 2026-11-20)
+  cheese: { juice: null, chunks: [0xf7c948, 0xf2bb34, 0xfad673], seeds: null, counts: { drops: 0, chunks: 0, seeds: 0 }, smear: 0xf5cf5a }, // nothing thrown, it only smears
+  cream: { juice: null, chunks: [0xfffdf8, 0xfbf6ec, 0xffffff], seeds: null, counts: { drops: 0, chunks: 0, seeds: 0 }, smear: 0xfbf7ef }, // nothing thrown, it only smears
 };
 
 type Kind = "drop" | "puddle" | "chunk" | "seed" | "smear";
