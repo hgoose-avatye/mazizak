@@ -24,6 +24,13 @@ export const usingTestAdId = AD_GROUP_ID === TEST_REWARDED_ID;
 const mockMode = (() => {
   try {
     const m = new URLSearchParams(location.search).get('ads');
+    // dev: a one-off ?ads=off is dropped from the address once read, so it does not linger through later toy switches and reloads
+    // (it kept hiding the free-pick chip in the preview — owner, 2026-11-20)
+    if (import.meta.env.DEV && m === 'off') {
+      const u = new URL(location.href);
+      u.searchParams.delete('ads');
+      history.replaceState(history.state, '', u.pathname + u.search + u.hash);
+    }
     if (m === 'mock' || m === 'mock-fail') return m;
     // dev server opened by a person: the stand-in ad is on by default (`?ads=off` turns it off). Automated checks
     // (navigator.webdriver) keep it off unless they ask, so they can switch toys freely.
