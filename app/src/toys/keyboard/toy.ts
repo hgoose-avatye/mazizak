@@ -14,6 +14,7 @@ import { settings } from '../../core/settings';
 import { round, summarize } from '../../core/metrics';
 import { hitTest, KeyboardModel, type KeyRect } from './model';
 import { buildKeyboardVisual, type KeyboardVisual } from './visual';
+import { iconLoaded } from './keycap';
 
 export { KEY_PRESET_INFO };
 
@@ -26,6 +27,8 @@ export function createKeyboard(ctx: ToyContext): Toy & { setPreset(p: KeyPresetI
   scene.environmentIntensity = 0.45;
   const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 100);
 
+  // the theme icons arrive after the first frame: redraw when one lands
+  iconLoaded.add(() => ctx.requestFrame());
   const vis: KeyboardVisual = buildKeyboardVisual(ctx.renderer);
   scene.add(vis.root);
   const SPACE = vis.keys.length - 1;

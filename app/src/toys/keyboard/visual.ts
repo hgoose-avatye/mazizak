@@ -1,6 +1,6 @@
 import type { KeyVisualStyle } from '../../audio/keyPresets';
 import * as THREE from 'three';
-import { KEYBOARD_COLORS } from './colors';
+import { ICON_PREFIX, KEYBOARD_COLORS } from './colors';
 import { createCaseGeometry, createKeycapGeometry, createLegendTexture } from './keycap';
 
 /**
@@ -105,7 +105,8 @@ export function buildKeyboardVisual(renderer: THREE.WebGLRenderer): KeyboardVisu
     const cached = legendCache.get(id);
     if (cached) return cached;
     // a wide cap gets a canvas of its own proportions (its name fills the space bar), a 1u cap a square one
-    const tex = createLegendTexture(text, { color, deco: deco && { ...deco, aspect: 1 }, wide: aspect, sizeRatio: aspect > 1 ? 0.5 : undefined });
+    const image = text.startsWith(ICON_PREFIX) ? text.slice(ICON_PREFIX.length) : undefined;
+    const tex = createLegendTexture(image ? '' : text, { color, deco: deco && { ...deco, aspect: 1 }, wide: aspect, sizeRatio: aspect > 1 ? 0.5 : undefined, image });
     tex.anisotropy = aniso;
     legendCache.set(id, tex);
     return tex;

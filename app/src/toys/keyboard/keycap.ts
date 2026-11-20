@@ -456,9 +456,27 @@ function drawDeco(g: CanvasRenderingContext2D, size: number, d: CapDeco) {
   g.restore();
 }
 
+/** called when an icon picture has loaded into its cap texture: the toy asks for a frame (the render loop sleeps while idle) */
+export const iconLoaded = new Set<() => void>();
+/** a picture legend (the theme icons): the cap's pattern, then the icon centred at ~70 % of the cap, drawn once it has loaded */
+function iconTexture(canvas: HTMLCanvasElement, g: CanvasRenderingContext2D, size: number, src: string, deco?: CapDeco): THREE.CanvasTexture {
+  if (deco) drawDeco(g, size, { ...deco, aspect: 1 });
+  const tex = finishLegend(canvas);
+  const img = new Image();
+  img.decoding = 'async';
+  img.onload = () => {
+    const s = size * 0.72;
+    g.drawImage(img, (size - s) / 2, (size - s) / 2 + size * 0.01, s, s);
+    tex.needsUpdate = true;
+    for (const f of iconLoaded) f();
+  };
+  img.src = src;
+  return tex;
+}
+
 export function createLegendTexture(
   text: string,
-  o: { color?: string; font?: string; sizeRatio?: number; size?: number; deco?: CapDeco; wide?: number } = {},
+  o: { color?: string; font?: string; sizeRatio?: number; size?: number; deco?: CapDeco; wide?: number; image?: string } = {},
 ): THREE.CanvasTexture {
   const size = o.size ?? 256;
   // `wide`: a canvas that many times wider than tall, for a wide cap (the space bar) — its legend can then use the whole width
@@ -468,6 +486,7 @@ export function createLegendTexture(
   canvas.width = Math.round(size * wide);
   canvas.height = size;
   const g = canvas.getContext('2d')!;
+  if (o.image) return iconTexture(canvas, g, size, o.image, o.deco);
   if (o.deco) {
     if (['blush', 'swirl', 'ring'].includes(o.deco.pattern)) {
       // one-per-cap patterns (a blush, a piped swirl, a typewriter ring) are drawn once across the whole wide cap — tiled they
@@ -508,6 +527,10 @@ export function createLegendTexture(
   const x = canvas.width / 2 + (left - right) / 2;
   const y = size / 2 + (asc - desc) / 2;
   g.fillText(text, x, y);
+  return finishLegend(canvas);
+}
+
+function finishLegend(canvas: HTMLCanvasElement): THREE.CanvasTexture {
   const tex = new THREE.CanvasTexture(canvas);
   tex.colorSpace = THREE.SRGBColorSpace;
   tex.premultiplyAlpha = true;
