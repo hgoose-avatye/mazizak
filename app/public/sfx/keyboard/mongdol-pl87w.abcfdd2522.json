@@ -1,0 +1,223 @@
+{
+ "version": 1,
+ "preset": "mongdol-pl87w",
+ "file": "mongdol-pl87w.5bfd74e51c.flac",
+ "sampleRate": 48000,
+ "upMode": "none",
+ "source": {
+  "recording": "몽돌.m4a",
+  "recordedBy": "project owner",
+  "recordedOn": "2026-11-19",
+  "keyboard": "keyboard with 몽돌 switches",
+  "sha256": "682717db4f05b8fcc70c2e80c3292bdbde5aa0a61bacc2b390b5de3ff8af73ae"
+ },
+ "clearance": {
+  "status": "own recording",
+  "statedBy": "project owner",
+  "statedOn": "2026-11-19",
+  "note": "Recorded by the project owner; no third-party permission needed."
+ },
+ "credit": {
+  "label": "몽돌",
+  "title": "몽돌축 typing recording",
+  "by": "project owner (own recording)"
+ },
+ "entries": {
+  "down": [
+   {
+    "offset": 0,
+    "duration": 0.16,
+    "gain": 1,
+    "src": "own:몽돌.m4a@1.496s",
+    "qc": {
+     "candidate": "now-2-B",
+     "candidateSha256": "0fcbed18b4b10bda3f157b30586cdee9bb64635f1f54c344170230efa424e5db",
+     "gainDb": 3.01,
+     "shippedBefore": true
+    }
+   },
+   {
+    "offset": 0.17,
+    "duration": 0.098,
+    "gain": 1,
+    "src": "own:몽돌.m4a@2.652s",
+    "qc": {
+     "candidate": "c11-B",
+     "candidateSha256": "7a2462c505eb8949652979a5a88a3be06b62837786e827fe17dd027093323cdf",
+     "gainDb": 3.03,
+     "shippedBefore": false
+    }
+   },
+   {
+    "offset": 0.278,
+    "duration": 0.09,
+    "gain": 1,
+    "src": "own:몽돌.m4a@2.862s",
+    "qc": {
+     "candidate": "c12-B",
+     "candidateSha256": "6ddfcd1458858d14e4942e71fac5fd1a9d11c366f03b85227c0b00ab47536654",
+     "gainDb": 3.02,
+     "shippedBefore": false
+    }
+   },
+   {
+    "offset": 0.378,
+    "duration": 0.104,
+    "gain": 1,
+    "src": "own:몽돌.m4a@3.094s",
+    "qc": {
+     "candidate": "c13-B",
+     "candidateSha256": "48ff23fad0cc63507102ff411d00667d03bcadf22fc98313ae982e8c7536f18b",
+     "gainDb": 3.04,
+     "shippedBefore": false
+    }
+   },
+   {
+    "offset": 0.492,
+    "duration": 0.102,
+    "gain": 1,
+    "src": "own:몽돌.m4a@3.296s",
+    "qc": {
+     "candidate": "c14-B",
+     "candidateSha256": "3b2f658dd489c1eef25ab6c68f5eacdc6be69b256d00d4828d60e3d213be1395",
+     "gainDb": 3.03,
+     "shippedBefore": false
+    }
+   },
+   {
+    "offset": 0.604,
+    "duration": 0.16,
+    "gain": 1,
+    "src": "own:몽돌.m4a@4.408s",
+    "qc": {
+     "candidate": "now-4-B",
+     "candidateSha256": "95fc8560e66de5478c9d1f04b053891d76a15be4a267a7b4b3b847867b3f4af8",
+     "gainDb": 3.01,
+     "shippedBefore": true
+    }
+   },
+   {
+    "offset": 0.774,
+    "duration": 0.138,
+    "gain": 1,
+    "src": "own:몽돌.m4a@4.940s",
+    "qc": {
+     "candidate": "c18-B",
+     "candidateSha256": "5ec791c789ef8ebf6e480f6031895b98d918d7d19d901295296396865966c3e1",
+     "gainDb": 3.02,
+     "shippedBefore": false
+    }
+   },
+   {
+    "offset": 0.922,
+    "duration": 0.138,
+    "gain": 1,
+    "src": "own:몽돌.m4a@5.822s",
+    "qc": {
+     "candidate": "c21-B",
+     "candidateSha256": "cb74ea3e1d59b39875f0191ab3d5c79849b0b4f34fc3d5c3517307ebc7dfbb43",
+     "gainDb": 3.07,
+     "shippedBefore": false
+    }
+   },
+   {
+    "offset": 1.07,
+    "duration": 0.102,
+    "gain": 1,
+    "src": "own:몽돌.m4a@6.544s",
+    "qc": {
+     "candidate": "c24-B",
+     "candidateSha256": "a1ceb845c692d6c75553f70b978417eabe5d1d95298b687708df59be266e134b",
+     "gainDb": 3.04,
+     "shippedBefore": false
+    }
+   },
+   {
+    "offset": 1.182,
+    "duration": 0.128,
+    "gain": 1,
+    "src": "own:몽돌.m4a@6.754s",
+    "qc": {
+     "candidate": "c25-B",
+     "candidateSha256": "667967b4eb3c7af2235053e5469f9dafc64e606cb59a062c80fd9d3aa3705347",
+     "gainDb": 3.05,
+     "shippedBefore": false
+    }
+   },
+   {
+    "offset": 1.32,
+    "duration": 0.16,
+    "gain": 1,
+    "src": "own:몽돌.m4a@8.456s",
+    "qc": {
+     "candidate": "now-6-B",
+     "candidateSha256": "50e08fa1313b8dda0cb82a46f99bd005d21fa1df5ed8d6141b679ea0d616f919",
+     "gainDb": 3.02,
+     "shippedBefore": true
+    }
+   },
+   {
+    "offset": 1.49,
+    "duration": 0.16,
+    "gain": 1,
+    "src": "own:몽돌.m4a@9.880s",
+    "qc": {
+     "candidate": "c36-B",
+     "candidateSha256": "4e7363fc3ac511b63b81835d045c841bc40aea746089b99a2cf9c79808e85424",
+     "gainDb": 3.03,
+     "shippedBefore": false
+    }
+   }
+  ],
+  "up": [],
+  "spaceDown": [],
+  "spaceUp": []
+ },
+ "processing": {
+  "script": "scripts/kbsamples/build-earphone-picks.py",
+  "pickedBy": "project owner, by ear on earphones (A/B/C listening page), 2026-11-20",
+  "pass": "B (earphone): 50 Hz high-pass; narrow cuts on the shared ringing tones after the strike; +3 dB at 3.5 kHz; tail fades a further 15 dB from 30 ms after the strike",
+  "ringCuts": {
+   "now": [
+    [
+     10840,
+     10
+    ],
+    [
+     1143,
+     10
+    ],
+    [
+     10564,
+     10
+    ]
+   ],
+   "new": [
+    [
+     1143,
+     10
+    ],
+    [
+     5238,
+     7
+    ],
+    [
+     12662,
+     7
+    ]
+   ]
+  },
+  "targetStrikeLoudnessDbfs": -21,
+  "previous": {
+   "script": "scripts/kbsamples/build-own-recording.py",
+   "variant": "medium",
+   "oversubtraction": 2.5,
+   "gainFloorDb": -20,
+   "noiseFloorDbfs": -71.1,
+   "onsetsFound": 82,
+   "targetStrikeLoudnessDbfs": -32.6,
+   "note": "Hiss and hum removed by spectral subtraction (noise profile = quietest 20 % of the recording); single presses cut, 1 ms fade-in / 10 ms fade-out, loudness-matched."
+  }
+ },
+ "wavSha256": "6dbce6aef8378a562676c981c1ca49278586f9d36eb36c6cc86369133cc741f5"
+}
